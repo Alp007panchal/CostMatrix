@@ -49,3 +49,9 @@ says so and references the old number.
 | D-042 | 2026-09-04 | Each panel carries a technical description, enclosure dimensions and unit of measure for Annexure IV; the app drafts the description from the panel's contents. |
 | D-043 | 2026-09-04 | Quotation layout follows docs/quotation-template.md, derived from quotation NPP-192-REV1; approver-editable text is frozen with the released quotation. |
 | D-044 | 2026-09-04 | The PDF prints amounts in the company currency only, labelled with the company's currency word (e.g. KSH). |
+| D-045 | 2026-09-04 | Material rates follow the labour-rate pattern: a master default in KES with a per-company override. Copper busbar is the only rate-based material in release 1. |
+| D-046 | 2026-09-04 | Manufacturer data sheets stay outside the app in release 1; the quotation PDF ends with the technical offer. |
+| D-047 | 2026-09-04 | Letterhead is one company logo in the header; partner logos (Siemens, C&S) and certification marks are a footer strip any company may fill. |
+| D-048 | 2026-09-04 | Follow-up reminders are an in-app due and overdue list in phase 1; no email digest. |
+| D-049 | 2026-09-04 | Supabase, the web host and GitHub are owned by the operator's own account; alerts and backup failures go to alp007panchal@gmail.com. |
+| D-050 | 2026-09-04 | Data protection is covered by a short plain-language terms page in the app, shown at sign-up, rather than a signed agreement per company. |

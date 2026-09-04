@@ -67,6 +67,13 @@ are applied to staging and production with `supabase db push`.
 3. Storage objects (PDFs, logos) are included in the weekly job.
 4. A written restore drill in `docs/operations.md`: restore last week's dump into a fresh project and open a costing. Run once before go-live and every quarter.
 5. Access: master admin read-only by database policy; company data never crosses tenants; no shared service keys in the browser, only the public anon key plus the user's own token.
+6. A short plain-language terms page in the app states what is stored, that data is held in London, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
+
+### Accounts and alerts
+Supabase, the web host and GitHub are all owned by the operator's own account. Alerts, backup
+failures and uptime notices go to alp007panchal@gmail.com. If the team grows, move these
+notifications to a shared company mailbox before adding more users, so nothing is missed while
+one person is away.
 
 ### Testing
 - Database: pgTAP tests for isolation and calculations, run in CI.

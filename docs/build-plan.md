@@ -61,7 +61,7 @@ second test company cannot see it, and an approver has approved one costing and 
 
 ## Slice 2 — Quotation release and revisions (about two weeks)
 
-- Company quotation defaults: letterhead, salutation and closing, signatory, notes on offer, the five terms sections, logo(s), currency word, quotation prefix.
+- Company quotation defaults: letterhead, salutation and closing, signatory, notes on offer, the five terms sections, header logo, footer strip of partner logos and certification marks, currency word, quotation prefix.
 - Panel technical description editor with the app-drafted text, and enclosure dimensions.
 - PDF template exactly as `docs/quotation-template.md`, checked against `docs/reference/quotation-NPP-192-REV1.pdf`.
 - Reference numbering: prefix + sequence + REV, sequence issued at first release.
@@ -80,7 +80,7 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 - Customers, contacts, projects with dropdown selection everywhere.
 - Enquiries with numbering; costing linked to an enquiry (required for new costings from here on).
 - Quotation status sent / won / lost with lost reason; enquiry status follows.
-- Follow-up reminders: create on a sent quotation, list of due and overdue per company, mark done.
+- Follow-up reminders: create on a sent quotation, in-app list of due and overdue per company, mark done. No email digest in this phase.
 - `stage` and `owner` on enquiries stored now, funnel view later.
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
@@ -96,6 +96,7 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 - Restore drill from the weekly dump into a fresh project, written up.
 - Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
 - Custom domain and email sender for Supabase Auth invitations.
+- Terms page published and linked at sign-up.
 - One-page user guide per role.
 - Import of the existing component list from Excel, in the "db" sheet layout of the reference workbook (Make, Item, Description, Reference, Price).
 

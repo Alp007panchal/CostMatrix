@@ -16,8 +16,9 @@ Sources, in the order the app looks them up:
 
 | Element | Source |
 |---|---|
-| Logo(s) top left and top right | Company (`logo_path`, optional second logo) |
+| Company logo, top of page | Company (`logo_path`) |
 | P.O. Box, street address, phone numbers, email | Company (letterhead fields) |
+| Partner logos and certification marks, footer strip | Company (`company_footer_logos`, in order) |
 | Page number | Fixed |
 
 ## Page 1 — cover letter
@@ -87,7 +88,7 @@ Table with one row per panel:
 - PARTICULAR = panel name plus option label.
 - TECHNICAL DESCRIPTION = Costing panel `technical_description`, edited by the engineer while costing. The app pre-fills a draft from the assemblies and items in the panel (grouped by assembly, "n No. item name"), which the engineer then edits.
 - Enclosure dimensions = panel `enclosure_dimensions`.
-- Data sheets: outside the app in release 1 unless decided otherwise (open question).
+- Data sheets: attached outside the app in release 1, as today.
 
 ## Page setup
 

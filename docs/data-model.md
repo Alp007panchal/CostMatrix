@@ -47,14 +47,19 @@ companies ─┬─ profiles ── user_roles
 - `material_margin_pct`, `labour_margin_pct`, `tax_pct` default 16
 - `price_rounding_step` numeric default 100 — panel unit price is rounded up to a multiple of this
 - `quotation_prefix` text default `QT`, `quotation_no_includes_year` boolean default false
-- `address`, `tax_pin`, `logo_path`, `logo2_path`, `is_active`
+- `address`, `tax_pin`, `logo_path` (header logo), `is_active`
 
 **company_settings** (one row per company)
 - `company_id` unique
 - Letterhead: `po_box`, `street_address`, `phones`, `email`
+- Footer: partner and certification marks (see **company_footer_logos**)
 - Cover letter defaults: `salutation`, `intro_text`, `closing_text`, `signatory_name`, `signatory_email`
 - Annexure defaults: `default_notes_on_offer`, `scope_of_supply`, `validity_days` (default 30), `payment_terms`, `delivery_terms`, `delivery_timelines`
 - `bank_details`, `quotation_footer`
+
+**company_footer_logos**
+- `company_id`, `image_path`, `caption` (optional, e.g. `Siemens`), `sort_order`
+- Printed as a strip in the quotation footer: partner logos (Siemens, C&S) and certification marks. Any company may add its own.
 
 **profiles** (one row per auth user)
 - `id` = `auth.users.id`
@@ -249,7 +254,7 @@ Role checks per area:
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).
-- Bucket `logos`, private, same pattern.
+- Bucket `logos`, private, same pattern. Holds the header logo and the footer strip images.
 
 ### Tests
 `supabase/tests/` holds pgTAP tests run in CI on every migration change:

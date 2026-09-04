@@ -5,24 +5,15 @@ are moved to `decisions.md` and deleted from here.
 
 ## Before slice 1 (costing)
 
-1. **Copper rate ownership.** Master default rate per kg with a company override, like labour rates? (Assumed yes.) What is today's rate: the reference sheet uses 3,000 KES/kg.
-2. **Other rate-based materials.** Only copper busbar, or also aluminium bar and cable per metre by weight?
+1. **Current copper rate.** The reference sheet uses 3,000 KES per kg. Is that still today's rate, or should the master default be something else?
 
 ## Before slice 2 (quotation)
 
-3. **Data sheets.** Annexure IV mentions data sheets. Should the app store manufacturer PDFs per component and append them to the quotation, or do they stay outside the app? (Assumed outside in release 1.)
-4. **Company defaults.** Are 30-day validity, 50 % / 50 % payment, Ex-Works Nairobi and "to be confirmed" delivery timelines the defaults for every quotation of your company? (Assumed yes, editable per quotation.)
-5. **Second logo.** The letterhead shows two images. Is the second one a certification mark that every company may upload, or specific to yours?
+2. **Footer images.** Please add the partner logos and certification marks that belong in the quotation footer to `docs/reference/`, or confirm I should lift them from the Word file.
 
-## Before slice 4 (CRM)
+## Before slice 6 (import)
 
-6. **Follow-up reminders.** In-app list only in phase 1, or also a daily email digest to the owner of the quotation?
-
-## Operational
-
-7. **Accounts.** Who owns the Supabase, Vercel/Netlify and GitHub accounts, and which email address receives alerts and backup failure notices?
-8. **Data protection.** Do external companies need a written agreement (retention period, deletion on request, where data is stored)? London region is already decided.
-9. **Component list.** Is there a master component list beyond the "db" sheets in the reference workbook? If yes, add it to `docs/reference/` as `component-list.xlsx`.
+3. **Component list.** Is there a master component list beyond the "db" sheets in the reference workbook? If yes, add it to `docs/reference/` as `component-list.xlsx`.
 
 ## Assumptions in force until you say otherwise
 
@@ -33,3 +24,4 @@ are moved to `decisions.md` and deleted from here.
 - English only.
 - Costing engineers may create CRM records (customers, contacts, projects, enquiries).
 - The quotation sequence is issued at first release and shared by all revisions of a costing.
+- Company defaults for terms are 30-day validity, 50 % / 50 % payment, Ex-Works Nairobi, delivery timelines to be confirmed; all editable per quotation.

@@ -84,7 +84,7 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Each company sets its own hourly rate per process type in its own currency. These rates are what the company's costings use.
 
 ### 4.5 Material rates
-- Master admin maintains default material rates in KES (initially one: copper busbar per kg).
+- Master admin maintains default material rates in KES (initially one: copper busbar per kg, 3,000 in the reference sheet).
 - Each company sets its own material rates in its own currency. Changing a rate changes the price of every `weight_rate` component in future costings; existing costings keep the frozen value.
 
 ## 5. Pricing rules
@@ -213,6 +213,7 @@ Each export lists component code, name, unit, quantity (summed across panels and
 - **Backups**: daily managed backups plus a weekly off-site dump; a restore drill before go-live and quarterly.
 - **Audit**: costing history log; price history; created_by/updated_at on every table.
 - **Import**: the master component list can be imported from Excel in the layout of the workbook's "db" sheets: Make, Item, Description, Reference (part number), Price, with a category chosen per block.
+- **Data protection**: a short terms page in the app states what is stored, that data is held in London, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 - **Language**: English only in release 1.
 
 ## 13. Out of scope for release 1
@@ -222,5 +223,5 @@ Each export lists component code, name, unit, quantity (summed across panels and
 - Company-defined categories.
 - Multi-company users.
 - Purchase orders, stock, or supplier management.
-- Manufacturer data sheets attached to the quotation PDF (open question; outside the app until decided).
+- Manufacturer data sheets: stored and attached outside the app in release 1, as today.
 - Mobile app (the web app should still be usable on a tablet).
