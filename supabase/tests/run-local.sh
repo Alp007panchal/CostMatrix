@@ -12,7 +12,7 @@ db="${TEST_DB:-costmatrix_test}"
 
 # Use an existing server if one is configured, else start a temporary one.
 if [[ -n "${PGHOST:-}" || -n "${DATABASE_URL:-}" ]]; then
-  psql_cmd=(psql -v ON_ERROR_STOP=1 -q -o /dev/null)
+  psql_cmd=(psql -v ON_ERROR_STOP=1 -q -o /dev/null -v bootstrap="$root/supabase/bootstrap.sql")
   dropdb --if-exists "$db"; createdb "$db"
   export PGDATABASE="$db"
 else
@@ -23,7 +23,7 @@ else
   pg_ctl -D "$tmp/data" -o "-p 55432 -k $tmp" -l "$tmp/log" start >/dev/null
   export PGHOST="$tmp" PGPORT=55432 PGUSER=postgres PGDATABASE=postgres
   createdb "$db"; export PGDATABASE="$db"
-  psql_cmd=(psql -v ON_ERROR_STOP=1 -q -o /dev/null)
+  psql_cmd=(psql -v ON_ERROR_STOP=1 -q -o /dev/null -v bootstrap="$root/supabase/bootstrap.sql")
 fi
 
 echo "→ auth shim"
@@ -34,17 +34,18 @@ for f in "$root"/supabase/migrations/*.sql; do
   "${psql_cmd[@]}" -f "$f"
 done
 
-# The seed is development data, not a test, but it must stay loadable: a broken
-# seed is a broken `supabase db reset` for everyone.
-echo "→ seed.sql"
-"${psql_cmd[@]}" -f "$root/supabase/seed.sql"
-
 failed=0
 for f in "$root"/supabase/tests/[0-9][0-9]_*.sql; do
   case "$(basename "$f")" in 00_auth_shim.sql) continue ;; esac
   echo "→ test $(basename "$f")"
   if ! "${psql_cmd[@]}" -f "$f"; then failed=1; fi
 done
+
+# The seed is development data rather than a test, but it must stay loadable:
+# a broken seed is a broken `supabase db reset` for everyone. Loaded last so it
+# does not colour the tests above.
+echo "→ seed.sql"
+"${psql_cmd[@]}" -f "$root/supabase/seed.sql"
 
 if [[ $failed -ne 0 ]]; then echo "FAILED"; exit 1; fi
 echo "All tests passed."

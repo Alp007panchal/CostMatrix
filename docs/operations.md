@@ -121,9 +121,9 @@ That is correct behaviour, not a problem.
 1. Go to **vercel.com**, sign up **with GitHub**, and allow it access to the CostMatrix repository.
 2. Click **Add New → Project**, pick `CostMatrix`, click **Import**.
 3. Settings on the import screen:
-   - **Framework preset**: Other
+   - **Framework preset**: Vite
    - **Root directory**: `web`
-   - Leave the build and output settings empty for now.
+   - Build command, output directory and install command: leave as Vercel suggests (`npm run build`, `dist`, `npm install`).
 4. Open **Environment Variables** and add two:
 
 | Name | Value |
@@ -136,24 +136,63 @@ That is correct behaviour, not a problem.
 
 - [ ] Vercel shows a successful deployment and gives you a URL like `costmatrix-xxxx.vercel.app`.
 
-### B7. Prove the chain works
+### B7. Create the database
 
-Open the Vercel URL in a browser. You should see a plain CostMatrix page saying the app is
-being set up. That page is a placeholder committed to the repository — its only purpose is to
-prove that GitHub and Vercel are talking to each other before any real code exists.
+The tables do not exist yet in your new project. The GitHub Action applies them:
 
-- [ ] The placeholder page loads.
+1. In GitHub, open **Actions** → **Deploy database** → **Run workflow** on `main`.
+2. Wait for the green tick. It applies every file in `supabase/migrations` in order.
 
-**When the first real screens are built, one Vercel setting changes**: the framework preset
-becomes Vite and a build step appears. That is expected and I will tell you exactly what to
-change when the time comes.
+This is also what happens automatically whenever a database change reaches `main`, so this is
+the only time you run it by hand.
 
-### B8. Tell me you are done
+- [ ] The workflow finished green.
+- [ ] In Supabase → Table Editor, you can see the `companies` and `profiles` tables.
 
-Message me that the checklist is complete. Include the Vercel URL and, if you like, the
-Supabase project URL — both are public. **Do not send me the service role key, the database
-password or the access token.** I never need them; the automated job uses them from GitHub
-secrets without showing them to anyone.
+### B8. Make yourself the master administrator
+
+Only an administrator can add people, and right now there are none. This creates the first one:
+
+1. Supabase → **Authentication** → **Users** → **Add user**. Use your own email address and
+   choose a password. That gives you a login with no company and no roles yet.
+2. Supabase → **SQL Editor** → **New query**. Open `supabase/bootstrap.sql` from the repository,
+   paste the whole file in, change the three values at the top (your email, your name, your
+   company name), and run it.
+3. It prints what it did. Running it twice changes nothing, so a mistaken re-run is harmless.
+
+- [ ] The script reports that you are the master administrator.
+
+### B9. Deploy the invitation function
+
+Inviting somebody needs the service role key, which must never reach a browser, so it runs on
+Supabase instead. From the repository folder on your own machine, with the Supabase CLI
+installed:
+
+```sh
+supabase login
+supabase link --project-ref YOUR_PROJECT_REF
+supabase functions deploy invite-user
+supabase secrets set SITE_URL=https://your-app.vercel.app
+```
+
+If you would rather not install anything locally yet, skip this: everything else works, and the
+People screen will simply report that the invitation could not be sent until it is deployed.
+
+- [ ] `supabase functions deploy invite-user` finished, or you have chosen to do it later.
+
+### B10. Sign in
+
+Open the Vercel URL. You should get the CostMatrix sign-in page, and your email and password
+should take you to a home screen showing your name, your company and your three roles.
+
+- [ ] You are signed in and can see the Home, People, Company and Companies pages.
+
+### B11. Tell me you are done
+
+Message me that the checklist is complete, and say which step gave trouble if any did. Include
+the Vercel URL and, if you like, the Supabase project URL — both are public. **Do not send me
+the service role key, the database password or the access token.** I never need them; the
+automated job uses them from GitHub secrets without showing them to anyone.
 
 ---
 
@@ -162,25 +201,29 @@ secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
-### Invite a user (slice 0)
-1. Sign in as master admin (you) for a new company, or as company admin for your own.
-2. Admin → Users → **Invite**. Enter the email and full name, tick the roles.
-3. They receive an email with a link to set a password. The link expires; you can resend it.
-4. Check the user appears in the list as active with the right roles.
+### Invite a user
+1. Sign in, open **People**.
+2. Fill in the name, email and roles under "Invite somebody", then send.
+3. They receive an email with a link to set their own password. Nobody can sign themselves up.
+4. Check they appear in the list with the right roles ticked.
+
+If the invitation fails, the invite-user function is not deployed (step B9), or Supabase's
+built-in email is rate limiting. Authentication → Users in the dashboard shows whether the
+account was created.
 
 Roles, as a reminder: **company admin** manages settings and users, **costing engineer** builds
 costings, **approver** approves costings and releases quotations. One person can hold several.
 
-### Someone leaves (slice 0)
-Admin → Users → open them → **Deactivate**. Do not delete: their name must stay attached to the
+### Someone leaves
+**People** → **Deactivate** on their row. Do not delete: their name must stay attached to the
 costings they built. Deactivating stops them signing in immediately.
 
-### Someone forgets a password (slice 0)
-They click "forgot password" on the login page and get an email. If the email does not arrive,
-Admin → Users → open them → **Send password reset**.
+### Someone forgets a password
+They click **Forgot password** on the sign-in page and get an email. If nothing arrives, send a
+reset from Supabase → Authentication → Users.
 
-### Change a company's discount (slice 0, master admin only)
-Admin → Companies → open the company → set the discount percentage → Save.
+### Change a company's discount (master admin only)
+**Companies** → click the discount on that company's row → change it → Save.
 Existing costings do not change: their prices were frozen when they were built. Only new
 costings pick up the new discount. This is deliberate.
 
@@ -192,6 +235,10 @@ costings pick up the new discount. This is deliberate.
 5. Confirm. Every price change is recorded with your name and the time.
 
 Uploads never delete anything. To remove a component, deactivate it on its own screen.
+
+### Change your own company's margins, VAT or currency
+**Company** → change the fields → Save. The screen shows the markup each margin implies, since
+margins are a share of the selling price rather than of cost.
 
 ### Change the copper rate (slice 1)
 Library → Material rates → edit the rate per kilogram → Save. New costings use it; existing

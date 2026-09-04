@@ -279,6 +279,13 @@ returns trigger
 language plpgsql
 as $$
 begin
+  -- No signed-in user means a direct database connection: a migration, the
+  -- bootstrap script or the service role. Those are trusted; the API always has
+  -- a user. Same carve-out as app.protect_profile_columns.
+  if auth.uid() is null then
+    return new;
+  end if;
+
   -- The discount is the master admin's commercial lever, not the company's.
   if new.discount_pct is distinct from old.discount_pct and not app.is_master_admin() then
     raise exception 'only the master admin may change a company discount';

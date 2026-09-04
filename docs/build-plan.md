@@ -16,15 +16,17 @@ Not a user workflow, but everything else stands on it.
 - GitHub Actions workflow that applies migrations to production on merge to `main`, using the repository secrets.
 - Migrations 0001 (extensions, `app` schema, helper functions) and 0002 (companies, settings, profiles, roles, counters, RLS).
 - Seed: in-house company, master admin user, process types, categories.
-- Web app skeleton: login, session, route guard by role, top navigation, empty pages per module.
-- Master admin screen: create a company, create its first company admin, set discount.
-- Company admin screen: invite users, assign roles.
-- Master admin company switcher (read-only view of another company).
+- Web app: sign in, forgot password, session with company and roles, route guards, navigation.
+- Home screen showing who you are and how your company is set up.
+- Master admin screen: list every company, create one, set its discount.
+- Company screen: currency, exchange rate, margins with the markup they imply, VAT, rounding step, quotation prefix.
+- People screen: list, invite (through the invite-user Edge Function), grant and revoke roles, deactivate and reactivate.
+- `supabase/bootstrap.sql` to create the first company and master administrator.
 - CI: lint, typecheck, run migrations and pgTAP on a throwaway database.
 - Weekly off-site backup job. (`docs/operations.md` is already written.)
 
-Done when: you can log in as master admin, create a test company and a user, log in as that
-user and see an empty costing list, and CI is green.
+Done when: you can sign in as master admin, create a test company, invite a user into it, sign
+in as that user and see only that company's data, and CI is green.
 
 ## Slice 1 — Cost one panel end to end (RECOMMENDED FIRST, about two to three weeks)
 
