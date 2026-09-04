@@ -63,7 +63,7 @@ says so and references the old number.
 | D-056 | 2026-09-04 | Vercel hosts the web app. Netlify is equivalent; Vercel is named so the operations guide can give one exact set of steps. |
 | D-057 | 2026-09-04 | Supersedes the three-environment plan in D-028's architecture: local and production to start, staging added in slice 6 when there is data worth rehearsing against. |
 | D-058 | 2026-09-04 | Supabase free tier during building; move to the paid tier (daily backups and point-in-time recovery) before the first real quotation is released. |
-| D-059 | 2026-09-04 | The project URL and anon key are public by design and live in the browser; the service role key and database password live only in GitHub secrets and a password manager, and are never shared. |
+| D-059 | 2026-09-04 | *(key names updated by D-077)* The project URL and browser key are public by design and live in the browser; the service role key and database password live only in GitHub secrets and a password manager, and are never shared. |
 | D-060 | 2026-09-04 | Migrations reach production through a GitHub Actions workflow using repository secrets, never from a laptop. |
 | D-061 | 2026-09-04 | Planning documents merged to main without a pull request, at the owner's request; work continues on the planning branch. |
 | D-062 | 2026-09-04 | Security predicates (`app.current_company_id`, `is_master_admin`, `has_role`) are SECURITY DEFINER and STABLE: definer to stop a policy recursing through the table it protects, stable so they run once per statement. Enforced by a test. |
@@ -81,3 +81,5 @@ says so and references the old number.
 | D-074 | 2026-09-04 | The toolchain is Vite, React, TypeScript strict, TanStack Query and plain CSS. No linter and no component library: fewer moving parts for someone learning to operate this, with TypeScript strict catching most of what a linter would. |
 | D-075 | 2026-09-04 | Supersedes D-025: the Supabase project lives in eu-west-1 (Ireland), not London. About five milliseconds further from Nairobi, and in the EU rather than outside it. The data-protection note says Ireland. |
 | D-076 | 2026-09-04 | The service role key is never collected or stored by us: Supabase provides it to the Edge Function from its own environment. The secrets a person handles are a personal access token, the project ref and the database password. |
+| D-077 | 2026-09-04 | Supabase renamed its API keys: `anon` became the **publishable** key (`sb_publishable_…`) and `service_role` became the **secret** key. The app reads `VITE_SUPABASE_PUBLISHABLE_KEY` and falls back to `VITE_SUPABASE_ANON_KEY` for older projects. |
+| D-078 | 2026-09-04 | The invite-user function validates the caller's token with the privileged client rather than building a second client from the browser key. One fewer environment variable, and immune to a key rename. |

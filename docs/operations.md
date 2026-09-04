@@ -76,17 +76,18 @@ Open a blank note to paste them into. Three come from the project, one from your
 | Value | Looks like | Where |
 |---|---|---|
 | Project URL | `https://abcdefghij.supabase.co` | Project Settings (gear icon) → **API** |
-| Anon key | a long string starting `eyJ...` | Project Settings → **API**, under Project API keys |
+| Publishable key | starts `sb_publishable_…` | Project Settings → **API**, under Project API keys |
 | Project ID / ref | `abcdefghij` — the same letters as in the URL | Project Settings → **General** |
 | Personal access token | a long string starting `sbp_` | Your avatar, top right → **Account preferences** → **Access Tokens** → Generate new token, named `github-actions` |
 
 The access token is shown **once**. If you lose it, delete it and generate another; no harm done.
 
-You do **not** need the service role key. Nothing we build uses it directly — Supabase hands it
-to the invitation function automatically, inside its own environment.
+You do **not** need the secret key (formerly service role). Nothing we build uses it directly —
+Supabase hands it to the invitation function automatically, inside its own environment.
 
-If your dashboard shows "Publishable key" and "Secret key" rather than "anon" and
-"service_role", those are newer names for the same two things: take the **publishable** one.
+Supabase used to call these the **anon** key (a long string starting `eyJ`) and the **service
+role** key. They are the same two things under new names. An older project showing `anon` still
+works — the app accepts either.
 
 - [ ] All four values saved, plus the database password from B2.
 
@@ -94,7 +95,7 @@ If your dashboard shows "Publishable key" and "Secret key" rather than "anon" an
 
 This is the one piece of security you need to hold in your head. Read it twice.
 
-**Safe to publish — the Project URL and the anon key.** These are sent to every browser that
+**Safe to publish — the Project URL and the publishable key.** These are sent to every browser that
 opens CostMatrix. That is by design and it is not a leak. They only let someone *attempt* a
 request; the database then checks who is signed in and returns nothing they are not entitled to.
 Anyone can read these out of the web page. That is expected and fine.
@@ -106,8 +107,9 @@ app, never commit them to the repository, never paste them into a chat window, n
 them. If a token is ever exposed, delete it under Account preferences → Access Tokens and
 generate another; that invalidates the old one immediately.
 
-The same goes for the **service role key** if you ever have cause to look at it: it bypasses
-every security rule in the database. We do not use it anywhere you could accidentally leak it.
+The same goes for the **secret key** (formerly the service role key) if you ever have cause to
+look at it: it bypasses every security rule in the database. We do not use it anywhere you could
+accidentally leak it.
 
 - [ ] You can say which two of the four values are secret without looking.
 
@@ -147,7 +149,7 @@ That is correct behaviour, not a problem.
 | Name | Value |
 |---|---|
 | `VITE_SUPABASE_URL` | the Project URL from B3 |
-| `VITE_SUPABASE_ANON_KEY` | the anon key from B3 |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | the publishable key from B3, starting `sb_publishable_` |
 
    (These are the two public values. They are here because the web pages need them.)
 5. Click **Deploy** and wait a minute.
@@ -366,7 +368,7 @@ support, with no ability to change it.
 | **Main** | The trunk of the repository: the current agreed version. |
 | **Migration** | One numbered file of database instructions ("add this table"). Running them in order builds the database from nothing, so it can always be rebuilt. |
 | **Environment variable** | A setting given to the app from outside the code, such as which Supabase project to talk to. Lets the same code run against a test database or the real one. |
-| **Key** | A long string that identifies or authorises a caller. The anon key is public; the service role key is not. |
+| **Key** | A long string that identifies or authorises a caller. The publishable key is public; the secret key is not. |
 | **Row-level security** (RLS) | Rules inside Postgres saying which rows each signed-in user may see. This is what keeps companies apart. |
 | **Tenant** | One company using the app, with its own walled-off data. |
 | **Deploy** | To publish a new version of the web pages so users get it. |

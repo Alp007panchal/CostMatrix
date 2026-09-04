@@ -39,4 +39,4 @@ jobs:
           # Build-time placeholders. The real values come from Vercel; these
           # only need to exist so the bundle can be produced.
           VITE_SUPABASE_URL: https://placeholder.supabase.co
-          VITE_SUPABASE_ANON_KEY: placeholder
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder

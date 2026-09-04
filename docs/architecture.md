@@ -78,7 +78,7 @@ shared with anyone: GitHub holds them write-only. The same migration files run l
 2. A weekly GitHub Actions job runs `supabase db dump` and uploads the file, encrypted, to an off-site bucket (an S3-compatible bucket or a second Supabase project). Retention 12 weeks.
 3. Storage objects (PDFs, logos) are included in the weekly job.
 4. A written restore drill in `docs/operations.md`: restore last week's dump into a fresh project and open a costing. Run once before go-live and every quarter.
-5. Access: master admin read-only by database policy; company data never crosses tenants; no shared service keys in the browser, only the public anon key plus the user's own token.
+5. Access: master admin read-only by database policy; company data never crosses tenants; no shared secret keys in the browser, only the public publishable key plus the user's own token.
 6. A short plain-language terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 
 ### Accounts and alerts

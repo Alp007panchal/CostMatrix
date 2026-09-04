@@ -39,19 +39,22 @@ Deno.serve(async (request: Request) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
-  if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+  if (!supabaseUrl || !serviceRoleKey) {
     return reply({ error: 'The function is missing its environment variables' }, 500)
   }
 
+  // The privileged client. Everything below reads with it deliberately, so the
+  // checks do not depend on the caller's own read policies.
+  const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } })
+
   // --- who is asking? ------------------------------------------------------
+  // Validating the caller's token directly avoids needing the browser key here,
+  // so a key rename on Supabase's side cannot break this function.
   const authorization = request.headers.get('Authorization')
   if (!authorization) return reply({ error: 'Not signed in' }, 401)
 
-  const asCaller = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authorization } },
-  })
-  const { data: caller } = await asCaller.auth.getUser()
+  const token = authorization.replace(/^Bearer\s+/i, '')
+  const { data: caller } = await admin.auth.getUser(token)
   if (!caller.user) return reply({ error: 'Not signed in' }, 401)
 
   // --- what did they ask for? ---------------------------------------------
@@ -72,10 +75,6 @@ Deno.serve(async (request: Request) => {
   if (!companyId) return reply({ error: 'A company is needed' }, 400)
 
   // --- may they? -----------------------------------------------------------
-  // Read with the service role so this check does not depend on the caller's
-  // own read policies, then decide here.
-  const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } })
-
   const { data: callerProfile } = await admin
     .from('profiles')
     .select('company_id, is_master_admin, is_active')

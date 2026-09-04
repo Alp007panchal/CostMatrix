@@ -3,10 +3,14 @@
 Creates a login, a profile and the roles for a new person, and emails them a link to set their
 own password.
 
-It exists as an Edge Function rather than app code because creating a login needs the **service
-role key**, which bypasses every security rule in the database. That key must never reach a
-browser. The browser calls this function; the function checks the caller is the master admin, or
-a company administrator inviting into their own company, before it uses the key.
+It exists as an Edge Function rather than app code because creating a login needs the **secret
+key** (Supabase used to call this the service role key), which bypasses every security rule in
+the database. That key must never reach a browser. The browser calls this function; the function
+checks the caller is the master admin, or a company administrator inviting into their own
+company, before it uses the key.
+
+It validates the caller's token directly rather than building a second client from the browser
+key, so it needs one fewer environment variable and is unaffected by Supabase renaming its keys.
 
 ## Deploying
 
@@ -15,8 +19,7 @@ supabase functions deploy invite-user
 supabase secrets set SITE_URL=https://your-app.vercel.app
 ```
 
-`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are provided by Supabase
-automatically. `SITE_URL` is where the invitation link sends people; without it they land on the
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided by Supabase automatically. `SITE_URL` is where the invitation link sends people; without it they land on the
 Supabase default page.
 
 ## Checking it

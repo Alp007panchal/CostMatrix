@@ -13,7 +13,12 @@ npm run dev                    # http://localhost:5173
 ```
 
 Both values in `.env.local` are public by design — they reach every browser, and row-level
-security is what protects the data. The service role key must never appear here.
+security is what protects the data. The **secret key** (which Supabase used to call the service
+role key) must never appear here.
+
+Supabase renamed the browser key from `anon` to **publishable**. The app reads
+`VITE_SUPABASE_PUBLISHABLE_KEY`, and falls back to `VITE_SUPABASE_ANON_KEY` for projects created
+before the rename.
 
 ## Commands
 
