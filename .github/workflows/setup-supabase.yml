@@ -1,0 +1,85 @@
+name: Set up Supabase
+
+# Does the parts of the setup that do not need a person: creates every table in
+# your Supabase project and deploys the invitation function.
+#
+# It reads three repository secrets. GitHub stores them write-only, so nobody —
+# not you after saving them, not me — can read them back. Set them up first:
+# docs/operations.md Part B5.
+#
+#   SUPABASE_ACCESS_TOKEN   a personal access token from the Supabase dashboard
+#   SUPABASE_PROJECT_REF    the bit of your project URL before .supabase.co
+#   SUPABASE_DB_PASSWORD    the database password chosen when the project was made
+#
+# Run it from the Actions tab, or ask me to run it for you.
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_function:
+        description: 'Also deploy the invite-user function'
+        type: boolean
+        default: true
+      site_url:
+        description: 'Where invitation links should send people, e.g. https://costmatrix.vercel.app (optional)'
+        type: string
+        default: ''
+
+jobs:
+  setup:
+    name: Create the tables and deploy the function
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the secrets are present
+        run: |
+          missing=""
+          [ -z "${{ secrets.SUPABASE_ACCESS_TOKEN }}" ] && missing="$missing SUPABASE_ACCESS_TOKEN"
+          [ -z "${{ secrets.SUPABASE_PROJECT_REF }}" ]  && missing="$missing SUPABASE_PROJECT_REF"
+          [ -z "${{ secrets.SUPABASE_DB_PASSWORD }}" ]  && missing="$missing SUPABASE_DB_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing"
+            echo "Add them under Settings → Secrets and variables → Actions."
+            echo "See docs/operations.md Part B5."
+            exit 1
+          fi
+          echo "All three secrets are set."
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link the project
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+
+      - name: Show what will be applied
+        run: supabase migration list --linked || true
+
+      - name: Create the tables
+        run: supabase db push
+
+      - name: Confirm what was applied
+        run: supabase migration list --linked
+
+      - name: Deploy the invitation function
+        if: ${{ inputs.deploy_function }}
+        run: supabase functions deploy invite-user
+
+      - name: Point invitation links at the app
+        if: ${{ inputs.deploy_function && inputs.site_url != '' }}
+        run: supabase secrets set "SITE_URL=${{ inputs.site_url }}"
+
+      - name: What to do next
+        run: |
+          echo "The database is ready."
+          echo ""
+          echo "Two things still need you, because they need a person:"
+          echo "  1. Supabase → Authentication → Users → Add user, with your own email."
+          echo "  2. Supabase → SQL Editor: paste supabase/bootstrap.sql, change the three"
+          echo "     values at the top, run it. That makes you the master administrator."
+          echo ""
+          echo "Then sign in to the app."

@@ -42,7 +42,12 @@ another company's data. That is why the next part is relaxed about one of the ke
 
 ## Part B — Setup checklist
 
-Do this once. Tick each box as you go. Expect 45–60 minutes.
+Do this once. Tick each box as you go. Expect 30–45 minutes.
+
+Three of these steps cannot be delegated, because they need a person: creating the Supabase
+account (B2), authorising Vercel against GitHub (B6), and creating the first administrator (B8).
+The rest can be run for you once the secrets in B5 are saved — GitHub keeps them write-only, so
+whoever runs the jobs never sees them.
 
 ### B1. GitHub — already done
 
@@ -97,8 +102,10 @@ invalidates the old one.
 
 ### B5. Add the GitHub secrets
 
-These let an automated job apply database changes and take backups without any secret ever
-sitting on a laptop or passing through a conversation.
+These let the automated jobs apply database changes and take backups without any secret sitting
+on a laptop or passing through a conversation. GitHub stores them **write-only**: once saved,
+nobody can read them back — not you, and not anyone helping you. That is what makes it safe to
+have someone else run the setup jobs on your behalf.
 
 1. First create an access token: in Supabase, click your avatar (top right) → **Access tokens**
    → **Generate new token**. Name it `github-actions`. Copy it; it is shown once.
@@ -136,49 +143,48 @@ That is correct behaviour, not a problem.
 
 - [ ] Vercel shows a successful deployment and gives you a URL like `costmatrix-xxxx.vercel.app`.
 
-### B7. Create the database
+### B7. Create the database and deploy the function — I can do this one
 
-The tables do not exist yet in your new project. The GitHub Action applies them:
+The tables do not exist yet in your new project, and the invitation function is not deployed.
+One workflow does both, reading the three secrets you just saved.
 
-1. In GitHub, open **Actions** → **Deploy database** → **Run workflow** on `main`.
-2. Wait for the green tick. It applies every file in `supabase/migrations` in order.
+**Either** tell me the secrets are in place and I will run it and report what happened, **or**
+run it yourself: GitHub → **Actions** → **Set up Supabase** → **Run workflow** on `main`. Fill in
+the app address if you already have it from step B6; leave it blank if not.
 
-This is also what happens automatically whenever a database change reaches `main`, so this is
-the only time you run it by hand.
+The workflow checks the secrets are present before doing anything, so a missing one gives a
+clear message rather than a confusing failure.
 
 - [ ] The workflow finished green.
-- [ ] In Supabase → Table Editor, you can see the `companies` and `profiles` tables.
+- [ ] In Supabase → Table Editor, the `companies` and `profiles` tables are there.
 
-### B8. Make yourself the master administrator
+From now on, database changes apply themselves whenever they reach `main`. This is the only
+time it is started by hand.
 
-Only an administrator can add people, and right now there are none. This creates the first one:
+### B8. Make yourself the master administrator — this one needs you
 
-1. Supabase → **Authentication** → **Users** → **Add user**. Use your own email address and
-   choose a password. That gives you a login with no company and no roles yet.
-2. Supabase → **SQL Editor** → **New query**. Open `supabase/bootstrap.sql` from the repository,
+Only an administrator can add people, and right now there are none. Creating the first one is
+deliberately a human action, so it is two steps in the Supabase dashboard:
+
+1. **Authentication** → **Users** → **Add user**. Use your own email address and choose a
+   password. That gives you a login with no company and no roles yet.
+2. **SQL Editor** → **New query**. Open
+   [`supabase/bootstrap.sql`](https://github.com/Alp007panchal/CostMatrix/blob/main/supabase/bootstrap.sql),
    paste the whole file in, change the three values at the top (your email, your name, your
-   company name), and run it.
-3. It prints what it did. Running it twice changes nothing, so a mistaken re-run is harmless.
+   company name), and press Run.
+
+It prints what it did. Running it twice changes nothing, so a mistaken re-run is harmless. If it
+says there is no account with that email, step 1 has not been done or the address differs.
 
 - [ ] The script reports that you are the master administrator.
 
-### B9. Deploy the invitation function
+### B9. Point invitation links at your app
 
-Inviting somebody needs the service role key, which must never reach a browser, so it runs on
-Supabase instead. From the repository folder on your own machine, with the Supabase CLI
-installed:
+If you left the app address blank in B7, ask me to run **Set up Supabase** again with it filled
+in, now that Vercel has given you a URL. Without it, invitation emails send people to a Supabase
+page rather than to CostMatrix.
 
-```sh
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
-supabase functions deploy invite-user
-supabase secrets set SITE_URL=https://your-app.vercel.app
-```
-
-If you would rather not install anything locally yet, skip this: everything else works, and the
-People screen will simply report that the invitation could not be sent until it is deployed.
-
-- [ ] `supabase functions deploy invite-user` finished, or you have chosen to do it later.
+- [ ] Done, or noted for later.
 
 ### B10. Sign in
 
