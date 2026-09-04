@@ -29,7 +29,7 @@ says so and references the old number.
 | D-022 | 2026-09-04 | One user belongs to exactly one company and may hold several roles in it. |
 | D-023 | 2026-09-04 | Component categories are master-only and seeded: switchgear, busbar, accessories & hardware, fabricated enclosure parts. |
 | D-024 | 2026-09-04 | Private components get no discount and no currency conversion; they are priced in the company currency. |
-| D-025 | 2026-09-04 | Supabase region is eu-west-2 (London). |
+| D-025 | 2026-09-04 | Supabase region is eu-west-2 (London). **Superseded by D-075.** |
 | D-026 | 2026-09-04 | All schema changes are numbered SQL migrations under supabase/migrations/; the database must rebuild from scratch. |
 | D-027 | 2026-09-04 | Tenant isolation is Postgres row-level security keyed on company_id; shared master rows use company_id IS NULL. |
 | D-028 | 2026-09-04 | Frontend is a Vite + React + TypeScript single-page app deployed as static files (Vercel or Netlify). |
@@ -79,3 +79,5 @@ says so and references the old number.
 | D-072 | 2026-09-04 | A database connection with no signed-in user (migration, bootstrap, service role) is treated as trusted by the column guard triggers; the API always has a signed-in user. |
 | D-073 | 2026-09-04 | Route guards and hidden buttons in the web app are for tidiness only. Row-level security is the security boundary, and every rule the UI applies is enforced again in Postgres. |
 | D-074 | 2026-09-04 | The toolchain is Vite, React, TypeScript strict, TanStack Query and plain CSS. No linter and no component library: fewer moving parts for someone learning to operate this, with TypeScript strict catching most of what a linter would. |
+| D-075 | 2026-09-04 | Supersedes D-025: the Supabase project lives in eu-west-1 (Ireland), not London. About five milliseconds further from Nairobi, and in the EU rather than outside it. The data-protection note says Ireland. |
+| D-076 | 2026-09-04 | The service role key is never collected or stored by us: Supabase provides it to the Edge Function from its own environment. The secrets a person handles are a personal access token, the project ref and the database password. |

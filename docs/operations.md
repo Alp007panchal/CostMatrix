@@ -62,7 +62,7 @@ The repository `Alp007panchal/CostMatrix` exists and holds this guide. Nothing t
 3. Fill in:
    - **Name**: `costmatrix`
    - **Database password**: click Generate, then **save it in your password manager immediately**. You cannot see it again afterwards. Losing it is recoverable but annoying.
-   - **Region**: **London (eu-west-2)**. This matters: it is the closest region to Kenya, and it is what our data-protection note tells companies. Do not pick another.
+   - **Region**: **West EU (Ireland)**, `eu-west-1`. Pick a European region and stay with it: it is what the data-protection note tells other companies, and moving later means moving the whole database. London is a few milliseconds closer to Nairobi; Ireland is in the EU. Either is fine, but the documents say Ireland.
    - **Plan**: Free for now. Part E says when to move to the paid tier.
 4. Wait a minute or two while it is created.
 
@@ -71,17 +71,24 @@ The repository `Alp007panchal/CostMatrix` exists and holds this guide. Nothing t
 
 ### B3. Collect four values
 
-In the project dashboard, open **Project Settings** (the gear icon), then **API** and
-**General**. Copy these somewhere safe for the next steps:
+Open a blank note to paste them into. Three come from the project, one from your account.
 
 | Value | Looks like | Where |
 |---|---|---|
-| Project URL | `https://abcdefghij.supabase.co` | Settings → API |
-| Anon key (public) | a long string starting `eyJ...` | Settings → API |
-| Service role key (secret) | another long `eyJ...` string | Settings → API, hidden until you click reveal |
-| Project ref | `abcdefghij` — the part of the URL before `.supabase.co` | Settings → General |
+| Project URL | `https://abcdefghij.supabase.co` | Project Settings (gear icon) → **API** |
+| Anon key | a long string starting `eyJ...` | Project Settings → **API**, under Project API keys |
+| Project ID / ref | `abcdefghij` — the same letters as in the URL | Project Settings → **General** |
+| Personal access token | a long string starting `sbp_` | Your avatar, top right → **Account preferences** → **Access Tokens** → Generate new token, named `github-actions` |
 
-- [ ] All four values saved.
+The access token is shown **once**. If you lose it, delete it and generate another; no harm done.
+
+You do **not** need the service role key. Nothing we build uses it directly — Supabase hands it
+to the invitation function automatically, inside its own environment.
+
+If your dashboard shows "Publishable key" and "Secret key" rather than "anon" and
+"service_role", those are newer names for the same two things: take the **publishable** one.
+
+- [ ] All four values saved, plus the database password from B2.
 
 ### B4. Understand which values are secret
 
@@ -92,11 +99,15 @@ opens CostMatrix. That is by design and it is not a leak. They only let someone 
 request; the database then checks who is signed in and returns nothing they are not entitled to.
 Anyone can read these out of the web page. That is expected and fine.
 
-**Never share — the service role key and the database password.** The service role key
-bypasses every security rule. It belongs only in GitHub secrets (next step) and your password
-manager. Never put it in the web app, never commit it to the repository, never paste it into a
-chat window, never email it. If it is ever exposed, go to Settings → API and roll it, which
-invalidates the old one.
+**Never share — the access token and the database password.** The access token can change
+anything in your Supabase account; the database password opens the database directly. They
+belong only in GitHub secrets (next step) and your password manager. Never put them in the web
+app, never commit them to the repository, never paste them into a chat window, never email
+them. If a token is ever exposed, delete it under Account preferences → Access Tokens and
+generate another; that invalidates the old one immediately.
+
+The same goes for the **service role key** if you ever have cause to look at it: it bypasses
+every security rule in the database. We do not use it anywhere you could accidentally leak it.
 
 - [ ] You can say which two of the four values are secret without looking.
 
@@ -338,7 +349,7 @@ list.
 ### Data protection promise to other companies
 
 CostMatrix holds data for companies other than your own, so the app carries a short terms page
-stating: what is stored, that it is held in London, that no company can see another company's
+stating: what is stored, that it is held in Ireland, that no company can see another company's
 data, and that a company's data is deleted on request. Keep that promise literally: the
 database enforces the isolation, and the master admin has read-only access to company data for
 support, with no ability to change it.

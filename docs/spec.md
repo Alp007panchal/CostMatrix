@@ -232,7 +232,7 @@ Costing BOM exports (§10) are separate and read-only; they are not uploaded bac
 
 ## 12. Non-functional requirements
 
-- **Backend**: Supabase (Postgres, Auth, Storage) in region eu-west-2 (London).
+- **Backend**: Supabase (Postgres, Auth, Storage) in region eu-west-1 (Ireland).
 - **Tenant isolation**: Postgres row-level security. Every tenant-owned table carries `company_id`. Shared master rows use `company_id IS NULL`. Tests prove a user of company A cannot read company B rows.
 - **Schema as code**: every schema change is a numbered SQL migration in `supabase/migrations/`. The database can be rebuilt from scratch with one command.
 - **Frontend**: a simple, clean single-page web app. Few screens, consistent layout, no clutter.
@@ -241,7 +241,7 @@ Costing BOM exports (§10) are separate and read-only; they are not uploaded bac
 - **Backups**: daily managed backups plus a weekly off-site dump; a restore drill before go-live and quarterly.
 - **Audit**: costing history log; price history; created_by/updated_at on every table.
 - **Excel round-trip**: the component library is built and maintained by downloading and uploading Excel files (§10). This is how the master list is created in the first place, since no finished list exists today.
-- **Data protection**: a short terms page in the app states what is stored, that data is held in London, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
+- **Data protection**: a short terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 - **Language**: English only in release 1.
 
 ## 13. Out of scope for release 1

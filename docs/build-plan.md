@@ -11,7 +11,7 @@ Time estimates assume one developer working with you part-time and are rough.
 
 Not a user workflow, but everything else stands on it.
 
-- **You first**: complete the setup checklist in `docs/operations.md` Part B — Supabase project in London, the three GitHub secrets, Vercel connected, placeholder page loading. Nothing below can be tested until this is done.
+- **You first**: complete the setup checklist in `docs/operations.md` Part B — Supabase project in Ireland, the three GitHub secrets, Vercel connected, placeholder page loading. Nothing below can be tested until this is done.
 - Install Supabase CLI; local database runs with `supabase start`.
 - GitHub Actions workflow that applies migrations to production on merge to `main`, using the repository secrets.
 - Migrations 0001 (extensions, `app` schema, helper functions) and 0002 (companies, settings, profiles, roles, counters, RLS).

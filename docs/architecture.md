@@ -9,7 +9,7 @@ and what the alternative would have cost.
 Browser ──▶ Web app (static files on Vercel)
                 │  Supabase JS client, signed-in user token
                 ▼
-           Supabase project (London)
+           Supabase project (Ireland)
              ├─ Auth       who the user is
              ├─ Postgres   all data, all rules, all calculations, row-level security
              └─ Storage    quotation PDFs and company logos
@@ -22,8 +22,9 @@ both with dashboards, both with generous documentation.
 ## 2. Choices
 
 ### Supabase (given)
-Managed Postgres with authentication, file storage and row-level security. Region eu-west-2
-(London), the nearest region to Kenya offered. Pro plan from day one of real use, for daily
+Managed Postgres with authentication, file storage and row-level security. Region eu-west-1
+(Ireland). London is marginally closer to Nairobi — about five milliseconds — but Ireland is in
+the EU, which is the more conventional home for a data-protection promise. Pro plan from day one of real use, for daily
 backups and point-in-time recovery.
 
 ### Frontend: Vite + React + TypeScript single-page app
@@ -62,7 +63,7 @@ to slice 6.
 | Name | Where | Purpose | From |
 |---|---|---|---|
 | local | a laptop, Supabase CLI + Docker | development and tests | now |
-| production | the live Supabase project (London) + the live Vercel deploy | customers | now |
+| production | the live Supabase project (Ireland) + the live Vercel deploy | customers | now |
 | staging | a second Supabase project + preview deploy | rehearse migrations against real-looking data | slice 6 |
 
 ### How database changes reach production
@@ -78,7 +79,7 @@ shared with anyone: GitHub holds them write-only. The same migration files run l
 3. Storage objects (PDFs, logos) are included in the weekly job.
 4. A written restore drill in `docs/operations.md`: restore last week's dump into a fresh project and open a costing. Run once before go-live and every quarter.
 5. Access: master admin read-only by database policy; company data never crosses tenants; no shared service keys in the browser, only the public anon key plus the user's own token.
-6. A short plain-language terms page in the app states what is stored, that data is held in London, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
+6. A short plain-language terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 
 ### Accounts and alerts
 Supabase, the web host and GitHub are all owned by the operator's own account. Alerts, backup
