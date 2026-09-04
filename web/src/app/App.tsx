@@ -7,6 +7,8 @@ import { HomePage } from '../modules/dashboard/HomePage'
 import { PeoplePage } from '../modules/admin/PeoplePage'
 import { CompanyPage } from '../modules/admin/CompanyPage'
 import { CompaniesPage } from '../modules/admin/CompaniesPage'
+import { ComponentsPage } from '../modules/library/ComponentsPage'
+import { RatesPage } from '../modules/library/RatesPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +36,15 @@ export function App() {
               }
             >
               <Route index element={<HomePage />} />
+              <Route path="library/components" element={<ComponentsPage />} />
+              <Route
+                path="library/rates"
+                element={
+                  <RequireRole role="company_admin">
+                    <RatesPage />
+                  </RequireRole>
+                }
+              />
               <Route
                 path="admin/people"
                 element={
