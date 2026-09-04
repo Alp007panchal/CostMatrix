@@ -71,7 +71,7 @@ companies ─┬─ profiles ── user_roles
 - unique (`user_id`, `role`)
 
 **company_counters**
-- `company_id`, `kind` enum (`costing`, `quotation`, `enquiry`), `year` int (0 when the number has no year), `next_no` int
+- `company_id`, `kind` enum (`costing`, `quotation`, `enquiry`), `year` int (0 when the number has no year), `last_no` int (the last number issued)
 - unique (`company_id`, `kind`, `year`)
 - Function `app.next_number(kind)` locks the row and returns e.g. `CM-2026-0007` or, for quotations, the bare sequence that the release function formats as `NPP-193-REV0` using the company prefix and the costing revision.
 

@@ -66,3 +66,11 @@ says so and references the old number.
 | D-059 | 2026-09-04 | The project URL and anon key are public by design and live in the browser; the service role key and database password live only in GitHub secrets and a password manager, and are never shared. |
 | D-060 | 2026-09-04 | Migrations reach production through a GitHub Actions workflow using repository secrets, never from a laptop. |
 | D-061 | 2026-09-04 | Planning documents merged to main without a pull request, at the owner's request; work continues on the planning branch. |
+| D-062 | 2026-09-04 | Security predicates (`app.current_company_id`, `is_master_admin`, `has_role`) are SECURITY DEFINER and STABLE: definer to stop a policy recursing through the table it protects, stable so they run once per statement. Enforced by a test. |
+| D-063 | 2026-09-04 | People are never deleted, only deactivated: their name must stay attached to the costings they built. No delete policy exists on profiles. |
+| D-064 | 2026-09-04 | Row-level security says which rows you may touch; a column guard trigger says which columns. Found during slice 0: the self-service clause on profiles let any user set is_master_admin on their own row and read every company. |
+| D-065 | 2026-09-04 | user_roles carries a composite foreign key to (profiles.id, profiles.company_id), so a role row cannot name a person from another company. |
+| D-066 | 2026-09-04 | company_counters stores last_no, the last number issued, and is written only by app.next_number; nobody holds an update grant on it. |
+| D-067 | 2026-09-04 | A quotation number without the year runs its own continuous sequence, matching the existing NPP-192 style where the number counts all quotations ever, not per year. |
+| D-068 | 2026-09-04 | The master admin can read every company but cannot edit a company's own quotation wording: support means looking, not editing someone's commercial text. |
+| D-069 | 2026-09-04 | Database tests run as ordinary signed-in users against the real policies, not as an administrator, and every "must be refused" assertion states the expected error so a typo cannot masquerade as a working control. |
