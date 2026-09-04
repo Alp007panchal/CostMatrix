@@ -28,17 +28,19 @@ user and see an empty costing list, and CI is green.
 ## Slice 1 — Cost one panel end to end (RECOMMENDED FIRST, about two to three weeks)
 
 Master admin:
-- Components with category, unit and KES price; price history on change.
+- Components with category, make, part number, unit and KES price; price history on change.
+- Rate-based components (busbar sizes with kg per metre) and the master copper rate.
 - One or more master assemblies with material list and hours per process type.
 - Master default hourly rates.
 
 Company admin:
-- Currency and exchange rate, labour hourly rates, material and labour margin (with "same for both"), VAT %.
+- Currency and exchange rate, labour hourly rates, material rates, material and labour margin (with "same for both"), rounding step, VAT %.
 
 Costing engineer:
 - Create costing (number issued, company settings frozen).
-- Add panels with quantity; add assemblies to a panel; change quantities of items; edit hours with source hours shown.
-- Totals panel showing material, labour, margins, selling price, VAT, grand total, all from the database views.
+- Add panels with quantity, option label, unit of measure; add assemblies to a panel; change quantities of items; edit hours with source hours shown.
+- Set negotiation margin (default 0).
+- Totals panel per panel and per option: material, labour, margins, rounded unit price, subtotal, VAT, grand total, all from the database views.
 - Submit.
 
 Approver:
@@ -53,13 +55,16 @@ Putting three or four of your real assemblies through it early will surface any 
 the labour model before the PDF, revisions and CRM are built on top of it. It also forces the
 tenant isolation, role checks and calculation views to be right from the start.
 
-Done when: two real panels costed in the app match a hand calculation, a second test company
-cannot see them, and an approver has approved one and returned one.
+Done when: the reference job (`docs/reference/costing-NPP-192-REV1.xlsm`, Option 1) rebuilt in
+the app reproduces its material subtotal of 4,164,997.80 and the margin and rounding steps, a
+second test company cannot see it, and an approver has approved one costing and returned one.
 
 ## Slice 2 — Quotation release and revisions (about two weeks)
 
-- Company quotation defaults (payment terms, validity, delivery, bank details, terms text, logo).
-- PDF template built around the file in `docs/reference/`.
+- Company quotation defaults: letterhead, salutation and closing, signatory, notes on offer, the five terms sections, logo(s), currency word, quotation prefix.
+- Panel technical description editor with the app-drafted text, and enclosure dimensions.
+- PDF template exactly as `docs/quotation-template.md`, checked against `docs/reference/quotation-NPP-192-REV1.pdf`.
+- Reference numbering: prefix + sequence + REV, sequence issued at first release.
 - Release by approver: PDF rendered, uploaded to private storage, `app.release_quotation` records it. Download from the costing.
 - Revision: "Revise" on an approved costing creates Rev N+1 in draft; older revision read-only with a banner; only current revision editable or quotable.
 - Optional per-line "refresh price" on a new revision, logged in history.
@@ -92,7 +97,7 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 - Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
 - Custom domain and email sender for Supabase Auth invitations.
 - One-page user guide per role.
-- Import of the existing component list from Excel.
+- Import of the existing component list from Excel, in the "db" sheet layout of the reference workbook (Make, Item, Description, Reference, Price).
 
 ## Later phases (not scheduled)
 

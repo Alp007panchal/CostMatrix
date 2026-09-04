@@ -1,6 +1,6 @@
 # CostMatrix — Specification
 
-Version 0.1 — 2026-09-04. This document is the source of truth for what CostMatrix does.
+Version 0.2 — 2026-09-04 (updated after reading the reference quotation and costing workbook). This document is the source of truth for what CostMatrix does.
 When a decision here changes, add a line to `decisions.md` and update this file.
 
 ## 1. Purpose
@@ -25,7 +25,9 @@ this by costing labour as fixed hours per assembly, per process type, at an hour
 | Category | Grouping of components used to split BOMs: switchgear, busbar, accessories & hardware, fabricated enclosure parts. |
 | Assembly (also "kit") | A standard building block of a panel: e.g. enclosure cubicle, mounting plate with switchgear, busbar set, wiring, accessories, hardware. Carries its own material list and its own labour hours. One level only; assemblies do not contain other assemblies. |
 | Process type | One of three kinds of labour: panel/component assembly, wiring of electrical components, busbar fabrication and assembly. Each has an hourly rate. |
-| Panel | One physical panel board inside a costing, with a quantity. Made of assemblies. |
+| Panel | One physical panel board inside a costing, with a quantity. Made of assemblies. May carry an option label when the customer is offered alternatives (Option 1, Option 2). |
+| Rate-based component | A component priced as weight per unit × a material rate per kg (copper busbar). Its price follows the rate. |
+| Fabricated part | Enclosure and sheet-metal items. Costed in a separate application; entered here as ordinary priced components in the enclosure category. |
 | Costing | A priced set of panels for one job, built by a costing engineer, approved by an approver. |
 | Revision | A numbered copy of an approved costing that was changed afterwards (Rev 1, Rev 2…). Older revisions are read-only. |
 | Quotation | The commercial PDF released from an approved costing to the customer. |
@@ -66,7 +68,8 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Master components: created and edited only by the master admin. Priced in KES.
 - Private components: created and edited by a company admin, visible only to that company. Priced in the company's currency. No discount applies.
 - Companies cannot edit or delete master components. They can hide them from their own pick lists (later phase; not in release 1).
-- Fields: code, name, description, category, unit (pcs, m, set…), manufacturer, unit price, currency, active flag.
+- Fields: code, name, description, category, unit (pcs, m, set…), manufacturer (make), part number (manufacturer reference), pricing mode, unit price or weight per unit, currency, active flag.
+- Pricing mode is `fixed` (a price per unit) or `weight_rate` (weight per unit × a material rate). Busbar sizes are `weight_rate` components with kg per metre; the copper rate per kg is a material rate. Fabricated enclosure and sheet-metal parts are `fixed` components in the enclosure category, priced from the separate fabrication costing.
 - Every price change is recorded in a price history with who changed it and when.
 
 ### 4.3 Assemblies
@@ -80,6 +83,10 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Master admin maintains default hourly rates per process type in KES. These are shown to a new company as a starting suggestion.
 - Each company sets its own hourly rate per process type in its own currency. These rates are what the company's costings use.
 
+### 4.5 Material rates
+- Master admin maintains default material rates in KES (initially one: copper busbar per kg).
+- Each company sets its own material rates in its own currency. Changing a rate changes the price of every `weight_rate` component in future costings; existing costings keep the frozen value.
+
 ## 5. Pricing rules
 
 - KES is the master currency. All master prices and master default rates are in KES.
@@ -89,6 +96,7 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
       unit_price = master_price_kes × (1 − discount%) ÷ exchange_rate
 
 - The in-house company uses the same mechanism with discount 0%. There is no separate cost price.
+- Rate-based components: `unit_price = weight_per_unit × company material rate`. For a master rate-based component the company's own rate is used, so discount does not apply; the weight comes from the master record.
 - Private component prices are used as entered, with no discount and no conversion.
 - Companies never see the undiscounted master price or their discount percentage as separate values in the costing screens; they see their price. (The master admin sees both.)
 
@@ -105,32 +113,42 @@ A costing contains one or more panels. Each panel has a quantity and contains on
 assemblies. Each assembly line has a quantity, a material list (items) and labour lines.
 
     unit_price (company currency) =
-        master component:  master_price_kes × (1 − discount%) ÷ exchange_rate
-        private component: private_price
+        master fixed component:  master_price_kes × (1 − discount%) ÷ exchange_rate
+        rate-based component:    weight_per_unit × company material rate
+        private component:       private_price
 
-    assembly material  = Σ item.qty × item.unit_price
-    assembly labour    = Σ over process types (hours × hourly_rate)
-    panel material     = Σ assembly material × assembly.qty
-    panel labour       = Σ assembly labour   × assembly.qty
-    costing material   = Σ panel material × panel.qty
-    costing labour     = Σ panel labour   × panel.qty
-    material margin    = costing material × material_margin%
-    labour margin      = costing labour   × labour_margin%
-    selling price      = costing material + costing labour + material margin + labour margin
-    VAT                = selling price × vat%
-    grand total        = selling price + VAT
+    assembly material   = Σ item.qty × item.unit_price
+    assembly labour     = Σ over process types (hours × hourly_rate)
+    panel material      = Σ assembly material × assembly.qty        (cost of one panel)
+    panel labour        = Σ assembly labour   × assembly.qty
+    material sell       = panel material ÷ (1 − material_margin%)
+    labour sell         = panel labour   ÷ (1 − labour_margin%)
+    panel unit price    = (material sell + labour sell) ÷ (1 − negotiation_margin%)
+    panel unit price    = rounded UP to the company rounding step (default 100)
+    panel total         = panel unit price × panel.qty
+    subtotal            = Σ panel totals                              (per option, if options are used)
+    VAT                 = subtotal × vat%
+    grand total         = subtotal + VAT
+
+Worked example from the reference job (one panel, qty 1, material 4,164,997.80, negotiation 0):
+with the sheet's 10% profit margin applied by division, 4,164,997.80 ÷ 0.9 = 4,627,775.33,
+rounded up to 4,627,800. Labour is then added as hours × rate rather than the sheet's ÷ 0.8.
+VAT 16% on the printed 5,784,800 is 925,568.00 and the total 6,710,368.00, as on the quotation.
 
 Rules:
-- Material and labour are carried separately all the way up so the two margins apply at the end. The UI offers a "same margin for both" shortcut that copies one percentage to the other.
-- Money is stored with 2 decimal places. Lines are not rounded; rounding happens only where totals are displayed or printed.
+- Margins are applied by division, ÷ (1 − margin %), as in the existing sheets, so a 20 % margin means 20 % of the selling price. The UI shows the resulting markup beside each percentage so nobody is surprised.
+- Material and labour are carried separately so the two margins apply to their own part. The UI offers a "same margin for both" shortcut. The negotiation margin is a third, optional percentage per costing, default 0, applied to the whole panel price.
+- The panel unit price is rounded up to the company's rounding step (default 100 in the company currency). Costs underneath stay exact. Money is stored with 2 decimal places; lines are not rounded.
+- A panel may carry an option label. Panels with the same label form one option; the price schedule prints one table with its own subtotal, VAT and total per option. Panels without a label form the base offer.
+- Each panel carries a technical description (free text printed in the quotation), proposed enclosure dimensions and a unit of measure (default PC). The app drafts the description from the panel's assemblies and items; the engineer edits it.
 - The calculation is implemented once, in the database. Screens, PDFs and exports all read the same totals.
 - After adding an assembly to a costing, the engineer may add, remove or change quantities of items in that costing line without affecting the library assembly.
 
 ### 7.1 Freezing
 When an assembly or component is added to a costing, the following are copied into the
 costing and never change afterwards: component code, name, category, unit, master price in
-KES, discount %, exchange rate, computed unit price, hours, source hours, hourly rates,
-margins and VAT %. Later changes to the master library, company rates or discount do not
+KES, discount %, exchange rate, weight and material rate for rate-based items, computed unit
+price, hours, source hours, hourly rates, the three margins, rounding step and VAT %. Later changes to the master library, company rates or discount do not
 alter an existing costing. A new revision re-reads current values only for lines the user
 explicitly refreshes.
 
@@ -144,13 +162,16 @@ explicitly refreshes.
 - **Submitted**: read-only. An approver may approve, or return it to draft with a mandatory comment.
 - **Approved**: read-only for ever. Only an approver may release a quotation from it.
 - **Revision**: any change after approval is made by creating a new revision. The new revision starts in draft with revision number +1, keeps the same costing number and the same family. The earlier revision stays approved and read-only. Only the current revision may be edited or quoted.
-- **Numbering**: `CM-YYYY-NNNN` per company per year, issued when the costing is created. Revisions are shown as `CM-2026-0007 Rev 2`.
+- **Numbering**: the internal costing number is `CM-YYYY-NNNN` per company per year, issued when the costing is created. Revisions are shown as `CM-2026-0007 Rev 2`. The printed quotation reference is separate (see §9).
 - **History**: every status change, revision, price refresh, release and quotation status change is logged with user, timestamp and details. The log is visible on the costing and cannot be edited.
 
 ## 9. Quotation
 
 - Released only by an approver, only from an approved, current costing.
-- Contains: company header and logo, customer and contact, project and enquiry reference, quotation number `QT-YYYY-NNNN`, date, validity, panel list with quantities and prices, subtotal, VAT and grand total in the company currency, payment terms, delivery terms, other commercial text, bank details, signature block. Exact layout follows the reference file in `docs/reference/`.
+- **Reference number**: company prefix + sequence + `-REV` + revision number, e.g. `NPP-193-REV0`, `NPP-193-REV1`. The company admin sets the prefix (default `QT`) and whether the year is included (`QT-2026-0193-REV0`). The sequence is issued once per costing family at first release; later revisions keep the sequence and change only the REV suffix.
+- **Layout** follows `docs/quotation-template.md`, derived from the reference file: letterhead on every page; cover letter (reference, date, customer, subject, annexure list, sign-off); Annexure I notes on the offer; Annexure II price schedule per option with subtotal, VAT and total; Annexure III terms (scope, validity, payment, delivery terms, delivery timelines); Annexure IV technical offer with one row per panel.
+- **Text sources**: letterhead, signatory and default terms come from company settings; prices, panels and VAT from the costing; subject, notes on the offer, terms wording and signatory are pre-filled and editable by the approver at release, then frozen with the quotation.
+- **Currency**: amounts in the company currency, labelled with the company's currency word (for example "KSH"). No second currency on the PDF in release 1.
 - The PDF is generated at release and stored. It is the document of record and is never regenerated silently. A changed costing needs a new revision and a new release.
 - Status after release: `released` → `sent` → `won` or `lost`. A lost quotation requires a reason.
 - Follow-ups: a sent quotation may carry one or more follow-up reminders with a due date, note and assignee. A follow-up list shows due and overdue items per company.
@@ -191,6 +212,7 @@ Each export lists component code, name, unit, quantity (summed across panels and
 - **Operability**: the owner is not a developer. Every operational step is documented in `docs/operations.md` in plain language.
 - **Backups**: daily managed backups plus a weekly off-site dump; a restore drill before go-live and quarterly.
 - **Audit**: costing history log; price history; created_by/updated_at on every table.
+- **Import**: the master component list can be imported from Excel in the layout of the workbook's "db" sheets: Make, Item, Description, Reference (part number), Price, with a category chosen per block.
 - **Language**: English only in release 1.
 
 ## 13. Out of scope for release 1
@@ -200,4 +222,5 @@ Each export lists component code, name, unit, quantity (summed across panels and
 - Company-defined categories.
 - Multi-company users.
 - Purchase orders, stock, or supplier management.
+- Manufacturer data sheets attached to the quotation PDF (open question; outside the app until decided).
 - Mobile app (the web app should still be usable on a tablet).

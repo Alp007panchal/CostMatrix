@@ -17,10 +17,10 @@ says so and references the old number.
 | D-010 | 2026-09-04 | A costing contains several panels, each with a quantity, each with its own assemblies. |
 | D-011 | 2026-09-04 | Master admin has read-only access to all company data and full control of company settings, users and discounts. |
 | D-012 | 2026-09-04 | Prices, discount, exchange rate, hours, rates, margins and VAT % are frozen into the costing when used. |
-| D-013 | 2026-09-04 | Margin is two percentages, material and labour, with a "same for both" shortcut in the UI. |
+| D-013 | 2026-09-04 | Margin is two percentages, material and labour, with a "same for both" shortcut in the UI. (Arithmetic: see D-036.) |
 | D-014 | 2026-09-04 | VAT is a per-company percentage, default 16, applied after margin. |
 | D-015 | 2026-09-04 | Money is stored with 2 decimals; rounding happens only at displayed or printed totals. |
-| D-016 | 2026-09-04 | Numbering per company per year: CM-YYYY-NNNN costings, QT-YYYY-NNNN quotations, EN-YYYY-NNNN enquiries. |
+| D-016 | 2026-09-04 | Numbering per company per year: CM-YYYY-NNNN costings, QT-YYYY-NNNN quotations, EN-YYYY-NNNN enquiries. (Quotation part superseded by D-035.) |
 | D-017 | 2026-09-04 | Lifecycle is draft → submitted → approved. An approver may return a submitted costing to draft; a comment is mandatory and logged. |
 | D-018 | 2026-09-04 | After approval any change creates a new revision; older revisions stay approved and read-only. |
 | D-019 | 2026-09-04 | Only the approver role can approve a costing and release the PDF quotation. |
@@ -39,3 +39,13 @@ says so and references the old number.
 | D-032 | 2026-09-04 | Backups: Supabase daily backups and PITR, plus a weekly off-site dump, plus a restore drill before go-live and quarterly. |
 | D-033 | 2026-09-04 | First build slice is "cost one panel end to end"; PDF and CRM follow. |
 | D-034 | 2026-09-04 | English only in release 1. |
+| D-035 | 2026-09-04 | Supersedes the quotation part of D-016: the printed quotation reference is company prefix + sequence + -REVn (e.g. NPP-193-REV1); year optional per company; default prefix QT. Internal costing numbers stay CM-YYYY-NNNN. |
+| D-036 | 2026-09-04 | Margins are applied by division, cost ÷ (1 − margin %), as in the existing sheets; the UI shows the equivalent markup. |
+| D-037 | 2026-09-04 | A third, optional negotiation margin per costing (default 0) is applied to the whole panel price after material and labour margins. |
+| D-038 | 2026-09-04 | The panel unit selling price is rounded up to a company rounding step, default 100 in the company currency; costs underneath stay exact. |
+| D-039 | 2026-09-04 | Busbar is a rate-based component: weight per unit × a material rate per kg; material rates follow the master-default-plus-company-override pattern of labour rates. |
+| D-040 | 2026-09-04 | Fabricated enclosure and sheet-metal parts are ordinary fixed-price components in the enclosure category; their cost comes from the separate fabrication costing application. |
+| D-041 | 2026-09-04 | A costing may offer alternatives: panels carry an optional option label, and the price schedule prints one table with subtotal, VAT and total per option. |
+| D-042 | 2026-09-04 | Each panel carries a technical description, enclosure dimensions and unit of measure for Annexure IV; the app drafts the description from the panel's contents. |
+| D-043 | 2026-09-04 | Quotation layout follows docs/quotation-template.md, derived from quotation NPP-192-REV1; approver-editable text is frozen with the released quotation. |
+| D-044 | 2026-09-04 | The PDF prints amounts in the company currency only, labelled with the company's currency word (e.g. KSH). |

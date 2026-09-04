@@ -19,7 +19,9 @@ companies ─┬─ profiles ── user_roles
            ├─ company_settings
            ├─ company_counters
            ├─ labour_rates (also master rows with company NULL)
-           ├─ components (also master rows) ── component_price_history
+           ├─ material_rates (also master rows)
+           ├─ components (also master rows) ─┬─ component_price_history
+           │                                 └─ → material_rates (rate-based components)
            ├─ assemblies (also master rows) ─┬─ assembly_components → components
            │                                 └─ assembly_labour
            ├─ company_assembly_hours → assemblies
@@ -40,13 +42,19 @@ companies ─┬─ profiles ── user_roles
 **companies**
 - `name`, `kind` enum (`in_house`, `external`, `buyer`)
 - `currency_code` char(3), `exchange_rate` numeric(14,6) — KES per 1 unit of currency (1 for KES)
+- `currency_label` text, default `KES` — the word printed on quotations (the reference prints "KSH")
 - `discount_pct` — set only by master admin
 - `material_margin_pct`, `labour_margin_pct`, `tax_pct` default 16
-- `address`, `tax_pin`, `logo_path`, `is_active`
+- `price_rounding_step` numeric default 100 — panel unit price is rounded up to a multiple of this
+- `quotation_prefix` text default `QT`, `quotation_no_includes_year` boolean default false
+- `address`, `tax_pin`, `logo_path`, `logo2_path`, `is_active`
 
 **company_settings** (one row per company)
 - `company_id` unique
-- `payment_terms`, `validity_days`, `delivery_terms`, `bank_details`, `terms_text`, `quotation_footer`
+- Letterhead: `po_box`, `street_address`, `phones`, `email`
+- Cover letter defaults: `salutation`, `intro_text`, `closing_text`, `signatory_name`, `signatory_email`
+- Annexure defaults: `default_notes_on_offer`, `scope_of_supply`, `validity_days` (default 30), `payment_terms`, `delivery_terms`, `delivery_timelines`
+- `bank_details`, `quotation_footer`
 
 **profiles** (one row per auth user)
 - `id` = `auth.users.id`
@@ -57,9 +65,9 @@ companies ─┬─ profiles ── user_roles
 - unique (`user_id`, `role`)
 
 **company_counters**
-- `company_id`, `kind` enum (`costing`, `quotation`, `enquiry`), `year` int, `next_no` int
+- `company_id`, `kind` enum (`costing`, `quotation`, `enquiry`), `year` int (0 when the number has no year), `next_no` int
 - unique (`company_id`, `kind`, `year`)
-- Function `app.next_number(kind)` locks the row and returns e.g. `CM-2026-0007`.
+- Function `app.next_number(kind)` locks the row and returns e.g. `CM-2026-0007` or, for quotations, the bare sequence that the release function formats as `NPP-193-REV0` using the company prefix and the costing revision.
 
 ## 2. Library
 
@@ -69,8 +77,10 @@ companies ─┬─ profiles ── user_roles
 **components**
 - `company_id` NULL = master
 - `category_id → component_categories`
-- `code`, `name`, `description`, `unit`, `manufacturer`
-- `unit_price`, `currency_code` (KES for master rows; company currency for private rows)
+- `code`, `name`, `description`, `unit`, `manufacturer` (make), `part_number` (manufacturer reference)
+- `pricing_mode` enum (`fixed`, `weight_rate`)
+- fixed: `unit_price`, `currency_code` (KES for master rows; company currency for private rows)
+- weight_rate: `weight_per_unit` (kg per unit, e.g. kg per metre of bar), `material_rate_id → material_rates`; `unit_price` NULL
 - `is_active`
 - unique (`company_id`, `code`) — Postgres treats NULLs as distinct, so a unique index uses `coalesce(company_id, '00000000-…')`
 
@@ -85,6 +95,11 @@ companies ─┬─ profiles ── user_roles
 - `company_id` NULL = master default in KES
 - `process_type → process_types`, `hourly_rate`
 - unique (`company_id`, `process_type`)
+
+**material_rates**
+- `company_id` NULL = master default in KES
+- `code` (e.g. `copper_busbar`), `name`, `unit` (kg), `rate`
+- unique (`company_id`, `code`)
 
 **assemblies**
 - `company_id` NULL = master
@@ -103,7 +118,8 @@ companies ─┬─ profiles ── user_roles
 - unique (`company_id`, `assembly_id`, `process_type`)
 
 View **v_component_prices** — for the calling user's company: every visible component with
-`unit_price` already discounted and converted. Master admin sees master price, discount and
+`unit_price` already discounted and converted, or computed from weight × the company's material
+rate for `weight_rate` components. Master admin sees master price, discount and
 converted price side by side.
 
 View **v_assembly_hours** — for the calling user's company: each assembly and process type
@@ -118,7 +134,8 @@ with `effective_hours`, `source` (`master`, `company_override`, `private`) and `
 - `is_current` boolean — exactly one true per family
 - `title`, `notes`
 - `status` enum (`draft`, `submitted`, `approved`)
-- Frozen at creation: `currency_code`, `exchange_rate`, `discount_pct`, `material_margin_pct`, `labour_margin_pct`, `tax_pct`
+- Frozen at creation: `currency_code`, `exchange_rate`, `discount_pct`, `material_margin_pct`, `labour_margin_pct`, `negotiation_margin_pct` (default 0, editable in draft), `price_rounding_step`, `tax_pct`
+- `quotation_seq` int nullable — issued at first release, shared by all revisions of the family
 - `submitted_by`, `submitted_at`, `approved_by`, `approved_at`, `returned_by`, `returned_at`, `return_comment`
 - unique (`company_id`, `costing_no`, `revision_no`)
 
@@ -126,7 +143,10 @@ with `effective_hours`, `source` (`master`, `company_override`, `private`) and `
 - `costing_id`, `process_type`, `hourly_rate`
 
 **costing_panels**
-- `costing_id`, `company_id`, `name`, `tag`, `quantity`, `sort_order`
+- `costing_id`, `company_id`, `name`, `tag`, `quantity`, `uom` default `PC`, `sort_order`
+- `option_label` text nullable — panels sharing a label form one priced option
+- `technical_description` text — printed in Annexure IV; drafted by the app, edited by the engineer
+- `enclosure_dimensions` text, e.g. `2100(H) x 3500(W) x 800(D) mm`
 
 **costing_assemblies**
 - `panel_id → costing_panels`, `company_id`
@@ -138,7 +158,8 @@ with `effective_hours`, `source` (`master`, `company_override`, `private`) and `
 - `source_component_id → components` nullable
 - Snapshots: `code`, `name`, `category_code`, `unit`
 - `quantity`
-- `master_price_kes` nullable (null for private components), `discount_pct`, `exchange_rate`, `unit_price` (company currency, frozen)
+- `pricing_mode`, `weight_per_unit` and `material_rate` (frozen, rate-based items only)
+- `master_price_kes` nullable (null for private and rate-based components), `discount_pct`, `exchange_rate`, `unit_price` (company currency, frozen)
 
 **costing_labour**
 - `costing_assembly_id`, `company_id`, `process_type`
@@ -151,8 +172,9 @@ with `effective_hours`, `source` (`master`, `company_override`, `private`) and `
 
 Views (the only place the formula lives):
 - **v_costing_assembly_totals** — material, labour per costing assembly line and × quantity
-- **v_costing_panel_totals** — per panel and × panel quantity
-- **v_costing_totals** — material, labour, both margins, selling price, VAT, grand total
+- **v_costing_panel_costs** — material and labour cost of one panel
+- **v_costing_panel_prices** — material sell, labour sell, negotiation, rounded unit price, panel total; grouped by `option_label`
+- **v_costing_totals** — per option and overall: subtotal, VAT, grand total
 - **v_costing_items_by_category** — flattened item list with effective quantity (item qty × assembly qty × panel qty), used by BOM exports
 
 Functions:
@@ -165,16 +187,19 @@ Functions:
 
 **quotations**
 - `company_id`, `costing_id` (approved and current at release time)
-- `quotation_no` e.g. `QT-2026-0004`
+- `reference_no` as printed, e.g. `NPP-193-REV1`; unique per company
 - `customer_id`, `contact_id`, `client_snapshot` jsonb (name and address as printed)
-- `payment_terms`, `validity_days`, `delivery_terms`, `notes`
+- Cover letter: `subject`, `salutation`, `intro_text`, `closing_text`, `signatory_name`, `signatory_email`
+- `notes_on_offer` text
+- `terms` jsonb with keys `scope_of_supply`, `validity`, `payment`, `delivery_terms`, `delivery_timelines`
+- `letterhead_snapshot` jsonb
 - `pdf_path` (Storage object path), `released_by`, `released_at`
 - `status` enum (`released`, `sent`, `won`, `lost`), `sent_at`, `decided_at`, `lost_reason`
 
 **quotation_followups**
 - `quotation_id`, `company_id`, `due_on` date, `note`, `assigned_to → profiles`, `done_at`
 
-Function `app.release_quotation(costing_id, pdf_path, …)` — checks role and status, issues number, inserts the row, writes history.
+Function `app.release_quotation(costing_id, pdf_path, texts…)` — checks role and status, issues the quotation sequence on first release of the family, formats the reference from prefix, optional year, sequence and revision, inserts the row, writes history.
 
 ## 5. CRM
 
@@ -216,7 +241,7 @@ For library tables with master rows:
 | write on private rows | `company_id = app.current_company_id()` AND `app.has_role('company_admin')` |
 
 Role checks per area:
-- companies, company_settings, user_roles: company_admin (own company), master admin (all, including `discount_pct` which company_admin cannot change — enforced by a trigger)
+- companies, company_settings, user_roles, labour_rates, material_rates: company_admin (own company), master admin (all, including `discount_pct` which company_admin cannot change — enforced by a trigger)
 - costings and children: costing_engineer or approver for writes in draft; status functions check the approver role
 - quotations: approver to release; costing_engineer or approver to change status and follow-ups
 - CRM tables: costing_engineer or approver

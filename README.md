@@ -13,4 +13,5 @@ Start here:
 - `docs/architecture.md` — tech choices explained plainly, folder structure
 - `docs/build-plan.md` — build order as vertical slices
 - `docs/open-questions.md` — what still needs an answer
-- `docs/reference/` — put the existing quotation format and sample sheets here
+- `docs/quotation-template.md` — layout of the PDF quotation and where each field comes from
+- `docs/reference/` — the real quotation and costing workbook the design is based on

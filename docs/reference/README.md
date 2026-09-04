@@ -1,12 +1,15 @@
 # Reference files
 
-Put the following here so the build can be designed around real documents:
+Real documents from one job, used to design the quotation template and the costing screens.
+Customer name appears in them; do not publish this folder outside the team.
 
-1. **Current quotation format** — the PDF or Word file you send to customers today.
-   Name it `quotation-format.pdf` (or `.docx`). Needed before build slice 2.
-2. **A current costing sheet** — one Excel sheet as used today, with real assemblies.
-   Name it `costing-sheet-example.xlsx`. Useful for slice 1 test data.
-3. **Component list** — the master component list as Excel, if one exists.
-   Name it `component-list.xlsx`. Needed for the import in slice 6.
+| File | What it is | Used for |
+|---|---|---|
+| `quotation-NPP-192-REV1.docx` | The quotation as written in Word | Source of the PDF template layout (`docs/quotation-template.md`) |
+| `quotation-NPP-192-REV1.pdf` | The same quotation as sent to the customer | Visual check of the generated PDF |
+| `costing-NPP-192-REV1.xlsm` | The Excel workbook behind that quotation (one sheet per panel or option, "db" sheets per make) | Test data for slice 1; import format for slice 6 |
 
-Remove customer names or prices you do not want in the repository before committing.
+Still wanted:
+
+- The master component list as Excel, if it exists separately from the "db" sheets. Name it `component-list.xlsx`.
+- Manufacturer data sheets that go in Annexure IV, if the app should attach them (see `docs/open-questions.md`).
