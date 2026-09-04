@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "//": "The app routes in the browser, so the server has no /admin/people file to serve. Without this, opening or refreshing any page but the home screen returns 404. Every path is handed index.html and React Router takes it from there.",
       "source": "/((?!assets/).*)",
       "destination": "/index.html"
     }

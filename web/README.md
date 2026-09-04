@@ -50,3 +50,13 @@ past a few hundred lines; when one does, split it by screen.
 Route guards and hidden buttons are for tidiness, not safety. Every rule the app applies is
 enforced again by row-level security in PostgreSQL, and that is the one that counts. A screen
 that forgets to hide a button is untidy; the database still refuses the write.
+
+## Why `vercel.json` exists
+
+React Router routes in the browser, so there is no `/admin/people` file on disk. Without the
+rewrite in `vercel.json`, opening or refreshing any page except the home screen returns a 404
+from the host. The rule hands every path `index.html` and lets the app work out what to show,
+excluding `/assets/` so the built JavaScript and CSS keep their real content types.
+
+Note that `vercel.json` is strict JSON: no comments, and no extra keys inside a rewrite. Vercel
+validates it against a schema and refuses to deploy if it finds a property it does not know.
