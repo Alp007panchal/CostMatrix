@@ -6,7 +6,7 @@ and what the alternative would have cost.
 ## 1. The pieces
 
 ```
-Browser ──▶ Web app (static files on Vercel or Netlify)
+Browser ──▶ Web app (static files on Vercel)
                 │  Supabase JS client, signed-in user token
                 ▼
            Supabase project (London)
@@ -27,7 +27,7 @@ Managed Postgres with authentication, file storage and row-level security. Regio
 backups and point-in-time recovery.
 
 ### Frontend: Vite + React + TypeScript single-page app
-- **What**: a normal React app, built into static files, served by Vercel or Netlify from the GitHub repository. Every push to `main` deploys.
+- **What**: a normal React app, built into static files, served by **Vercel** from the GitHub repository. Every push to `main` deploys. Netlify would do the same job; Vercel is named so the operations guide can give one exact set of steps instead of hedging.
 - **Why**: no server to run, patch or secure. React has the largest pool of documentation and help. TypeScript catches mistakes before they reach users.
 - **Alternative**: Next.js. More features, but adds a server layer and concepts (server components, cookies, middleware) that are not needed when the database does the authorisation.
 - Libraries kept to a few boring ones: React Router (pages), TanStack Query (loading and caching data), Supabase JS (talking to Supabase), `@react-pdf/renderer` (PDF), SheetJS community build (XLSX export). Plain CSS modules, no design system to learn.
@@ -55,11 +55,22 @@ order. `seed.sql` holds categories, process types and a demo company for local w
 are applied to staging and production with `supabase db push`.
 
 ### Environments
-| Name | Where | Purpose |
-|---|---|---|
-| local | your laptop, Supabase CLI + Docker | development and tests |
-| staging | a second Supabase project + preview deploy | try changes with real-looking data |
-| production | the live Supabase project + the live web deploy | customers |
+Two to start, three before go-live. Staging means a second paid Supabase project; until there
+is real data to protect, local development is where changes are tried, so staging is deferred
+to slice 6.
+
+| Name | Where | Purpose | From |
+|---|---|---|---|
+| local | a laptop, Supabase CLI + Docker | development and tests | now |
+| production | the live Supabase project (London) + the live Vercel deploy | customers | now |
+| staging | a second Supabase project + preview deploy | rehearse migrations against real-looking data | slice 6 |
+
+### How database changes reach production
+Migrations are applied by a GitHub Actions workflow when a change is merged to `main`, using
+the `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` and `SUPABASE_DB_PASSWORD` repository
+secrets. Nobody runs migrations from a laptop against production, and no secret has to be
+shared with anyone: GitHub holds them write-only. The same migration files run locally with
+`supabase db reset`.
 
 ### Backups and data protection
 1. Supabase daily backups and point-in-time recovery (Pro plan).

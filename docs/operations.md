@@ -1,0 +1,309 @@
+# Operations guide
+
+How to set CostMatrix up and how to run it day to day. Written for someone who has never
+deployed software. Follow Part B once; keep Parts C and D to hand afterwards.
+
+If a step does not match what you see on screen, the service has changed its wording. The
+intent of each step is explained, so look for the equivalent button rather than an exact match.
+
+---
+
+## Part A — What you are building on
+
+Three services, each free to start, each doing one job:
+
+| Service | What it holds | Who signs in |
+|---|---|---|
+| **GitHub** | The code and these documents. Already set up: this repository. | You |
+| **Supabase** | The database, the user accounts and passwords, and the stored quotation PDFs. | You (admin), and every CostMatrix user indirectly |
+| **Vercel** | Serves the web pages to browsers. Holds no data. | You |
+
+How a click reaches the data:
+
+```
+Someone opens costmatrix.yourdomain.com
+        │
+        ▼
+Vercel sends them the web pages (HTML, JavaScript). No data yet.
+        │
+        ▼
+The page asks Supabase: "who is this person?"  → Supabase checks the login
+        │
+        ▼
+The page asks Supabase: "give me my costings" → Postgres checks the row-level
+        security rules and returns only that person's company's rows.
+```
+
+The important consequence: **security lives in the database, not in the web pages.** Even if
+someone modified the web page in their own browser, the database would still refuse to return
+another company's data. That is why the next part is relaxed about one of the keys being public.
+
+---
+
+## Part B — Setup checklist
+
+Do this once. Tick each box as you go. Expect 45–60 minutes.
+
+### B1. GitHub — already done
+
+The repository `Alp007panchal/CostMatrix` exists and holds this guide. Nothing to do.
+
+- [ ] You can sign in to github.com and see the repository.
+
+### B2. Create the Supabase project
+
+1. Go to **supabase.com** and sign up. Signing in with your GitHub account is easiest.
+2. Click **New project**.
+3. Fill in:
+   - **Name**: `costmatrix`
+   - **Database password**: click Generate, then **save it in your password manager immediately**. You cannot see it again afterwards. Losing it is recoverable but annoying.
+   - **Region**: **London (eu-west-2)**. This matters: it is the closest region to Kenya, and it is what our data-protection note tells companies. Do not pick another.
+   - **Plan**: Free for now. Part E says when to move to the paid tier.
+4. Wait a minute or two while it is created.
+
+- [ ] The project dashboard opens and says the project is healthy.
+- [ ] The database password is in your password manager.
+
+### B3. Collect four values
+
+In the project dashboard, open **Project Settings** (the gear icon), then **API** and
+**General**. Copy these somewhere safe for the next steps:
+
+| Value | Looks like | Where |
+|---|---|---|
+| Project URL | `https://abcdefghij.supabase.co` | Settings → API |
+| Anon key (public) | a long string starting `eyJ...` | Settings → API |
+| Service role key (secret) | another long `eyJ...` string | Settings → API, hidden until you click reveal |
+| Project ref | `abcdefghij` — the part of the URL before `.supabase.co` | Settings → General |
+
+- [ ] All four values saved.
+
+### B4. Understand which values are secret
+
+This is the one piece of security you need to hold in your head. Read it twice.
+
+**Safe to publish — the Project URL and the anon key.** These are sent to every browser that
+opens CostMatrix. That is by design and it is not a leak. They only let someone *attempt* a
+request; the database then checks who is signed in and returns nothing they are not entitled to.
+Anyone can read these out of the web page. That is expected and fine.
+
+**Never share — the service role key and the database password.** The service role key
+bypasses every security rule. It belongs only in GitHub secrets (next step) and your password
+manager. Never put it in the web app, never commit it to the repository, never paste it into a
+chat window, never email it. If it is ever exposed, go to Settings → API and roll it, which
+invalidates the old one.
+
+- [ ] You can say which two of the four values are secret without looking.
+
+### B5. Add the GitHub secrets
+
+These let an automated job apply database changes and take backups without any secret ever
+sitting on a laptop or passing through a conversation.
+
+1. First create an access token: in Supabase, click your avatar (top right) → **Access tokens**
+   → **Generate new token**. Name it `github-actions`. Copy it; it is shown once.
+2. In GitHub, open the repository → **Settings** → **Secrets and variables** → **Actions** →
+   **New repository secret**. Add three:
+
+| Name | Value |
+|---|---|
+| `SUPABASE_ACCESS_TOKEN` | the token you just generated |
+| `SUPABASE_PROJECT_REF` | the project ref from B3 |
+| `SUPABASE_DB_PASSWORD` | the database password from B2 |
+
+- [ ] Three secrets listed on the GitHub Actions secrets page.
+
+GitHub hides these values after saving; even you cannot read them back, only replace them.
+That is correct behaviour, not a problem.
+
+### B6. Connect Vercel
+
+1. Go to **vercel.com**, sign up **with GitHub**, and allow it access to the CostMatrix repository.
+2. Click **Add New → Project**, pick `CostMatrix`, click **Import**.
+3. Settings on the import screen:
+   - **Framework preset**: Other
+   - **Root directory**: `web`
+   - Leave the build and output settings empty for now.
+4. Open **Environment Variables** and add two:
+
+| Name | Value |
+|---|---|
+| `VITE_SUPABASE_URL` | the Project URL from B3 |
+| `VITE_SUPABASE_ANON_KEY` | the anon key from B3 |
+
+   (These are the two public values. They are here because the web pages need them.)
+5. Click **Deploy** and wait a minute.
+
+- [ ] Vercel shows a successful deployment and gives you a URL like `costmatrix-xxxx.vercel.app`.
+
+### B7. Prove the chain works
+
+Open the Vercel URL in a browser. You should see a plain CostMatrix page saying the app is
+being set up. That page is a placeholder committed to the repository — its only purpose is to
+prove that GitHub and Vercel are talking to each other before any real code exists.
+
+- [ ] The placeholder page loads.
+
+**When the first real screens are built, one Vercel setting changes**: the framework preset
+becomes Vite and a build step appears. That is expected and I will tell you exactly what to
+change when the time comes.
+
+### B8. Tell me you are done
+
+Message me that the checklist is complete. Include the Vercel URL and, if you like, the
+Supabase project URL — both are public. **Do not send me the service role key, the database
+password or the access token.** I never need them; the automated job uses them from GitHub
+secrets without showing them to anyone.
+
+---
+
+## Part C — Day-to-day tasks
+
+These describe the finished app. Some screens do not exist yet; each says which build slice
+brings it.
+
+### Invite a user (slice 0)
+1. Sign in as master admin (you) for a new company, or as company admin for your own.
+2. Admin → Users → **Invite**. Enter the email and full name, tick the roles.
+3. They receive an email with a link to set a password. The link expires; you can resend it.
+4. Check the user appears in the list as active with the right roles.
+
+Roles, as a reminder: **company admin** manages settings and users, **costing engineer** builds
+costings, **approver** approves costings and releases quotations. One person can hold several.
+
+### Someone leaves (slice 0)
+Admin → Users → open them → **Deactivate**. Do not delete: their name must stay attached to the
+costings they built. Deactivating stops them signing in immediately.
+
+### Someone forgets a password (slice 0)
+They click "forgot password" on the login page and get an email. If the email does not arrive,
+Admin → Users → open them → **Send password reset**.
+
+### Change a company's discount (slice 0, master admin only)
+Admin → Companies → open the company → set the discount percentage → Save.
+Existing costings do not change: their prices were frozen when they were built. Only new
+costings pick up the new discount. This is deliberate.
+
+### Update prices from a supplier (slice 1)
+1. Library → Components → **Download Excel**.
+2. Send the file to the supplier, or edit the price column yourself.
+3. Library → Components → **Upload Excel**, choose the file.
+4. Read the preview: how many rows are new, how many changed, and the old versus new price for each. Nothing has been saved yet.
+5. Confirm. Every price change is recorded with your name and the time.
+
+Uploads never delete anything. To remove a component, deactivate it on its own screen.
+
+### Change the copper rate (slice 1)
+Library → Material rates → edit the rate per kilogram → Save. New costings use it; existing
+ones keep the rate they froze.
+
+### Find out what happened to a costing (slice 1)
+Open the costing → **History** tab. Every submission, approval, return, revision and release is
+listed with who did it and when. The log cannot be edited by anyone, including you.
+
+### Check the app is running
+Open the Vercel URL. If the page loads and you can sign in, everything is working. For more
+detail: Vercel dashboard shows deployments; Supabase dashboard shows database health.
+
+### Download a backup (see Part E)
+Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the
+backup job stores it.
+
+---
+
+## Part D — When something goes wrong
+
+### The page is blank or shows an error
+Usually a bad deployment. Vercel dashboard → Deployments → the most recent one → check it says
+Ready. If it failed, the log says why. You can click **Rollback** on the previous working
+deployment to get back online immediately, then we fix the cause.
+
+### A user cannot sign in
+- Is the account active? Admin → Users.
+- Did they ever set a password? If the invitation expired, resend it.
+- Check Supabase → Authentication → Users to see whether the account exists at all.
+
+### A user says "you do not have permission"
+They are missing a role. Admin → Users → tick the role they need. Note that only an **approver**
+can approve a costing or release a quotation; that restriction is deliberate and enforced by the
+database, so it cannot be worked around from the screen.
+
+### A user sees no data at all
+They are probably attached to the wrong company. Admin → Users → check the company. A user
+belongs to exactly one company and sees only its data.
+
+### An old quotation shows a price that is no longer current
+**This is correct, not a bug.** Prices, discounts, exchange rates, hours and margins are frozen
+into a costing when it is built, so an approved costing and its PDF never change under you.
+To re-price, open the costing and create a new revision, which starts from current prices.
+
+### The site is down
+Check status.supabase.com and vercel-status.com. If both are healthy, the problem is ours;
+tell me what the page shows. Your data is unaffected by a hosting outage.
+
+### You think data has been lost
+Stop. Do not try to fix it by re-entering data. Tell me immediately and note the time. The
+database keeps daily backups (paid tier) and we hold a weekly off-site dump; the sooner we
+look, the more precisely we can restore.
+
+---
+
+## Part E — Backups and data protection
+
+### What each tier gives you
+
+**Free tier** — fine for building, not for real quotations. No automatic daily backups, and the
+project pauses if unused for a week. Use it until real customer data exists.
+
+**Paid tier** — daily backups kept for a week, and point-in-time recovery, which restores the
+database to any moment (for example, five minutes before a mistake). Check Supabase's pricing
+page for the current cost; it changes.
+
+**Switch to the paid tier before the first real quotation is released.** That is the moment
+data becomes irreplaceable. Note it in your calendar now.
+
+### The three layers
+
+1. **Supabase daily backups and point-in-time recovery** — automatic, once on the paid tier.
+2. **A weekly off-site dump** — an automated job in GitHub takes a full copy of the database and stores it away from Supabase, so a problem with the Supabase account itself does not take the backups with it. Kept for twelve weeks. It emails you if it fails.
+3. **Quotation PDFs** — stored in Supabase and included in the weekly dump. They can also be regenerated from the costing data.
+
+### The restore drill
+
+A backup you have never restored is not a backup. Once before go-live, and once a quarter
+after, do this and write the date in `docs/decisions.md`:
+
+1. Take the most recent weekly dump.
+2. Create a fresh empty Supabase project (free tier is fine for the drill).
+3. Restore the dump into it.
+4. Sign in and open a costing. Check the totals match.
+5. Delete the drill project.
+
+If any step fails, the backup process is broken and fixing it is the most urgent thing on the
+list.
+
+### Data protection promise to other companies
+
+CostMatrix holds data for companies other than your own, so the app carries a short terms page
+stating: what is stored, that it is held in London, that no company can see another company's
+data, and that a company's data is deleted on request. Keep that promise literally: the
+database enforces the isolation, and the master admin has read-only access to company data for
+support, with no ability to change it.
+
+---
+
+## Part F — Words explained
+
+| Word | Meaning here |
+|---|---|
+| **Repository** (repo) | The folder of code and documents stored on GitHub. |
+| **Branch** | A parallel copy of the repository where work happens before it is accepted into the main version. |
+| **Commit** | One saved change, with a message saying what it was and who made it. |
+| **Main** | The trunk of the repository: the current agreed version. |
+| **Migration** | One numbered file of database instructions ("add this table"). Running them in order builds the database from nothing, so it can always be rebuilt. |
+| **Environment variable** | A setting given to the app from outside the code, such as which Supabase project to talk to. Lets the same code run against a test database or the real one. |
+| **Key** | A long string that identifies or authorises a caller. The anon key is public; the service role key is not. |
+| **Row-level security** (RLS) | Rules inside Postgres saying which rows each signed-in user may see. This is what keeps companies apart. |
+| **Tenant** | One company using the app, with its own walled-off data. |
+| **Deploy** | To publish a new version of the web pages so users get it. |
+| **Slice** | One complete workflow built end to end, from database to screen. See `build-plan.md`. |

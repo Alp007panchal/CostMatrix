@@ -60,3 +60,9 @@ says so and references the old number.
 | D-053 | 2026-09-04 | An upload matches existing rows by id column, else manufacturer part number within make, else make plus item plus description; it shows a preview of new, changed, unchanged and rejected rows before saving anything. |
 | D-054 | 2026-09-04 | Uploads never delete rows; removing a component is a separate deliberate action. Price changes made by upload go to the price history with the user, time and batch. |
 | D-055 | 2026-09-04 | Every library list can be downloaded to Excel, and the download doubles as the upload template. |
+| D-056 | 2026-09-04 | Vercel hosts the web app. Netlify is equivalent; Vercel is named so the operations guide can give one exact set of steps. |
+| D-057 | 2026-09-04 | Supersedes the three-environment plan in D-028's architecture: local and production to start, staging added in slice 6 when there is data worth rehearsing against. |
+| D-058 | 2026-09-04 | Supabase free tier during building; move to the paid tier (daily backups and point-in-time recovery) before the first real quotation is released. |
+| D-059 | 2026-09-04 | The project URL and anon key are public by design and live in the browser; the service role key and database password live only in GitHub secrets and a password manager, and are never shared. |
+| D-060 | 2026-09-04 | Migrations reach production through a GitHub Actions workflow using repository secrets, never from a laptop. |
+| D-061 | 2026-09-04 | Planning documents merged to main without a pull request, at the owner's request; work continues on the planning branch. |

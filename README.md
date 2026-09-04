@@ -3,9 +3,12 @@
 Web application for end-to-end costing and quotation of electrical panel boards, built for
 several companies at once (multi-tenant) on Supabase.
 
-Status: planning. No application code yet.
+Status: setting up. No application code yet.
 
-Start here:
+**Running it:** `docs/operations.md` — set-up checklist, day-to-day tasks, what to do when
+something breaks, and backups. Start there if you are deploying or operating CostMatrix.
+
+Understanding it:
 
 - `docs/spec.md` — what the app does and the rules it follows
 - `docs/decisions.md` — one-line log of every decision taken

@@ -11,8 +11,9 @@ Time estimates assume one developer working with you part-time and are rough.
 
 Not a user workflow, but everything else stands on it.
 
-- Create the Supabase project (London) and a staging project.
+- **You first**: complete the setup checklist in `docs/operations.md` Part B — Supabase project in London, the three GitHub secrets, Vercel connected, placeholder page loading. Nothing below can be tested until this is done.
 - Install Supabase CLI; local database runs with `supabase start`.
+- GitHub Actions workflow that applies migrations to production on merge to `main`, using the repository secrets.
 - Migrations 0001 (extensions, `app` schema, helper functions) and 0002 (companies, settings, profiles, roles, counters, RLS).
 - Seed: in-house company, master admin user, process types, categories.
 - Web app skeleton: login, session, route guard by role, top navigation, empty pages per module.
@@ -20,7 +21,7 @@ Not a user workflow, but everything else stands on it.
 - Company admin screen: invite users, assign roles.
 - Master admin company switcher (read-only view of another company).
 - CI: lint, typecheck, run migrations and pgTAP on a throwaway database.
-- Weekly backup job and first draft of `docs/operations.md` (deploy, invite a user, restore).
+- Weekly off-site backup job. (`docs/operations.md` is already written.)
 
 Done when: you can log in as master admin, create a test company and a user, log in as that
 user and see an empty costing list, and CI is green.
@@ -95,7 +96,9 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 
 ## Slice 6 — Go-live hardening (about one week)
 
-- Restore drill from the weekly dump into a fresh project, written up.
+- Restore drill from the weekly dump into a fresh project, written up and dated in `decisions.md`.
+- Staging environment added (second Supabase project plus preview deploys).
+- Move production to the paid Supabase tier if it is not already.
 - Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
 - Custom domain and email sender for Supabase Auth invitations.
 - Terms page published and linked at sign-up.
