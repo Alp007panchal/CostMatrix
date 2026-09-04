@@ -89,3 +89,8 @@ says so and references the old number.
 | D-082 | 2026-09-04 | A master assembly may use only master components, and a private assembly only master or its own; enforced by trigger, so a company can always open its own costings. |
 | D-083 | 2026-09-04 | Effective prices and hours live in views (`v_component_prices`, `v_assembly_hours`, `v_material_rates`), so discount, currency conversion and hour overrides are computed in one place rather than in each screen. |
 | D-084 | 2026-09-04 | The app is live at cost-matrix-theta.vercel.app, Supabase project `mssqjuzgycfpfmtjukvq` in eu-west-1. Slice 0 verified in production on 2026-09-04. |
+| D-085 | 2026-09-04 | Every costing child row carries both its parent and its costing, tied by a composite foreign key, so a row cannot drift into another costing and the policies stay simple and fast. |
+| D-086 | 2026-09-04 | Immutability is enforced by the database, not the screens: the write policies require the costing to be a current draft, so a submitted or approved costing cannot be edited even by a direct API call. |
+| D-087 | 2026-09-04 | Status changes go through SECURITY DEFINER functions that check the role, check the current status and write the history in the same transaction, so the log can never disagree with the costing. |
+| D-088 | 2026-09-04 | `app.create_costing` freezes the company's currency, rate, discount, margins, rounding, VAT and hourly rates at creation. A rate rise next month cannot silently reprice an existing job. |
+| D-089 | 2026-09-04 | A revision is a deep copy of the approved costing at the prices it froze, not a re-pricing. Refreshing prices is a separate, deliberate act on individual lines. |
