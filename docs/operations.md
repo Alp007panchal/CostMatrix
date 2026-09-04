@@ -199,6 +199,24 @@ page rather than to CostMatrix.
 
 - [ ] Done, or noted for later.
 
+### B9b. Turn on two-factor authentication
+
+Not required to finish setup, so skip the prompts if they interrupt you — but do it before real
+customer data exists. You will be holding other companies' commercial information, and each of
+these accounts is a way in:
+
+| Account | Why it matters | Priority |
+|---|---|---|
+| **GitHub** | Holds the code and the Supabase secrets | Highest |
+| **Supabase** | Holds every company's data | High |
+| **Vercel** | Someone could publish a fake version of the app at your own address | Worth doing |
+
+Each takes about two minutes with an authenticator app on your phone. Save the recovery codes
+each service gives you in the same place as your database password: without them, losing your
+phone locks you out of your own system.
+
+- [ ] Two-factor authentication on all three, recovery codes saved.
+
 ### B10. Sign in
 
 Open the Vercel URL. You should get the CostMatrix sign-in page, and your email and password
