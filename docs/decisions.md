@@ -55,3 +55,8 @@ says so and references the old number.
 | D-048 | 2026-09-04 | Follow-up reminders are an in-app due and overdue list in phase 1; no email digest. |
 | D-049 | 2026-09-04 | Supabase, the web host and GitHub are owned by the operator's own account; alerts and backup failures go to alp007panchal@gmail.com. |
 | D-050 | 2026-09-04 | Data protection is covered by a short plain-language terms page in the app, shown at sign-up, rather than a signed agreement per company. |
+| D-051 | 2026-09-04 | The master copper rate is seeded at 3,000 KES per kg and is editable at any time; every change is recorded like a component price change. |
+| D-052 | 2026-09-04 | No finished master component list exists, so the library is built and maintained inside the app by Excel upload and download; the round-trip is part of slice 1, not a go-live afterthought. |
+| D-053 | 2026-09-04 | An upload matches existing rows by id column, else manufacturer part number within make, else make plus item plus description; it shows a preview of new, changed, unchanged and rejected rows before saving anything. |
+| D-054 | 2026-09-04 | Uploads never delete rows; removing a component is a separate deliberate action. Price changes made by upload go to the price history with the user, time and batch. |
+| D-055 | 2026-09-04 | Every library list can be downloaded to Excel, and the download doubles as the upload template. |

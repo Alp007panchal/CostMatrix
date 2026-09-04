@@ -29,7 +29,8 @@ user and see an empty costing list, and CI is green.
 
 Master admin:
 - Components with category, make, part number, unit and KES price; price history on change.
-- Rate-based components (busbar sizes with kg per metre) and the master copper rate.
+- **Build the library by Excel upload**: download the template, fill it from the existing "db" sheets, upload, review the preview of new and changed rows, confirm. Download the library back to Excel at any time. There is no finished master list today, so this is how the library comes into existence.
+- Rate-based components (busbar sizes with kg per metre) and the master copper rate, seeded at 3,000 KES/kg and editable.
 - One or more master assemblies with material list and hours per process type.
 - Master default hourly rates.
 
@@ -47,7 +48,7 @@ Approver:
 - Approve, or return to draft with a mandatory comment.
 - History log visible on the costing.
 
-Not in this slice: PDF, CRM, private library, revisions, exports, master admin browsing.
+Not in this slice: PDF, CRM, private library, revisions, BOM exports, master admin browsing.
 
 **Why this slice first.** It is the whole reason the app exists. It exercises the frozen-price
 and hours-based labour model that Excel gets wrong. Every later slice hangs off a costing.
@@ -55,9 +56,10 @@ Putting three or four of your real assemblies through it early will surface any 
 the labour model before the PDF, revisions and CRM are built on top of it. It also forces the
 tenant isolation, role checks and calculation views to be right from the start.
 
-Done when: the reference job (`docs/reference/costing-NPP-192-REV1.xlsm`, Option 1) rebuilt in
-the app reproduces its material subtotal of 4,164,997.80 and the margin and rounding steps, a
-second test company cannot see it, and an approver has approved one costing and returned one.
+Done when: the components for the reference job have been loaded by Excel upload, the job
+(`docs/reference/costing-NPP-192-REV1.xlsm`, Option 1) rebuilt in the app reproduces its
+material subtotal of 4,164,997.80 and the margin and rounding steps, a second test company
+cannot see it, and an approver has approved one costing and returned one.
 
 ## Slice 2 — Quotation release and revisions (about two weeks)
 
@@ -85,7 +87,7 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
-- Private components and private assemblies per company, with company admin setting hours.
+- Private components and private assemblies per company, with company admin setting hours, including Excel upload and download of the private library.
 - Company override of master hours per assembly, shown beside master hours.
 - Company price view with discount applied; master admin view showing both.
 - Master admin read-only browsing of any company's costings, quotations and CRM.
@@ -98,7 +100,8 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 - Custom domain and email sender for Supabase Auth invitations.
 - Terms page published and linked at sign-up.
 - One-page user guide per role.
-- Import of the existing component list from Excel, in the "db" sheet layout of the reference workbook (Make, Item, Description, Reference, Price).
+- Bulk price update rehearsal: download the library, change prices, upload, confirm the preview and the price history.
+- Assembly upload and download (assemblies, their components, their hours), if not finished in slice 1.
 
 ## Later phases (not scheduled)
 

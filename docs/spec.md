@@ -84,7 +84,7 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Each company sets its own hourly rate per process type in its own currency. These rates are what the company's costings use.
 
 ### 4.5 Material rates
-- Master admin maintains default material rates in KES (initially one: copper busbar per kg, 3,000 in the reference sheet).
+- Master admin maintains default material rates in KES. Release 1 is seeded with one: copper busbar at 3,000 per kg. The rate is editable at any time, and every change is recorded with the user and time, like a component price.
 - Each company sets its own material rates in its own currency. Changing a rate changes the price of every `weight_rate` component in future costings; existing costings keep the frozen value.
 
 ## 5. Pricing rules
@@ -186,6 +186,34 @@ From any costing (draft or approved), four separate exports, each in CSV and XLS
 
 Each export lists component code, name, unit, quantity (summed across panels and multiplied by panel and assembly quantities), and optionally unit price and line total. Exports are per costing revision.
 
+## 10a. Excel import and export of the library
+
+There is no finished master component list today, so the library is built inside the app by
+uploading spreadsheets, and kept up to date the same way. Every library screen can be
+downloaded to Excel and uploaded back.
+
+### Download
+- **Components**: one row per component with all editable columns, plus a read-only id column. Master admin downloads the master list; a company admin downloads its private list.
+- **Assemblies**: one sheet listing assemblies, one listing their components and quantities, one listing their labour hours per process type.
+- Downloads are also the upload template: an empty library downloads as a file with headers and one example row.
+
+### Upload
+- Accepts `.xlsx` and `.xlsm`. The user picks the sheet if the file has several.
+- Column headers are matched by name; the order does not matter. Unknown columns are ignored and reported.
+- Matching an existing component: by the read-only id column when present, else by manufacturer part number within the same make, else by make plus item plus description. Anything that matches nothing is a new component.
+- A category must be set for every row, either as a column or chosen once for the whole upload.
+- **Preview before anything is saved**: the app shows how many rows are new, changed (with the old and new value side by side), unchanged, and rejected with the reason. The user confirms or cancels.
+- Price changes made by upload are written to the price history like any other change, with the user and time.
+- Rows are never deleted by an upload. Removing a component is a separate, deliberate action.
+- The same rules apply to a company admin uploading private components, and to master and private assemblies.
+
+### Practical uses
+- Build the master list from the "db" sheets of the existing workbooks (Make, Item, Description, Reference, Price).
+- Send the list to a supplier, get updated prices back, upload the file, review the price changes, confirm.
+- Bulk-add a new manufacturer range.
+
+Costing BOM exports (§10) are separate and read-only; they are not uploaded back.
+
 ## 11. CRM
 
 ### 11.1 Phase 1 (release 1)
@@ -212,7 +240,7 @@ Each export lists component code, name, unit, quantity (summed across panels and
 - **Operability**: the owner is not a developer. Every operational step is documented in `docs/operations.md` in plain language.
 - **Backups**: daily managed backups plus a weekly off-site dump; a restore drill before go-live and quarterly.
 - **Audit**: costing history log; price history; created_by/updated_at on every table.
-- **Import**: the master component list can be imported from Excel in the layout of the workbook's "db" sheets: Make, Item, Description, Reference (part number), Price, with a category chosen per block.
+- **Excel round-trip**: the component library is built and maintained by downloading and uploading Excel files (§10). This is how the master list is created in the first place, since no finished list exists today.
 - **Data protection**: a short terms page in the app states what is stored, that data is held in London, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 - **Language**: English only in release 1.
 

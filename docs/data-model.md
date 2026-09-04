@@ -19,7 +19,8 @@ companies ─┬─ profiles ── user_roles
            ├─ company_settings
            ├─ company_counters
            ├─ labour_rates (also master rows with company NULL)
-           ├─ material_rates (also master rows)
+           ├─ material_rates (also master rows) ── material_rate_history
+           ├─ import_batches (also master-library uploads)
            ├─ components (also master rows) ─┬─ component_price_history
            │                                 └─ → material_rates (rate-based components)
            ├─ assemblies (also master rows) ─┬─ assembly_components → components
@@ -90,8 +91,8 @@ companies ─┬─ profiles ── user_roles
 - unique (`company_id`, `code`) — Postgres treats NULLs as distinct, so a unique index uses `coalesce(company_id, '00000000-…')`
 
 **component_price_history**
-- `component_id`, `old_price`, `new_price`, `changed_by`, `changed_at`
-- Filled by a trigger on `components` when `unit_price` changes.
+- `component_id`, `old_price`, `new_price`, `changed_by`, `changed_at`, `import_batch_id` nullable
+- Filled by a trigger on `components` when `unit_price` changes, whether the change came from a screen or from an Excel upload.
 
 **process_types** (seeded, fixed)
 - `code` (`assembly`, `wiring`, `busbar`), `name`, `sort_order`
@@ -105,6 +106,17 @@ companies ─┬─ profiles ── user_roles
 - `company_id` NULL = master default in KES
 - `code` (e.g. `copper_busbar`), `name`, `unit` (kg), `rate`
 - unique (`company_id`, `code`)
+- Seeded with copper busbar at 3,000 KES/kg. Editable by the master admin (master row) or company admin (own row).
+
+**material_rate_history**
+- `material_rate_id`, `old_rate`, `new_rate`, `changed_by`, `changed_at`
+- Filled by a trigger, like `component_price_history`.
+
+**import_batches** (audit of every Excel upload)
+- `company_id` (NULL for a master-library upload), `user_id`, `target` enum (`components`, `assemblies`), `file_name`, `at`
+- Counts: `rows_new`, `rows_changed`, `rows_unchanged`, `rows_rejected`
+- `details` jsonb — the rejected rows and their reasons, kept so a user can see what went wrong
+- Components and assemblies created or changed by an upload carry `import_batch_id` so a bad upload can be traced.
 
 **assemblies**
 - `company_id` NULL = master
