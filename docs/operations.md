@@ -8,6 +8,16 @@ intent of each step is explained, so look for the equivalent button rather than 
 
 ---
 
+**The live system**
+
+| What | Where |
+|---|---|
+| The app | https://cost-matrix-theta.vercel.app |
+| Database and logins | Supabase project `mssqjuzgycfpfmtjukvq`, region eu-west-1 (Ireland) |
+| Code | https://github.com/Alp007panchal/CostMatrix |
+
+---
+
 ## Part A — What you are building on
 
 Three services, each free to start, each doing one job:
