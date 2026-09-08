@@ -14,6 +14,7 @@ import { PanelCard } from './PanelCard'
 import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
+import { BomExports } from './BomExports'
 
 /**
  * One costing. Editable while it is a current draft and the person may build
@@ -184,6 +185,7 @@ export function CostingEditor() {
 
               <div>
                 <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} />
+                <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
                 <HistoryPanel costingId={costing.id} />
               </div>
             </div>

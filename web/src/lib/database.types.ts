@@ -374,3 +374,19 @@ export interface ReleaseTexts {
   signatory_name?: string
   signatory_email?: string
 }
+
+/** v_costing_items_by_category: one row per distinct component, quantities multiplied through. */
+export interface BomItem {
+  costing_id: string
+  category_code: string
+  category_name: string
+  code: string
+  name: string
+  manufacturer: string | null
+  part_number: string | null
+  unit: string
+  unit_price: number
+  option_label: string | null
+  quantity: number
+  line_total: number
+}

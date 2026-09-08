@@ -108,3 +108,6 @@ says so and references the old number.
 | D-101 | 2026-09-08 | Turning a costing into the PDF's data is a pure step (prepare.ts) separate from drawing it (Document.tsx), so option grouping, numbering and wording defaults are unit-tested without rendering. |
 | D-102 | 2026-09-08 | Logos are uploaded through the app into the private bucket and embedded in the PDF as data URLs. The reference files in docs/reference/logos are the source copies, not what the app reads. |
 | D-103 | 2026-09-08 | @react-pdf/renderer is loaded by dynamic import from a single module (pdf/build.tsx), landing in its own chunk; the main bundle is 266 kB. |
+| D-104 | 2026-09-08 | BOM exports read `v_costing_items_by_category`, which already multiplies quantities through assembly and panel quantities; the app groups and formats, never recomputes. Four category exports plus an all-in-one workbook, each as .xlsx or CSV. |
+| D-105 | 2026-09-08 | The four category groups are always present in order, even when empty, so the export buttons are stable and an empty category is visibly empty rather than missing. |
+| D-106 | 2026-09-08 | CSV is RFC 4180 with CRLF line ends and a UTF-8 byte-order mark, so Excel opens it correctly without an import wizard. |

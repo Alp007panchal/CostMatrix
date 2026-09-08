@@ -304,6 +304,12 @@ reference number issued in one step. If anything fails, nothing is released — 
 Once released, nothing on it changes. To alter a quoted job, create a new revision of the
 costing; releasing that gives the same number with the next REV.
 
+### Export a bill of materials
+Open any costing → **Bills of materials** on the right. One line per category with the
+material value; **Excel** or **CSV** per category, or **All four as one workbook**. Quantities
+are already multiplied through assembly and panel quantities, so the figure is what to buy.
+Works on a draft too, which is handy for checking a costing before submitting it.
+
 ### Record the outcome of a quotation
 **Quotations** → **Mark sent** when it goes to the customer, then **Won** or **Lost**. Lost asks
 for a reason. That reason is what the sales reports are built on later, so make it honest.

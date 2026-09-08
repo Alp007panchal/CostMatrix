@@ -1,6 +1,7 @@
 import { supabase } from '../../lib/supabase'
 import type {
   AssemblyTotals,
+  BomItem,
   Costing,
   CostingAssembly,
   CostingHistoryRow,
@@ -208,4 +209,18 @@ export async function createRevision(id: string): Promise<Costing> {
   const { data, error } = await supabase.rpc('create_costing_revision', { target: id })
   fail('Could not create a revision', error)
   return data as Costing
+}
+
+// --- bill of materials -------------------------------------------------------
+
+/** Every distinct component in a costing with its total quantity, for the exports. */
+export async function listBomItems(costingId: string): Promise<BomItem[]> {
+  const { data, error } = await supabase
+    .from('v_costing_items_by_category')
+    .select('*')
+    .eq('costing_id', costingId)
+    .order('category_code')
+    .order('code')
+  fail('Could not load the bill of materials', error)
+  return (data ?? []) as BomItem[]
 }
