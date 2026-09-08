@@ -3,6 +3,12 @@
 Nothing is blocking the build. What remains is material to be supplied, and assumptions you can
 overturn at any time. Answered questions live in `decisions.md`.
 
+## Now: the acceptance test
+
+Everything through slice 4 is live and unit-tested, and none of it has been clicked through by
+a person. `docs/acceptance-test.md` is the script: one real job, end to end, about an hour.
+Findings go in its table or in one message; all of them get fixed before slice 5 starts.
+
 ## Waiting on you
 
 | What | Needed by | Note |

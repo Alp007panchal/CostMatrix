@@ -15,6 +15,7 @@ Understanding it:
 - `docs/data-model.md` — tables, relationships and tenant isolation
 - `docs/architecture.md` — tech choices explained plainly, folder structure
 - `docs/build-plan.md` — build order as vertical slices
+- `docs/acceptance-test.md` — the end-to-end test script for what is built so far
 - `docs/open-questions.md` — what still needs an answer
 - `docs/quotation-template.md` — layout of the PDF quotation and where each field comes from
 - `docs/reference/` — the real quotation and costing workbook the design is based on
