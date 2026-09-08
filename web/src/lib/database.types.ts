@@ -178,3 +178,138 @@ export interface AssemblyHours {
   company_hours: number | null
   source: 'master' | 'company_override' | 'private'
 }
+
+// --- costing ---------------------------------------------------------------
+
+export type CostingStatus = 'draft' | 'submitted' | 'approved'
+
+export interface Costing {
+  id: string
+  company_id: string
+  costing_no: string
+  revision_no: number
+  family_id: string
+  previous_revision_id: string | null
+  is_current: boolean
+  title: string
+  notes: string | null
+  status: CostingStatus
+  currency_code: string
+  currency_label: string
+  exchange_rate: number
+  discount_pct: number
+  material_margin_pct: number
+  labour_margin_pct: number
+  negotiation_margin_pct: number
+  price_rounding_step: number
+  tax_pct: number
+  submitted_at: string | null
+  approved_at: string | null
+  returned_at: string | null
+  return_comment: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CostingPanel {
+  id: string
+  costing_id: string
+  company_id: string
+  name: string
+  tag: string | null
+  option_label: string | null
+  uom: string
+  quantity: number
+  technical_description: string | null
+  enclosure_dimensions: string | null
+  sort_order: number
+}
+
+export interface CostingAssembly {
+  id: string
+  costing_id: string
+  panel_id: string
+  source_assembly_id: string | null
+  code: string
+  name: string
+  quantity: number
+  sort_order: number
+}
+
+export interface CostingItem {
+  id: string
+  costing_id: string
+  costing_assembly_id: string
+  source_component_id: string | null
+  code: string
+  name: string
+  category_code: string
+  unit: string
+  manufacturer: string | null
+  part_number: string | null
+  quantity: number
+  pricing_mode: PricingMode
+  unit_price: number
+  sort_order: number
+}
+
+export interface CostingLabour {
+  id: string
+  costing_id: string
+  costing_assembly_id: string
+  process_type: string
+  hours: number
+  source_hours: number | null
+  source: string
+  hourly_rate: number
+}
+
+/** v_costing_assembly_totals */
+export interface AssemblyTotals {
+  costing_assembly_id: string
+  material_each: number
+  labour_each: number
+  material_total: number
+  labour_total: number
+  hours_each: number
+  hours_total: number
+}
+
+/** v_costing_panel_prices */
+export interface PanelPrice {
+  panel_id: string
+  material_cost: number
+  labour_cost: number
+  hours: number
+  material_sell: number
+  labour_sell: number
+  unit_price: number
+  line_total: number
+}
+
+/** v_costing_totals */
+export interface CostingTotals {
+  costing_id: string
+  material_cost: number
+  labour_cost: number
+  hours: number
+  subtotal: number
+  tax: number
+  grand_total: number
+}
+
+/** v_costing_option_totals */
+export interface OptionTotals {
+  option_label: string
+  subtotal: number
+  tax: number
+  grand_total: number
+}
+
+export interface CostingHistoryRow {
+  id: string
+  user_id: string | null
+  action: string
+  details: Record<string, unknown> | null
+  at: string
+}

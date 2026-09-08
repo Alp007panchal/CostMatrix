@@ -94,3 +94,6 @@ says so and references the old number.
 | D-087 | 2026-09-04 | Status changes go through SECURITY DEFINER functions that check the role, check the current status and write the history in the same transaction, so the log can never disagree with the costing. |
 | D-088 | 2026-09-04 | `app.create_costing` freezes the company's currency, rate, discount, margins, rounding, VAT and hourly rates at creation. A rate rise next month cannot silently reprice an existing job. |
 | D-089 | 2026-09-04 | A revision is a deep copy of the approved costing at the prices it froze, not a re-pricing. Refreshing prices is a separate, deliberate act on individual lines. |
+| D-090 | 2026-09-04 | The API client reaches only the public schema, so the six costing functions have thin public wrappers that pass straight through to app. The app schema stays internal; the API surface is exactly what a screen may ask for. |
+| D-091 | 2026-09-04 | Every edit in the costing editor reloads the costing from the database afterwards. The screen never computes a total; it shows what the views return. |
+| D-092 | 2026-09-04 | Editable fields commit on blur rather than on every keystroke, so a person can type a number without a save firing mid-way, and the database round-trip happens once per change. |

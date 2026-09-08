@@ -14,6 +14,7 @@ export function Layout() {
           <NavLink to="/" end>
             Home
           </NavLink>
+          <NavLink to="/costings">Costings</NavLink>
           <NavLink to="/library/components">Components</NavLink>
           <NavLink to="/library/assemblies">Assemblies</NavLink>
           {canAdminister && <NavLink to="/library/rates">Rates</NavLink>}
