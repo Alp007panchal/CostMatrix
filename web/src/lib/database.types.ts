@@ -149,3 +149,32 @@ export interface PriceHistoryRow {
   changed_at: string
   changed_by: string | null
 }
+
+export interface Assembly {
+  id: string
+  company_id: string | null
+  code: string
+  name: string
+  description: string | null
+  is_active: boolean
+}
+
+export interface AssemblyComponentRow {
+  id: string
+  assembly_id: string
+  component_id: string
+  quantity: number
+  sort_order: number
+}
+
+/** Hours per process type for one assembly, as this company plans them. */
+export interface AssemblyHours {
+  assembly_id: string
+  process_type: string
+  process_name: string
+  sort_order: number
+  effective_hours: number
+  master_hours: number | null
+  company_hours: number | null
+  source: 'master' | 'company_override' | 'private'
+}

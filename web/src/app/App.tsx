@@ -9,6 +9,7 @@ import { CompanyPage } from '../modules/admin/CompanyPage'
 import { CompaniesPage } from '../modules/admin/CompaniesPage'
 import { ComponentsPage } from '../modules/library/ComponentsPage'
 import { RatesPage } from '../modules/library/RatesPage'
+import { AssembliesPage } from '../modules/library/AssembliesPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ export function App() {
             >
               <Route index element={<HomePage />} />
               <Route path="library/components" element={<ComponentsPage />} />
+              <Route path="library/assemblies" element={<AssembliesPage />} />
               <Route
                 path="library/rates"
                 element={

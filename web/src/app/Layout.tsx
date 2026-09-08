@@ -15,6 +15,7 @@ export function Layout() {
             Home
           </NavLink>
           <NavLink to="/library/components">Components</NavLink>
+          <NavLink to="/library/assemblies">Assemblies</NavLink>
           {canAdminister && <NavLink to="/library/rates">Rates</NavLink>}
           {canAdminister && <NavLink to="/admin/people">People</NavLink>}
           {canAdminister && <NavLink to="/admin/company">Company</NavLink>}
