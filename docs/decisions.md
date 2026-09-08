@@ -97,3 +97,7 @@ says so and references the old number.
 | D-090 | 2026-09-04 | The API client reaches only the public schema, so the six costing functions have thin public wrappers that pass straight through to app. The app schema stays internal; the API surface is exactly what a screen may ask for. |
 | D-091 | 2026-09-04 | Every edit in the costing editor reloads the costing from the database afterwards. The screen never computes a total; it shows what the views return. |
 | D-092 | 2026-09-04 | Editable fields commit on blur rather than on every keystroke, so a person can type a number without a save firing mid-way, and the database round-trip happens once per change. |
+| D-093 | 2026-09-08 | Spreadsheet reading and writing uses exceljs, loaded by dynamic import so its megabyte is fetched only by the person who clicks Download or Upload, never by someone costing a panel. |
+| D-094 | 2026-09-08 | Upload matching order: the id column, then part number within the same make, then code, then make plus name. The rules are pure functions with unit tests, because matching is the easiest part of a bulk upload to get wrong. |
+| D-095 | 2026-09-08 | The upload reader finds the header row rather than assuming row 1, and skips a sheet's own sub-headings, so the old costing workbooks upload directly without being reshaped first. |
+| D-096 | 2026-09-08 | Duplicate codes within one uploaded file are rejected after the first, rather than applied in sequence to the same component, so the outcome does not depend on row order. |

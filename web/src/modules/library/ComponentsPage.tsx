@@ -12,6 +12,7 @@ import {
 } from './api'
 import { ComponentForm } from './ComponentForm'
 import { PriceHistory } from './PriceHistory'
+import { ExcelPanel } from './ExcelPanel'
 
 /**
  * Everything this company can put in a panel: the master list plus its own.
@@ -31,6 +32,7 @@ export function ComponentsPage() {
   const [showInactive, setShowInactive] = useState(false)
   const [editing, setEditing] = useState<ComponentPrice | 'new' | null>(null)
   const [historyFor, setHistoryFor] = useState<ComponentPrice | null>(null)
+  const [excelOpen, setExcelOpen] = useState(false)
 
   const canEdit = isMasterAdmin || hasRole('company_admin')
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['components'] })
@@ -61,11 +63,23 @@ export function ComponentsPage() {
       <div className="spread">
         <h1>Components</h1>
         {canEdit && (
-          <button className="primary" onClick={() => setEditing('new')}>
-            Add component
-          </button>
+          <div className="row">
+            <button onClick={() => setExcelOpen((o) => !o)}>Excel</button>
+            <button className="primary" onClick={() => setEditing('new')}>
+              Add component
+            </button>
+          </div>
         )}
       </div>
+
+      {excelOpen && (
+        <ExcelPanel
+          components={components.data ?? []}
+          categories={categories.data ?? []}
+          onClose={() => setExcelOpen(false)}
+          onApplied={() => void refresh()}
+        />
+      )}
 
       <p className="muted">
         Prices are what {company.name} pays: the master price less your{' '}

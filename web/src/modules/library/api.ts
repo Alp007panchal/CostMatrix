@@ -277,3 +277,49 @@ export async function clearCompanyAssemblyHours(
     .eq('process_type', processType)
   fail('Could not remove your override', error)
 }
+
+// --- spreadsheet uploads -----------------------------------------------------
+
+export interface ImportBatchInput {
+  company_id: string | null
+  target: 'components' | 'assemblies'
+  file_name: string
+  rows_new: number
+  rows_changed: number
+  rows_unchanged: number
+  rows_rejected: number
+  details: unknown
+}
+
+/** One row per upload, kept so a bad file can be traced afterwards. */
+export async function createImportBatch(input: ImportBatchInput): Promise<string> {
+  const { data, error } = await supabase
+    .from('import_batches')
+    .insert(input)
+    .select('id')
+    .single()
+  fail('Could not record the upload', error)
+  return (data as { id: string }).id
+}
+
+/** Inserts many components at once, all stamped with the upload they came from. */
+export async function insertComponents(
+  rows: (ComponentInput & { import_batch_id: string })[],
+): Promise<void> {
+  if (rows.length === 0) return
+  const { error } = await supabase.from('components').insert(rows.map(cleanForMode))
+  fail('Could not add the new components', error)
+}
+
+/** Updates one component from an upload; the batch id rides along for the history. */
+export async function updateComponentFromImport(
+  id: string,
+  changes: Partial<ComponentInput>,
+  importBatchId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from('components')
+    .update({ ...changes, import_batch_id: importBatchId })
+    .eq('id', id)
+  fail('Could not update a component', error)
+}
