@@ -39,8 +39,8 @@ export async function listCostings(): Promise<(Costing & { totals: CostingTotals
   return ((costings ?? []) as Costing[]).map((c) => ({ ...c, totals: byId.get(c.id) ?? null }))
 }
 
-export async function createCosting(title: string, notes: string | null): Promise<Costing> {
-  const { data, error } = await supabase.rpc('create_costing', { title, notes })
+export async function createCosting(title: string, notes: string | null, enquiryId: string | null): Promise<Costing> {
+  const { data, error } = await supabase.rpc('create_costing', { title, notes, enquiry: enquiryId })
   fail('Could not create the costing', error)
   return data as Costing
 }

@@ -304,6 +304,19 @@ reference number issued in one step. If anything fails, nothing is released — 
 Once released, nothing on it changes. To alter a quoted job, create a new revision of the
 costing; releasing that gives the same number with the next REV.
 
+### Log a customer and an enquiry
+**Customers** → **Add customer**, then on the customer's page add the people and projects.
+**Enquiries** → **Log enquiry** → choose the customer (and contact or project if you like),
+give it a short title. It gets a number, EN-2026-0001. Create the costing from the Enquiries
+screen's **Costings** button, or pick the enquiry on the new-costing form.
+
+When the quotation is marked sent, the enquiry becomes *quoted* on its own; won or lost follow
+too. You can also set the status by hand on the Enquiries screen.
+
+### Chase a quotation
+**Quotations** → **Follow up** on a sent quotation → pick a date and say what to do. It appears
+on **Follow-ups**, overdue ones first. Mark it **Done** when done.
+
 ### Export a bill of materials
 Open any costing → **Bills of materials** on the right. One line per category with the
 material value; **Excel** or **CSV** per category, or **All four as one workbook**. Quantities

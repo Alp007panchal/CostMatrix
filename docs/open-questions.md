@@ -14,6 +14,8 @@ overturn at any time. Answered questions live in `decisions.md`.
 Not needed: the master component list. It does not exist yet and will be built inside the app
 by Excel upload (see `docs/spec.md` §10a).
 
+| **Slice 4 acceptance:** log a real customer and enquiry, cost against it, release, mark sent | Before slice 5 | The enquiry should move to *quoted* by itself; a follow-up should appear on the Follow-ups screen. |
+
 ## Assumptions in force until you say otherwise
 
 - One user belongs to one company; a user may hold several roles.

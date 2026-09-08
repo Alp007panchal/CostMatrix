@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
 import { longDate, money } from '../../lib/format'
 import type { CostingStatus } from '../../lib/database.types'
 import { createCosting, listCostings } from './api'
+import { listEnquiries } from '../crm/api'
 
 const STATUS_LABEL: Record<CostingStatus, string> = {
   draft: 'Draft',
@@ -19,6 +20,9 @@ export function CostingsPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const costings = useQuery({ queryKey: ['costings'], queryFn: listCostings })
+  const enquiries = useQuery({ queryKey: ['enquiries'], queryFn: listEnquiries })
+  const [params] = useSearchParams()
+  const enquiryFilter = params.get('enquiry')
 
   const [creating, setCreating] = useState(false)
   const [showOld, setShowOld] = useState(false)
@@ -26,7 +30,8 @@ export function CostingsPage() {
 
   if (!company) return null
 
-  const rows = (costings.data ?? []).filter((c) => showOld || c.is_current)
+  const rows = (costings.data ?? []).filter((c) => (showOld || c.is_current) && (!enquiryFilter || c.enquiry_id === enquiryFilter))
+  const enquiryNo = (id: string | null) => enquiries.data?.find((e) => e.id === id)?.enquiry_no
 
   return (
     <>
@@ -41,6 +46,8 @@ export function CostingsPage() {
 
       {creating && (
         <NewCostingForm
+          enquiries={(enquiries.data ?? []).filter((e) => !['won', 'lost', 'closed'].includes(e.status))}
+          defaultEnquiryId={enquiryFilter}
           onClose={() => setCreating(false)}
           onCreated={(id) => {
             void queryClient.invalidateQueries({ queryKey: ['costings'] })
@@ -64,6 +71,7 @@ export function CostingsPage() {
                   <tr>
                     <th>Number</th>
                     <th>Title</th>
+                    <th>Enquiry</th>
                     <th>Status</th>
                     <th>Created</th>
                     <th className="right">Total</th>
@@ -83,6 +91,7 @@ export function CostingsPage() {
                         {!c.is_current && <span className="badge">superseded</span>}
                       </td>
                       <td>{c.title}</td>
+                      <td className="muted">{enquiryNo(c.enquiry_id) ?? '—'}</td>
                       <td>
                         <span className="badge">{STATUS_LABEL[c.status]}</span>
                       </td>
@@ -103,16 +112,21 @@ export function CostingsPage() {
 }
 
 function NewCostingForm({
+  enquiries,
+  defaultEnquiryId,
   onClose,
   onCreated,
 }: {
+  enquiries: { id: string; enquiry_no: string; title: string }[]
+  defaultEnquiryId: string | null
   onClose: () => void
   onCreated: (id: string) => void
 }) {
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
+  const [enquiryId, setEnquiryId] = useState(defaultEnquiryId ?? '')
   const create = useMutation({
-    mutationFn: () => createCosting(title.trim(), notes.trim() || null),
+    mutationFn: () => createCosting(title.trim(), notes.trim() || null, enquiryId || null),
     onSuccess: (c) => onCreated(c.id),
   })
 
@@ -133,6 +147,12 @@ function NewCostingForm({
         Your company&rsquo;s current prices, rates, margins and VAT are copied in now and stay
         fixed for this costing, however they change later.
       </p>
+      <Field label="Enquiry" hint="which request this costing answers; log one on the Enquiries screen if it is missing">
+        <select value={enquiryId} onChange={(e) => { setEnquiryId(e.target.value); const en = enquiries.find((x) => x.id === e.target.value); if (en && !title) setTitle(en.title) }}>
+          <option value="">No enquiry yet</option>
+          {enquiries.map((en) => <option key={en.id} value={en.id}>{en.enquiry_no} — {en.title}</option>)}
+        </select>
+      </Field>
       <Field label="Title" hint="the job, as you would say it: e.g. MCC for Triclover">
         <input value={title} required autoFocus onChange={(e) => setTitle(e.target.value)} />
       </Field>

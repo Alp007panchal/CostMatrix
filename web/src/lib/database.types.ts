@@ -186,6 +186,7 @@ export type CostingStatus = 'draft' | 'submitted' | 'approved'
 export interface Costing {
   id: string
   company_id: string
+  enquiry_id: string | null
   costing_no: string
   revision_no: number
   family_id: string
@@ -342,6 +343,8 @@ export interface Quotation {
   company_id: string
   costing_id: string
   reference_no: string
+  customer_id: string | null
+  contact_id: string | null
   customer_name: string
   customer_address: string | null
   subject: string
@@ -364,6 +367,8 @@ export interface Quotation {
 /** What the approver types or accepts at release. Blanks fall back to company defaults. */
 export interface ReleaseTexts {
   customer_name: string
+  customer_id?: string
+  contact_id?: string
   customer_address?: string
   subject?: string
   salutation?: string
@@ -389,4 +394,71 @@ export interface BomItem {
   option_label: string | null
   quantity: number
   line_total: number
+}
+
+// --- crm -------------------------------------------------------------------
+
+export type EnquiryStatus = 'open' | 'quoted' | 'won' | 'lost' | 'closed'
+
+export interface Customer {
+  id: string
+  company_id: string
+  name: string
+  address: string | null
+  city: string | null
+  country: string | null
+  tax_pin: string | null
+  notes: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export interface Contact {
+  id: string
+  company_id: string
+  customer_id: string
+  name: string
+  email: string | null
+  phone: string | null
+  job_title: string | null
+  is_primary: boolean
+  is_active: boolean
+}
+
+export interface Project {
+  id: string
+  company_id: string
+  customer_id: string
+  name: string
+  site_location: string | null
+  notes: string | null
+  is_active: boolean
+}
+
+export interface Enquiry {
+  id: string
+  company_id: string
+  enquiry_no: string
+  customer_id: string
+  contact_id: string | null
+  project_id: string | null
+  received_on: string
+  title: string
+  description: string | null
+  source: string | null
+  status: EnquiryStatus
+  stage: string | null
+  owner_user_id: string | null
+  created_at: string
+}
+
+export interface QuotationFollowup {
+  id: string
+  quotation_id: string
+  company_id: string
+  due_on: string
+  note: string | null
+  assigned_to: string | null
+  done_at: string | null
+  created_at: string
 }

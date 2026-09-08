@@ -111,3 +111,10 @@ says so and references the old number.
 | D-104 | 2026-09-08 | BOM exports read `v_costing_items_by_category`, which already multiplies quantities through assembly and panel quantities; the app groups and formats, never recomputes. Four category exports plus an all-in-one workbook, each as .xlsx or CSV. |
 | D-105 | 2026-09-08 | The four category groups are always present in order, even when empty, so the export buttons are stable and an empty category is visibly empty rather than missing. |
 | D-106 | 2026-09-08 | CSV is RFC 4180 with CRLF line ends and a UTF-8 byte-order mark, so Excel opens it correctly without an import wizard. |
+| D-107 | 2026-09-08 | CRM rows (contacts, projects, enquiries) point at their customer through a composite key (customer id, company id), so a contact can never belong to a customer of another company whatever the row claims. |
+| D-108 | 2026-09-08 | Enquiries are inserted only through `create_enquiry`, which issues EN-YYYY-NNNN; there is no insert policy on the table. |
+| D-109 | 2026-09-08 | A costing's enquiry is optional in the database but offered first on the new-costing form, and a revision inherits it. Forcing an enquiry on every costing would have blocked a first-time user with an empty CRM. |
+| D-110 | 2026-09-08 | The enquiry follows its quotation: marking a quotation sent moves an open enquiry to quoted; won or lost moves it to won or lost. Done inside `set_quotation_status`, so the two cannot disagree. |
+| D-111 | 2026-09-08 | The release page picks a customer record, which fills the printed name and address; both stay editable, and the quotation keeps the record ids alongside the printed text. |
+| D-112 | 2026-09-08 | Costing engineers may create customers, contacts, projects, enquiries and follow-ups; only enquiry numbering and quotation release are function-only. |
+| D-113 | 2026-09-08 | `create_costing` gained an optional enquiry parameter by dropping and recreating the function rather than overloading it, so the API call cannot become ambiguous. |

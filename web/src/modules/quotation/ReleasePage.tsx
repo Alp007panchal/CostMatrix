@@ -5,6 +5,7 @@ import { useSession } from '../auth/session'
 import { Field } from '../../ui/Async'
 import type { QuotationTerms, ReleaseTexts } from '../../lib/database.types'
 import { getCompanySettings, listFooterLogos } from '../admin/api'
+import { getEnquiry, listContacts, listCustomers } from '../crm/api'
 import { getCostingDetail } from '../costing/api'
 import { logoAsDataUrl, releaseQuotation, uploadQuotationPdf } from './api'
 import { prepareQuotationPdf } from './pdf/prepare'
@@ -32,7 +33,12 @@ export function ReleasePage() {
     enabled: Boolean(company),
   })
 
-  const [form, setForm] = useState<Required<Omit<ReleaseTexts, 'terms'>> & { terms: QuotationTerms }>({
+  const customers = useQuery({ queryKey: ['customers'], queryFn: listCustomers })
+  const [customerId, setCustomerId] = useState('')
+  const [contactId, setContactId] = useState('')
+  const contacts = useQuery({ queryKey: ['contacts', customerId], queryFn: () => listContacts(customerId), enabled: Boolean(customerId) })
+
+  const [form, setForm] = useState<Required<Omit<ReleaseTexts, 'terms' | 'customer_id' | 'contact_id'>> & { terms: QuotationTerms }>({
     customer_name: '', customer_address: '', subject: '', salutation: '', intro_text: '',
     closing_text: '', notes_on_offer: '', signatory_name: '', signatory_email: '',
     terms: { scope_of_supply: '', validity: '', payment: '', delivery_terms: '', delivery_timelines: '' },
@@ -57,7 +63,17 @@ export function ReleasePage() {
       },
     }))
     setSeeded(true)
+    // If the costing came from an enquiry, its customer is the default addressee.
+    const enquiryId = detail.data.costing.enquiry_id
+    if (enquiryId) void getEnquiry(enquiryId).then((en) => { if (en) { setCustomerId(en.customer_id); setContactId(en.contact_id ?? '') } })
   }, [settings.data, detail.data, seeded])
+
+  // Choosing a customer fills the printed name and address; they stay editable.
+  useEffect(() => {
+    const c = customers.data?.find((x) => x.id === customerId)
+    if (!c) return
+    setForm((f) => ({ ...f, customer_name: c.name, customer_address: [c.address, c.city, c.country].filter(Boolean).join('\n') }))
+  }, [customerId, customers.data])
 
   const set = (key: keyof typeof form, value: string) => setForm((f) => ({ ...f, [key]: value }))
   const setTerm = (key: keyof QuotationTerms, value: string) => setForm((f) => ({ ...f, terms: { ...f.terms, [key]: value } }))
@@ -109,6 +125,8 @@ export function ReleasePage() {
       const path = await uploadQuotationPdf(company.id, detail.data.costing.id, blob)
       return releaseQuotation(detail.data.costing.id, path, {
         ...form,
+        customer_id: customerId || undefined,
+        contact_id: contactId || undefined,
         customer_address: form.customer_address || undefined,
         notes_on_offer: form.notes_on_offer || undefined,
       } as ReleaseTexts)
@@ -157,7 +175,25 @@ export function ReleasePage() {
 
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Addressed to</h2>
-        <Field label="Customer" hint="as it should appear after “To:”">
+        <div className="row">
+          <div style={{ flex: 2 }}>
+            <Field label="Customer record" hint="from your customer list; fills the name and address below">
+              <select value={customerId} onChange={(e) => { setCustomerId(e.target.value); setContactId('') }}>
+                <option value="">— type the name below instead —</option>
+                {(customers.data ?? []).filter((c) => c.is_active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </Field>
+          </div>
+          <div style={{ flex: 1 }}>
+            <Field label="Contact" hint="optional">
+              <select value={contactId} disabled={!customerId} onChange={(e) => setContactId(e.target.value)}>
+                <option value="">—</option>
+                {(contacts.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </Field>
+          </div>
+        </div>
+        <Field label="Printed as" hint="as it should appear after “To:”">
           <input value={form.customer_name} required onChange={(e) => set('customer_name', e.target.value)} />
         </Field>
         <Field label="Address" hint="optional">

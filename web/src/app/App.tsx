@@ -18,6 +18,9 @@ const CostingsPage = lazy(() => import('../modules/costing/CostingsPage').then((
 const CostingEditor = lazy(() => import('../modules/costing/CostingEditor').then((m) => ({ default: m.CostingEditor })))
 const ReleasePage = lazy(() => import('../modules/quotation/ReleasePage').then((m) => ({ default: m.ReleasePage })))
 const QuotationsPage = lazy(() => import('../modules/quotation/QuotationsPage').then((m) => ({ default: m.QuotationsPage })))
+const CustomersPage = lazy(() => import('../modules/crm/CustomersPage').then((m) => ({ default: m.CustomersPage })))
+const EnquiriesPage = lazy(() => import('../modules/crm/EnquiriesPage').then((m) => ({ default: m.EnquiriesPage })))
+const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m) => ({ default: m.FollowUpsPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 
 const queryClient = new QueryClient({
@@ -59,6 +62,10 @@ export function App() {
                 }
               />
               <Route path="quotations" element={<QuotationsPage />} />
+              <Route path="crm/customers" element={<CustomersPage />} />
+              <Route path="crm/customers/:id" element={<CustomersPage />} />
+              <Route path="crm/enquiries" element={<EnquiriesPage />} />
+              <Route path="crm/follow-ups" element={<FollowUpsPage />} />
               <Route
                 path="admin/quotation-defaults"
                 element={

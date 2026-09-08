@@ -5,7 +5,7 @@ import { buildSchedules, buildTechnical, buildTerms, splitLines } from './prepar
 function detail(over: Partial<CostingDetail> = {}): CostingDetail {
   return {
     costing: {
-      id: 'c', company_id: 'co', costing_no: 'CM-2026-0001', revision_no: 0, family_id: 'f',
+      id: 'c', company_id: 'co', enquiry_id: null, costing_no: 'CM-2026-0001', revision_no: 0, family_id: 'f',
       previous_revision_id: null, is_current: true, title: 'MCC', notes: null, status: 'approved',
       currency_code: 'KES', currency_label: 'KSH', exchange_rate: 1, discount_pct: 0,
       material_margin_pct: 10, labour_margin_pct: 20, negotiation_margin_pct: 0,
