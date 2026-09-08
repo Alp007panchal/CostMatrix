@@ -13,7 +13,8 @@ Time estimates assume one developer working with you part-time and are rough.
 |---|---|---|
 | 0 — Foundation | **Done and live.** Signed in at cost-matrix-theta.vercel.app. | 2026-09-04 |
 | 1 — Cost one panel end to end | **Built; awaiting the first real panel.** Library, rates, assemblies, costing editor and Excel round-trip all shipped. The done-when test below is yours to run. | 2026-09-08 |
-| 2 — Quotation | Next | |
+| 2 — Quotation | **Built.** Release from an approved costing, PDF per the reference layout, wording defaults, logos, sent/won/lost. First real PDF to be compared against `docs/reference/quotation-NPP-192-REV1.pdf`. | 2026-09-08 |
+| 3 — BOM exports | Next | |
 
 ## Slice 0 — Foundation (about one week)
 

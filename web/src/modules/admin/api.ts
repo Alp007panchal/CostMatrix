@@ -64,6 +64,7 @@ export async function updateCompany(
       | 'quotation_no_includes_year'
       | 'address'
       | 'tax_pin'
+      | 'logo_path'
       | 'is_active'
     >
   >,
@@ -163,4 +164,47 @@ export async function invitePerson(input: {
 }): Promise<void> {
   const { error } = await supabase.functions.invoke('invite-user', { body: input })
   if (error) throw new Error(`Could not send the invitation: ${error.message}`)
+}
+
+// --- logos ---------------------------------------------------------------------
+
+export interface FooterLogo {
+  id: string
+  company_id: string
+  image_path: string
+  caption: string | null
+  sort_order: number
+}
+
+export async function listFooterLogos(companyId: string): Promise<FooterLogo[]> {
+  const { data, error } = await supabase
+    .from('company_footer_logos')
+    .select('*')
+    .eq('company_id', companyId)
+    .order('sort_order')
+  fail('Could not load the footer logos', error)
+  return (data ?? []) as FooterLogo[]
+}
+
+/** Puts an image in the company's own folder of the private logos bucket. */
+export async function uploadLogo(companyId: string, file: File, name: string): Promise<string> {
+  const ext = (file.name.split('.').pop() ?? 'png').toLowerCase()
+  const path = `${companyId}/${name}-${Date.now()}.${ext}`
+  const { error } = await supabase.storage
+    .from('logos')
+    .upload(path, file, { contentType: file.type, upsert: false })
+  fail('Could not upload the image', error)
+  return path
+}
+
+export async function addFooterLogo(companyId: string, imagePath: string, caption: string | null, sortOrder: number): Promise<void> {
+  const { error } = await supabase
+    .from('company_footer_logos')
+    .insert({ company_id: companyId, image_path: imagePath, caption, sort_order: sortOrder })
+  fail('Could not add the footer logo', error)
+}
+
+export async function removeFooterLogo(id: string): Promise<void> {
+  const { error } = await supabase.from('company_footer_logos').delete().eq('id', id)
+  fail('Could not remove the footer logo', error)
 }

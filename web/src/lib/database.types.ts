@@ -313,3 +313,64 @@ export interface CostingHistoryRow {
   details: Record<string, unknown> | null
   at: string
 }
+
+// --- quotation -------------------------------------------------------------
+
+export type QuotationStatus = 'released' | 'sent' | 'won' | 'lost'
+
+export interface QuotationTerms {
+  scope_of_supply: string | null
+  validity: string | null
+  payment: string | null
+  delivery_terms: string | null
+  delivery_timelines: string | null
+}
+
+export interface Letterhead {
+  company_name: string
+  po_box: string | null
+  street_address: string | null
+  phones: string | null
+  email: string | null
+  tax_pin: string | null
+  logo_path: string | null
+  currency_label: string
+}
+
+export interface Quotation {
+  id: string
+  company_id: string
+  costing_id: string
+  reference_no: string
+  customer_name: string
+  customer_address: string | null
+  subject: string
+  salutation: string
+  intro_text: string
+  closing_text: string
+  notes_on_offer: string | null
+  terms: QuotationTerms
+  signatory_name: string | null
+  signatory_email: string | null
+  letterhead_snapshot: Letterhead
+  pdf_path: string
+  released_at: string
+  status: QuotationStatus
+  sent_at: string | null
+  decided_at: string | null
+  lost_reason: string | null
+}
+
+/** What the approver types or accepts at release. Blanks fall back to company defaults. */
+export interface ReleaseTexts {
+  customer_name: string
+  customer_address?: string
+  subject?: string
+  salutation?: string
+  intro_text?: string
+  closing_text?: string
+  notes_on_offer?: string
+  terms?: QuotationTerms
+  signatory_name?: string
+  signatory_email?: string
+}

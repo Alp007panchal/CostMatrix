@@ -16,6 +16,9 @@ const RatesPage = lazy(() => import('../modules/library/RatesPage').then((m) => 
 const AssembliesPage = lazy(() => import('../modules/library/AssembliesPage').then((m) => ({ default: m.AssembliesPage })))
 const CostingsPage = lazy(() => import('../modules/costing/CostingsPage').then((m) => ({ default: m.CostingsPage })))
 const CostingEditor = lazy(() => import('../modules/costing/CostingEditor').then((m) => ({ default: m.CostingEditor })))
+const ReleasePage = lazy(() => import('../modules/quotation/ReleasePage').then((m) => ({ default: m.ReleasePage })))
+const QuotationsPage = lazy(() => import('../modules/quotation/QuotationsPage').then((m) => ({ default: m.QuotationsPage })))
+const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +50,23 @@ export function App() {
               <Route index element={<HomePage />} />
               <Route path="costings" element={<CostingsPage />} />
               <Route path="costings/:id" element={<CostingEditor />} />
+              <Route
+                path="costings/:id/release"
+                element={
+                  <RequireRole role="approver">
+                    <ReleasePage />
+                  </RequireRole>
+                }
+              />
+              <Route path="quotations" element={<QuotationsPage />} />
+              <Route
+                path="admin/quotation-defaults"
+                element={
+                  <RequireRole role="company_admin">
+                    <QuotationDefaultsPage />
+                  </RequireRole>
+                }
+              />
               <Route path="library/components" element={<ComponentsPage />} />
               <Route path="library/assemblies" element={<AssembliesPage />} />
               <Route

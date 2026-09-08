@@ -13,6 +13,7 @@ import {
 import { PanelCard } from './PanelCard'
 import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
+import { QuotationLine } from '../quotation/QuotationLine'
 
 /**
  * One costing. Editable while it is a current draft and the person may build
@@ -122,7 +123,10 @@ export function CostingEditor() {
               <p className="muted">Awaiting approval. Nothing can change until an approver approves it or returns it.</p>
             )}
             {costing.status === 'approved' && (
-              <p className="muted">Approved and read-only. To change anything, create a new revision; this one stays as the record of what was agreed.</p>
+              <>
+                <p className="muted">Approved and read-only. To change anything, create a new revision; this one stays as the record of what was agreed.</p>
+                <QuotationLine costingId={costing.id} canRelease={isApprover && costing.is_current} />
+              </>
             )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 20rem', gap: '1rem', alignItems: 'start' }}>

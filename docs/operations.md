@@ -291,6 +291,23 @@ margins are a share of the selling price rather than of cost.
 Library → Material rates → edit the rate per kilogram → Save. New costings use it; existing
 ones keep the rate they froze.
 
+### Set up the quotation letterhead and wording
+**Quotation wording** (company admin). Upload the header logo, add the footer marks one by one,
+fill in the address lines, the standard opening and closing, the signatory, and the five terms.
+Every new quotation starts from these; the approver can still change the wording on each one.
+
+### Release a quotation
+Open an approved costing → **Release quotation** (approvers only). Check the customer name and
+the wording, click **Preview PDF** to see it, then **Release**. The PDF is stored and the
+reference number issued in one step. If anything fails, nothing is released — try again.
+
+Once released, nothing on it changes. To alter a quoted job, create a new revision of the
+costing; releasing that gives the same number with the next REV.
+
+### Record the outcome of a quotation
+**Quotations** → **Mark sent** when it goes to the customer, then **Won** or **Lost**. Lost asks
+for a reason. That reason is what the sales reports are built on later, so make it honest.
+
 ### Find out what happened to a costing (slice 1)
 Open the costing → **History** tab. Every submission, approval, return, revision and release is
 listed with who did it and when. The log cannot be edited by anyone, including you.

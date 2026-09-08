@@ -8,7 +8,8 @@ overturn at any time. Answered questions live in `decisions.md`.
 | What | Needed by | Note |
 |---|---|---|
 | **Slice 1 acceptance:** cost one real panel in the app and compare with the spreadsheet | Before slice 2 starts | Upload the "db" sheet from the reference workbook, build one assembly, cost one panel. The material subtotal should match the sheet; labour will differ, deliberately, because it is now hours × rate. |
-| Partner logos and certification marks as image files | Slice 2 (quotation PDF) | PNG or SVG, one file per mark. Put them in `docs/reference/logos/`. The header logo too, at print resolution. |
+| Upload the header logo and footer marks | Before the first real quotation | Now done in the app: **Quotation wording** → Header logo and Footer strip. PNG with a transparent background prints best. Keep source copies in `docs/reference/logos/` too. |
+| **Slice 2 acceptance:** release one quotation and compare the PDF with the reference | Before slice 3 starts | Approve a costing, Release quotation, preview, release. Compare against `docs/reference/quotation-NPP-192-REV1.pdf` page by page. Wording and layout differences go on the list; the price schedule numbers should match the costing exactly. |
 
 Not needed: the master component list. It does not exist yet and will be built inside the app
 by Excel upload (see `docs/spec.md` §10a).

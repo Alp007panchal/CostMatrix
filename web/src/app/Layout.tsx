@@ -15,11 +15,13 @@ export function Layout() {
             Home
           </NavLink>
           <NavLink to="/costings">Costings</NavLink>
+          <NavLink to="/quotations">Quotations</NavLink>
           <NavLink to="/library/components">Components</NavLink>
           <NavLink to="/library/assemblies">Assemblies</NavLink>
           {canAdminister && <NavLink to="/library/rates">Rates</NavLink>}
           {canAdminister && <NavLink to="/admin/people">People</NavLink>}
           {canAdminister && <NavLink to="/admin/company">Company</NavLink>}
+          {canAdminister && <NavLink to="/admin/quotation-defaults">Quotation wording</NavLink>}
           {isMasterAdmin && <NavLink to="/admin/companies">Companies</NavLink>}
         </nav>
         <div className="who">
