@@ -7,6 +7,7 @@ overturn at any time. Answered questions live in `decisions.md`.
 
 | What | Needed by | Note |
 |---|---|---|
+| **Slice 1 acceptance:** cost one real panel in the app and compare with the spreadsheet | Before slice 2 starts | Upload the "db" sheet from the reference workbook, build one assembly, cost one panel. The material subtotal should match the sheet; labour will differ, deliberately, because it is now hours × rate. |
 | Partner logos and certification marks as image files | Slice 2 (quotation PDF) | PNG or SVG, one file per mark. Put them in `docs/reference/logos/`. The header logo too, at print resolution. |
 
 Not needed: the master component list. It does not exist yet and will be built inside the app

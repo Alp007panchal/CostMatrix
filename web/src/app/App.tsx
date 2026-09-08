@@ -1,17 +1,21 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider } from '../modules/auth/session'
 import { RequireAuth, RequireRole } from './guards'
 import { Layout } from './Layout'
 import { HomePage } from '../modules/dashboard/HomePage'
-import { PeoplePage } from '../modules/admin/PeoplePage'
-import { CompanyPage } from '../modules/admin/CompanyPage'
-import { CompaniesPage } from '../modules/admin/CompaniesPage'
-import { ComponentsPage } from '../modules/library/ComponentsPage'
-import { RatesPage } from '../modules/library/RatesPage'
-import { AssembliesPage } from '../modules/library/AssembliesPage'
-import { CostingsPage } from '../modules/costing/CostingsPage'
-import { CostingEditor } from '../modules/costing/CostingEditor'
+
+// Each area of the app is fetched the first time somebody opens it, so signing
+// in does not download the costing editor for a person who only sets rates.
+const PeoplePage = lazy(() => import('../modules/admin/PeoplePage').then((m) => ({ default: m.PeoplePage })))
+const CompanyPage = lazy(() => import('../modules/admin/CompanyPage').then((m) => ({ default: m.CompanyPage })))
+const CompaniesPage = lazy(() => import('../modules/admin/CompaniesPage').then((m) => ({ default: m.CompaniesPage })))
+const ComponentsPage = lazy(() => import('../modules/library/ComponentsPage').then((m) => ({ default: m.ComponentsPage })))
+const RatesPage = lazy(() => import('../modules/library/RatesPage').then((m) => ({ default: m.RatesPage })))
+const AssembliesPage = lazy(() => import('../modules/library/AssembliesPage').then((m) => ({ default: m.AssembliesPage })))
+const CostingsPage = lazy(() => import('../modules/costing/CostingsPage').then((m) => ({ default: m.CostingsPage })))
+const CostingEditor = lazy(() => import('../modules/costing/CostingEditor').then((m) => ({ default: m.CostingEditor })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,7 +38,9 @@ export function App() {
             <Route
               element={
                 <RequireAuth>
-                  <Layout />
+                  <Suspense fallback={<p className="empty">Loading…</p>}>
+                    <Layout />
+                  </Suspense>
                 </RequireAuth>
               }
             >

@@ -7,6 +7,14 @@ migrations merged, pgTAP tests green, a short demo script in `docs/demos/`, and 
 
 Time estimates assume one developer working with you part-time and are rough.
 
+## Progress
+
+| Slice | State | Date |
+|---|---|---|
+| 0 — Foundation | **Done and live.** Signed in at cost-matrix-theta.vercel.app. | 2026-09-04 |
+| 1 — Cost one panel end to end | **Built; awaiting the first real panel.** Library, rates, assemblies, costing editor and Excel round-trip all shipped. The done-when test below is yours to run. | 2026-09-08 |
+| 2 — Quotation | Next | |
+
 ## Slice 0 — Foundation (about one week)
 
 Not a user workflow, but everything else stands on it.
