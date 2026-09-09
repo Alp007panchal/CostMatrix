@@ -8,12 +8,21 @@ describe('money', () => {
   it('defaults to the ISO code', () => {
     expect(money(1234.5)).toBe('KES 1,234.50')
   })
+  it('shows a dash for a part without a price instead of crashing', () => {
+    expect(money(null)).toBe('—')
+    expect(money(undefined, 'KSH')).toBe('—')
+    expect(money(null, 'KSH', 'no price')).toBe('no price')
+    expect(money(Number.NaN)).toBe('—')
+  })
 })
 
 describe('percent', () => {
   it('drops trailing zeros', () => {
     expect(percent(16)).toBe('16%')
     expect(percent(12.5)).toBe('12.5%')
+  })
+  it('shows a dash for a missing value', () => {
+    expect(percent(null)).toBe('—')
   })
 })
 
