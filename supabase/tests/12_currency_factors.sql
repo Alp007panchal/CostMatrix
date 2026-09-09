@@ -10,12 +10,13 @@
 \set master '00000000-0000-0000-0000-0000000000a1'
 
 -- === The master defaults ===================================================
-select test.eq((select exchange_rate from public.currency_factors
-                where company_id is null and currency_code = 'EUR'), 113.000000,
-  'the master EUR exchange rate is 113 KES per EUR');
 select test.eq((select landed_factor from public.currency_factors
-                where company_id is null and currency_code = 'EUR'), 1.7699115,
-  'and the landed factor lands it at 200 KES per EUR');
+                where company_id is null and currency_code = 'EUR'), 200.000000,
+  'the master EUR landed factor is 200 KES per EUR, one number (decision 2)');
+select test.eq((select rate from public.material_rates where company_id is null and code = 'copper_busbar'), 15.0000,
+  'the copper rate is 15 per kg');
+select test.eq((select currency_code from public.material_rates where company_id is null and code = 'copper_busbar'), 'EUR',
+  'in EUR (decision 3)');
 select test.eq((select landed_factor from public.currency_factors
                 where company_id is null and currency_code = 'KES'), 1.000000,
   'KES lands at face value');
@@ -44,9 +45,11 @@ update public.companies set discount_pct = 10 where id = :'alpha'::uuid;
 begin;
 set local role authenticated;
 select test.sign_in(:'master');
--- 42 × 113 × 1.7699115 = 8,400.00
+-- 42 × 200 = 8,400.00
 select test.eq((select unit_price from public.v_component_prices where code = 'LK-42'), 8400.00,
   '42 EUR lands at 8,400 KES for a company with no discount');
+select test.eq((select kes_per_kg from public.v_material_rates where code = 'copper_busbar'), 3000.00,
+  'and copper at 15 EUR/kg lands at 3,000 KES/kg');
 select test.eq((select landed_price_kes from public.v_component_prices where code = 'LK-42'), 8400.00,
   'and the landed KES price is shown in its own right');
 select test.eq((select purchase_currency from public.v_component_prices where code = 'LK-42'), 'EUR',
@@ -66,10 +69,12 @@ rollback;
 begin;
 set local role authenticated;
 select test.sign_in(:'alice');
-insert into public.currency_factors (company_id, currency_code, exchange_rate, landed_factor)
-values (:'alpha'::uuid, 'EUR', 120, 1.5);
+insert into public.currency_factors (company_id, currency_code, landed_factor)
+values (:'alpha'::uuid, 'EUR', 180);
 select test.eq((select unit_price from public.v_component_prices where code = 'LK-42'), 6804.00,
-  'Alpha''s own EUR factor is used for Alpha: 42 × 120 × 1.5 less 10 %');
+  'Alpha''s own EUR factor is used for Alpha: 42 × 180 less 10 %');
+select test.eq((select kes_per_kg from public.v_material_rates where code = 'copper_busbar'), 2700.00,
+  'and Alpha''s copper follows its own EUR factor: 15 × 180');
 select test.eq((select source from public.v_currency_factors where currency_code = 'EUR'), 'company',
   'and the factors view says the row is the company''s own');
 commit;
@@ -88,8 +93,8 @@ begin;
 set local role authenticated;
 select test.sign_in(:'alice');
 select test.refuses(
-  $$insert into public.currency_factors (company_id, currency_code, exchange_rate, landed_factor)
-    values (null, 'GBP', 150, 1.5)$$,
+  $$insert into public.currency_factors (company_id, currency_code, landed_factor)
+    values (null, 'GBP', 225)$$,
   'a company admin cannot add a master currency', 'row-level security');
 with attempted as (
   update public.currency_factors set landed_factor = 1 where company_id is null and currency_code = 'EUR'
@@ -101,10 +106,10 @@ rollback;
 begin;
 set local role authenticated;
 select test.sign_in(:'master');
-update public.currency_factors set landed_factor = 1.8 where company_id is null and currency_code = 'EUR';
+update public.currency_factors set landed_factor = 205 where company_id is null and currency_code = 'EUR';
 select test.eq((select count(*) from public.currency_factor_history h
                 join public.currency_factors f on f.id = h.currency_factor_id
-                where f.currency_code = 'EUR' and h.new_landed_factor = 1.8)::int, 1,
+                where f.currency_code = 'EUR' and h.new_landed_factor = 205)::int, 1,
   'changing a factor writes one history row');
 rollback;
 
@@ -150,7 +155,7 @@ select test.eq((select purchase_currency from public.costing_items
                 where costing_id = :'costing_id'::uuid and code = 'CUB-800'), 'EUR',
   'the purchase currency');
 select test.eq((select landed_factor from public.costing_items
-                where costing_id = :'costing_id'::uuid and code = 'CUB-800'), 1.7699115,
+                where costing_id = :'costing_id'::uuid and code = 'CUB-800'), 200.000000,
   'and the landed factor that produced the KES price');
 select test.eq((select master_price_kes from public.costing_items
                 where costing_id = :'costing_id'::uuid and code = 'CUB-800'), 76000.00,

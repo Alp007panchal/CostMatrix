@@ -11,7 +11,7 @@ function existing(over: Partial<ComponentPrice>): ComponentPrice {
     manufacturer: 'SIEMENS', part_number: '3VJ1216', pricing_mode: 'fixed',
     raw_price: 10000, unit_price: 10000, purchase_currency: 'KES', currency_code: 'KES',
     currency_label: 'KES', weight_per_unit: null, material_rate_code: null, is_active: true,
-    source: 'master', is_enclosure_cubicle: false, factor_exchange_rate: 1, landed_factor: 1,
+    source: 'master', is_enclosure_cubicle: false, landed_factor: 1, rating: null, poles: null,
     landed_price_kes: 10000,
     ...over,
   }

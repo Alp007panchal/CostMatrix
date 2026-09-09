@@ -105,11 +105,15 @@ export interface Component {
   weight_per_unit: number | null
   material_rate_code: string | null
   is_enclosure_cubicle: boolean
+  rating: string | null
+  poles: string | null
+  breaking_capacity: string | null
+  frame_size: string | null
   is_active: boolean
 }
 
 /** A component as the signed-in company would pay for it (v_component_prices). */
-export interface ComponentPrice extends Omit<Component, 'purchase_price'> {
+export interface ComponentPrice extends Omit<Component, 'purchase_price' | 'breaking_capacity' | 'frame_size'> {
   category_name: string
   /** The purchase price in purchase_currency. */
   raw_price: number | null
@@ -118,9 +122,9 @@ export interface ComponentPrice extends Omit<Component, 'purchase_price'> {
   currency_code: string
   currency_label: string
   source: 'master' | 'company'
-  factor_exchange_rate: number | null
+  /** KES per 1 unit of the purchase currency, landed (one number, decision 2). */
   landed_factor: number | null
-  /** purchase_price × exchange rate × landed factor, before any discount. */
+  /** purchase_price × landed factor, before any discount. */
   landed_price_kes: number | null
 }
 
@@ -128,18 +132,16 @@ export interface CurrencyFactor {
   id: string
   company_id: string | null
   currency_code: string
-  exchange_rate: number
+  /** KES per 1 unit of the currency, landed: exchange rate, freight, duty and handling in one number. */
   landed_factor: number
   note: string | null
 }
 
-/** The factors this company works with: its own row or the master default (v_currency_factors). */
+/** The factor this company works with per currency: its own row or the master default (v_currency_factors). */
 export interface EffectiveCurrencyFactor {
   currency_code: string
-  exchange_rate: number
   landed_factor: number
   source: 'master' | 'company'
-  master_exchange_rate: number
   master_landed_factor: number
   master_id: string
   own_id: string | null
@@ -159,6 +161,7 @@ export interface MaterialRate {
   name: string
   unit: string
   rate: number
+  currency_code: string
 }
 
 /** The rate this company actually pays, its own or the master default. */
@@ -166,9 +169,16 @@ export interface EffectiveMaterialRate {
   code: string
   name: string
   unit: string
+  /** What this company pays per unit, in its own currency. */
   rate: number
   source: 'master' | 'company'
   master_rate_kes: number
+  kes_per_kg: number
+  /** The rate as typed and its currency (15 EUR). */
+  rate_entered: number
+  currency_code: string
+  master_rate: number
+  master_currency: string
 }
 
 export interface PriceHistoryRow {
