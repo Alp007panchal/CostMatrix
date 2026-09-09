@@ -22,8 +22,8 @@ Time estimates assume one developer working with you part-time and are rough.
 | S2 — Master data & importer | **Built, PR 3 open** (stacked on PR 2). Import screen: components, kits and groups, kit-group hours, each with preview and reasons; placeholders; the real seed loads in the test suite (735 parts, 17 groups, 297 kits, one main device each); 223 database assertions. | 2026-09-09 |
 | S3 — Costing engine + NPP-192 acceptance | **Built, PR 4 open** (stacked on PR 3). Kits by group and rating, loose components and typed lines per panel, cubicle uplift on loose lines, revision copy fixed, category subtotals on the Totals card; test 15 rebuilds NPP-192 Option 1 from the seed to the cent and proves the margin, rounding and VAT arithmetic; 256 database assertions, 40 web tests. | 2026-09-09 |
 | S4 — Outputs | **Built, PR 5 open** (stacked on PR 4). Annexure IV drafted from the kits and lines (button and release fallback), BOMs and price schedule checked against loose and typed lines. | 2026-09-09 |
-| S5 — External companies | | |
-| S6 — CRM gap review | | |
+| S5 — External companies | **Reviewed, PR 6 open** (stacked on PR 5). Discount, currency, private library, overrides and master-admin reads all existed; added the Company column and filter on the cross-company lists, invitation by company, the kit ownership check on screen, the new-company checklist in the runbook, test 16; 272 database assertions. | 2026-09-09 |
+| S6 — CRM gap review | **Reviewed, PR 6.** Customers, contacts, projects, numbered enquiries, costings against enquiries, quotations to customer records, status following the quotation and follow-ups all existed; added follow-ups on the home page and editing a customer's details. Not built: an enquiry detail page listing its costings and quotations (the Costings button on the enquiry filters the list instead). | 2026-09-09 |
 
 ## Slice 0 — Foundation (about one week)
 

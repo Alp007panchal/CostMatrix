@@ -26,7 +26,7 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
 
   const isMaster = assembly.company_id === null
   const isCompanyAdmin = hasRole('company_admin')
-  const canEditContents = isMaster ? isMasterAdmin : isCompanyAdmin
+  const canEditContents = isMaster ? isMasterAdmin : isCompanyAdmin && assembly.company_id === company?.id
   const canOverrideHours = isMaster && isCompanyAdmin && !isMasterAdmin
 
   const lines = useQuery({

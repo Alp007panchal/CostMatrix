@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
+import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { longDate, money } from '../../lib/format'
 import type { CostingStatus } from '../../lib/database.types'
 import { createCosting, listCostings } from './api'
@@ -27,10 +28,11 @@ export function CostingsPage() {
   const [creating, setCreating] = useState(false)
   const [showOld, setShowOld] = useState(false)
   const canCreate = hasRole('costing_engineer') || hasRole('approver')
+  const byCompany = useCompanyFilter()
 
   if (!company) return null
 
-  const rows = (costings.data ?? []).filter((c) => (showOld || c.is_current) && (!enquiryFilter || c.enquiry_id === enquiryFilter))
+  const rows = (costings.data ?? []).filter((c) => (showOld || c.is_current) && (!enquiryFilter || c.enquiry_id === enquiryFilter) && byCompany.keep(c.company_id))
   const enquiryNo = (id: string | null) => enquiries.data?.find((e) => e.id === id)?.enquiry_no
 
   return (
@@ -58,6 +60,7 @@ export function CostingsPage() {
 
       <div className="card">
         <div className="row end" style={{ marginBottom: '.5rem' }}>
+          <CompanyFilterSelect filter={byCompany} />
           <label className="row" style={{ gap: '.35rem' }}>
             <input type="checkbox" checked={showOld} onChange={(e) => setShowOld(e.target.checked)} />
             Show superseded revisions
@@ -69,6 +72,7 @@ export function CostingsPage() {
               <table>
                 <thead>
                   <tr>
+                    {byCompany.multi && <th>Company</th>}
                     <th>Number</th>
                     <th>Title</th>
                     <th>Enquiry</th>
@@ -85,6 +89,7 @@ export function CostingsPage() {
                       style={{ cursor: 'pointer' }}
                       onClick={() => navigate(`/costings/${c.id}`)}
                     >
+                      {byCompany.multi && <td className="muted">{byCompany.companyName(c.company_id)}</td>}
                       <td>
                         {c.costing_no}
                         {c.revision_no > 0 && <span className="badge">Rev {c.revision_no}</span>}

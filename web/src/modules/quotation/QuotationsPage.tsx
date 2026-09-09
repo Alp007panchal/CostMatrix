@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
+import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { longDate } from '../../lib/format'
 import type { Quotation, QuotationStatus } from '../../lib/database.types'
 import { listQuotations, pdfDownloadUrl, setQuotationStatus } from './api'
@@ -29,6 +30,7 @@ export function QuotationsPage() {
   })
 
   const canChange = hasRole('costing_engineer') || hasRole('approver')
+  const byCompany = useCompanyFilter()
   const change = useMutation({
     mutationFn: (input: { id: string; status: QuotationStatus; reason: string | null }) =>
       setQuotationStatus(input.id, input.status, input.reason),
@@ -76,12 +78,14 @@ export function QuotationsPage() {
       )}
 
       <div className="card">
+        {byCompany.multi && <div className="row end" style={{ marginBottom: '.5rem' }}><CompanyFilterSelect filter={byCompany} /></div>}
         <div className="table-wrap">
           <Async query={quotations} empty="No quotations released yet. Approve a costing, then release one from it.">
-            {(rows) => (
+            {(all) => (
               <table>
                 <thead>
                   <tr>
+                    {byCompany.multi && <th>Company</th>}
                     <th>Reference</th>
                     <th>Customer</th>
                     <th>Subject</th>
@@ -91,8 +95,9 @@ export function QuotationsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((q) => (
+                  {all.filter((q) => byCompany.keep(q.company_id)).map((q) => (
                     <tr key={q.id}>
+                      {byCompany.multi && <td className="muted">{byCompany.companyName(q.company_id)}</td>}
                       <td>
                         <button onClick={() => navigate(`/costings/${q.costing_id}`)} style={{ padding: '.1rem .4rem' }}>{q.reference_no}</button>
                       </td>

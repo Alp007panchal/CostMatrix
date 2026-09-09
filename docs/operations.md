@@ -248,6 +248,21 @@ automated job uses them from GitHub secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
+### Set up a new company (sessions 5–6 review)
+Master administrator, in this order; each step is a screen that already exists.
+1. **Companies → Add company**: name, kind (external, buyer), currency code and printed label,
+   exchange rate (KES per 1 unit), and its discount on master prices.
+2. **People → Invite somebody**: choose the new company in the *Company* box, tick *Company
+   admin*. They get an email to set a password.
+3. Hand over. The new company admin then does, on their own screens: **Company** (margins,
+   VAT, rounding, enclosure uplift, quotation prefix, address), **Rates** (hourly rates per kind
+   of work, copper rate, any currency factor of their own), **Quotation wording** (letterhead,
+   logos, terms, signatory), **People** (their engineers and approvers).
+4. Their library: master parts and kits are already visible at their discount; private parts,
+   kits and kit groups are theirs to add (Components, Kits, Kit groups, or Import).
+You can read any company's costings, quotations, customers and enquiries (the lists gain a
+*Company* column and filter for you) but cannot change them; that is by design.
+
 ### Invite a user
 1. Sign in, open **People**.
 2. Fill in the name, email and roles under "Invite somebody", then send.

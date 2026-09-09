@@ -10,7 +10,7 @@ Read §5 (the thirteen decisions) and §6.2 (what will differ when the app rebui
 Option 1) and correct anything wrong, then merge PR 1. PR 2 (session 1: the schema for decisions
 1, 2, 3 and 11) is stacked on it; PR 3 (session 2: the Import screen) on that, PR 4 (session 3: costing from kits, loose lines,
 the NPP-192 acceptance test) on that, PR 5 (session 4: the technical offer from the kits) on
-that. Merge 1 to 5 in order. Nothing reaches the live
+that, PR 6 (sessions 5–6 review) on that. Merge 1 to 6 in order. Nothing reaches the live
 database until then; after PR 3 you run the three imports.
 
 ## Waiting on you
