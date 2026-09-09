@@ -22,7 +22,7 @@ editor, quotation PDF, BOM exports, CRM phase 1.
 and over the existing code. When it conflicts with the schema, write a forward migration
 (0008 onward); never rebuild what already agrees.
 
-## The 13 decisions (short form; §5 has the full text and which are still proposed)
+## The 13 decisions (short form; §5 has the full text)
 
 1. Enclosure = catalogue cubicles × quantity + a company uplift %.
 2. Every component has a purchase price and purchase currency; a landed-cost factor per

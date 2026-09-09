@@ -137,3 +137,4 @@ says so and references the old number.
 | D-130 | 2026-09-09 | The `assemblies` table keeps its name; screens, buttons and messages say "kit". Renaming 200 identifiers would buy nothing and risk the live app. |
 | D-131 | 2026-09-09 | The Excel round-trip gained a Currency column (or a currency word in front of the price, KSH read as KES) and an Enclosure cubicle column; a blank currency means KES so old sheets still upload. |
 | D-132 | 2026-09-09 | With the eight-decimal factor (D-126) the NPP-192 Option 1 acceptance figures from the seed are switchgear 2,386,421.80 and material 4,012,709.80 (difference −152,288.00 to the shilling); D-123's 2,386,422.24 carried the 0.00006 rounding and is superseded. |
+| D-148 | 2026-09-09 | The owner read §5 and confirmed decisions 4, 10, 12 and 13 as written; all thirteen are now the owner's. Supersedes the "proposed" note in D-115. |
