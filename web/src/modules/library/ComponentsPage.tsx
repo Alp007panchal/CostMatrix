@@ -160,7 +160,9 @@ export function ComponentsPage() {
                               : <span className="error">no price</span>}
                         </td>
                         <td className="right">
-                          {money(c.unit_price, company.currency_label)}
+                          {c.unit_price == null
+                            ? <span className="muted" title="Set a purchase price to cost this part">—</span>
+                            : money(c.unit_price, company.currency_label)}
                           {c.pricing_mode === 'weight_rate' && (
                             <div className="muted">{c.weight_per_unit} kg per {c.unit}</div>
                           )}
