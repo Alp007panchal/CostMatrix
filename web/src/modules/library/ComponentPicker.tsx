@@ -57,7 +57,9 @@ export function ComponentPicker({
                     {c.code} — {c.name}
                     <span className="muted"> {c.manufacturer}</span>
                   </td>
-                  <td className="right">{money(c.unit_price, label)}</td>
+                  <td className="right">
+                    {c.unit_price == null ? <span className="error">no price</span> : money(c.unit_price, label)}
+                  </td>
                   <td className="right">
                     <button
                       className="primary"

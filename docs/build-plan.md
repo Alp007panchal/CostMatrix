@@ -21,6 +21,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | — | **Reconciliation with the thirteen decisions.** `docs/reference/current-costing-and-quotation-reference.md` §5 is now the source of truth; seed derived from the owner's exports; six sessions below replace slices 5–6. PR 1 (seed, reference document, plan) open for the owner. | 2026-09-09 |
 | S1 — Foundation (0008–0009) | **Built, PR 2 open** (stacked on PR 1). Currency factors, purchase price and currency, cubicles and uplift, kit groups with hours, main device, rating; Rates → Currency factors, Company → Enclosure uplift, Kits and Kit groups screens. 187 database assertions, 35 web tests. | 2026-09-09 |
 | S2 — Master data & importer | **Built, PR 3 open** (stacked on PR 2). Import screen: components, kits and groups, kit-group hours, each with preview and reasons; placeholders; the owner's seed files load as they are in the test suite (735 parts, 17 labour groups, 296 kits, 720 lines, one main device each). | 2026-09-09 |
+| — | **Hotfix, PR 8 to `main` (2026-09-09).** After the first production import the Components page went blank: the price formatter crashed on the eight parts without a price. Formatter made null-safe, error boundary added, render tests that load `data/seed` and draw both lists. | 2026-09-09 |
 | S3 — Costing engine + NPP-192 acceptance | | |
 | S4 — Outputs (PDF from kits, BOMs) | | |
 | S5 — External companies | | |
