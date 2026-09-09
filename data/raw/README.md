@@ -1,10 +1,11 @@
 # Raw catalogue and kit exports
 
 The owner's source files, committed exactly as received on 2026-09-09 (zip `KITS_AND_CATALOGUE.zip`).
-Nothing in this folder is edited by hand. `scripts/build_seed.py` and `scripts/build_kits.py`
-read these and write the clean seed files under `data/seed/`; `scripts/check_npp192.py` reprices
-the NPP-192 workbook from the result. The rules are in
-`docs/reference/current-costing-and-quotation-reference.md` §6.
+Nothing in this folder is edited by hand. The owner cleaned these into `data/seed/` (see the
+README there and `docs/reference/current-costing-and-quotation-reference.md` §6); the owner's
+`scripts/build_seed.py data/raw` and `scripts/build_kits.py data/raw` reproduce the seed from
+this folder (they need pandas and are not run in CI). `scripts/check_npp192.py` reprices the
+NPP-192 workbook from the seed.
 
 | File | What it is |
 |---|---|

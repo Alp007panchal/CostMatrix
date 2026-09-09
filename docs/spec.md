@@ -84,11 +84,11 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Each company sets its own hourly rate per process type in its own currency. These rates are what the company's costings use.
 
 ### 4.5 Material rates
-- Master admin maintains default material rates in KES. Release 1 is seeded with one: copper busbar at 3,000 per kg. The rate is editable at any time, and every change is recorded with the user and time, like a component price.
+- Master admin maintains default material rates, each in a currency: copper busbar is **15 EUR per kg** and lands through the EUR factor (15 × 200 = 3,000 KES/kg) (decision 3). The rate is editable at any time, and every change is recorded with the user and time, like a component price. The kg-per-metre table is the busbar components' kg per metre (catalogue EUR ÷ 15).
 - Each company sets its own material rates in its own currency. Changing a rate changes the price of every `weight_rate` component in future costings; existing costings keep the frozen value.
 
 ### 4.6 Currency factors
-- Per currency: an exchange rate (KES per 1 unit) and a landed-cost factor for freight, duty and clearing. Master defaults (KES 1 × 1; EUR 113 × 1.7699115, which lands a euro at 200 KES as the NPP-192 workbook did); a company may hold its own row for a currency and it wins for that company. Every change is recorded in a history.
+- Per currency: **one landed-cost factor** — KES per 1 unit landed, with exchange rate, freight, duty and handling in a single admin-maintained number (decision 2). Master defaults KES 1 and EUR 200 (the NPP-192 figure); a company may hold its own row for a currency and it wins for that company. Every change is recorded in a history.
 
 ## 5. Pricing rules
 
@@ -96,7 +96,7 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Each company works in one currency (KES or another). The company admin sets the currency and the exchange rate, defined as **KES per 1 unit of the company currency** (1.00 for a KES company; about 130 for a USD company).
 - A fixed-price component is priced in three steps (decision 2), all in `v_component_prices`:
 
-      landed_price_kes = purchase_price × exchange_rate(purchase_currency) × landed_factor(purchase_currency)
+      landed_price_kes = purchase_price × landed_factor(purchase_currency)
       master component:  unit_price = landed_price_kes × (1 − discount%) ÷ company exchange_rate
       private component: unit_price = landed_price_kes ÷ company exchange_rate          (no discount)
 
@@ -212,11 +212,14 @@ Each export lists component code, name, unit, quantity (summed across panels and
 
 ## 10a. Excel import and export of the library
 
-Beside the Excel round-trip below, the **Import** screen loads the three seed CSVs
-(`data/seed/components.csv`, `kits.csv`, `kit-group-labour-template.csv`) in order, with a
-preview first: counts of new, changed, unchanged and rejected rows and the reason for each
-rejection. Validation: unique part numbers; known category and currency; a kit has exactly one
-main device and every part in the library, or the whole kit is rejected; hours are numbers.
+Beside the Excel round-trip below, the **Import** screen loads the owner's seed files as they
+are in `data/seed/`: `components.csv` with `category-map.csv`, `kits.csv` with
+`kit-labour-template.csv` (labour group, main device, per-kit hours), and the wide
+`kit-group-labour-template.csv`, in that order, with a preview first: counts of new, changed,
+unchanged and rejected rows and the reason for each rejection. Validation: unique part numbers;
+a category in the map and a known currency; busbar kg per metre derived as price ÷ copper rate;
+a kit has exactly one main device and every part in the library, or the whole kit is rejected;
+hours are numbers.
 Re-importing replaces a changed kit's lines and keeps its hours. Imports never delete.
 
 There is no finished master component list today, so the library is built inside the app by

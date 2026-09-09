@@ -13,6 +13,7 @@ import type {
 } from '../../lib/database.types'
 import { AssemblyLine } from './AssemblyLine'
 import { KitPicker } from './KitPicker'
+import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
 import { Detail } from './PanelDetails'
 import { describePanel } from './technical'
@@ -65,6 +66,7 @@ export function PanelCard({
   const totalsById = new Map(assemblyTotals.map((t) => [t.costing_assembly_id, t]))
   // Kits first, the loose lines last, whatever order they were added in.
   const ordered = [...assemblies].sort((a, b) => (a.kind === b.kind ? a.sort_order - b.sort_order : a.kind === 'free' ? 1 : -1))
+  const kvar = kvarTotal(assemblies, kits)
 
   const field = (key: keyof CostingPanel, value: string | number | null) =>
     handlers.onPanelChange(panel.id, { [key]: value })
@@ -199,6 +201,11 @@ export function PanelCard({
           </tbody>
           {price && (
             <tfoot>
+              {kvar != null && (
+                <tr>
+                  <td colSpan={6} className="muted">APFC bank: {kvar} kVAr in steps (the kits above, rating × quantity)</td>
+                </tr>
+              )}
               <tr>
                 <th colSpan={2}>Cost of one panel</th>
                 <th className="right">{money(price.material_cost, label)}</th>

@@ -1,0 +1,14 @@
+partNumber,description,source,sourceRow,priceEur,problem,action
+CSMBS3ISO63X,63A TP MCB Isolator,component-C&S.csv,51,,no price,"kept, price blank - needs a price before use"
+3VJ1340-5DB32-0AA0,"200A,TP,MCCB, Adjustable, 36kA",component-catalog-ALL.csv,365,141.12,part number belongs to the 400A MCCB (3VJ13-40); 200A is probably 3VJ1320-5DB32-0AA0,dropped from seed - confirm the 200A part number and price
+3VJ9417-0AA21,Right Alarm Switch (3VJ13 & 14),component-catalog-ALL.csv,407,7.33,"duplicate part number (first occurrence kept: ""Left Alarm Switch (3VJ13 & 14)"" @ 7.33)",dropped from seed - confirm correct price / part number
+CSE4NN630ATM3P-630A,630A TP Adj Therm Mag MCCB 630AF 36KA,component-C&S.csv,15,201,"duplicate part number (first occurrence kept: ""630A TP Adj Therm Mag MCCB 630AF 36KA"" @ 210.25)",dropped from seed - confirm correct price / part number
+CS630NATU6303,630A TP Adj Therm Mag MCCB 630AF 65KA,component-C&S.csv,16,241.5,"duplicate part number (first occurrence kept: ""630A TP Adj Therm Mag MCCB 630AF 65KA"" @ 275)",dropped from seed - confirm correct price / part number
+CSRCB02PC40A30-10KA,40A DP RCBO 30mA,component-C&S.csv,172,12.5,"duplicate part number (first occurrence kept: ""40A DP RCBO 30mA"" @ 12.5)",dropped from seed - confirm correct price / part number
+CSESL125FMU125A3P,125A TP Adjustable MCCB,kits-export,,,"used by kit ""50KVAR APFC-BREAKER KIT"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
+5SJ43508RC,50A TP MCB 10KA 'D' Curve,kits-export,,,"used by kit ""25KVAR APFC-BREAKER KIT"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
+5SY73328CC,32A TP MCB(D),kits-export,,,"used by kit ""12.5KVAR APFC-BREAKER KIT"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
+5SY7310-8CC,10A TP MCB 15KA 'D' Curve,kits-export,,,"used by kit ""5KVAR APFC-BREAKER KIT"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
+5TE39137Y,63A DP ISOLATOR,kits-export,,,"used by kit ""STANDARD METERBOARD-SINGLE PHASE"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
+5SL6263-7RC,"63A MCB,7.5kA, DP, C Curve",kits-export,,,"used by kit ""STANDARD METERBOARD-SINGLE PHASE"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
+LA9D50978X,Elec/Mech I/lock Hor.Mount 40-65A AC3,kits-export,,,"used by kit ""STANDARD METERBOARD-THREE PHASE-63A-ATS"" but not in the component catalogue",placeholder row added to components.csv with no price - add price or map to an existing part
