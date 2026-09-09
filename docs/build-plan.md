@@ -20,7 +20,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | — | **The owner's reference document and cleaned seed arrived (2026-09-09, second zip)** and replaced the derived ones; §5 is the owner's; the factor is one number (200), copper 15 EUR/kg, labour groups 17. |
 | — | **Reconciliation with the thirteen decisions.** `docs/reference/current-costing-and-quotation-reference.md` §5 is now the source of truth; seed derived from the owner's exports; six sessions below replace slices 5–6. PR 1 (seed, reference document, plan) open for the owner. | 2026-09-09 |
 | S1 — Foundation (0008–0009) | **Built, PR 2 open** (stacked on PR 1). Currency factors, purchase price and currency, cubicles and uplift, kit groups with hours, main device, rating; Rates → Currency factors, Company → Enclosure uplift, Kits and Kit groups screens. 187 database assertions, 35 web tests. | 2026-09-09 |
-| S2 — Master data & importer | **Built, PR 3 open** (stacked on PR 2). Import screen: components, kits and groups, kit-group hours, each with preview and reasons; placeholders; the real seed loads in the test suite (735 parts, 17 groups, 297 kits, one main device each); 223 database assertions. | 2026-09-09 |
+| S2 — Master data & importer | **Built, PR 3 open** (stacked on PR 2). Import screen: components, kits and groups, kit-group hours, each with preview and reasons; placeholders; the owner's seed files load as they are in the test suite (735 parts, 17 labour groups, 296 kits, 720 lines, one main device each). | 2026-09-09 |
 | S3 — Costing engine + NPP-192 acceptance | | |
 | S4 — Outputs (PDF from kits, BOMs) | | |
 | S5 — External companies | | |

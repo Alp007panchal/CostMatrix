@@ -120,12 +120,14 @@ export interface ImportReport {
   changed: number
   unchanged: number
   rejected: { row: number; key: string; reason: string }[]
-  warnings?: { row: number; key: string; reason: string }[]
+  warnings?: { row?: number; key: string; reason: string }[]
   changes: { key: string; changes: { field: string; from: unknown; to: unknown }[] }[]
   applied: boolean
   batch_id: string | null
   groups_new?: number
+  overrides?: number
   skipped_blank?: number
+  busbar_kg_derived?: number
 }
 
 /** A component as the signed-in company would pay for it (v_component_prices). */

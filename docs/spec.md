@@ -195,11 +195,14 @@ Each export lists component code, name, unit, quantity (summed across panels and
 
 ## 10a. Excel import and export of the library
 
-Beside the Excel round-trip below, the **Import** screen loads the three seed CSVs
-(`data/seed/components.csv`, `kits.csv`, `kit-group-labour-template.csv`) in order, with a
-preview first: counts of new, changed, unchanged and rejected rows and the reason for each
-rejection. Validation: unique part numbers; known category and currency; a kit has exactly one
-main device and every part in the library, or the whole kit is rejected; hours are numbers.
+Beside the Excel round-trip below, the **Import** screen loads the owner's seed files as they
+are in `data/seed/`: `components.csv` with `category-map.csv`, `kits.csv` with
+`kit-labour-template.csv` (labour group, main device, per-kit hours), and the wide
+`kit-group-labour-template.csv`, in that order, with a preview first: counts of new, changed,
+unchanged and rejected rows and the reason for each rejection. Validation: unique part numbers;
+a category in the map and a known currency; busbar kg per metre derived as price ÷ copper rate;
+a kit has exactly one main device and every part in the library, or the whole kit is rejected;
+hours are numbers.
 Re-importing replaces a changed kit's lines and keeps its hours. Imports never delete.
 
 There is no finished master component list today, so the library is built inside the app by

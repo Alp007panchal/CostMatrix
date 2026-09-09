@@ -290,15 +290,22 @@ Uploads never delete anything. To remove a component, deactivate it on its own s
 margins are a share of the selling price rather than of cost.
 
 ### Import the seed (session 2)
-Import (in the top bar; administrators only). Three steps, in order, each with its own CSV from
-`data/seed/` in the repository: **1 Components** (`components.csv`), **2 Kits and kit groups**
-(`kits.csv`), **3 Kit group hours** (`kit-group-labour-template.csv`, once you have filled the
-hours). Choose the file → **Preview** shows how many rows are new, changed, unchanged and
-rejected, with the reason for every rejection → **Apply** saves. Nothing is ever deleted, and a
-second import of the same file changes nothing. Parts the kits use but the catalogue does not
-price import as *placeholders*: they show "no price" on the Components screen, and a kit that
-holds one cannot be added to a costing until you give it a purchase price. The master admin
-imports the master library; a company admin imports private parts and kits for their company.
+Import (in the top bar; administrators only). Three steps, in order, each fed by the files in
+`data/seed/` in the repository, exactly as they are there: **1 Components** — `components.csv`
+plus `category-map.csv` (the second file tells the importer which of the four BOM categories
+each catalogue category belongs to; a `BOM category:` note on a single row overrides it).
+Busbar rows become weight-priced parts: kg per metre = catalogue EUR ÷ the copper rate (15 EUR
+per kg), and the preview says how many were derived. **2 Kits and kit groups** — `kits.csv` plus
+`kit-labour-template.csv` (the second file gives each kit its labour group and main device, and
+any hours filled in for a single kit become that kit's own hours). **3 Kit group hours** —
+`kit-group-labour-template.csv` once you have filled the three hours columns; blank cells are
+skipped and counted. Choose the file(s) → **Preview** shows how many rows are new, changed,
+unchanged and rejected, with the reason for every rejection → **Apply** saves. Nothing is ever
+deleted, and a second import of the same files changes nothing. Expected on the first import:
+735 parts (7 placeholders without a price, plus one part whose price is blank in the export),
+296 kits in 17 groups with 720 lines. Placeholders show "no price" on the Components screen, and
+a kit that holds one cannot be added to a costing until you give it a purchase price. The master
+admin imports the master library; a company admin imports private parts and kits for their company.
 
 ### Change a currency's landed factor (session 1)
 Rates → Currency factors. Each currency shows one figure: KES per 1 unit **landed**, with the
