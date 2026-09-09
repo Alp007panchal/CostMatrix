@@ -1,7 +1,8 @@
 -- NPP-192 Option 1 rebuilt from the seed (reference document §4 and §6.2).
 -- Runs after 14, which leaves the seed in the database. Every priced line of
 -- the workbook's OPTION1 sheet is added: catalogue parts as free components,
--- the eleven uncatalogued lines typed in at the workbook price.
+-- the ten uncatalogued lines typed in at the workbook price. The workbook's
+-- enclosure line (102 × 4,000) is disregarded (decision 1) and not entered.
 
 \set alpha  '00000000-0000-0000-0000-0000000000c2'
 \set alice  '00000000-0000-0000-0000-0000000000a2'
@@ -74,42 +75,46 @@ select app.add_component_to_costing(:'panel_id'::uuid, (select id from public.co
 select app.add_component_to_costing(:'panel_id'::uuid, (select id from public.components where company_id is null and upper(code) = '70SQMM'), 18);  -- BUSBAR
 select app.add_component_to_costing(:'panel_id'::uuid, (select id from public.components where company_id is null and upper(code) = '50SQMM'), 9);  -- BUSBAR
 select app.add_component_to_costing(:'panel_id'::uuid, (select id from public.components where company_id is null and upper(code) = '35SQMM'), 9);  -- BUSBAR
-select app.add_manual_item(:'panel_id'::uuid, '4000', 'enclosure_parts', 408000.00, 1);  -- ENCLOSURE
 
 select test.eq((select count(*) from public.costing_assemblies where costing_id = :'costing_id'::uuid), 1::bigint,
   'everything sits in the panel''s one components-and-enclosure line');
 select test.eq((select kind from public.costing_assemblies where costing_id = :'costing_id'::uuid), 'free',
   'which is the free holder');
 
--- The §6.2 material figure, to the cent.
+-- The material figure from the owner's seed, to the cent
+-- (docs/reference/npp192-acceptance-from-seed.md; the workbook has 3,756,997.80
+-- without its enclosure line, the gap being its stale prices).
 select test.eq((select material_cost from public.v_costing_panel_costs where costing_id = :'costing_id'::uuid),
-               4012709.80, 'material for Option 1 from the seed is 4,012,709.80 (workbook 4,164,997.80; §6.2 explains the gap)');
+               3622781.80, 'material for Option 1 from the seed is 3,622,781.80');
 
--- By category. The workbook files 106,800 of cable under its APFC section; the
--- app files cable under busbar & cable, so its split differs by that amount.
+-- By BOM category. Cable belongs to accessories & hardware (category-map.csv),
+-- so the app's busbar figure is the workbook's BUSBAR section alone, which matches exactly.
 select test.eq((select sum(line_total) from public.v_costing_items_by_category
-                where costing_id = :'costing_id'::uuid and category_code = 'switchgear'), 2279621.80,
-  'switchgear 2,279,621.80 (= §6.2 2,386,421.80 less 106,800 of cable filed under busbar)');
+                where costing_id = :'costing_id'::uuid and category_code = 'switchgear'), 2212282.00,
+  'switchgear 2,212,282.00');
 select test.eq((select sum(line_total) from public.v_costing_items_by_category
-                where costing_id = :'costing_id'::uuid and category_code = 'busbar'), 1325088.00,
-  'busbar & cable 1,325,088.00 (= §6.2 1,218,288.00 plus that cable)');
+                where costing_id = :'costing_id'::uuid and category_code = 'busbar'), 1176600.00,
+  'busbar 1,176,600.00, the workbook''s BUSBAR section to the shilling');
 select test.eq((select sum(line_total) from public.v_costing_items_by_category
-                where costing_id = :'costing_id'::uuid and category_code = 'enclosure_parts'), 408000.00,
-  'enclosure 408,000.00, typed in as the workbook has it');
+                where costing_id = :'costing_id'::uuid and category_code = 'accessories_hardware'), 233899.80,
+  'accessories & hardware (cable) 233,899.80');
+select test.eq((select coalesce(sum(line_total), 0) from public.v_costing_items_by_category
+                where costing_id = :'costing_id'::uuid and category_code = 'enclosure_parts'), 0.00,
+  'no enclosure: the workbook''s 102 × 4,000 line is disregarded (decision 1)');
 
 -- Individual workings kept on the lines.
 select test.eq((select unit_price from public.costing_items where costing_id = :'costing_id'::uuid and code = '50X10MM'),
-               13440.00, 'busbar 50 x 10 is 4.48 kg × 3,000 = 13,440 per metre');
+               13800.00, 'busbar 50 x 10 is 69 EUR ÷ 15 = 4.6 kg × 3,000 KES/kg = 13,800 per metre');
 select test.eq((select quantity from public.costing_items where costing_id = :'costing_id'::uuid and code = '35SQMM'),
                99.000, 'the same cable added twice adds up (90 + 9 m)');
-select test.eq((select count(*) from public.costing_items where costing_id = :'costing_id'::uuid and is_manual)::int, 11,
-  'eleven typed lines');
+select test.eq((select count(*) from public.costing_items where costing_id = :'costing_id'::uuid and is_manual)::int, 10,
+  'ten typed lines');
 select test.eq((select landed_factor from public.costing_items where costing_id = :'costing_id'::uuid and code = 'LOGO'),
-               1.76991150, 'a catalogue line keeps the factor that priced it');
+               200.000000, 'a catalogue line keeps the landed factor that priced it (200 KES per EUR)');
 
 -- With no margin the panel price is the material rounded up to 100.
 select test.eq((select unit_price from public.v_costing_panel_prices where costing_id = :'costing_id'::uuid),
-               4012800.00, 'rounded up to the next 100');
+               3622800.00, 'rounded up to the next 100');
 commit;
 
 -- === The workbook's arithmetic on its own material figure ==================
@@ -198,7 +203,7 @@ select app.add_assembly_to_costing(:'panel_id'::uuid, :'kit_id'::uuid, 1);
 select test.eq((select material_each from public.v_costing_assembly_totals where costing_id = :'costing_id'::uuid),
                28214.00, 'the kit prices to the sum of its lines');
 select test.eq((select hours from public.costing_labour where costing_id = :'costing_id'::uuid and process_type = 'assembly'),
-               2.00, 'with the kit group''s hours (set in test 14)');
+               3.00, 'with the kit''s own hours (the override test 14 imported beats the group''s 2.00)');
 rollback;
 
 -- === A revision keeps every frozen column ==================================

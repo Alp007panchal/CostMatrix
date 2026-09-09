@@ -26,11 +26,11 @@ export function SeedImportPage() {
     <>
       <h1>Import</h1>
       <p className="muted">
-        Load the catalogue and the kits from the CSV files derived from your exports
-        (<code>data/seed/</code> in the repository; <code>README.md</code> there explains the
-        columns and lists the rows worth checking first). Do the three steps in order: kits need
-        their parts, hours need their kit groups. Each step shows what would happen before it
-        saves anything, and never deletes.
+        Load the catalogue and the kits from the cleaned files in <code>data/seed/</code>
+        (<code>README.md</code> there explains the columns; the two <code>*-issues.csv</code> files
+        list what the clean-up changed). Do the three steps in order: kits need their parts, hours
+        need their kit groups. Each step shows what would happen before it saves anything, and
+        never deletes.
       </p>
       {isMasterAdmin && (
         <label className="row" style={{ gap: '.4rem', marginBottom: '.75rem' }}>
@@ -42,25 +42,27 @@ export function SeedImportPage() {
       <ImportCard
         step={1}
         title="Components"
-        blurb="components.csv — one row per part: purchase price and currency, or kg per metre for busbar. Parts without a price import as placeholders and are flagged; price them on the Components screen before costing."
-        required={['part_number', 'name', 'bom_category']}
-        run={(rows, apply, fileName) => importComponents(rows, target, apply, fileName)}
+        blurb="components.csv — one row per part in the supplier template: purchase price in EUR, category, brand, rating. Busbar sizes are priced by weight (kg per metre = price ÷ the copper rate). Parts without a price import as placeholders and are flagged; price them on the Components screen before costing."
+        required={['partNumber', 'description', 'category', 'priceEur', 'purchaseCurrency']}
+        second={{ label: 'Category map', hint: 'category-map.csv, which BOM category each catalogue category belongs to', required: ['category', 'bomCategory'] }}
+        run={(rows, map, apply, fileName) => importComponents(rows, map, target, apply, fileName)}
         onApplied={refresh}
       />
       <ImportCard
         step={2}
         title="Kits and kit groups"
-        blurb="kits.csv — one row per kit line. Kit groups are created from the kit_group column. A kit is accepted only if every part is in the library and exactly one line is its main device; re-importing a changed kit replaces its lines and keeps its hours."
-        required={['kit_group', 'kit_name', 'part_number', 'quantity', 'is_main_device']}
-        run={(rows, apply, fileName) => importKits(rows, target, apply, fileName)}
+        blurb="kits.csv — one row per kit line. With kit-labour-template.csv each kit gets its labour group (the 17 groups become the kit groups), its main device and any hours of its own. A kit is accepted only if every part is in the library and its main device is among its lines; re-importing a changed kit replaces its lines and keeps its hours."
+        required={['kitName', 'partNumber', 'quantity', 'kitGroup']}
+        second={{ label: 'Kit template', hint: 'kit-labour-template.csv, one row per kit', required: ['kitName', 'labourGroup', 'mainPart'] }}
+        run={(rows, tpl, apply, fileName) => importKits(rows, tpl, target, apply, fileName)}
         onApplied={refresh}
       />
       <ImportCard
         step={3}
         title="Kit group hours"
-        blurb="kit-group-labour-template.csv with the hours filled in — one row per kit group and kind of work. Blank rows are skipped, so you can fill the file a group at a time. The Kit groups screen edits the same figures."
-        required={['kit_group', 'process_type', 'hours']}
-        run={(rows, apply) => importKitGroupHours(rows, target, apply)}
+        blurb="kit-group-labour-template.csv with the hours filled in — one row per labour group with three columns: panel assembly, wiring, busbar fabrication. Blank cells are skipped, so you can fill the file a group at a time. The Kit groups screen edits the same figures."
+        required={['labourGroup', 'hoursPanelAssembly', 'hoursWiring', 'hoursBusbarFabrication']}
+        run={(rows, _second, apply) => importKitGroupHours(rows, target, apply)}
         onApplied={refresh}
       />
     </>

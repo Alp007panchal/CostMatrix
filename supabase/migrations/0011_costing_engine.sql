@@ -97,7 +97,7 @@ begin
   insert into public.costing_items
     (costing_id, costing_assembly_id, company_id, source_component_id, code, name,
      category_code, unit, manufacturer, part_number, quantity, pricing_mode,
-     purchase_price, purchase_currency, factor_exchange_rate, landed_factor,
+     purchase_price, purchase_currency, landed_factor,
      master_price_kes, discount_pct, exchange_rate, weight_per_unit, material_rate,
      uplift_pct, unit_price, sort_order, created_by)
   values
@@ -105,7 +105,6 @@ begin
      p.category_code, p.unit, p.manufacturer, p.part_number, qty, p.pricing_mode,
      case when p.pricing_mode = 'fixed' then p.raw_price end,
      case when p.pricing_mode = 'fixed' then p.purchase_currency end,
-     case when p.pricing_mode = 'fixed' then p.factor_exchange_rate end,
      case when p.pricing_mode = 'fixed' then p.landed_factor end,
      case when p.company_id is null and p.pricing_mode = 'fixed' then p.landed_price_kes end,
      case when p.company_id is null and p.pricing_mode = 'fixed' then c.discount_pct end,
@@ -342,12 +341,12 @@ begin
   insert into public.costing_items
     (costing_id, costing_assembly_id, company_id, source_component_id, code, name,
      category_code, unit, manufacturer, part_number, quantity, pricing_mode,
-     purchase_price, purchase_currency, factor_exchange_rate, landed_factor,
+     purchase_price, purchase_currency, landed_factor,
      master_price_kes, discount_pct, exchange_rate, weight_per_unit, material_rate,
      uplift_pct, unit_price, is_manual, sort_order, created_by)
   select new_costing.id, cav.new_id, i.company_id, i.source_component_id, i.code, i.name,
          i.category_code, i.unit, i.manufacturer, i.part_number, i.quantity, i.pricing_mode,
-         i.purchase_price, i.purchase_currency, i.factor_exchange_rate, i.landed_factor,
+         i.purchase_price, i.purchase_currency, i.landed_factor,
          i.master_price_kes, i.discount_pct, i.exchange_rate, i.weight_per_unit, i.material_rate,
          i.uplift_pct, i.unit_price, i.is_manual, i.sort_order, auth.uid()
   from public.costing_items i
