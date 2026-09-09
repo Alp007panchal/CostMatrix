@@ -58,10 +58,12 @@ export interface CostingDetail {
   panelPrices: PanelPrice[]
   totals: CostingTotals | null
   optionTotals: OptionTotals[]
+  /** The library kits, for group names and main devices in the technical offer. */
+  kits: Kit[]
 }
 
 export async function getCostingDetail(id: string): Promise<CostingDetail> {
-  const [costing, panels, assemblies, items, labour, assemblyTotals, panelPrices, totals, options] =
+  const [costing, panels, assemblies, items, labour, assemblyTotals, panelPrices, totals, options, kits] =
     await Promise.all([
       supabase.from('costings').select('*').eq('id', id).single(),
       supabase.from('costing_panels').select('*').eq('costing_id', id).order('sort_order'),
@@ -72,6 +74,7 @@ export async function getCostingDetail(id: string): Promise<CostingDetail> {
       supabase.from('v_costing_panel_prices').select('*').eq('costing_id', id),
       supabase.from('v_costing_totals').select('*').eq('costing_id', id).maybeSingle(),
       supabase.from('v_costing_option_totals').select('*').eq('costing_id', id),
+      supabase.from('v_kits').select('*'),
     ])
 
   fail('Could not load the costing', costing.error)
@@ -83,6 +86,7 @@ export async function getCostingDetail(id: string): Promise<CostingDetail> {
   fail('Could not load panel prices', panelPrices.error)
   fail('Could not load totals', totals.error)
   fail('Could not load option totals', options.error)
+  fail('Could not load kits', kits.error)
 
   return {
     costing: costing.data as Costing,
@@ -94,6 +98,7 @@ export async function getCostingDetail(id: string): Promise<CostingDetail> {
     panelPrices: (panelPrices.data ?? []) as PanelPrice[],
     totals: (totals.data as CostingTotals | null) ?? null,
     optionTotals: (options.data ?? []) as OptionTotals[],
+    kits: (kits.data ?? []) as Kit[],
   }
 }
 

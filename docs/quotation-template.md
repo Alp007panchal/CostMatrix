@@ -86,7 +86,7 @@ Table with one row per panel:
 | 1 | MAIN LV BOARD – OPTION 1 | Free-text specification, several paragraphs, with sub-headings such as INCOMING CHANGEOVER SECTION, OUTGOERS, APFC, and "Proposed Enclosure: 2100(H) × 3500(W) × 800(D) mm" | 1 |
 
 - PARTICULAR = panel name plus option label.
-- TECHNICAL DESCRIPTION = Costing panel `technical_description`, edited by the engineer while costing. The app pre-fills a draft from the assemblies and items in the panel (grouped by assembly, "n No. item name"), which the engineer then edits.
+- TECHNICAL DESCRIPTION = Costing panel `technical_description`, edited by the engineer while costing. **Draft from the kits** (session 4) writes it from the panel's kits grouped by kit group, each kit with its lines ("n No. item name, make (part number)", busbar and cable in metres), then OTHER COMPONENTS, then ENCLOSURE; a blank description gets the same text at release (`web/src/modules/costing/technical.ts`).
 - Enclosure dimensions = panel `enclosure_dimensions`.
 - Data sheets: attached outside the app in release 1, as today.
 

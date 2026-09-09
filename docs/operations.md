@@ -298,6 +298,12 @@ are uplifted) or a **typed line** with its own price for a part the catalogue do
 Loose lines gather in one *Components and enclosure* line per panel. The Totals card shows the
 material split by category, which is what the old sheets subtotalled.
 
+### Write the technical offer from the kits (session 4)
+In a panel → *Details* → **Draft from the kits**: the technical description is written from
+the panel's kits (grouped by kit group, each with its lines), then the loose components, then
+the enclosure. Edit it freely; the quotation prints what you leave. A panel whose description is
+left blank gets the same draft at release, so Annexure IV is never empty for a costed panel.
+
 ### Add a part that is not in the catalogue (session 3)
 In the panel, *Outside a kit → typed in with a price*: name, category, price each in your
 currency, quantity. It lives in that costing only. When you know its purchase price, add it to

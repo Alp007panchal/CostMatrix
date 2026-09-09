@@ -7,7 +7,7 @@ import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
   addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, listKits, removeCostingAssembly, removeItem, removePanel, returnCosting,
+  getCostingDetail, listBomItems, removeCostingAssembly, removeItem, removePanel, returnCosting,
   setCostingAssemblyQuantity, setItemQuantity, setLabourHours, submitCosting, updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
@@ -28,7 +28,6 @@ export function CostingEditor() {
   const { company, hasRole } = useSession()
 
   const detail = useQuery({ queryKey: ['costing', id], queryFn: () => getCostingDetail(id), enabled: Boolean(id) })
-  const kits = useQuery({ queryKey: ['kits'], queryFn: listKits })
   const components = useQuery({ queryKey: ['components'], queryFn: listComponentPrices })
   const categories = useQuery({ queryKey: ['categories'], queryFn: listCategories })
   const processTypes = useQuery({ queryKey: ['process-types'], queryFn: listProcessTypes })
@@ -53,7 +52,7 @@ export function CostingEditor() {
 
   return (
     <Async query={detail}>
-      {({ costing, panels, assemblies, items, labour, assemblyTotals, panelPrices, totals, optionTotals }) => {
+      {({ costing, panels, assemblies, items, labour, assemblyTotals, panelPrices, totals, optionTotals, kits }) => {
         const canBuild = hasRole('costing_engineer') || hasRole('approver')
         const isApprover = hasRole('approver')
         const editable = costing.status === 'draft' && costing.is_current && canBuild
@@ -145,7 +144,7 @@ export function CostingEditor() {
                     items={items}
                     labour={labour}
                     assemblyTotals={assemblyTotals}
-                    kits={kits.data ?? []}
+                    kits={kits}
                     components={components.data ?? []}
                     categories={categories.data ?? []}
                     label={label}

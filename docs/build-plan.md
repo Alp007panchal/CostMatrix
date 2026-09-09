@@ -21,7 +21,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | S1 — Foundation (0008–0009) | **Built, PR 2 open** (stacked on PR 1). Currency factors, purchase price and currency, cubicles and uplift, kit groups with hours, main device, rating; Rates → Currency factors, Company → Enclosure uplift, Kits and Kit groups screens. 187 database assertions, 35 web tests. | 2026-09-09 |
 | S2 — Master data & importer | **Built, PR 3 open** (stacked on PR 2). Import screen: components, kits and groups, kit-group hours, each with preview and reasons; placeholders; the real seed loads in the test suite (735 parts, 17 groups, 297 kits, one main device each); 223 database assertions. | 2026-09-09 |
 | S3 — Costing engine + NPP-192 acceptance | **Built, PR 4 open** (stacked on PR 3). Kits by group and rating, loose components and typed lines per panel, cubicle uplift on loose lines, revision copy fixed, category subtotals on the Totals card; test 15 rebuilds NPP-192 Option 1 from the seed to the cent and proves the margin, rounding and VAT arithmetic; 256 database assertions, 40 web tests. | 2026-09-09 |
-| S4 — Outputs (PDF from kits, BOMs) | | |
+| S4 — Outputs | **Built, PR 5 open** (stacked on PR 4). Annexure IV drafted from the kits and lines (button and release fallback), BOMs and price schedule checked against loose and typed lines. | 2026-09-09 |
 | S5 — External companies | | |
 | S6 — CRM gap review | | |
 
