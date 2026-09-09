@@ -304,8 +304,9 @@ currency, quantity. It lives in that costing only. When you know its purchase pr
 the catalogue so the next costing can pick it.
 
 ### Import the seed (session 2)
-Import (in the top bar; administrators only). Three steps, in order, each fed by the files in
-`data/seed/` in the repository, exactly as they are there: **1 Components** — `components.csv`
+Import (in the top bar; administrators only). First download the five files from GitHub:
+open the repository's `data/seed` folder on `main`, open each file and press its download button
+("Download raw file"). Three steps, in order, each fed by those files exactly as they are: **1 Components** — `components.csv`
 plus `category-map.csv` (the second file tells the importer which of the four BOM categories
 each catalogue category belongs to; a `BOM category:` note on a single row overrides it).
 Busbar rows become weight-priced parts: kg per metre = catalogue EUR ÷ the copper rate (15 EUR
