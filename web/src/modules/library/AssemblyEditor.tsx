@@ -62,6 +62,7 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
     (sum, l) => sum + l.quantity * (priceById.get(l.component_id)?.unit_price ?? 0),
     0,
   )
+  const unpricedLines = (lines.data ?? []).filter((l) => priceById.get(l.component_id)?.unit_price == null).length
   const labourTotal = (hours.data ?? []).reduce(
     (sum, h) => sum + h.effective_hours * rateFor(h.process_type),
     0,
@@ -111,6 +112,11 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
             <span className="muted">Material</span>
             <strong>{money(materialTotal, label)}</strong>
           </div>
+          {unpricedLines > 0 && (
+            <div className="error" style={{ fontSize: '.8rem' }}>
+              {unpricedLines} line{unpricedLines === 1 ? '' : 's'} without a price — not in this total; the kit cannot be costed until priced.
+            </div>
+          )}
           <div className="spread">
             <span className="muted">Labour</span>
             <strong>{money(labourTotal, label)}</strong>
@@ -182,9 +188,11 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
                             l.quantity
                           )}
                         </td>
-                        <td className="right">{p ? money(p.unit_price, label) : '—'}</td>
                         <td className="right">
-                          {p ? money(l.quantity * p.unit_price, label) : '—'}
+                          {p?.unit_price == null ? <span className="error">no price</span> : money(p.unit_price, label)}
+                        </td>
+                        <td className="right">
+                          {p?.unit_price == null ? '—' : money(l.quantity * p.unit_price, label)}
                         </td>
                         <td className="right">
                           {canEditContents && (

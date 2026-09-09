@@ -1,10 +1,12 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useSession } from '../modules/auth/session'
+import { ErrorBoundary } from './ErrorBoundary'
 
 /** The shell every signed-in screen sits in: brand, navigation, who you are. */
 export function Layout() {
   const { profile, company, isMasterAdmin, hasRole, signOut } = useSession()
   const canAdminister = isMasterAdmin || hasRole('company_admin')
+  const { pathname } = useLocation()
 
   return (
     <div className="shell">
@@ -36,7 +38,10 @@ export function Layout() {
       </header>
 
       <main className="page">
-        <Outlet />
+        {/* A crash on one screen shows a message here; the navigation stays usable. */}
+        <ErrorBoundary key={pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   )

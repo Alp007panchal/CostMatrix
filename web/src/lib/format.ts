@@ -4,7 +4,10 @@
  * Money for display. The label is the company's own word for its currency
  * ("KSH"), which is not always the ISO code ("KES").
  */
-export function money(amount: number, label = 'KES'): string {
+export function money(amount: number | null | undefined, label = 'KES', fallback = '—'): string {
+  // A part without a price yet, or a rate that cannot be worked out, shows the
+  // fallback rather than crashing the screen (that blanked the Components page once).
+  if (amount == null || Number.isNaN(amount)) return fallback
   return `${label} ${amount.toLocaleString('en-KE', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -12,7 +15,8 @@ export function money(amount: number, label = 'KES'): string {
 }
 
 /** A percentage as people write it: 16 becomes "16%", 12.5 becomes "12.5%". */
-export function percent(value: number): string {
+export function percent(value: number | null | undefined, fallback = '—'): string {
+  if (value == null || Number.isNaN(value)) return fallback
   return `${Number(value.toFixed(3))}%`
 }
 
