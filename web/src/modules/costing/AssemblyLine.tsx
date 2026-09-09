@@ -39,7 +39,8 @@ export function AssemblyLine({
   onItemRemove: (id: string) => void
   onHours: (id: string, hours: number) => void
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(line.kind === 'free')
+  const isFree = line.kind === 'free'
 
   return (
     <>
@@ -48,10 +49,12 @@ export function AssemblyLine({
           <button onClick={() => setOpen((o) => !o)} style={{ padding: '.1rem .45rem', marginRight: '.4rem' }}>
             {open ? '▾' : '▸'}
           </button>
-          {line.code} — {line.name}
+          {isFree ? <em>{line.name}</em> : `${line.code} — ${line.name}`}
         </td>
         <td className="right">
-          {editable ? (
+          {isFree ? (
+            <span className="muted">—</span>
+          ) : editable ? (
             <input
               type="number"
               step="0.001"
@@ -69,14 +72,20 @@ export function AssemblyLine({
         </td>
         <td className="right">{money(totals?.material_each ?? 0, label)}</td>
         <td className="right">
-          {money(totals?.labour_each ?? 0, label)}
-          <div className="muted" style={{ fontSize: '.75rem' }}>{(totals?.hours_each ?? 0).toFixed(1)} h</div>
+          {isFree ? (
+            <span className="muted">—</span>
+          ) : (
+            <>
+              {money(totals?.labour_each ?? 0, label)}
+              <div className="muted" style={{ fontSize: '.75rem' }}>{(totals?.hours_each ?? 0).toFixed(1)} h</div>
+            </>
+          )}
         </td>
         <td className="right">
           {money((totals?.material_total ?? 0) + (totals?.labour_total ?? 0), label)}
         </td>
         <td className="right">
-          {editable && (
+          {editable && (isFree ? items.length === 0 : true) && (
             <button className="danger" onClick={() => onRemove(line.id)}>
               Remove
             </button>
@@ -107,7 +116,9 @@ export function AssemblyLine({
                 {items.map((i) => (
                   <tr key={i.id}>
                     <td>
-                      {i.code} — {i.name}
+                      {i.is_manual ? i.name : `${i.code} — ${i.name}`}
+                      {i.is_manual && <span className="badge">typed</span>}
+                      {i.uplift_pct != null && <span className="badge">+{i.uplift_pct}% uplift</span>}
                       {i.part_number && <div className="muted">{i.part_number}</div>}
                     </td>
                     <td>{i.manufacturer}</td>
@@ -140,6 +151,7 @@ export function AssemblyLine({
               </tbody>
             </table>
 
+            {!isFree && (
             <table style={{ marginTop: '.75rem' }}>
               <thead>
                 <tr>
@@ -189,6 +201,7 @@ export function AssemblyLine({
                 })}
               </tbody>
             </table>
+            )}
           </td>
         </tr>
       )}

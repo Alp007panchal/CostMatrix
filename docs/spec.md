@@ -116,6 +116,19 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 
 ## 7. Costing model and calculation
 
+A panel is built from three kinds of line (session 3):
+
+- **Kits**, chosen by kit group and rating, times a quantity. Each brings its lines and its
+  hours (§6) frozen at today's prices and this costing's rates.
+- **Components on their own**, from the catalogue, in the panel's one *components and
+  enclosure* line (quantity always 1, no labour). An enclosure cubicle added this way is
+  uplifted like one inside a kit. Adding the same component again adds to its quantity.
+- **Typed lines**: a name, category, unit price in the costing's currency and quantity, for a
+  part no catalogue holds yet. They live in this costing only and are marked *typed*.
+
+A part without a price (a placeholder) is refused with its code named, whether inside a kit or
+on its own.
+
 A costing contains one or more panels. Each panel has a quantity and contains one or more
 assemblies. Each assembly line has a quantity, a material list (items) and labour lines.
 

@@ -315,11 +315,32 @@ export interface CostingAssembly {
   id: string
   costing_id: string
   panel_id: string
+  /** kit: a copy of a library kit. free: the panel's holder for loose components and typed lines. */
+  kind: 'kit' | 'free'
   source_assembly_id: string | null
   code: string
   name: string
   quantity: number
   sort_order: number
+}
+
+/** A kit as the costing picker sees it (v_kits). */
+export interface Kit {
+  id: string
+  company_id: string | null
+  code: string
+  name: string
+  description: string | null
+  is_active: boolean
+  kit_group_id: string | null
+  group_name: string | null
+  rating: number | null
+  rating_unit: 'A' | 'KVAR' | null
+  poles: number | null
+  main_device_code: string | null
+  main_device_name: string | null
+  has_unpriced_part: boolean
+  line_count: number
 }
 
 export interface CostingItem {
@@ -340,6 +361,8 @@ export interface CostingItem {
   landed_factor: number | null
   uplift_pct: number | null
   unit_price: number
+  /** Typed in with its own price; no catalogue source. */
+  is_manual: boolean
   sort_order: number
 }
 

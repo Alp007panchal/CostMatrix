@@ -59,4 +59,11 @@ describe('bomFileName', () => {
     expect(bomFileName('CM-2026-0007', 0, 'switchgear', 'xlsx')).toBe('CM-2026-0007-bom-switchgear.xlsx')
     expect(bomFileName('CM-2026-0007', 2, 'busbar', 'csv')).toBe('CM-2026-0007-rev2-bom-busbar.csv')
   })
+
+  it('groups a typed line under the category it was given', () => {
+    const typed = { ...item({ code: 'MANUAL-001', name: 'Synchro check relay', category_code: 'switchgear', quantity: 2, unit_price: 35000, line_total: 70000 }) }
+    const groups = groupBom([typed], { switchgear: 'Switchgear' })
+    expect(groups[0]?.rows.map((r) => r.code)).toEqual(['MANUAL-001'])
+    expect(groups[0]?.total).toBe(70000)
+  })
 })

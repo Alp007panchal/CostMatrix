@@ -2,6 +2,7 @@ import { supabase } from '../../lib/supabase'
 import type {
   AssemblyTotals,
   BomItem,
+  Kit,
   Costing,
   CostingAssembly,
   CostingHistoryRow,
@@ -158,6 +159,48 @@ export async function addAssemblyToPanel(
     qty: quantity,
   })
   fail('Could not add the kit', error)
+}
+
+/** A catalogue component on its own, into the panel's components-and-enclosure line. */
+export async function addComponentToPanel(panelId: string, componentId: string, quantity: number): Promise<void> {
+  const { error } = await supabase.rpc('add_component_to_costing', {
+    target_panel_id: panelId,
+    component: componentId,
+    qty: quantity,
+  })
+  fail('Could not add the component', error)
+}
+
+export interface ManualItemInput {
+  name: string
+  category: string
+  unit_price: number
+  quantity: number
+  unit: string
+  make: string | null
+  part_number: string | null
+}
+
+/** A line typed in with its own price: a part no catalogue holds yet. */
+export async function addManualItem(panelId: string, input: ManualItemInput): Promise<void> {
+  const { error } = await supabase.rpc('add_manual_item', {
+    target_panel_id: panelId,
+    item_name: input.name,
+    category: input.category,
+    unit_price: input.unit_price,
+    qty: input.quantity,
+    unit: input.unit,
+    make: input.make,
+    part_no: input.part_number,
+  })
+  fail('Could not add the line', error)
+}
+
+/** Kits with group, rating and main device, for the picker. */
+export async function listKits(): Promise<Kit[]> {
+  const { data, error } = await supabase.from('v_kits').select('*').order('group_name').order('rating').order('name')
+  fail('Could not load kits', error)
+  return (data ?? []) as Kit[]
 }
 
 export async function setCostingAssemblyQuantity(id: string, quantity: number): Promise<void> {

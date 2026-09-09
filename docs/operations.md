@@ -289,9 +289,24 @@ Uploads never delete anything. To remove a component, deactivate it on its own s
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
 margins are a share of the selling price rather than of cost.
 
+### Cost a panel from kits (session 3)
+Costings → open a draft → in a panel: **Kit group → rating → kit → quantity → Add kit**. The kit
+arrives with its lines priced today and its hours from the kit group (or its own). A kit with an
+unpriced part is greyed out with "unpriced part": price the part on the Components screen first.
+Under the kits, *Outside a kit* adds a catalogue component on its own (type to search; cubicles
+are uplifted) or a **typed line** with its own price for a part the catalogue does not hold.
+Loose lines gather in one *Components and enclosure* line per panel. The Totals card shows the
+material split by category, which is what the old sheets subtotalled.
+
+### Add a part that is not in the catalogue (session 3)
+In the panel, *Outside a kit → typed in with a price*: name, category, price each in your
+currency, quantity. It lives in that costing only. When you know its purchase price, add it to
+the catalogue so the next costing can pick it.
+
 ### Import the seed (session 2)
-Import (in the top bar; administrators only). Three steps, in order, each fed by the files in
-`data/seed/` in the repository, exactly as they are there: **1 Components** — `components.csv`
+Import (in the top bar; administrators only). First download the five files from GitHub:
+open the repository's `data/seed` folder on `main`, open each file and press its download button
+("Download raw file"). Three steps, in order, each fed by those files exactly as they are: **1 Components** — `components.csv`
 plus `category-map.csv` (the second file tells the importer which of the four BOM categories
 each catalogue category belongs to; a `BOM category:` note on a single row overrides it).
 Busbar rows become weight-priced parts: kg per metre = catalogue EUR ÷ the copper rate (15 EUR
@@ -313,6 +328,10 @@ exchange rate, freight, duty and handling in it (200 per EUR today). **Change** 
 company's own figure; the master admin ticks *master* to change the default for everyone, and may
 add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
 be saved. New costings use the new figure; existing ones keep what they froze.
+
+### Read the APFC bank size (session 3)
+A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
+under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.
 
 ### Set the enclosure uplift (session 1)
 Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure

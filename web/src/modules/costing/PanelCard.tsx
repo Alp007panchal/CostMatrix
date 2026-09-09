@@ -1,20 +1,29 @@
 import { useState } from 'react'
 import { money } from '../../lib/format'
 import type {
-  Assembly,
   AssemblyTotals,
+  ComponentCategory,
+  ComponentPrice,
   CostingAssembly,
   CostingItem,
   CostingLabour,
   CostingPanel,
+  Kit,
   PanelPrice,
 } from '../../lib/database.types'
 import { AssemblyLine } from './AssemblyLine'
+import { KitPicker } from './KitPicker'
+import { kvarTotal } from './kvar'
+import { AddFreeLine } from './AddFreeLine'
+import { Detail } from './PanelDetails'
+import type { ManualItemInput } from './api'
 
 interface Handlers {
   onPanelChange: (id: string, changes: Partial<CostingPanel>) => void
   onPanelRemove: (id: string) => void
   onAddAssembly: (panelId: string, assemblyId: string, quantity: number) => Promise<void>
+  onAddComponent: (panelId: string, componentId: string, quantity: number) => Promise<void>
+  onAddManual: (panelId: string, input: ManualItemInput) => Promise<void>
   onAssemblyQuantity: (id: string, quantity: number) => void
   onAssemblyRemove: (id: string) => void
   onItemQuantity: (id: string, quantity: number) => void
@@ -22,7 +31,7 @@ interface Handlers {
   onHours: (id: string, hours: number) => void
 }
 
-/** One panel: its details, its price, and the assemblies it is made of. */
+/** One panel: its details, its price, the kits it is made of and its loose lines. */
 export function PanelCard({
   panel,
   price,
@@ -30,7 +39,9 @@ export function PanelCard({
   items,
   labour,
   assemblyTotals,
-  library,
+  kits,
+  components,
+  categories,
   label,
   editable,
   processNames,
@@ -42,7 +53,9 @@ export function PanelCard({
   items: CostingItem[]
   labour: CostingLabour[]
   assemblyTotals: AssemblyTotals[]
-  library: Assembly[]
+  kits: Kit[]
+  components: ComponentPrice[]
+  categories: ComponentCategory[]
   label: string
   editable: boolean
   processNames: Record<string, string>
@@ -50,6 +63,9 @@ export function PanelCard({
 }) {
   const [showDetails, setShowDetails] = useState(false)
   const totalsById = new Map(assemblyTotals.map((t) => [t.costing_assembly_id, t]))
+  // Kits first, the loose lines last, whatever order they were added in.
+  const ordered = [...assemblies].sort((a, b) => (a.kind === b.kind ? a.sort_order - b.sort_order : a.kind === 'free' ? 1 : -1))
+  const kvar = kvarTotal(assemblies, kits)
 
   const field = (key: keyof CostingPanel, value: string | number | null) =>
     handlers.onPanelChange(panel.id, { [key]: value })
@@ -145,10 +161,10 @@ export function PanelCard({
           <tbody>
             {assemblies.length === 0 && (
               <tr>
-                <td colSpan={6} className="muted">No kits yet — add one below.</td>
+                <td colSpan={6} className="muted">Nothing yet — add a kit or a component below.</td>
               </tr>
             )}
-            {assemblies.map((a) => (
+            {ordered.map((a) => (
               <AssemblyLine
                 key={a.id}
                 line={a}
@@ -168,6 +184,11 @@ export function PanelCard({
           </tbody>
           {price && (
             <tfoot>
+              {kvar != null && (
+                <tr>
+                  <td colSpan={6} className="muted">APFC bank: {kvar} kVAr in steps (the kits above, rating × quantity)</td>
+                </tr>
+              )}
               <tr>
                 <th colSpan={2}>Cost of one panel</th>
                 <th className="right">{money(price.material_cost, label)}</th>
@@ -180,60 +201,19 @@ export function PanelCard({
         </table>
       </div>
 
-      {editable && <AddAssembly library={library} onAdd={(id, qty) => handlers.onAddAssembly(panel.id, id, qty)} />}
-    </div>
-  )
-}
-
-function Detail({ label, hint, value, editable, onCommit }: {
-  label: string
-  hint?: string
-  value: string | null
-  editable: boolean
-  onCommit: (value: string | null) => void
-}) {
-  return (
-    <label className="field" style={{ margin: 0 }}>
-      <span>{label}{hint && <em className="hint"> — {hint}</em>}</span>
-      {editable ? (
-        <input defaultValue={value ?? ''} onBlur={(e) => e.target.value !== (value ?? '') && onCommit(e.target.value || null)} />
-      ) : (
-        <div>{value || <span className="muted">—</span>}</div>
+      {editable && (
+        <>
+          <KitPicker kits={kits} onAdd={(id, qty) => handlers.onAddAssembly(panel.id, id, qty)} />
+          <AddFreeLine
+            components={components}
+            categories={categories}
+            label={label}
+            onAddComponent={(cid, qty) => handlers.onAddComponent(panel.id, cid, qty)}
+            onAddManual={(input) => handlers.onAddManual(panel.id, input)}
+          />
+        </>
       )}
-    </label>
-  )
-}
-
-function AddAssembly({ library, onAdd }: { library: Assembly[]; onAdd: (id: string, qty: number) => Promise<void> }) {
-  const [choice, setChoice] = useState('')
-  const [qty, setQty] = useState('1')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const active = library.filter((a) => a.is_active)
-
-  return (
-    <div className="row" style={{ marginTop: '.75rem' }}>
-      <select value={choice} style={{ flex: 3, minWidth: '14rem' }} onChange={(e) => setChoice(e.target.value)}>
-        <option value="">Add a kit…</option>
-        {active.map((a) => (
-          <option key={a.id} value={a.id}>{a.code} — {a.name}{a.company_id ? ' (yours)' : ''}</option>
-        ))}
-      </select>
-      <input type="number" step="1" min="1" value={qty} style={{ width: '5rem' }} aria-label="Quantity" onChange={(e) => setQty(e.target.value)} />
-      <button
-        className="primary"
-        disabled={!choice || busy}
-        onClick={() => {
-          setBusy(true); setError(null)
-          onAdd(choice, Number(qty) || 1)
-            .then(() => { setChoice(''); setQty('1') })
-            .catch((e: unknown) => setError(String(e)))
-            .finally(() => setBusy(false))
-        }}
-      >
-        {busy ? 'Adding…' : 'Add'}
-      </button>
-      {error && <span className="error">{error}</span>}
     </div>
   )
 }
+
