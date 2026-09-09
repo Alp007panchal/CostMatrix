@@ -45,6 +45,7 @@ export interface ParsedComponent {
   weight_per_unit: number | null
   material_rate_code: string | null
   is_enclosure_cubicle: boolean
+  is_placeholder: boolean
 }
 
 export interface FieldChange {
@@ -137,6 +138,8 @@ export function parseRow(
       material_rate_code: pricing_mode === 'weight_rate' ? rateCode : null,
       // Only an enclosure part can be a cubicle, whatever the cell says.
       is_enclosure_cubicle: category_code === 'enclosure_parts' && /^(y|yes|true|1|cubicle)$/i.test((row.cubicle ?? '').trim()),
+      // A sheet row always carries a price or a weight, so it is never a placeholder.
+      is_placeholder: false,
     },
   }
 }

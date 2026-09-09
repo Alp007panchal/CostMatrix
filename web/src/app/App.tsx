@@ -15,6 +15,7 @@ const ComponentsPage = lazy(() => import('../modules/library/ComponentsPage').th
 const RatesPage = lazy(() => import('../modules/library/RatesPage').then((m) => ({ default: m.RatesPage })))
 const AssembliesPage = lazy(() => import('../modules/library/AssembliesPage').then((m) => ({ default: m.AssembliesPage })))
 const KitGroupsPage = lazy(() => import('../modules/library/KitGroupsPage').then((m) => ({ default: m.KitGroupsPage })))
+const SeedImportPage = lazy(() => import('../modules/library/SeedImportPage').then((m) => ({ default: m.SeedImportPage })))
 const CostingsPage = lazy(() => import('../modules/costing/CostingsPage').then((m) => ({ default: m.CostingsPage })))
 const CostingEditor = lazy(() => import('../modules/costing/CostingEditor').then((m) => ({ default: m.CostingEditor })))
 const ReleasePage = lazy(() => import('../modules/quotation/ReleasePage').then((m) => ({ default: m.ReleasePage })))
@@ -83,6 +84,14 @@ export function App() {
                 element={
                   <RequireRole role="company_admin">
                     <RatesPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="library/import"
+                element={
+                  <RequireRole role="company_admin">
+                    <SeedImportPage />
                   </RequireRole>
                 }
               />

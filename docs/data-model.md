@@ -165,6 +165,12 @@ View **v_currency_factors** — per master currency: the company's own figures w
 
 `v_assembly_hours`: `effective_hours = coalesce(company override, kit's own, kit group's, 0)`; `source` gains `kit_group`; new column `group_hours`.
 
+### Added by migration 0010 — the seed importer
+
+- **components.is_placeholder** — a part the kits use but the catalogue does not price. The pricing check allows a null `purchase_price` only for a placeholder; `add_assembly_to_costing` refuses a kit whose line prices to null ("… has no price yet").
+- **import_batches.target** also `kits`, `kit_group_hours`.
+- **app.import_components(rows jsonb, to_company uuid, apply boolean, file_name text)**, **app.import_kits(…)**, **app.import_kit_group_hours(rows, to_company, apply)** — SECURITY DEFINER; the master admin imports into the master library (`to_company null`), a company admin into their own. Each validates, compares with what exists and returns a report `{new, changed, unchanged, rejected[], changes[], groups_new?, skipped_blank?}`; with `apply = true` it also writes, in one transaction, and records an `import_batches` row. A kit's code is `app.kit_code(name)` (letters and digits, hyphens between); a kit needs exactly one main device and every part in the library or it is rejected whole; a changed kit has its lines replaced and its hours kept. Public wrappers of the same names.
+
 **companies** — `enclosure_uplift_pct` (company-set). **costings** — `enclosure_uplift_pct` frozen at creation. **costing_items** — frozen `purchase_price`, `purchase_currency`, `factor_exchange_rate`, `landed_factor`, and `uplift_pct` on cubicle lines; `master_price_kes` is the landed KES price before discount. `add_assembly_to_costing` applies the uplift to cubicles and freezes all of these.
 
 ## 3. Costing

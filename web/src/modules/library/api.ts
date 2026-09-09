@@ -66,6 +66,7 @@ export type ComponentInput = Pick<
   | 'weight_per_unit'
   | 'material_rate_code'
   | 'is_enclosure_cubicle'
+  | 'is_placeholder'
 > & { company_id: string | null }
 
 export async function createComponent(input: ComponentInput): Promise<void> {
@@ -90,7 +91,7 @@ export async function setComponentActive(id: string, isActive: boolean): Promise
 function cleanForMode(input: ComponentInput): ComponentInput {
   return input.pricing_mode === 'fixed'
     ? { ...input, weight_per_unit: null, material_rate_code: null }
-    : { ...input, purchase_price: null }
+    : { ...input, purchase_price: null, is_placeholder: false }
 }
 
 export async function listPriceHistory(componentId: string): Promise<PriceHistoryRow[]> {

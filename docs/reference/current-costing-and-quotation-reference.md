@@ -138,6 +138,8 @@ column meanings, the counts and every row the scripts flagged. In short:
   the first line that is not busbar, cable or controls. Rating (`630A`, `50KVAR`) and poles
   (`TP`, `4P`) are parsed from the kit name. Parts a kit uses that the catalogue lacks are added
   to the catalogue as placeholders with no price.
+- **Kit codes** are derived from the kit name when imported: letters and digits, hyphens
+  between (`250A,TP,MCCB, Adjustable, 25KA-KIT` → `250A-TP-MCCB-ADJUSTABLE-25KA-KIT`).
 - **Labour hours** are not in the exports (the columns are empty). The template lists every kit
   group × process type with blank hours for the owner to fill.
 

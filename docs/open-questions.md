@@ -8,7 +8,8 @@ overturn at any time. Answered questions live in `decisions.md`.
 `docs/reference/current-costing-and-quotation-reference.md` is a draft written from your files.
 Read §5 (the thirteen decisions) and §6.2 (what will differ when the app rebuilds NPP-192
 Option 1) and correct anything wrong, then merge PR 1. PR 2 (session 1: the schema for decisions
-1, 2, 3 and 11) is stacked on it; merge it second. Nothing reaches the live database until then.
+1, 2, 3 and 11) is stacked on it; PR 3 (session 2: the Import screen) on that. Merge 1, 2, 3 in
+order. Nothing reaches the live database until then; after PR 3 you run the three imports.
 
 ## Waiting on you
 
@@ -17,7 +18,8 @@ Option 1) and correct anything wrong, then merge PR 1. PR 2 (session 1: the sche
 | Confirm or rewrite decisions **4, 10, 12, 13** in §5 | Before session 1 | Proposed from the original brief; the other nine are your words. |
 | Decision 6: does "each line" mean each **panel** on the price schedule (as built today) or each component line? | Before session 3 | Built as per panel; changing it is a small view change. |
 | Decision 2: the real landed-cost factor for EUR (freight + duty + clearing) | Before session 2 imports the seed | Back-solved as 1.7699115 so that 113 KES/EUR lands at 200; once PR 2 is live you change it yourself under Rates → Currency factors. |
-| **Labour hours per kit group** — fill `data/seed/kit-group-labour-template.csv` | Before session 3 | 17 groups × 3 process types. Without them every kit costs zero labour. |
+| **Labour hours per kit group** — fill `data/seed/kit-group-labour-template.csv` and import it (step 3), or type them on the Kit groups screen | Before session 3 | 17 groups × 3 process types. Without them every kit costs zero labour. |
+| **Price the placeholders** after importing: 8 parts show "no price" on the Components screen | Before costing a kit that uses them | Seven APFC parts and one C&S isolator. A kit holding one is refused by the costing with the part named. |
 | What the enclosure line `102 × 4,000` on Option 1 counts | Before session 3 | Kilograms of sheet metal, modules, or something else. Decides how the cubicle-plus-uplift model maps onto it. |
 | Two 800A ACBs at 330,432 on Option 1 versus 279,744 from the catalogue | Before session 3 | If accessories are included in 330,432, they should be kit lines. |
 | Data-quality items in `data/seed/README.md` | Before session 2 | Fifteen kits with only a main device, stray cable lines, two 4000A kits that look like one, duplicate and double-priced parts. Fix in `data/raw/` or say "import as is". |

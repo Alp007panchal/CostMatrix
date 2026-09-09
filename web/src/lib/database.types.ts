@@ -105,7 +105,23 @@ export interface Component {
   weight_per_unit: number | null
   material_rate_code: string | null
   is_enclosure_cubicle: boolean
+  /** Used by kits but not priced yet; cannot be costed until a purchase price is set. */
+  is_placeholder: boolean
   is_active: boolean
+}
+
+/** What an import function reports, with or without having written anything. */
+export interface ImportReport {
+  new: number
+  changed: number
+  unchanged: number
+  rejected: { row: number; key: string; reason: string }[]
+  warnings?: { row: number; key: string; reason: string }[]
+  changes: { key: string; changes: { field: string; from: unknown; to: unknown }[] }[]
+  applied: boolean
+  batch_id: string | null
+  groups_new?: number
+  skipped_blank?: number
 }
 
 /** A component as the signed-in company would pay for it (v_component_prices). */

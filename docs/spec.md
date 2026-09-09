@@ -70,6 +70,7 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Fields: code, name, description, category, unit (pcs, m, set…), manufacturer (make), part number (manufacturer reference), pricing mode, purchase price and currency or kg per metre, enclosure-cubicle flag, active flag.
 - Pricing mode is `fixed` (a purchase price per unit) or `weight_rate` (kg per metre × a material rate, decision 3). Busbar sizes are `weight_rate` components; the copper rate per kg is a material rate. Enclosure cubicles from the catalogue are `fixed` components in the enclosure category flagged as cubicles (decision 1); when costed they are uplifted by the company's enclosure uplift percentage.
 - A purchase currency must have a master row in the currency factors (§4.6); the master admin adds currencies.
+- A part without a purchase price is a **placeholder**: allowed and flagged, so kits can be imported complete, but a kit holding one cannot enter a costing until the part is priced.
 - Every price change is recorded in a price history with the currency, who changed it and when.
 
 ### 4.3 Kits and kit groups
@@ -193,6 +194,13 @@ From any costing (draft or approved), four separate exports, each in CSV and XLS
 Each export lists component code, name, unit, quantity (summed across panels and multiplied by panel and assembly quantities), and optionally unit price and line total. Exports are per costing revision.
 
 ## 10a. Excel import and export of the library
+
+Beside the Excel round-trip below, the **Import** screen loads the three seed CSVs
+(`data/seed/components.csv`, `kits.csv`, `kit-group-labour-template.csv`) in order, with a
+preview first: counts of new, changed, unchanged and rejected rows and the reason for each
+rejection. Validation: unique part numbers; known category and currency; a kit has exactly one
+main device and every part in the library, or the whole kit is rejected; hours are numbers.
+Re-importing replaces a changed kit's lines and keeps its hours. Imports never delete.
 
 There is no finished master component list today, so the library is built inside the app by
 uploading spreadsheets, and kept up to date the same way. Every library screen can be

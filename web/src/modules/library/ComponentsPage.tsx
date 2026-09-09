@@ -153,9 +153,11 @@ export function ComponentsPage() {
                         <td>{c.category_name}</td>
                         <td>{c.unit}</td>
                         <td className="right muted">
-                          {c.pricing_mode === 'fixed' && c.raw_price != null
-                            ? `${c.purchase_currency} ${c.raw_price}`
-                            : 'by weight'}
+                          {c.pricing_mode === 'weight_rate'
+                            ? 'by weight'
+                            : c.raw_price != null
+                              ? `${c.purchase_currency} ${c.raw_price}`
+                              : <span className="error">no price</span>}
                         </td>
                         <td className="right">
                           {money(c.unit_price, company.currency_label)}

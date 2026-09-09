@@ -57,13 +57,15 @@ export function PricingFields({
         <>
           <div className="row">
             <div style={{ flex: 1 }}>
-              <Field label={`Purchase price per ${unit || 'unit'}`} hint="what the supplier charges">
+              <Field
+                label={`Purchase price per ${unit || 'unit'}`}
+                hint="what the supplier charges; leave blank to keep the part as an unpriced placeholder"
+              >
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   value={values.purchase_price}
-                  required
                   onChange={(e) => onChange('purchase_price', e.target.value)}
                 />
               </Field>

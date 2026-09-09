@@ -74,6 +74,8 @@ export function ComponentForm({
         weight_per_unit: form.pricing_mode === 'weight_rate' ? Number(form.weight_per_unit) : null,
         material_rate_code: form.pricing_mode === 'weight_rate' ? form.material_rate_code : null,
         is_enclosure_cubicle: form.category_code === 'enclosure_parts' && form.is_enclosure_cubicle,
+        // A placeholder stops being one the moment it gets a price.
+        is_placeholder: form.pricing_mode === 'fixed' && form.purchase_price === '',
       }
       return existing ? updateComponent(existing.id, input) : createComponent(input)
     },
