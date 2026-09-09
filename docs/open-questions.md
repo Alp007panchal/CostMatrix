@@ -15,7 +15,6 @@ order. Nothing reaches the live database until then; after PR 3 you run the thre
 
 | What | Needed by | Note |
 |---|---|---|
-| Confirm or rewrite decisions **4, 10, 12, 13** in §5 | Before session 1 | Proposed from the original brief; the other nine are your words. |
 | Decision 6: does "each line" mean each **panel** on the price schedule (as built today) or each component line? | Before session 3 | Built as per panel; changing it is a small view change. |
 | Decision 2: the real landed-cost factor for EUR (freight + duty + clearing) | Before session 2 imports the seed | Back-solved as 1.7699115 so that 113 KES/EUR lands at 200; once PR 2 is live you change it yourself under Rates → Currency factors. |
 | **Labour hours per kit group** — fill `data/seed/kit-group-labour-template.csv` and import it (step 3), or type them on the Kit groups screen | Before session 3 | 17 groups × 3 process types. Without them every kit costs zero labour. |

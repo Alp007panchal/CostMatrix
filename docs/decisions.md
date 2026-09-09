@@ -142,3 +142,4 @@ says so and references the old number.
 | D-135 | 2026-09-09 | A kit is rejected whole when it lacks a main device, has two, uses a part the library does not hold, or a non-positive quantity; re-importing a changed kit replaces its lines and keeps its hours and any company overrides. Imports never delete. |
 | D-136 | 2026-09-09 | A kit's code is derived from its name (`app.kit_code`: letters and digits, hyphens between) so the seed needs no code column and the same name always maps to the same kit. |
 | D-137 | 2026-09-09 | Test 14 loads the real `data/seed` CSVs with `\copy` and leaves them in the throwaway database, so the session-3 acceptance test builds NPP-192 Option 1 on the actual seed. |
+| D-148 | 2026-09-09 | The owner read §5 and confirmed decisions 4, 10, 12 and 13 as written; all thirteen are now the owner's. Supersedes the "proposed" note in D-115. |
