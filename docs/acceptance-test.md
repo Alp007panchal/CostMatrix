@@ -1,3 +1,11 @@
+> **Session 3 (2026-09-09):** the NPP-192 Option 1 rebuild is now automated as
+> `supabase/tests/15_acceptance_npp192.sql`, which adds the 52 priced lines of the workbook's
+> `OPTION1` sheet from the seed and asserts material 4,012,709.80 (switchgear 2,279,621.80,
+> busbar & cable 1,325,088.00, enclosure 408,000.00) and the margin, rounding and VAT arithmetic
+> (5,784,800 / 925,568 / 6,710,368 with a 28 % material margin standing in for the workbook's
+> ÷0.8 ÷0.9). To repeat it by hand: `python3 scripts/check_npp192.py OPTION1 --sql` lists every
+> line to add; the Totals card shows the category split to compare.
+
 # Acceptance test — one real job, end to end
 
 The first time a human clicks through everything built so far. Do it in this order, with a

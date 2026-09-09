@@ -4,11 +4,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import { percent } from '../../lib/format'
-import { listAssemblies, listProcessTypes } from '../library/api'
+import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
-  addAssemblyToPanel, addPanel, approveCosting, createRevision, getCostingDetail,
-  removeCostingAssembly, removeItem, removePanel, returnCosting, setCostingAssemblyQuantity,
-  setItemQuantity, setLabourHours, submitCosting, updateCosting, updatePanel,
+  addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
+  getCostingDetail, listBomItems, listKits, removeCostingAssembly, removeItem, removePanel, returnCosting,
+  setCostingAssemblyQuantity, setItemQuantity, setLabourHours, submitCosting, updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
 import { TotalsPanel } from './TotalsPanel'
@@ -28,11 +28,15 @@ export function CostingEditor() {
   const { company, hasRole } = useSession()
 
   const detail = useQuery({ queryKey: ['costing', id], queryFn: () => getCostingDetail(id), enabled: Boolean(id) })
-  const library = useQuery({ queryKey: ['assemblies'], queryFn: listAssemblies })
+  const kits = useQuery({ queryKey: ['kits'], queryFn: listKits })
+  const components = useQuery({ queryKey: ['components'], queryFn: listComponentPrices })
+  const categories = useQuery({ queryKey: ['categories'], queryFn: listCategories })
   const processTypes = useQuery({ queryKey: ['process-types'], queryFn: listProcessTypes })
+  const bom = useQuery({ queryKey: ['bom', id], queryFn: () => listBomItems(id), enabled: Boolean(id) })
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['costing', id] })
+    await queryClient.invalidateQueries({ queryKey: ['bom', id] })
     await queryClient.invalidateQueries({ queryKey: ['costing-history', id] })
     await queryClient.invalidateQueries({ queryKey: ['costings'] })
   }
@@ -141,7 +145,9 @@ export function CostingEditor() {
                     items={items}
                     labour={labour}
                     assemblyTotals={assemblyTotals}
-                    library={library.data ?? []}
+                    kits={kits.data ?? []}
+                    components={components.data ?? []}
+                    categories={categories.data ?? []}
                     label={label}
                     editable={editable}
                     processNames={processNames}
@@ -149,6 +155,8 @@ export function CostingEditor() {
                       onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
                       onPanelRemove: (pid) => run(() => removePanel(pid)),
                       onAddAssembly: async (pid, aid, qty) => { await addAssemblyToPanel(pid, aid, qty); await refresh() },
+                      onAddComponent: async (pid, cid, qty) => { await addComponentToPanel(pid, cid, qty); await refresh() },
+                      onAddManual: async (pid, input) => { await addManualItem(pid, input); await refresh() },
                       onAssemblyQuantity: (aid, q) => run(() => setCostingAssemblyQuantity(aid, q)),
                       onAssemblyRemove: (aid) => run(() => removeCostingAssembly(aid)),
                       onItemQuantity: (iid, q) => run(() => setItemQuantity(iid, q)),
@@ -184,7 +192,7 @@ export function CostingEditor() {
               </div>
 
               <div>
-                <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} />
+                <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} bom={bom.data ?? []} categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))} />
                 <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
                 <HistoryPanel costingId={costing.id} />
               </div>

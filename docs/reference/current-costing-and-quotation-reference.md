@@ -169,7 +169,7 @@ Where the −152,288 comes from:
 4. **Rounded KES prices on the APFC capacitors and contactors** (ZJE…, CSTC…): the workbook
    rounds to the nearest 10 or 50 KES; net effect under 1,000.
 5. **Small drifts**: 6A SP MCB 308 vs 246 (× 22 = 1,364), LM1340 meter 12,500 vs 11,500 (× 3
-   = 3,000), 160A MCCB 14,200 vs 14,176, a few rounding cents on the ACBs.
+   = 3,000), 160A MCCB 14,200 vs 14,176, 250A MCCB 19,905 vs 19,904.
 6. Eleven lines are **not in the catalogue** and are kept at the workbook price: SYNCHRO CHECK
    RELAYS, CONTROLS, the Rishabh CTs (1600/5 and 800/5), `3WJ1108-2AE02-1AD1` (a typo for
    `…-1AD0`, which is in the catalogue at 171,562), timers and relays, the FK5526-230 filter fan,

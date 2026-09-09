@@ -289,6 +289,20 @@ Uploads never delete anything. To remove a component, deactivate it on its own s
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
 margins are a share of the selling price rather than of cost.
 
+### Cost a panel from kits (session 3)
+Costings → open a draft → in a panel: **Kit group → rating → kit → quantity → Add kit**. The kit
+arrives with its lines priced today and its hours from the kit group (or its own). A kit with an
+unpriced part is greyed out with "unpriced part": price the part on the Components screen first.
+Under the kits, *Outside a kit* adds a catalogue component on its own (type to search; cubicles
+are uplifted) or a **typed line** with its own price for a part the catalogue does not hold.
+Loose lines gather in one *Components and enclosure* line per panel. The Totals card shows the
+material split by category, which is what the old sheets subtotalled.
+
+### Add a part that is not in the catalogue (session 3)
+In the panel, *Outside a kit → typed in with a price*: name, category, price each in your
+currency, quantity. It lives in that costing only. When you know its purchase price, add it to
+the catalogue so the next costing can pick it.
+
 ### Import the seed (session 2)
 Import (in the top bar; administrators only). Three steps, in order, each with its own CSV from
 `data/seed/` in the repository: **1 Components** (`components.csv`), **2 Kits and kit groups**

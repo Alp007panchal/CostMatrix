@@ -1,5 +1,6 @@
 import { money, percent } from '../../lib/format'
-import type { Costing, CostingTotals, OptionTotals } from '../../lib/database.types'
+import type { BomItem, Costing, CostingTotals, OptionTotals } from '../../lib/database.types'
+import { groupBom } from './bom'
 
 /**
  * The numbers, straight from the database views. Nothing here is calculated;
@@ -9,13 +10,20 @@ export function TotalsPanel({
   costing,
   totals,
   optionTotals,
+  bom,
+  categoryNames,
 }: {
   costing: Costing
   totals: CostingTotals | null
   optionTotals: OptionTotals[]
+  bom: BomItem[]
+  categoryNames: Record<string, string>
 }) {
   const label = costing.currency_label
   const hasOptions = optionTotals.some((o) => o.option_label !== '')
+  // Material by category, as the old costing sheets subtotalled it. From the
+  // BOM view: quantities already multiplied through kit and panel quantities.
+  const byCategory = groupBom(bom, categoryNames).filter((g) => g.rows.length > 0)
 
   return (
     <div className="card">
@@ -24,6 +32,9 @@ export function TotalsPanel({
       <table>
         <tbody>
           <Row label="Material cost" value={money(totals?.material_cost ?? 0, label)} muted />
+          {byCategory.map((g) => (
+            <Row key={g.category_code} label={`— ${g.category_name}`} value={money(g.total, label)} muted small />
+          ))}
           <Row label="Labour cost" value={money(totals?.labour_cost ?? 0, label)} muted />
           <Row label="Hours" value={(totals?.hours ?? 0).toFixed(1)} muted />
         </tbody>
@@ -86,16 +97,18 @@ function Row({
   hint,
   muted,
   strong,
+  small,
 }: {
   label: string
   value: string
   hint?: string
   muted?: boolean
   strong?: boolean
+  small?: boolean
 }) {
   return (
-    <tr>
-      <td className={muted ? 'muted' : undefined} style={{ border: 0, padding: '.2rem 0' }}>
+    <tr style={small ? { fontSize: '.8125rem' } : undefined}>
+      <td className={muted ? 'muted' : undefined} style={{ border: 0, padding: '.2rem 0', paddingLeft: small ? '.75rem' : 0 }}>
         {label}
         {hint && <div className="muted" style={{ fontSize: '.75rem' }}>{hint}</div>}
       </td>

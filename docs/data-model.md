@@ -231,6 +231,14 @@ Functions:
 - `app.submit_costing(id)`, `app.approve_costing(id)`, `app.return_costing(id, comment)` — status transitions with role checks and history rows
 - `app.create_costing_revision(id)` — deep copy, revision_no + 1, moves `is_current`
 
+### Added by migration 0011 — the costing engine
+
+- **costing_assemblies.kind** `kit | free`. Each panel has at most one `free` holder (unique partial index), created on demand by `app.free_line(panel_id)`; a trigger keeps its quantity at 1. It holds components added on their own and typed lines; it has no labour.
+- **costing_items.is_manual** — a typed line: `code MANUAL-nnn`, no source, price as entered.
+- **app.freeze_component(costing, holder, company, component, qty, sort)** — the one place a catalogue component is priced into a costing (every frozen column, cubicle uplift, refusal of an unpriced part). `add_assembly_to_costing` loops over the kit's lines with it; **app.add_component_to_costing(panel, component, qty)** uses it for a loose component (same component twice adds quantities); **app.add_manual_item(panel, name, category, unit_price, qty, unit, make, part_no)** writes a typed line.
+- **app.create_costing_revision** now copies `kind` and every column added since 0004 (`purchase_price`, `purchase_currency`, `factor_exchange_rate`, `landed_factor`, `uplift_pct`, `is_manual`, `enquiry_id`, `enclosure_uplift_pct`). Before 0011 a revision silently dropped the frozen workings.
+- View **v_kits** — kits with `group_name`, `rating`, `poles`, `main_device_code/name`, `has_unpriced_part` (for the signed-in company) and `line_count`: what the costing picker lists.
+
 ## 4. Quotation
 
 **quotations**

@@ -54,9 +54,10 @@ conversion: 113 KES/EUR × landed factor 1.7699115 = 200 KES per EUR, back-solve
 Workbook: switchgear 2,520,637.80 · busbar & cable 1,236,360.00 · enclosure 408,000.00
 (102 × 4,000) · material 4,164,997.80 · ÷0.8 → 5,206,247.25 · ÷0.9 → 5,784,719.17 · round
 up to 100 → 5,784,800 · VAT 16 % 925,568 · total 6,710,368. Option 2: 7,684,700 /
-1,229,552 / 8,914,252. Rebuilt from the seed the app must give switchgear 2,386,421.80 and
-busbar & cable 1,218,288.00 (the differences are the workbook's, itemised in §6.2), and
-reproduce the margin, rounding and VAT arithmetic exactly.
+1,229,552 / 8,914,252. Rebuilt from the seed the app gives material 4,012,709.80 (switchgear 2,279,621.80, busbar &
+cable 1,325,088.00, enclosure 408,000.00; the differences are the workbook's, itemised in
+§6.2) and reproduces the margin, rounding and VAT arithmetic exactly. This is automated as
+`supabase/tests/15_acceptance_npp192.sql`; keep it green.
 
 ## Build order — one feature per session; each ends with tests green and a pull request
 

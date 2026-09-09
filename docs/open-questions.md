@@ -8,8 +8,9 @@ overturn at any time. Answered questions live in `decisions.md`.
 `docs/reference/current-costing-and-quotation-reference.md` is a draft written from your files.
 Read §5 (the thirteen decisions) and §6.2 (what will differ when the app rebuilds NPP-192
 Option 1) and correct anything wrong, then merge PR 1. PR 2 (session 1: the schema for decisions
-1, 2, 3 and 11) is stacked on it; PR 3 (session 2: the Import screen) on that. Merge 1, 2, 3 in
-order. Nothing reaches the live database until then; after PR 3 you run the three imports.
+1, 2, 3 and 11) is stacked on it; PR 3 (session 2: the Import screen) on that, PR 4 (session 3: costing from kits, loose lines,
+the NPP-192 acceptance test) on that. Merge 1, 2, 3, 4 in order. Nothing reaches the live
+database until then; after PR 3 you run the three imports.
 
 ## Waiting on you
 
