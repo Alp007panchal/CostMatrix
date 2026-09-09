@@ -1,13 +1,16 @@
-"""Rebuild the NPP-192 Option 1 material subtotals from the derived seed.
+"""Rebuild the NPP-192 Option 1 material from the owner's seed and compare.
 
 Reads the OPTION1 sheet of docs/reference/costing-NPP-192-REV1.xlsm line by
-line, prices each line the way the app will (catalogue EUR x 200 KES for
-priced parts, kg per metre x 3,000 KES/kg for busbar) and compares with the
-workbook figure. Lines the catalogue does not carry keep the workbook price
-(they will be typed in as placeholder parts). The printed differences are
-§6.2 of docs/reference/current-costing-and-quotation-reference.md.
+line and prices each line the way the app will from data/seed/components.csv:
+purchase price in EUR × the landed factor (200 KES per EUR, decision 2).
+Busbar is kg per metre × the copper rate (15 EUR/kg, decision 3), and the
+seed's kg per metre is the catalogue price ÷ 15, so busbar also lands at
+EUR × 200. Lines the catalogue does not carry keep the workbook price (they
+are typed in). The workbook's enclosure line (102 × 4,000) is disregarded
+(decision 1). The printed differences are docs/reference/npp192-acceptance-
+from-seed.md; --sql prints the calls behind supabase/tests/15_acceptance_npp192.sql.
 
-Usage: python3 scripts/check_npp192.py [SHEET]
+Usage: python3 scripts/check_npp192.py [SHEET] [--sql]
 """
 import csv
 import re
@@ -19,9 +22,12 @@ from xlsx_reader import read_sheet  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK = ROOT / "docs" / "reference" / "costing-NPP-192-REV1.xlsm"
-KES_PER_EUR = 113.0
-LANDED_FACTOR = 1.769912          # 113 x 1.769912 = 200.0001
-COPPER_RATE = 3000.0              # KES per kg
+SEED = ROOT / "data" / "seed"
+LANDED_FACTOR = 200.0     # KES per 1 EUR, landed (decision 2)
+COPPER_RATE_EUR = 15.0    # EUR per kg (decision 3)
+BOM = {"SWITCHGEAR": "switchgear", "BUSBAR": "busbar",
+       "ACCESSORIES & HARDWARE": "accessories_hardware",
+       "FABRICATED ENCLOSURE PARTS": "enclosure_parts"}
 
 
 def key(s):
@@ -29,8 +35,18 @@ def key(s):
 
 
 def load_seed():
-    with open(ROOT / "data" / "seed" / "components.csv", newline="", encoding="utf-8") as f:
-        return {key(r["part_number"]): r for r in csv.DictReader(f)}
+    with open(SEED / "category-map.csv", newline="", encoding="utf-8") as f:
+        cmap = {key(r["category"]): BOM[r["bomCategory"].strip().upper()] for r in csv.DictReader(f)}
+    parts = {}
+    with open(SEED / "components.csv", newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            bom = cmap.get(key(r["category"]), "switchgear")
+            m = re.search(r"BOM category:\s*([a-z &]+)", r["notes"] or "", re.I)
+            if m:
+                bom = BOM.get(m.group(1).strip().upper(), bom)
+            r["bom"] = bom
+            parts[key(r["partNumber"])] = r
+    return parts
 
 
 def num(v):
@@ -42,67 +58,81 @@ def num(v):
 
 def app_price(part):
     """KES unit price the app will compute for a seed part, or None."""
-    if part is None:
+    price = num(part["priceEur"]) if part else None
+    if price is None or price <= 0:
         return None, ""
-    if part["kg_per_metre"]:
-        return round(float(part["kg_per_metre"]) * COPPER_RATE, 2), "kg x rate"
-    if part["purchase_price"]:
-        return round(float(part["purchase_price"]) * KES_PER_EUR * LANDED_FACTOR, 2), "EUR x 200"
-    return None, ""
+    if key(part["category"]) == "BUSBAR":
+        kg = price / COPPER_RATE_EUR
+        return round(kg * COPPER_RATE_EUR * LANDED_FACTOR, 2), f"{kg:g} kg/m × 15 EUR × 200"
+    return round(price * LANDED_FACTOR, 2), "EUR × 200"
 
 
 def run(sheet="OPTION1"):
     seed = load_seed()
-    section, sections, lines = "", {}, []
+    section, lines = "", []
     for cells in read_sheet(WORKBOOK, sheet):
         a = cells.get("A", "")
         if a and "B" not in cells and "F" not in cells and not a.startswith("Sub-Total"):
             section = a.strip()
             continue
         price, qty = num(cells.get("F")), num(cells.get("G"))
-        if price is None or not qty or "D" not in cells and "C" not in cells:
+        if price is None or not qty or ("D" not in cells and "C" not in cells):
             continue
+        if section == "ENCLOSURE":
+            continue  # decision 1: the 102 × 4,000 line is disregarded
         ref = key(cells.get("E", "")) or key(cells.get("C", ""))
         part = seed.get(ref)
         unit, how = app_price(part)
+        bom = part["bom"] if part else "switchgear"
         if unit is None:
-            unit, how = price, "workbook price (placeholder)"
+            unit, how = price, "workbook price (typed line)"
         lines.append({"section": section, "ref": ref, "qty": qty, "sheet_unit": price,
-                      "app_unit": unit, "how": how,
+                      "app_unit": unit, "how": how, "bom": bom,
                       "sheet_total": round(price * qty, 2), "app_total": round(unit * qty, 2)})
-        s = sections.setdefault(section, {"sheet": 0.0, "app": 0.0})
-        s["sheet"] += price * qty
-        s["app"] += unit * qty
-    return sections, lines
+    return lines
 
 
-def group(sections):
-    """The workbook's three subtotals: switchgear, busbar & cable, enclosure."""
-    out = {"switchgear": [0, 0], "busbar & cable": [0, 0], "enclosure": [0, 0]}
-    for name, s in sections.items():
-        k = "busbar & cable" if name == "BUSBAR" else "enclosure" if name == "ENCLOSURE" else "switchgear"
-        out[k][0] += s["sheet"]
-        out[k][1] += s["app"]
-    return out
+def print_sql(lines):
+    print("-- generated by: python3 scripts/check_npp192.py OPTION1 --sql")
+    for ln in lines:
+        section = ln["section"].replace("'", "''")
+        if ln["how"].startswith("workbook"):
+            print(f"select app.add_manual_item(:'panel_id'::uuid, '{ln['ref'].replace(chr(39), chr(39)*2)}', "
+                  f"'{ln['bom']}', {ln['sheet_unit']:.2f}, {ln['qty']:g});  -- {section}")
+        else:
+            print(f"select app.add_component_to_costing(:'panel_id'::uuid, "
+                  f"(select id from public.components where company_id is null and upper(code) = '{ln['ref']}'), "
+                  f"{ln['qty']:g});  -- {section}")
 
 
 if __name__ == "__main__":
-    sheet = sys.argv[1] if len(sys.argv) > 1 else "OPTION1"
-    sections, lines = run(sheet)
-    print(f"{sheet}: {len(lines)} priced lines")
-    print(f"{'subtotal':16} {'workbook':>14} {'app':>14} {'difference':>12}")
-    total = [0, 0]
-    for k, (sh, ap) in group(sections).items():
-        print(f"{k:16} {sh:14,.2f} {ap:14,.2f} {ap - sh:12,.2f}")
-        total[0] += sh
-        total[1] += ap
-    print(f"{'material':16} {total[0]:14,.2f} {total[1]:14,.2f} {total[1] - total[0]:12,.2f}")
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    lines = run(args[0] if args else "OPTION1")
+    if "--sql" in sys.argv:
+        print_sql(lines)
+        sys.exit(0)
+    print(f"{len(lines)} priced lines (the enclosure line is disregarded, decision 1)\n")
+    print(f"{'workbook section':26} {'workbook':>14} {'app':>14} {'difference':>12}")
+    by_section = {}
+    for ln in lines:
+        s = by_section.setdefault(ln["section"], [0.0, 0.0])
+        s[0] += ln["sheet_total"]; s[1] += ln["app_total"]
+    for s, (a, b) in by_section.items():
+        print(f"{s[:26]:26} {a:14,.2f} {b:14,.2f} {b - a:12,.2f}")
+    tw, ta = sum(l["sheet_total"] for l in lines), sum(l["app_total"] for l in lines)
+    print(f"{'material (no enclosure)':26} {tw:14,.2f} {ta:14,.2f} {ta - tw:12,.2f}")
+    print(f"\n{'app category':26} {'app':>14}")
+    by_bom = {}
+    for ln in lines:
+        by_bom[ln["bom"]] = by_bom.get(ln["bom"], 0.0) + ln["app_total"]
+    for b, v in sorted(by_bom.items()):
+        print(f"{b:26} {v:14,.2f}")
     print("\nLines the app prices differently (workbook unit -> app unit, how):")
     for ln in lines:
-        if abs(ln["app_unit"] - ln["sheet_unit"]) >= 0.5:
+        if abs(ln["app_unit"] - ln["sheet_unit"]) >= 0.5 and not ln["how"].startswith("workbook"):
             print(f"  {ln['section'][:22]:22} {ln['ref'][:34]:34} x{ln['qty']:<5g} "
                   f"{ln['sheet_unit']:>12,.2f} -> {ln['app_unit']:>12,.2f}  {ln['how']}")
-    print("\nLines kept at the workbook price because the catalogue lacks them:")
+    print("\nLines kept at the workbook price because the catalogue lacks them (typed lines):")
     for ln in lines:
         if ln["how"].startswith("workbook"):
             print(f"  {ln['section'][:22]:22} {ln['ref'][:34]:34} x{ln['qty']:<5g} {ln['sheet_unit']:>12,.2f}")

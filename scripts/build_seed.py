@@ -1,246 +1,218 @@
-#!/usr/bin/env python3
-"""Derive data/seed/components.csv and category-map.csv from data/raw/.
+"""Consolidate the four component-catalog CSVs into one clean seed file.
 
-Standard library only. Run from anywhere:  python3 scripts/build_seed.py
-Prints a validation report; the same report is written to data/seed/README.md
-by build_kits.py (run second), so the two scripts must both be run.
+Inputs (from "KITS AND CATALOGUE.zip", Alpesh, 8 Sep 2026):
+  component-catalog-ALL.csv               - Siemens ACB/MCCB/MCB + accessories, APFC, CT, metering,
+                                            SPD, LED, controllers, busbar/cable/enclosure (descriptions blank)
+  component-catalog-BUSBAR AND CABLES.csv - same busbar/cable/enclosure rows with descriptions
+  component-catalog-ACB.csv               - subset of ALL (identical prices), not used
+  component-C&S.csv                       - C&S range, not in ALL
+  component-catalog-ENCLOSURE.csv         - nine more (1600 mm high) enclosures
+  component-catalog-SAMPLE.csv            - the CONTROLS & WIRING lump-sum item
+  kits-export-*.xlsx                      - read only to add placeholder rows for parts kits use
+                                            that the catalogue lacks (no price)
 
-Rules (see docs/reference/current-costing-and-quotation-reference.md §6):
-- Sources are merged in priority order; the first file to name a part wins and
-  a differing price elsewhere is flagged, never silently replaced.
-- A row with no part number but a description becomes a placeholder part with
-  a synthetic PLC- number. A row with neither is dropped.
-- A blank or zero price is allowed and flagged `no-price`.
-- Busbar rows get kg per metre from the copper table (8.96 g/cm3 x section).
-- Part numbers used by kits but absent from the catalogue are added as
-  placeholders flagged `from-kits`, so every kit can be imported.
+Outputs: components.csv (same 13 columns as the input template), category-map.csv,
+         components-issues.csv (rows dropped or needing a decision).
 """
-import csv
-import json
 import re
 import sys
-from collections import OrderedDict
-from pathlib import Path
+import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "data" / "raw"
-SEED = ROOT / "data" / "seed"
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from kit_rows import iter_kit_lines  # noqa: E402
-
-SOURCES = [
-    "component-catalog-ALL.csv",
-    "component-C&S.csv",
-    "component-catalog-ENCLOSURE.csv",
-    "component-catalog-BUSBAR AND CABLES.csv",
-    "component-catalog-SAMPLE.csv",
-    "component-catalog-ACB.csv",
-]
-
-# raw category (upper-cased) -> app BOM category. The four codes are the ones
-# seeded by supabase/migrations/0003_library.sql.
-CATEGORY_MAP = {
-    "ACB": "switchgear", "MCCB": "switchgear", "MCB": "switchgear", "APFC": "switchgear",
-    "CT": "switchgear", "METERING": "switchgear", "SPD": "switchgear", "LED": "switchgear",
-    "CONTACTOR": "switchgear", "ISOLATOR": "switchgear", "ATS SWITCH": "switchgear",
-    "BYPASS SWITCH": "switchgear", "ONLOAD CHANGEOVER": "switchgear",
-    "SWITCH DISCONNECTOR": "switchgear", "CONTROLS": "switchgear", "RCBO": "switchgear",
-    "RCCB": "switchgear", "INTERLOCK": "switchgear",
-    "BUSBAR": "busbar", "BUSBAR-LINK": "busbar", "CABLE": "busbar",
-    "SINOVA MCCB ACCESSORIES": "accessories_hardware",
-    "ACB SINOVA ACCESSORIES": "accessories_hardware",
-    "MCCB ACCESSORIES": "accessories_hardware",
-    "CONTACTOR ACCESSORIES": "accessories_hardware",
-    "ENCLOSURE": "enclosure_parts",
-}
-COPPER_DENSITY_KG_PER_MM2_M = 8.96 / 1000  # 8.96 g/cm3 -> kg per (mm2 x m)
+# Folder holding the four original CSVs (kept outside the repo). Usage: python scripts/build_seed.py <folder>
+UP = (sys.argv[1] if len(sys.argv) > 1 else 'data/source').rstrip('/') + '/'
+OUT = 'data/seed/'
+COLS = ['partNumber', 'description', 'category', 'priceEur', 'purchaseCurrency',
+        'listSellingPrice', 'unit', 'brand', 'rating', 'poles', 'breakingCapacity',
+        'frameSize', 'notes']
 
 
-def norm(s):
-    return re.sub(r"\s+", " ", (s or "").strip())
+def load(name, source):
+    df = pd.read_csv(UP + name, dtype=str, keep_default_na=False)
+    df.columns = [c.strip() for c in df.columns]
+    for c in df.columns:
+        df[c] = df[c].str.replace(r'\s+', ' ', regex=True).str.strip()
+    df['source'] = source
+    df['srcRow'] = df.index + 2  # spreadsheet row number
+    return df
 
 
-def key(s):
-    return norm(s).upper()
+ALL = load('component-catalog-ALL.csv', 'component-catalog-ALL.csv')
+BUS = load('component-catalog-BUSBAR AND CABLES.csv', 'component-catalog-BUSBAR AND CABLES.csv')
+CS = load('component-C&S.csv', 'component-C&S.csv')
+
+# --- fill busbar/cable/enclosure descriptions in ALL from the BUSBAR file
+desc = dict(zip(BUS.partNumber, BUS.description))
+mask = (ALL.description == '') & ALL.partNumber.isin(desc)
+ALL.loc[mask, 'description'] = ALL.loc[mask, 'partNumber'].map(desc)
+ALL.loc[mask, 'brand'] = ALL.loc[mask].apply(
+    lambda r: r.brand or dict(zip(BUS.partNumber, BUS.brand)).get(r.partNumber, ''), axis=1)
+
+ENC = load('component-catalog-ENCLOSURE.csv', 'component-catalog-ENCLOSURE.csv')
+SMP = load('component-catalog-SAMPLE.csv', 'component-catalog-SAMPLE.csv')
+df = pd.concat([ALL, CS, ENC, SMP], ignore_index=True)
+
+issues = []
 
 
-def slug(s):
-    return re.sub(r"[^A-Z0-9]+", "-", key(s)).strip("-")[:40]
+def issue(row, problem, action):
+    issues.append({'partNumber': row.partNumber, 'description': row.description,
+                   'source': row.source, 'sourceRow': row.srcRow,
+                   'priceEur': row.priceEur, 'problem': problem, 'action': action})
 
 
-def kg_per_metre(part):
-    m = re.fullmatch(r"(\d+)\s*X\s*(\d+)\s*MM", key(part))
-    if not m:
-        return ""
-    w, t = int(m.group(1)), int(m.group(2))
-    return f"{w * t * COPPER_DENSITY_KG_PER_MM2_M:.3f}"
+# --- drop blank and section-header rows (no description and no price)
+hdr = (df.description == '') | (df.partNumber == '') | ((df.priceEur == '') & (df.category == ''))
+df = df[~hdr].copy()
+
+# --- normalise categories
+cat_fix = {'busbar-link': 'BUSBAR LINK', 'Switch Disconnector': 'SWITCH DISCONNECTOR'}
+df['category'] = df.category.replace(cat_fix).str.upper()
 
 
-def read_raw(name):
-    with open(RAW / name, newline="", encoding="utf-8-sig") as f:
-        return list(csv.DictReader(f))
+def infer_category(r):
+    d = r.description.upper()
+    p = r.partNumber.upper()
+    if 'CONTROLLER' in d:
+        return 'CONTROLLER'
+    if 'RCBO' in d:
+        return 'RCBO'
+    if 'RCCB' in d:
+        return 'RCCB'
+    if 'CONTACTOR' in d:
+        return 'CONTACTOR'
+    if 'C/O SWITCH' in d and p.startswith('CSCOS'):
+        return 'MCB CHANGEOVER'
+    return ''
 
 
-def is_section_header(row):
-    """Heading rows: `BUSBAR,,,,` or `CABLE,CABLE,,,` in the busbar file, and
-    `,3VJ11 SERIES,,,` in the main catalogue. No price, no category, and the
-    description is blank or repeats the part number."""
-    if norm(row["priceEur"]) not in ("", "0"):
-        return False
-    pn, desc = key(row["partNumber"]), key(row["description"])
-    if norm(row["category"]) != "" and pn != "":
-        return False
-    # A row with no part number and no price is a heading, whatever its
-    # category column says: real placeholder parts only arrive from the kits.
-    return (pn != "" and desc in ("", pn)) or (pn == "" and desc != "")
+notes = {}
+for i, r in df[df.category == ''].iterrows():
+    c = infer_category(r)
+    if c:
+        df.at[i, 'category'] = c
+        notes[i] = f'category "{c}" assigned during import clean-up (was blank)'
+    else:
+        issue(r, 'blank category', 'kept with blank category')
 
+# --- defaults for blank currency / unit / listSellingPrice
+for i, r in df.iterrows():
+    n = []
+    if r.purchaseCurrency == '':
+        df.at[i, 'purchaseCurrency'] = 'EUR'; n.append('purchaseCurrency defaulted to EUR')
+    if r.unit == '':
+        df.at[i, 'unit'] = '1'; n.append('unit defaulted to 1')
+    if r.listSellingPrice == '':
+        df.at[i, 'listSellingPrice'] = '0'
+    if r.priceEur == '':
+        issue(r, 'no price', 'kept, price blank - needs a price before use')
+        n.append('NO PRICE in source')
+    if n:
+        notes[i] = '; '.join(filter(None, [notes.get(i, '')] + n))
 
-def build():
-    parts = OrderedDict()        # key -> record
-    report = {"dropped_empty": [], "headings": [], "duplicates": [], "repeats": [], "price_differs": [],
-              "placeholders": [], "no_price": [], "category_guessed": [],
-              "currency_assumed": [], "from_kits": []}
-    for name in SOURCES:
-        section = ""
-        for i, row in enumerate(read_raw(name), start=2):
-            pn, desc = norm(row["partNumber"]), norm(row["description"])
-            if is_section_header(row):
-                section = key(pn or desc)
-                report["headings"].append((pn or desc, name, i))
-                continue
-            if not pn and not desc:
-                report["dropped_empty"].append((name, i))
-                continue
-            if not pn:
-                pn = "PLC-" + slug(desc)
-                placeholder = True
-            else:
-                placeholder = False
-            k = key(pn)
-            price = norm(row["priceEur"])
-            price_num = float(price) if price not in ("", "0", "0.0") else None
-            if k in parts:
-                kept = parts[k]
-                if price_num is not None and kept["purchase_price"] not in ("", f"{price_num:g}"):
-                    kept["flags"].add(f"price-differs:{name}={price_num:g}")
-                    report["price_differs"].append((pn, kept["source_file"], kept["purchase_price"], name, price))
-                elif kept["source_file"] == name:
-                    report["duplicates"].append((pn, name, i))
-                else:
-                    report["repeats"].append((pn, name))
-                continue
-            raw_cat = key(row["category"]) or section
-            cat_key = raw_cat.replace("_", " ")
-            cat_key = {"BUSBAR-LINK": "BUSBAR-LINK"}.get(cat_key, cat_key)
-            bom = CATEGORY_MAP.get(cat_key)
-            flags = set()
-            if bom is None:
-                bom = "switchgear"
-                flags.add("category-guessed")
-                report["category_guessed"].append((pn, raw_cat or "(blank)", name))
-            currency = key(row["purchaseCurrency"])
-            if price_num is None:
-                flags.add("no-price")
-                report["no_price"].append((pn, desc, name))
-                currency = currency or ""
-            elif not currency:
-                currency = "EUR"
-                flags.add("currency-assumed")
-                report["currency_assumed"].append((pn, name))
-            if placeholder:
-                flags.add("placeholder")
-                report["placeholders"].append((pn, desc, name))
-            is_busbar = cat_key == "BUSBAR"
-            parts[k] = {
-                "part_number": pn,
-                "name": desc or pn,
-                "category": raw_cat or "",
-                "bom_category": bom,
-                "brand": norm(row["brand"]),
-                "unit": "m" if cat_key in ("BUSBAR", "CABLE") else "pcs",
-                "purchase_price": f"{price_num:g}" if price_num is not None else "",
-                "purchase_currency": currency,
-                "kg_per_metre": kg_per_metre(pn) if is_busbar else "",
-                "is_enclosure_cubicle": "yes" if cat_key == "ENCLOSURE" else "no",
-                "is_placeholder": "yes" if placeholder else "no",
-                "source_file": name,
-                "flags": flags,
-            }
-    # Parts that kits reference but the catalogue lacks.
-    for line in iter_kit_lines(RAW):
-        k = key(line["part_number"])
-        if not k or k in parts:
+# --- description fixes
+df['description'] = df.description.str.replace('?', ':', regex=False)  # 'Uc?385V' encoding loss
+
+# --- parse rating / poles / breaking capacity from descriptions where unambiguous
+POLES = {'SP': '1P', 'DP': '2P', 'TP': '3P', 'FP': '4P', '1P': '1P', '2P': '2P', '3P': '3P', '4P': '4P',
+         '1P+N': '1P+N', '3P+N': '3P+N', '3P+NPE': '3P+NPE'}
+for i, r in df.iterrows():
+    d = r.description.upper()
+    if r.category in ('BUSBAR', 'CABLE', 'ENCLOSURE', 'BUSBAR LINK') or 'ACCESSORIES' in r.category:
+        continue
+    if r.category == 'CT':
+        df.at[i, 'rating'] = r.partNumber
+        continue
+    m = re.search(r'\b(\d+(?:\.\d+)?)\s*(A|KVAR|KA)\b', d)
+    if m and m.group(2) == 'A' and r.rating == '':
+        df.at[i, 'rating'] = m.group(1) + 'A'
+    m = re.search(r'\b(\d+(?:\.\d+)?)\s*KVAR\b', d)
+    if m and r.rating == '':
+        df.at[i, 'rating'] = m.group(1) + 'kVAr'
+    m = re.search(r'\b(SP|DP|TP|FP|1P\+N|3P\+NPE|3P\+N|[1-4]P)\b', d)
+    if m and r.poles == '':
+        df.at[i, 'poles'] = POLES[m.group(1)]
+    m = re.search(r'\b(\d+)\s*KA\b', d)
+    if m and r.breakingCapacity == '' and r.category != 'SPD':
+        df.at[i, 'breakingCapacity'] = m.group(1) + 'kA'
+    m = re.search(r'\b(\d+)AF\b', d)
+    if m and r.frameSize == '':
+        df.at[i, 'frameSize'] = m.group(1) + 'A'
+
+# --- duplicates: keep first occurrence, log the rest
+# Exception: 3VJ1340 is Siemens' 400A frame, so the 200A row carrying that number is the wrong one.
+wrong = df[(df.partNumber == '3VJ1340-5DB32-0AA0') & df.description.str.startswith('200A')]
+for i, r in wrong.iterrows():
+    issue(r, 'part number belongs to the 400A MCCB (3VJ13-40); 200A is probably 3VJ1320-5DB32-0AA0',
+          'dropped from seed - confirm the 200A part number and price')
+df = df.drop(wrong.index)
+dup = df[df.partNumber.duplicated(keep='first')]
+for i, r in dup.iterrows():
+    first = df[df.partNumber == r.partNumber].iloc[0]
+    issue(r, f'duplicate part number (first occurrence kept: "{first.description}" @ {first.priceEur})',
+          'dropped from seed - confirm correct price / part number')
+    j = first.name
+    notes[j] = '; '.join(filter(None, [notes.get(j, ''),
+                                       f'DUPLICATE in source: also listed as "{r.description}" @ {r.priceEur} - confirm']))
+df = df.drop(dup.index)
+
+# --- parts referenced by kits but absent from the catalogue: add placeholder rows (no price)
+import glob, openpyxl
+kit_parts = {}
+for f in sorted(glob.glob(UP + 'kits-export*.xlsx')):
+    ws = openpyxl.load_workbook(f, data_only=True).worksheets[0]
+    for r in ws.iter_rows(min_row=2, values_only=True):
+        kit, cat, frame, _h, _r, part, _q = (list(r) + [None] * 7)[:7]
+        if part is None or str(part).strip() == '':
             continue
-        cat_key = key(line["category"]).replace("-C&S", "")
-        bom = CATEGORY_MAP.get(cat_key, "switchgear")
-        flags = {"placeholder", "from-kits", "no-price"}
-        if cat_key not in CATEGORY_MAP:
-            flags.add("category-guessed")
-        parts[k] = {
-            "part_number": norm(line["part_number"]),
-            "name": norm(line["description"]) or norm(line["part_number"]),
-            "category": cat_key, "bom_category": bom, "brand": "",
-            "unit": "m" if cat_key in ("BUSBAR", "CABLE") else "pcs",
-            "purchase_price": "", "purchase_currency": "",
-            "kg_per_metre": kg_per_metre(line["part_number"]) if cat_key == "BUSBAR" else "",
-            "is_enclosure_cubicle": "no", "is_placeholder": "yes",
-            "source_file": line["source_file"], "flags": flags,
-        }
-        report["from_kits"].append((norm(line["part_number"]), cat_key, line["source_file"]))
-    return parts, report
+        part = re.sub(r'\s+', ' ', str(part)).strip()
+        kit_parts.setdefault(part, (re.sub(r'\s+', ' ', str(kit)).strip(), str(cat or '').strip(), str(frame or '').strip()))
+placeholders = []
+for part, (kit, cat, frame) in kit_parts.items():
+    if part in set(df.partNumber):
+        continue
+    brand = 'SIEMENS' if re.match(r'^5[ST]', part) else ('C&S' if part.startswith('CS') else '')
+    category = {'MCB-C&S': 'MCB', 'MCCB-C&S': 'MCCB', 'ISOLATOR': 'ISOLATOR', 'INTERLOCK': 'CONTACTOR ACCESSORIES',
+                'MCB': 'MCB'}.get(cat, cat.upper())
+    placeholders.append({'partNumber': part, 'description': frame if not frame.isdigit() else part, 'category': category,
+                         'priceEur': '', 'purchaseCurrency': 'EUR', 'listSellingPrice': '0', 'unit': '1', 'brand': brand,
+                         'rating': '', 'poles': '', 'breakingCapacity': '', 'frameSize': '',
+                         'notes': f'PLACEHOLDER: used by kit "{kit}" but not in the catalogue - price needed',
+                         'source': 'kits-export', 'srcRow': ''})
+    issues.append({'partNumber': part, 'description': frame, 'source': 'kits-export', 'sourceRow': '', 'priceEur': '',
+                   'problem': f'used by kit "{kit}" but not in the component catalogue',
+                   'action': 'placeholder row added to components.csv with no price - add price or map to an existing part'})
+if placeholders:
+    df = pd.concat([df, pd.DataFrame(placeholders)], ignore_index=True)
 
+# --- hardware hiding inside the APFC category
+for i, r in df.iterrows():
+    if r.category == 'APFC' and re.search(r'FUSE|BUSBAR SUPPORT', r.description.upper()):
+        notes[i] = '; '.join(filter(None, [notes.get(i, ''), 'BOM category: accessories & hardware (not switchgear)']))
 
-def write_components(parts):
-    cols = ["part_number", "name", "category", "bom_category", "brand", "unit",
-            "purchase_price", "purchase_currency", "kg_per_metre",
-            "is_enclosure_cubicle", "is_placeholder", "source_file", "flags"]
-    rows = sorted(parts.values(), key=lambda r: (r["bom_category"], r["category"], r["brand"], r["part_number"]))
-    with open(SEED / "components.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=cols, lineterminator="\n")
-        w.writeheader()
-        for r in rows:
-            out = dict(r)
-            out["flags"] = " ".join(sorted(r["flags"]))
-            w.writerow(out)
-    return len(rows)
+for i, n in notes.items():
+    if i in df.index:
+        df.at[i, 'notes'] = '; '.join(filter(None, [df.at[i, 'notes'], n]))
 
+df = df[COLS]
+df.to_csv(OUT + 'components.csv', index=False)
+pd.DataFrame(issues).to_csv(OUT + 'components-issues.csv', index=False)
 
-def write_category_map(parts):
-    seen = {}
-    for r in parts.values():
-        c = r["category"] or "(blank)"
-        seen.setdefault(c, {"raw_category": c, "bom_category": r["bom_category"],
-                            "is_busbar": "yes" if c == "BUSBAR" else "no",
-                            "is_enclosure_cubicle": "yes" if c == "ENCLOSURE" else "no",
-                            "parts": 0})
-        seen[c]["parts"] += 1
-    with open(SEED / "category-map.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["raw_category", "bom_category", "is_busbar",
-                                          "is_enclosure_cubicle", "parts"], lineterminator="\n")
-        w.writeheader()
-        for c in sorted(seen):
-            w.writerow(seen[c])
+BOM = {
+    'SWITCHGEAR': ['ACB', 'MCCB', 'MCB', 'ONLOAD CHANGEOVER', 'SWITCH DISCONNECTOR', 'BYPASS SWITCH',
+                   'ATS SWITCH', 'ISOLATOR', 'CONTACTOR', 'RCCB', 'RCBO', 'MCB CHANGEOVER', 'CONTROLLER',
+                   'METERING', 'CT', 'SPD', 'APFC'],
+    'ACCESSORIES & HARDWARE': ['MCCB ACCESSORIES', 'SINOVA MCCB ACCESSORIES', 'ACB SINOVA ACCESSORIES',
+                               'CONTACTOR ACCESSORIES', 'LED', 'CABLE', 'CONTROLS'],
+    'BUSBAR': ['BUSBAR', 'BUSBAR LINK'],
+    'FABRICATED ENCLOSURE PARTS': ['ENCLOSURE'],
+}
+rows = [{'category': c, 'bomCategory': b, 'count': int((df.category == c).sum())} for b, cs in BOM.items() for c in cs]
+cm = pd.DataFrame(rows)
+missing = set(df.category.unique()) - set(cm.category)
+assert not missing, missing
+cm.to_csv(OUT + 'category-map.csv', index=False)
 
-
-def main():
-    SEED.mkdir(parents=True, exist_ok=True)
-    parts, report = build()
-    n = write_components(parts)
-    write_category_map(parts)
-    summary = {
-        "components": n,
-        "placeholders": sum(1 for p in parts.values() if p["is_placeholder"] == "yes"),
-        "no_price": sum(1 for p in parts.values() if "no-price" in p["flags"]),
-        "by_bom_category": {c: sum(1 for p in parts.values() if p["bom_category"] == c)
-                            for c in sorted({p["bom_category"] for p in parts.values()})},
-        "report": {k: v for k, v in report.items()},
-    }
-    (SEED / ".components-report.json").write_text(json.dumps(summary, indent=1) + "\n")
-    print(f"components.csv: {n} parts "
-          f"({summary['placeholders']} placeholders, {summary['no_price']} without a price)")
-    for k, v in report.items():
-        print(f"  {k}: {len(v)}")
-
-
-if __name__ == "__main__":
-    main()
+print(len(df), 'components;', len(issues), 'issues')
+print(df.category.value_counts().to_string())
+print(df.brand.value_counts().to_string())
+print('rating filled', (df.rating != '').sum(), 'poles', (df.poles != '').sum(), 'kA', (df.breakingCapacity != '').sum(), 'frame', (df.frameSize != '').sum())

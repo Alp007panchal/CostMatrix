@@ -22,41 +22,53 @@ editor, quotation PDF, BOM exports, CRM phase 1.
 and over the existing code. When it conflicts with the schema, write a forward migration
 (0008 onward); never rebuild what already agrees.
 
-## The 13 decisions (short form; §5 has the full text)
+## The 13 decisions (short form; §5 has the owner's full text)
 
-1. Enclosure = catalogue cubicles × quantity + a company uplift %.
-2. Every component has a purchase price and purchase currency; a landed-cost factor per
-   currency (with the exchange rate) converts to KES.
-3. Busbar = kg per metre × copper rate (KES/kg); both tables editable.
-4. Labour = hours × rate per process type, never a % of material.
-5. Margins are % of selling price: cost ÷ (1 − m); profit, then negotiation.
-6. Each price-schedule line rounds **up** to the company increment (default 100).
-7. Reference = company prefix + running sequence + revision (`NPP-193-REV0`).
-8. Per-company default terms, editable per quotation.
-9. Fixed letterhead per company; partner and certification logos in the footer.
-10. Draft → submitted → approved → revisions; older revisions read-only.
-11. Kits have lines; kit groups carry hours per process type; kits may override.
-12. Four BOM exports: switchgear, busbar & cable, accessories & hardware, enclosure parts.
-13. External companies: master-set discount, private kits and components, own currency at
-    a frozen rate.
+1. Enclosure = catalogue cubicles × quantity + an uplift (percentage or fixed) for form
+   3B/4B and extras; the workbook's 102 × 4,000 line is disregarded; no fabrication calculator.
+2. The 200 is a landed-cost factor: **one admin-maintained number per purchase currency**;
+   KES cost = purchase price × factor; both frozen on every costing line.
+3. Copper busbar: one copper rate in **EUR per kg (15)** through the EUR factor, and a
+   kg-per-metre table per bar size; busbar reprices when the rate changes, then freezes.
+4. APFC bank = manual step kits added by quantity in phase 1 (the app shows total kVAr);
+   a configurator later.
+5. Margins are % of selling price (divisor style, 10 % = ÷0.9); the equivalent markup shown.
+6. Each panel line's ex-VAT price rounds **up** to the company increment (default KES 100);
+   VAT on the rounded figure.
+7. Reference = company prefix + running number + revision (`NPP-193-REV1`); never resets.
+8. Per-company default terms for the five Annexure III headings, editable per quotation.
+9. Letterhead header and footer fixed per company, uploaded once.
+10. Catalogue clean-up: duplicate C&S parts keep the higher price; the 200 A row with the
+    400 A part number is dropped; the seven unpriced placeholders stay, flagged.
+11. Labour hours per process type are held **per kit group (17 labour groups; ACB split by
+    frame)** with per-kit overrides; `kit-group-labour-template.csv` first.
+12. Standard kits fix their busbar and cable metres; no run calculator in phase 1.
+13. The C&S 1250 A ATS and sync kits use the C&S ACB `WX12N4PEDOA (S)`.
 
 ## Seed data
 
-`data/raw/` holds the owner's exports, never edited. `scripts/build_seed.py` then
-`scripts/build_kits.py` derive `data/seed/components.csv`, `category-map.csv`, `kits.csv` and
-`kit-group-labour-template.csv`; `data/seed/README.md` (generated) lists columns, counts and
-every flagged row. Placeholder parts without a price are allowed and flagged. Master EUR
-conversion: 113 KES/EUR × landed factor 1.769912 = 200 KES per EUR, back-solved from NPP-192.
-`scripts/check_npp192.py` reprices the NPP-192 Option 1 sheet from the seed and prints §6.2.
+`data/seed/` is the owner's cleaned master data, read as it is: `components.csv` (735 parts
+in the supplier template columns, 7 placeholders and 1 catalogue part without a price),
+`category-map.csv` (category → BOM category), `kits.csv` (296 kits, 720 lines),
+`kit-labour-template.csv` (one row per kit: labour group, main device, override hours),
+`kit-group-labour-template.csv` (17 labour groups, hours to fill), and the two issue lists.
+`data/raw/` holds the original exports; the owner's `scripts/build_seed.py data/raw` and
+`scripts/build_kits.py data/raw` reproduce the seed (pandas; not run in CI). Master EUR
+factor 200; copper 15 EUR/kg; busbar kg per metre = catalogue EUR ÷ 15.
+`scripts/check_npp192.py` reprices the NPP-192 Option 1 sheet from the seed and prints
+`docs/reference/npp192-acceptance-from-seed.md`.
 
 ## Acceptance (NPP-192 Option 1, reference §4 and §6.2)
 
 Workbook: switchgear 2,520,637.80 · busbar & cable 1,236,360.00 · enclosure 408,000.00
-(102 × 4,000) · material 4,164,997.80 · ÷0.8 → 5,206,247.25 · ÷0.9 → 5,784,719.17 · round
-up to 100 → 5,784,800 · VAT 16 % 925,568 · total 6,710,368. Option 2: 7,684,700 /
-1,229,552 / 8,914,252. Rebuilt from the seed the app must give switchgear 2,386,422.24 and
-busbar & cable 1,218,288.00 (the differences are the workbook's, itemised in §6.2), and
-reproduce the margin, rounding and VAT arithmetic exactly.
+(disregarded, decision 1) · material 4,164,997.80 · ÷0.8 → 5,206,247.25 · ÷0.9 →
+5,784,719.17 · round up to 100 → 5,784,800 · VAT 16 % 925,568 · total 6,710,368. Option 2:
+7,684,700 / 1,229,552 / 8,914,252. Rebuilt from the seed without the enclosure line the app
+gives material **3,622,781.80** (switchgear 2,212,282.00, busbar 1,176,600.00, accessories &
+hardware 233,899.80; the workbook's own figure without the enclosure is 3,756,997.80 and the
+134,216 gap is stale workbook prices, itemised in `npp192-acceptance-from-seed.md`), and
+reproduces the margin, rounding and VAT arithmetic exactly. Automated as
+`supabase/tests/15_acceptance_npp192.sql`; keep it green.
 
 ## Build order — one feature per session; each ends with tests green and a pull request
 
@@ -87,9 +99,9 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   Ask before anything destructive or outside the plan.
 - Branch `claude/costmatrix-planning-bq7j86`. **One pull request per feature; the owner
   reviews and merges.** Migrations reach production automatically on merge to `main`.
-- Verify before claiming: `supabase/tests/run-local.sh`; in `web/` `npm run typecheck`,
-  `npm test`, `npm run build`; and `python3 scripts/build_seed.py && python3
-  scripts/build_kits.py` must leave `data/seed/` unchanged. Say plainly what could not be
+- Verify before claiming: `supabase/tests/run-local.sh` (it imports the real `data/seed`
+  files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
+  Never edit `data/seed/*` by hand: it is the owner's data. Say plainly what could not be
   verified (this environment has no browser).
 - Record every decision as one line in `docs/decisions.md`; keep `docs/build-plan.md` and
   `docs/open-questions.md` current; no source file over roughly 300 lines.
@@ -100,4 +112,6 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
 - `docs/operations.md` — the runbook the owner follows; update it when a screen changes.
 - `docs/quotation-template.md` — the PDF layout, from the real NPP-192 quotation.
 - `docs/acceptance-test.md` — the end-to-end click-through script.
-- `docs/reference/` — the NPP-192 quotation and workbook, and the reference document above.
+- `docs/reference/` — the NPP-192 quotation and workbook, the reference document above, and
+  `npp192-acceptance-from-seed.md` (what the seed rebuild gives and why it differs).
+- `docs/prompts/` — the owner's kickoff prompt that set the build order.

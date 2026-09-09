@@ -17,6 +17,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | 3 — BOM exports | **Built.** Four category exports plus one workbook, Excel or CSV, from any costing. | 2026-09-08 |
 | 4 — CRM phase 1 | **Built.** Customers, contacts, projects, enquiries with numbers, costings against enquiries, quotations addressed to customer records, enquiry status following the quotation, follow-up reminders. | 2026-09-08 |
 | — | **Acceptance testing.** Building paused by the owner's decision after slice 4. The owner runs `docs/acceptance-test.md`; findings are fixed before anything new. | 2026-09-08 |
+| — | **The owner's reference document and cleaned seed arrived (2026-09-09, second zip)** and replaced the derived ones; §5 is the owner's; the factor is one number (200), copper 15 EUR/kg, labour groups 17. |
 | — | **Reconciliation with the thirteen decisions.** `docs/reference/current-costing-and-quotation-reference.md` §5 is now the source of truth; seed derived from the owner's exports; six sessions below replace slices 5–6. PR 1 (seed, reference document, plan) open for the owner. | 2026-09-09 |
 | S1 — Foundation (0008–0009) | After PR 1 merges and §5 is corrected | |
 | S2 — Master data & importer | | |
