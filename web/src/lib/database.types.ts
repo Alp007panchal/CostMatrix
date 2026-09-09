@@ -135,8 +135,8 @@ export interface ComponentPrice extends Omit<Component, 'purchase_price' | 'brea
   category_name: string
   /** The purchase price in purchase_currency. */
   raw_price: number | null
-  /** What this company pays, in its own currency, after discount and conversion. */
-  unit_price: number
+  /** What this company pays, in its own currency, after discount and conversion. Null until a placeholder gets a purchase price. */
+  unit_price: number | null
   currency_code: string
   currency_label: string
   source: 'master' | 'company'

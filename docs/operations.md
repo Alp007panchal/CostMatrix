@@ -408,9 +408,12 @@ backup job stores it.
 ## Part D — When something goes wrong
 
 ### The page is blank or shows an error
-Usually a bad deployment. Vercel dashboard → Deployments → the most recent one → check it says
-Ready. If it failed, the log says why. You can click **Rollback** on the previous working
-deployment to get back online immediately, then we fix the cause.
+A screen that hits an error now says so in a box ("This screen hit an error and stopped
+drawing") with the message and links home; the navigation keeps working. Copy the message
+and tell the administrator what you had just done. A fully white page with nothing on it is
+usually a bad deployment instead: Vercel dashboard → Deployments → the most recent one → check
+it says Ready. If it failed, the log says why. You can click **Rollback** on the previous
+working deployment to get back online immediately, then we fix the cause.
 
 ### A user cannot sign in
 - Is the account active? Admin → Users.
