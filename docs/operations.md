@@ -328,6 +328,10 @@ company's own figure; the master admin ticks *master* to change the default for 
 add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
 be saved. New costings use the new figure; existing ones keep what they froze.
 
+### Read the APFC bank size (session 3)
+A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
+under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.
+
 ### Set the enclosure uplift (session 1)
 Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure
 cubicle*) when they enter a costing, and frozen there.
