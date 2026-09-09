@@ -98,6 +98,16 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - The in-house company uses the same mechanism with discount 0%. There is no separate cost price.
 - Rate-based components: `unit_price = weight_per_unit × company material rate`. For a master rate-based component the company's own rate is used, so discount does not apply; the weight comes from the master record.
 - Private component prices are used as entered, with no discount and no conversion.
+- **From migration 0008 (reference document §5, decision 2):** a component carries a purchase
+  price in its purchase currency; a per-currency exchange rate and landed-cost factor (master
+  default, company override) convert it to KES before the discount and the company currency:
+
+      master_price_kes = purchase_price × exchange_rate(purchase_currency) × landed_factor(purchase_currency)
+
+  Master EUR: 113 × 1.769912 = 200 KES per EUR. Busbar stays kg per metre × copper rate.
+- **Enclosure (decision 1):** catalogue cubicles are ordinary priced components marked as
+  cubicles; a panel's enclosure lines are uplifted by the company's enclosure uplift percentage,
+  frozen on the costing.
 - Companies never see the undiscounted master price or their discount percentage as separate values in the costing screens; they see their price. (The master admin sees both.)
 
 ## 6. Labour rules

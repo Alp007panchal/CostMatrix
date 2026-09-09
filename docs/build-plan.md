@@ -17,7 +17,14 @@ Time estimates assume one developer working with you part-time and are rough.
 | 3 — BOM exports | **Built.** Four category exports plus one workbook, Excel or CSV, from any costing. | 2026-09-08 |
 | 4 — CRM phase 1 | **Built.** Customers, contacts, projects, enquiries with numbers, costings against enquiries, quotations addressed to customer records, enquiry status following the quotation, follow-up reminders. | 2026-09-08 |
 | — | **Acceptance testing.** Building paused by the owner's decision after slice 4. The owner runs `docs/acceptance-test.md`; findings are fixed before anything new. | 2026-09-08 |
-| 5 — Multi-tenant library | After acceptance | |
+| — | **The owner's reference document and cleaned seed arrived (2026-09-09, second zip)** and replaced the derived ones; §5 is the owner's; the factor is one number (200), copper 15 EUR/kg, labour groups 17. |
+| — | **Reconciliation with the thirteen decisions.** `docs/reference/current-costing-and-quotation-reference.md` §5 is now the source of truth; seed derived from the owner's exports; six sessions below replace slices 5–6. PR 1 (seed, reference document, plan) open for the owner. | 2026-09-09 |
+| S1 — Foundation (0008–0009) | After PR 1 merges and §5 is corrected | |
+| S2 — Master data & importer | | |
+| S3 — Costing engine + NPP-192 acceptance | | |
+| S4 — Outputs (PDF from kits, BOMs) | | |
+| S5 — External companies | | |
+| S6 — CRM gap review | | |
 
 ## Slice 0 — Foundation (about one week)
 
@@ -100,6 +107,36 @@ Done when: a released PDF matches the reference layout, a revision can be made a
 - Follow-up reminders: create on a sent quotation, in-app list of due and overdue per company, mark done. No email digest in this phase.
 - `stage` and `owner` on enquiries stored now, funnel view later.
 
+## The six sessions of the reconciliation (2026-09-09 onward)
+
+Each session adapts what is live to the thirteen decisions, ends with tests green, and opens
+one pull request that the owner merges. Details in `CLAUDE.md` and the reference document §5.
+
+1. **Foundation** — migration 0008: `currency_factors`, purchase price and currency on
+   components, enclosure cubicle flag and uplift, frozen factors on costing lines,
+   `v_component_prices` recomputed. Migration 0009: `kit_groups`, `kit_group_labour`,
+   `assemblies.kit_group_id`/`rating`, `assembly_components.is_main_device`, `v_assembly_hours`
+   resolving override → group → zero. Documents updated. Done when the old test suite plus the
+   new assertions pass and a 42 EUR busbar prices at 8,400 KES through the view.
+2. **Master data & importer** — CSV import of `data/seed/components.csv`, `kits.csv`,
+   `category-map.csv` and the filled labour template, with preview, validation (one main device
+   per kit, unique kit names, placeholders without price allowed but flagged) and admin screens
+   for currency factors, kit groups and cubicles. Done when the owner imports the seed into
+   production through the screen.
+3. **Costing engine** — add a kit by rating × quantity, free components, cubicles + uplift,
+   per-line rounding confirmed, options, lifecycle and revisions re-verified; an SQL acceptance
+   test that loads the seed into the throwaway database, builds NPP-192 Option 1 and asserts the
+   §6.2 figures. Done when that test is green.
+4. **Outputs** — Annexure IV technical offer generated from the kits (main device, rating,
+   poles, lines), the four BOMs by `bom_category`, PDF re-checked against the reference.
+5. **External companies** — discount, private kits and components, company currency with the
+   frozen rate: verify what exists, add the master-admin read-only browsing and onboarding
+   checklist from the old slice 5.
+6. **CRM phase 1** — gap review against the brief; fixes only.
+
+Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
+or into go-live.
+
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
 - Private components and private assemblies per company, with company admin setting hours, including Excel upload and download of the private library.
@@ -128,5 +165,5 @@ reports, hiding master components per company, company-defined categories.
 ## Working rhythm
 
 - One slice at a time. No slice starts until the previous one's "done when" is met with you.
-- Every change goes through a pull request with CI green.
+- Every change goes through a pull request with CI green; the owner reviews and merges (D-117).
 - `decisions.md` is updated in the same pull request as the change it records.
