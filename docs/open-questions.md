@@ -3,24 +3,25 @@
 Nothing is blocking the build. What remains is material to be supplied, and assumptions you can
 overturn at any time. Answered questions live in `decisions.md`.
 
-## Now: the acceptance test
+## Now: correct the reference document, then PR 1
 
-Everything through slice 4 is live and unit-tested, and none of it has been clicked through by
-a person. `docs/acceptance-test.md` is the script: one real job, end to end, about an hour.
-Findings go in its table or in one message; all of them get fixed before slice 5 starts.
+`docs/reference/current-costing-and-quotation-reference.md` is a draft written from your files.
+Read §5 (the thirteen decisions) and §6.2 (what will differ when the app rebuilds NPP-192
+Option 1) and correct anything wrong. Merge PR 1 when you are satisfied; session 1 starts then.
 
 ## Waiting on you
 
 | What | Needed by | Note |
 |---|---|---|
-| **Slice 1 acceptance:** cost one real panel in the app and compare with the spreadsheet | Before slice 2 starts | Upload the "db" sheet from the reference workbook, build one assembly, cost one panel. The material subtotal should match the sheet; labour will differ, deliberately, because it is now hours × rate. |
-| Upload the header logo and footer marks | Before the first real quotation | Now done in the app: **Quotation wording** → Header logo and Footer strip. PNG with a transparent background prints best. Keep source copies in `docs/reference/logos/` too. |
-| **Slice 2 acceptance:** release one quotation and compare the PDF with the reference | Before slice 3 starts | Approve a costing, Release quotation, preview, release. Compare against `docs/reference/quotation-NPP-192-REV1.pdf` page by page. Wording and layout differences go on the list; the price schedule numbers should match the costing exactly. |
-
-Not needed: the master component list. It does not exist yet and will be built inside the app
-by Excel upload (see `docs/spec.md` §10a).
-
-| **Slice 4 acceptance:** log a real customer and enquiry, cost against it, release, mark sent | Before slice 5 | The enquiry should move to *quoted* by itself; a follow-up should appear on the Follow-ups screen. |
+| Confirm or rewrite decisions **4, 10, 12, 13** in §5 | Before session 1 | Proposed from the original brief; the other nine are your words. |
+| Decision 6: does "each line" mean each **panel** on the price schedule (as built today) or each component line? | Before session 3 | Built as per panel; changing it is a small view change. |
+| Decision 2: the real landed-cost factor for EUR (freight + duty + clearing) | Before session 2 imports the seed | Back-solved as 1.769912 so that 113 KES/EUR lands at 200; replace with the true figure and the app recomputes. |
+| **Labour hours per kit group** — fill `data/seed/kit-group-labour-template.csv` | Before session 3 | 17 groups × 3 process types. Without them every kit costs zero labour. |
+| What the enclosure line `102 × 4,000` on Option 1 counts | Before session 3 | Kilograms of sheet metal, modules, or something else. Decides how the cubicle-plus-uplift model maps onto it. |
+| Two 800A ACBs at 330,432 on Option 1 versus 279,744 from the catalogue | Before session 3 | If accessories are included in 330,432, they should be kit lines. |
+| Data-quality items in `data/seed/README.md` | Before session 2 | Fifteen kits with only a main device, stray cable lines, two 4000A kits that look like one, duplicate and double-priced parts. Fix in `data/raw/` or say "import as is". |
+| Upload the header logo and footer marks | Before the first real quotation | **Quotation wording** → Header logo and Footer strip. PNG with transparent background prints best. |
+| Run `docs/acceptance-test.md` on what is live | Any time | Findings are fixed inside the sessions above. |
 
 ## Assumptions in force until you say otherwise
 

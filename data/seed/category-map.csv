@@ -1,0 +1,28 @@
+raw_category,bom_category,is_busbar,is_enclosure_cubicle,parts
+ACB,switchgear,no,no,80
+ACB SINOVA ACCESSORIES,accessories_hardware,no,no,12
+ACCESSORIES,switchgear,no,no,4
+APFC,switchgear,no,no,20
+ATS SWITCH,switchgear,no,no,3
+BUSBAR,busbar,yes,no,10
+BUSBAR-LINK,busbar,no,no,5
+BYPASS SWITCH,switchgear,no,no,10
+CABLE,busbar,no,no,9
+CONTACTOR,switchgear,no,no,15
+CONTACTOR ACCESSORIES,accessories_hardware,no,no,12
+CONTROLS,switchgear,no,no,1
+CT,switchgear,no,no,10
+ENCLOSURE,enclosure_parts,no,yes,23
+INTERLOCK,switchgear,no,no,1
+ISOLATOR,switchgear,no,no,3
+LED,switchgear,no,no,3
+MCB,switchgear,no,no,100
+MCCB,switchgear,no,no,314
+MCCB ACCESSORIES,accessories_hardware,no,no,6
+METERING,switchgear,no,no,9
+ONLOAD CHANGEOVER,switchgear,no,no,13
+RCBO,switchgear,no,no,5
+RCCB,switchgear,no,no,6
+SINOVA MCCB ACCESSORIES,accessories_hardware,no,no,44
+SPD,switchgear,no,no,4
+SWITCH DISCONNECTOR,switchgear,no,no,13

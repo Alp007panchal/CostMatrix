@@ -1,0 +1,126 @@
+{
+ "main_assumed": 217,
+ "main_only": [
+  "4000A 4P WITHDRAWABLE MOTORIZED ACB-KIT with changeover accessories-KIT",
+  "4000A 4P WITHDRAWABLE MOTORIZED ACB with changeover accessories-KIT",
+  "20A,4P,MCCB, Adjustable, 25KA-KIT",
+  "25A,4P,MCCB, Adjustable, 25KA-KIT",
+  "32A,4P,MCCB, Adjustable, 25KA-KIT",
+  "40A,4P,MCCB, Adjustable, 25KA-KIT",
+  "50A,4P,MCCB, Adjustable, 25KA-KIT",
+  "63A,4P,MCCB, Adjustable 25KA-KIT",
+  "80A,4P,MCCB, Adjustable, 25KA-KIT",
+  "100A,4P,MCCB, Adjustable,25KA-KIT",
+  "125A,4P,MCCB, Adjustable, 25KA-KIT",
+  "2000A 3P MF WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT",
+  "2000A 4P EDO WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT",
+  "400A TP Adj Therm Adj Mag MCCB 25KA",
+  "63A TP MCB Isolator-KIT"
+ ],
+ "non_contiguous": [
+  "20A,TP,MCCB, Adjustable, 25KA-KIT",
+  "25A,TP,MCCB, Adjustable, 25KA-KIT",
+  "32A,TP,MCCB, Adjustable, 25KA-KIT",
+  "40A,TP,MCCB, Adjustable, 25KA-KIT",
+  "50A,TP,MCCB, Adjustable, 25KA-KIT",
+  "63A,TP,MCCB, Adjustable 25KA-KIT",
+  "80A,TP,MCCB, Adjustable, 25KA-KIT",
+  "100A,TP,MCCB, Adjustable,25KA-KIT",
+  "125A,TP,MCCB, Adjustable, 25KA-KIT",
+  "2000A 3P EDO WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT",
+  "630A TP Adj Therm Mag MCCB 630AF 36KA-KIT",
+  "63A SP MCB 6KA 'C' Curve-KIT"
+ ],
+ "name_collision": [],
+ "merged": [],
+ "unknown_parts": [],
+ "quantity_assumed": [
+  [
+   "1600A 4P WITHDRAWABLE MOTORIZED ACB with changeover accessories-KIT",
+   "3WJ1116-2AE42-4DD0-Z F40+R55+T40"
+  ]
+ ],
+ "stray_lines": [
+  [
+   "20A,TP,MCCB, Adjustable, 25KA-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 20A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "25A,TP,MCCB, Adjustable, 25KA-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 25A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "32A,TP,MCCB, Adjustable, 25KA-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 32A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "40A,TP,MCCB, Adjustable, 25KA-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 40A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "50A,TP,MCCB, Adjustable, 25KA-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 50A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "63A,TP,MCCB, Adjustable 25KA-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 63A,4P,MCCB, Adjustable 25KA-KIT)"
+  ],
+  [
+   "80A,TP,MCCB, Adjustable, 25KA-KIT",
+   "25SQMM",
+   "stray-line(previous kit: 80A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "100A,TP,MCCB, Adjustable,25KA-KIT",
+   "25SQMM",
+   "stray-line(previous kit: 100A,4P,MCCB, Adjustable,25KA-KIT)"
+  ],
+  [
+   "125A,TP,MCCB, Adjustable, 25KA-KIT",
+   "35SQMM",
+   "stray-line(previous kit: 125A,4P,MCCB, Adjustable, 25KA-KIT)"
+  ],
+  [
+   "2000A 3P EDO WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT",
+   "50X10MM",
+   "stray-line(previous kit: 2000A 3P MF WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT)"
+  ],
+  [
+   "2000A 3P EDO WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT",
+   "50X10MM",
+   "stray-line(previous kit: 2000A 4P EDO WITH MIRCROPRO4.1 RELAY WM2 ACB-KIT)"
+  ],
+  [
+   "63A SP MCB 6KA 'C' Curve-KIT",
+   "16SQMM",
+   "stray-line(previous kit: 63A TP MCB Isolator-KIT)"
+  ]
+ ],
+ "groups": {
+  "ACB": 80,
+  "BUSBAR": 1,
+  "MCCB": 44,
+  "INCOMER-KIT": 12,
+  "OUTGOER-KITS": 12,
+  "MCB": 60,
+  "ATS": 12,
+  "SYNCHRONIZATION": 12,
+  "ACCESORISES": 3,
+  "APFC BANK": 10,
+  "METERBOARD": 6,
+  "METERBOARD-WITH ATS": 6,
+  "ISOLATOR": 1,
+  "ONLOAD CHANGEOVER": 13,
+  "SWITCH DISCONNECTOR": 13,
+  "ATS-SWITCH": 9,
+  "RCBO": 3
+ },
+ "kits": 297,
+ "lines": 722
+}
