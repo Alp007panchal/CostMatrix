@@ -300,12 +300,12 @@ price import as *placeholders*: they show "no price" on the Components screen, a
 holds one cannot be added to a costing until you give it a purchase price. The master admin
 imports the master library; a company admin imports private parts and kits for their company.
 
-### Change an exchange rate or landed factor (session 1)
-Rates → Currency factors. Each currency shows KES per 1 unit, the landed factor (freight, duty
-and clearing; 1 means none) and what one unit lands at. **Change** writes your company's own
-figure; the master admin ticks *master* to change the default for everyone, and may add a new
-currency at the bottom of the table. A purchase price in a currency with no row cannot be saved.
-New costings use the new figures; existing ones keep what they froze.
+### Change a currency's landed factor (session 1)
+Rates → Currency factors. Each currency shows one figure: KES per 1 unit **landed**, with the
+exchange rate, freight, duty and handling in it (200 per EUR today). **Change** writes your
+company's own figure; the master admin ticks *master* to change the default for everyone, and may
+add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
+be saved. New costings use the new figure; existing ones keep what they froze.
 
 ### Set the enclosure uplift (session 1)
 Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure
@@ -318,7 +318,9 @@ on the kit means the group's hours apply. On a kit: choose its group, rating and
 the title, and tick the radio button of the line that is its main device.
 
 ### Change the copper rate (slice 1)
-Library → Material rates → edit the rate per kilogram → Save. New costings use it; existing
+Rates → Material rates → **Change** on Copper busbar → type the rate per kilogram → Save. The
+master figure is in **EUR per kg (15)** and lands through the EUR factor; the *Lands at* column
+shows the KES per kg (3,000). A company's own figure is in its own currency. New costings use it; existing
 ones keep the rate they froze.
 
 ### Set up the quotation letterhead and wording

@@ -11,7 +11,7 @@ import { fail } from './api'
 /**
  * The three tables of numbers that turn hours, weights and purchase prices
  * into money: labour rates per hour, material rates per kilogram, and the
- * exchange rate and landed factor per currency. Each has master defaults and
+ * landed factor per currency (KES per 1 unit). Each has master defaults and
  * company overrides.
  */
 
@@ -51,15 +51,17 @@ export async function listEffectiveMaterialRates(): Promise<EffectiveMaterialRat
   return (data ?? []) as EffectiveMaterialRate[]
 }
 
+/** The company's own rate, in the currency given (its own currency on screen). */
 export async function setMaterialRate(
   companyId: string,
   code: string,
   name: string,
   rate: number,
+  currencyCode: string,
 ): Promise<void> {
   const { error } = await supabase
     .from('material_rates')
-    .upsert({ company_id: companyId, code, name, unit: 'kg', rate }, { onConflict: 'company_id,code' })
+    .upsert({ company_id: companyId, code, name, unit: 'kg', rate, currency_code: currencyCode }, { onConflict: 'company_id,code' })
   fail('Could not save the rate', error)
 }
 
@@ -77,7 +79,7 @@ export async function listCurrencyFactors(): Promise<CurrencyFactor[]> {
   return (data ?? []) as CurrencyFactor[]
 }
 
-/** Per currency: the company's own exchange rate and landed factor, or the master's. */
+/** Per currency: the company's own landed factor, or the master's. */
 export async function listEffectiveCurrencyFactors(): Promise<EffectiveCurrencyFactor[]> {
   const { data, error } = await supabase.from('v_currency_factors').select('*').order('currency_code')
   fail('Could not load currency factors', error)
@@ -88,13 +90,12 @@ export async function listEffectiveCurrencyFactors(): Promise<EffectiveCurrencyF
 export async function setCurrencyFactor(
   companyId: string,
   currencyCode: string,
-  exchangeRate: number,
   landedFactor: number,
 ): Promise<void> {
   const { error } = await supabase
     .from('currency_factors')
     .upsert(
-      { company_id: companyId, currency_code: currencyCode, exchange_rate: exchangeRate, landed_factor: landedFactor },
+      { company_id: companyId, currency_code: currencyCode, landed_factor: landedFactor },
       { onConflict: 'company_id,currency_code' },
     )
   fail('Could not save the currency factor', error)
@@ -106,25 +107,17 @@ export async function clearCurrencyFactor(ownId: string): Promise<void> {
 }
 
 /** Master admin: change a master row, or add a currency the library may buy in. */
-export async function updateMasterCurrencyFactor(
-  id: string,
-  exchangeRate: number,
-  landedFactor: number,
-): Promise<void> {
+export async function updateMasterCurrencyFactor(id: string, landedFactor: number): Promise<void> {
   const { error } = await supabase
     .from('currency_factors')
-    .update({ exchange_rate: exchangeRate, landed_factor: landedFactor })
+    .update({ landed_factor: landedFactor })
     .eq('id', id)
   fail('Could not save the currency factor', error)
 }
 
-export async function addMasterCurrency(
-  currencyCode: string,
-  exchangeRate: number,
-  landedFactor: number,
-): Promise<void> {
+export async function addMasterCurrency(currencyCode: string, landedFactor: number): Promise<void> {
   const { error } = await supabase.from('currency_factors').insert({
-    company_id: null, currency_code: currencyCode, exchange_rate: exchangeRate, landed_factor: landedFactor,
+    company_id: null, currency_code: currencyCode, landed_factor: landedFactor,
   })
   fail('Could not add the currency', error)
 }

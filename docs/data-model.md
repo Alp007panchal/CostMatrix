@@ -145,15 +145,17 @@ with `effective_hours`, `source` (`master`, `company_override`, `private`) and `
 ### Added by migrations 0008 and 0009 (reference document §5, decisions 1, 2, 11)
 
 **currency_factors** (decision 2)
-- `company_id` NULL = master default; `currency_code` (three letters), `exchange_rate` (KES per 1 unit), `landed_factor` (freight, duty and clearing as a multiplier; 1 = none; eight decimals), `note`
-- unique (`company_id`, `currency_code`); master rows seeded `KES 1 × 1` and `EUR 113 × 1.7699115` (= 200 KES per landed EUR, from NPP-192); the migration also adds a master row for any currency an existing company already works in
+- `company_id` NULL = master default; `currency_code` (three letters), `landed_factor` (**KES per 1 unit, landed**: exchange rate, freight, duty and handling in one admin-maintained number, decision 2), `note`
+- unique (`company_id`, `currency_code`); master rows seeded `KES 1` and `EUR 200` (the NPP-192 figure); the migration also adds a master row for any currency an existing company already works in, at that company's exchange rate
 - **currency_factor_history** filled by a SECURITY DEFINER trigger on either column
 
 View **v_currency_factors** — per master currency: the company's own figures where set, else the master's, with `source`, the master figures, `master_id` and `own_id`.
 
-**components** — `unit_price` and `currency_code` were **renamed** `purchase_price` and `purchase_currency` (one price, never two that can disagree); `is_enclosure_cubicle` added (decision 1). A trigger upper-cases the currency and refuses one with no master factor row. `component_price_history` gained `purchase_currency`.
+**components** — `unit_price` and `currency_code` were **renamed** `purchase_price` (four decimals) and `purchase_currency` (one price, never two that can disagree); `is_enclosure_cubicle` added (decision 1); `rating`, `poles`, `breaking_capacity`, `frame_size` (text, parsed from the catalogue by the owner's clean-up; informational). A trigger upper-cases the currency and refuses one with no master factor row. `component_price_history` gained `purchase_currency`.
 
-`v_component_prices` now computes `landed_price_kes = purchase × exchange rate × landed factor` (company row else master row for that currency), then the discount (master rows only) and the company currency; `raw_price` is the purchase price; new columns `purchase_currency`, `factor_exchange_rate`, `landed_factor`, `landed_price_kes`, `is_enclosure_cubicle`.
+**material_rates** — `currency_code` (default KES); the master copper row is **15 EUR per kg** (decision 3). `v_material_rates` lands the rate through that currency's factor (`kes_per_kg` = 15 × 200 = 3,000) and converts into the company currency (`rate`); `rate_entered`/`currency_code` show the row as typed. The kg-per-metre table is the busbar components' `weight_per_unit`, seeded as catalogue EUR ÷ 15.
+
+`v_component_prices` now computes `landed_price_kes = purchase × landed_factor` (company row else master row for that currency), then the discount (master rows only) and the company currency; `raw_price` is the purchase price; new columns `purchase_currency`, `landed_factor`, `landed_price_kes`, `is_enclosure_cubicle`, `rating`, `poles`.
 
 **kit_groups** (decision 11) — `company_id` NULL = master; `name`, `description`, `sort_order`; unique name per owner.
 
@@ -170,8 +172,7 @@ View **v_currency_factors** — per master currency: the company's own figures w
 - **components.is_placeholder** — a part the kits use but the catalogue does not price. The pricing check allows a null `purchase_price` only for a placeholder; `add_assembly_to_costing` refuses a kit whose line prices to null ("… has no price yet").
 - **import_batches.target** also `kits`, `kit_group_hours`.
 - **app.import_components(rows jsonb, to_company uuid, apply boolean, file_name text)**, **app.import_kits(…)**, **app.import_kit_group_hours(rows, to_company, apply)** — SECURITY DEFINER; the master admin imports into the master library (`to_company null`), a company admin into their own. Each validates, compares with what exists and returns a report `{new, changed, unchanged, rejected[], changes[], groups_new?, skipped_blank?}`; with `apply = true` it also writes, in one transaction, and records an `import_batches` row. A kit's code is `app.kit_code(name)` (letters and digits, hyphens between); a kit needs exactly one main device and every part in the library or it is rejected whole; a changed kit has its lines replaced and its hours kept. Public wrappers of the same names.
-
-**companies** — `enclosure_uplift_pct` (company-set). **costings** — `enclosure_uplift_pct` frozen at creation. **costing_items** — frozen `purchase_price`, `purchase_currency`, `factor_exchange_rate`, `landed_factor`, and `uplift_pct` on cubicle lines; `master_price_kes` is the landed KES price before discount. `add_assembly_to_costing` applies the uplift to cubicles and freezes all of these.
+**companies** — `enclosure_uplift_pct` (company-set). **costings** — `enclosure_uplift_pct` frozen at creation. **costing_items** — frozen `purchase_price`, `purchase_currency`, `landed_factor`, and `uplift_pct` on cubicle lines; `master_price_kes` is the landed KES price before discount. `add_assembly_to_costing` applies the uplift to cubicles and freezes all of these.
 
 ## 3. Costing
 

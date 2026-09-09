@@ -11,10 +11,10 @@ export interface PricingValues {
   material_rate_code: string
 }
 
-/** 42 EUR × 113 × 1.7699115 → 8,400.00 KES: the landed price before any discount. */
+/** 42 EUR × 200 → 8,400.00 KES: the landed price before any discount. */
 export function landedKes(price: number, factor: EffectiveCurrencyFactor | undefined): number | null {
   if (!factor || !(price > 0)) return null
-  return Math.round(price * factor.exchange_rate * factor.landed_factor * 100) / 100
+  return Math.round(price * factor.landed_factor * 100) / 100
 }
 
 export function PricingFields({
@@ -89,7 +89,7 @@ export function PricingFields({
             <p className="muted">
               Lands at <strong>{money(landed, 'KES')}</strong> per {unit || 'unit'}
               {factor.currency_code !== 'KES' &&
-                ` (× ${factor.exchange_rate} KES per ${factor.currency_code} × ${factor.landed_factor} landed)`}
+                ` (× ${factor.landed_factor} KES per ${factor.currency_code}, landed)`}
               . Discounts and company currencies apply after that.
             </p>
           )}
