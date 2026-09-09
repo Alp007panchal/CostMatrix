@@ -24,20 +24,32 @@ export function AssemblyHoursRow({
     if (!Number.isFinite(n) || n < 0) return
     onSave(n).catch((e: unknown) => setError(String(e)))
   }
-  const shownBase = mode === 'override' ? row.master_hours : row.effective_hours
+  const shownBase = mode === 'override' ? row.master_hours ?? row.group_hours : row.effective_hours
+  const origin =
+    row.source === 'kit_group'
+      ? 'from the kit group'
+      : row.source === 'company_override'
+        ? 'your override'
+        : row.master_hours != null && row.group_hours != null
+          ? `kit's own (group says ${row.group_hours})`
+          : null
 
   return (
     <tr>
-      <td>{row.process_name}</td>
+      <td>
+        {row.process_name}
+        {origin && <div className="muted" style={{ fontSize: '.75rem' }}>{origin}</div>}
+      </td>
       <td className="right">
         {mode === 'edit' ? (
           <input
             type="number"
             step="0.25"
             min="0"
-            defaultValue={row.effective_hours}
+            defaultValue={row.master_hours ?? ''}
+            placeholder={row.group_hours != null ? `group: ${row.group_hours}` : '0'}
             style={{ width: '6rem', textAlign: 'right' }}
-            onBlur={(e) => commit(e.target.value)}
+            onBlur={(e) => e.target.value !== '' && commit(e.target.value)}
           />
         ) : (
           (shownBase ?? 0).toFixed(2)

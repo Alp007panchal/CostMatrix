@@ -46,7 +46,7 @@ and over the existing code. When it conflicts with the schema, write a forward m
 `scripts/build_kits.py` derive `data/seed/components.csv`, `category-map.csv`, `kits.csv` and
 `kit-group-labour-template.csv`; `data/seed/README.md` (generated) lists columns, counts and
 every flagged row. Placeholder parts without a price are allowed and flagged. Master EUR
-conversion: 113 KES/EUR × landed factor 1.769912 = 200 KES per EUR, back-solved from NPP-192.
+conversion: 113 KES/EUR × landed factor 1.7699115 = 200 KES per EUR, back-solved from NPP-192.
 `scripts/check_npp192.py` reprices the NPP-192 Option 1 sheet from the seed and prints §6.2.
 
 ## Acceptance (NPP-192 Option 1, reference §4 and §6.2)
@@ -54,7 +54,7 @@ conversion: 113 KES/EUR × landed factor 1.769912 = 200 KES per EUR, back-solved
 Workbook: switchgear 2,520,637.80 · busbar & cable 1,236,360.00 · enclosure 408,000.00
 (102 × 4,000) · material 4,164,997.80 · ÷0.8 → 5,206,247.25 · ÷0.9 → 5,784,719.17 · round
 up to 100 → 5,784,800 · VAT 16 % 925,568 · total 6,710,368. Option 2: 7,684,700 /
-1,229,552 / 8,914,252. Rebuilt from the seed the app must give switchgear 2,386,422.24 and
+1,229,552 / 8,914,252. Rebuilt from the seed the app must give switchgear 2,386,421.80 and
 busbar & cable 1,218,288.00 (the differences are the workbook's, itemised in §6.2), and
 reproduce the margin, rounding and VAT arithmetic exactly.
 
@@ -86,7 +86,10 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
 - Keep momentum inside an approved slice: build it to the end, verify, open the PR, report.
   Ask before anything destructive or outside the plan.
 - Branch `claude/costmatrix-planning-bq7j86`. **One pull request per feature; the owner
-  reviews and merges.** Migrations reach production automatically on merge to `main`.
+  reviews and merges.** While an earlier PR is still open, the next session goes on a branch
+  stacked on it (`…-s1-foundation`, `…-s2-importer`) with its PR targeting the earlier branch;
+  GitHub retargets to `main` when the earlier PR merges. Migrations reach production
+  automatically on merge to `main`.
 - Verify before claiming: `supabase/tests/run-local.sh`; in `web/` `npm run typecheck`,
   `npm test`, `npm run build`; and `python3 scripts/build_seed.py && python3
   scripts/build_kits.py` must leave `data/seed/` unchanged. Say plainly what could not be

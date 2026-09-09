@@ -75,10 +75,10 @@ export async function getCostingDetail(id: string): Promise<CostingDetail> {
 
   fail('Could not load the costing', costing.error)
   fail('Could not load panels', panels.error)
-  fail('Could not load assemblies', assemblies.error)
+  fail('Could not load kits', assemblies.error)
   fail('Could not load items', items.error)
   fail('Could not load labour', labour.error)
-  fail('Could not load assembly totals', assemblyTotals.error)
+  fail('Could not load kit totals', assemblyTotals.error)
   fail('Could not load panel prices', panelPrices.error)
   fail('Could not load totals', totals.error)
   fail('Could not load option totals', options.error)
@@ -157,7 +157,7 @@ export async function addAssemblyToPanel(
     source_assembly: assemblyId,
     qty: quantity,
   })
-  fail('Could not add the assembly', error)
+  fail('Could not add the kit', error)
 }
 
 export async function setCostingAssemblyQuantity(id: string, quantity: number): Promise<void> {
@@ -167,7 +167,7 @@ export async function setCostingAssemblyQuantity(id: string, quantity: number): 
 
 export async function removeCostingAssembly(id: string): Promise<void> {
   const { error } = await supabase.from('costing_assemblies').delete().eq('id', id)
-  fail('Could not remove the assembly', error)
+  fail('Could not remove the kit', error)
 }
 
 export async function setItemQuantity(id: string, quantity: number): Promise<void> {

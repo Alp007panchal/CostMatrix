@@ -65,19 +65,18 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Companies cannot add categories in release 1.
 
 ### 4.2 Components
-- Master components: created and edited only by the master admin. Priced in KES.
-- Private components: created and edited by a company admin, visible only to that company. Priced in the company's currency. No discount applies.
-- Companies cannot edit or delete master components. They can hide them from their own pick lists (later phase; not in release 1).
-- Fields: code, name, description, category, unit (pcs, m, set…), manufacturer (make), part number (manufacturer reference), pricing mode, unit price or weight per unit, currency, active flag.
-- Pricing mode is `fixed` (a price per unit) or `weight_rate` (weight per unit × a material rate). Busbar sizes are `weight_rate` components with kg per metre; the copper rate per kg is a material rate. Fabricated enclosure and sheet-metal parts are `fixed` components in the enclosure category, priced from the separate fabrication costing.
-- Every price change is recorded in a price history with who changed it and when.
+- Master components: created and edited only by the master admin. Private components: created and edited by a company admin, visible only to that company. Companies cannot edit or delete master components.
+- Every component carries a **purchase price in a purchase currency** — what the supplier charges (decision 2). The KES landed price and the company price are computed, never stored (§5).
+- Fields: code, name, description, category, unit (pcs, m, set…), manufacturer (make), part number (manufacturer reference), pricing mode, purchase price and currency or kg per metre, enclosure-cubicle flag, active flag.
+- Pricing mode is `fixed` (a purchase price per unit) or `weight_rate` (kg per metre × a material rate, decision 3). Busbar sizes are `weight_rate` components; the copper rate per kg is a material rate. Enclosure cubicles from the catalogue are `fixed` components in the enclosure category flagged as cubicles (decision 1); when costed they are uplifted by the company's enclosure uplift percentage.
+- A purchase currency must have a master row in the currency factors (§4.6); the master admin adds currencies.
+- Every price change is recorded in a price history with the currency, who changed it and when.
 
-### 4.3 Assemblies
-- Master assemblies: created and edited only by the master admin. May reference only master components. Carry master labour hours per process type.
-- Private assemblies: created by a company admin. May reference master components and the company's own private components. Labour hours per process type are entered by the company admin.
-- Companies cannot edit or delete master assemblies.
-- A company admin may set company-level override hours for a master assembly, per process type. When present, these replace the master hours for that company's costings. The master hours stay visible beside the override.
-- An assembly may involve one, two or all three process types. Hours for an unused process type are zero.
+### 4.3 Kits and kit groups
+- A **kit** (the `assemblies` table; "assembly" in older text) is a main device plus its lines — busbar, cable, accessories — with quantities. It carries a rating (630 A, 50 KVAR) and poles so a costing can pick it by rating and the technical offer can describe it. At most one line is the main device; the importer requires exactly one.
+- A **kit group** (ACB, MCCB, ATS, APFC BANK…) carries the labour hours per process type for every kit in it. A kit may override one process type at a time with its own hours (decision 11).
+- Master kits and groups: created and edited only by the master admin; a master kit may reference only master components and master groups. Private kits and groups: created by a company admin; a private kit may reference master components and groups and the company's own.
+- A company admin may set company-level override hours for a master kit, per process type. Precedence for a costing line: the edited value on the line → the company override → the kit's own hours → the kit group's hours → zero. The figure one level down stays visible beside the one in force.
 
 ### 4.4 Labour rates
 - Master admin maintains default hourly rates per process type in KES. These are shown to a new company as a starting suggestion.
@@ -87,33 +86,30 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Master admin maintains default material rates in KES. Release 1 is seeded with one: copper busbar at 3,000 per kg. The rate is editable at any time, and every change is recorded with the user and time, like a component price.
 - Each company sets its own material rates in its own currency. Changing a rate changes the price of every `weight_rate` component in future costings; existing costings keep the frozen value.
 
+### 4.6 Currency factors
+- Per currency: an exchange rate (KES per 1 unit) and a landed-cost factor for freight, duty and clearing. Master defaults (KES 1 × 1; EUR 113 × 1.7699115, which lands a euro at 200 KES as the NPP-192 workbook did); a company may hold its own row for a currency and it wins for that company. Every change is recorded in a history.
+
 ## 5. Pricing rules
 
 - KES is the master currency. All master prices and master default rates are in KES.
 - Each company works in one currency (KES or another). The company admin sets the currency and the exchange rate, defined as **KES per 1 unit of the company currency** (1.00 for a KES company; about 130 for a USD company).
-- Price a company sees for a master component:
+- A fixed-price component is priced in three steps (decision 2), all in `v_component_prices`:
 
-      unit_price = master_price_kes × (1 − discount%) ÷ exchange_rate
+      landed_price_kes = purchase_price × exchange_rate(purchase_currency) × landed_factor(purchase_currency)
+      master component:  unit_price = landed_price_kes × (1 − discount%) ÷ company exchange_rate
+      private component: unit_price = landed_price_kes ÷ company exchange_rate          (no discount)
 
+  The factors are the company's own row for that currency if it has one, else the master row.
+  A KES-priced part of a KES company therefore prices at face value, as before.
 - The in-house company uses the same mechanism with discount 0%. There is no separate cost price.
-- Rate-based components: `unit_price = weight_per_unit × company material rate`. For a master rate-based component the company's own rate is used, so discount does not apply; the weight comes from the master record.
-- Private component prices are used as entered, with no discount and no conversion.
-- **From migration 0008 (reference document §5, decision 2):** a component carries a purchase
-  price in its purchase currency; a per-currency exchange rate and landed-cost factor (master
-  default, company override) convert it to KES before the discount and the company currency:
-
-      master_price_kes = purchase_price × exchange_rate(purchase_currency) × landed_factor(purchase_currency)
-
-  Master EUR: 113 × 1.769912 = 200 KES per EUR. Busbar stays kg per metre × copper rate.
-- **Enclosure (decision 1):** catalogue cubicles are ordinary priced components marked as
-  cubicles; a panel's enclosure lines are uplifted by the company's enclosure uplift percentage,
-  frozen on the costing.
+- Rate-based components: `unit_price = kg_per_metre × company material rate` (decision 3). For a master rate-based component the company's own rate is used, so discount does not apply; the weight comes from the master record.
+- **Enclosure cubicles (decision 1):** priced as above, then multiplied by (1 + enclosure uplift %) when they enter a costing. The uplift is a company setting, frozen into the costing and onto each cubicle line.
 - Companies never see the undiscounted master price or their discount percentage as separate values in the costing screens; they see their price. (The master admin sees both.)
 
 ## 6. Labour rules
 
 - Labour for an assembly = Σ over process types (hours × company hourly rate for that process type).
-- Hours come from, in order of precedence: the value edited on the costing line, else the company override for that assembly, else the master hours (or the private assembly's own hours).
+- Hours come from, in order of precedence: the value edited on the costing line, else the company override for that kit, else the kit's own hours, else the kit group's hours, else zero.
 - On a costing line the engineer may edit hours. The source hours (override or master) are shown beside the edited value so the deviation is visible.
 - Labour is never calculated as a percentage of material.
 

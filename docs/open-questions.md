@@ -3,11 +3,12 @@
 Nothing is blocking the build. What remains is material to be supplied, and assumptions you can
 overturn at any time. Answered questions live in `decisions.md`.
 
-## Now: correct the reference document, then PR 1
+## Now: review PR 1, then PR 2
 
 `docs/reference/current-costing-and-quotation-reference.md` is a draft written from your files.
 Read §5 (the thirteen decisions) and §6.2 (what will differ when the app rebuilds NPP-192
-Option 1) and correct anything wrong. Merge PR 1 when you are satisfied; session 1 starts then.
+Option 1) and correct anything wrong, then merge PR 1. PR 2 (session 1: the schema for decisions
+1, 2, 3 and 11) is stacked on it; merge it second. Nothing reaches the live database until then.
 
 ## Waiting on you
 
@@ -15,7 +16,7 @@ Option 1) and correct anything wrong. Merge PR 1 when you are satisfied; session
 |---|---|---|
 | Confirm or rewrite decisions **4, 10, 12, 13** in §5 | Before session 1 | Proposed from the original brief; the other nine are your words. |
 | Decision 6: does "each line" mean each **panel** on the price schedule (as built today) or each component line? | Before session 3 | Built as per panel; changing it is a small view change. |
-| Decision 2: the real landed-cost factor for EUR (freight + duty + clearing) | Before session 2 imports the seed | Back-solved as 1.769912 so that 113 KES/EUR lands at 200; replace with the true figure and the app recomputes. |
+| Decision 2: the real landed-cost factor for EUR (freight + duty + clearing) | Before session 2 imports the seed | Back-solved as 1.7699115 so that 113 KES/EUR lands at 200; once PR 2 is live you change it yourself under Rates → Currency factors. |
 | **Labour hours per kit group** — fill `data/seed/kit-group-labour-template.csv` | Before session 3 | 17 groups × 3 process types. Without them every kit costs zero labour. |
 | What the enclosure line `102 × 4,000` on Option 1 counts | Before session 3 | Kilograms of sheet metal, modules, or something else. Decides how the cubicle-plus-uplift model maps onto it. |
 | Two 800A ACBs at 330,432 on Option 1 versus 279,744 from the catalogue | Before session 3 | If accessories are included in 330,432, they should be kit lines. |

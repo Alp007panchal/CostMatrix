@@ -60,6 +60,7 @@ export async function updateCompany(
       | 'labour_margin_pct'
       | 'tax_pct'
       | 'price_rounding_step'
+      | 'enclosure_uplift_pct'
       | 'quotation_prefix'
       | 'quotation_no_includes_year'
       | 'address'

@@ -6,22 +6,22 @@ import type {
   Component,
   ComponentCategory,
   ComponentPrice,
-  EffectiveMaterialRate,
-  LabourRate,
-  MaterialRate,
   PriceHistoryRow,
   ProcessType,
 } from '../../lib/database.types'
 
 /**
- * The component and assembly library.
+ * The component and kit library.
  *
  * Prices are read from v_component_prices, never from the components table:
- * the view applies the company's discount, converts out of KES and works out
- * what a busbar costs from its weight. Writing goes to the table.
+ * the view lands the purchase price in KES through the currency's exchange
+ * rate and landed factor, applies the company's discount, converts into the
+ * company currency, and works out what a busbar costs from its weight.
+ * Writing goes to the table. Rates and currency factors live in rates-api.ts,
+ * kit groups and main devices in kits-api.ts.
  */
 
-function fail(context: string, error: { message: string } | null): void {
+export function fail(context: string, error: { message: string } | null): void {
   if (error) throw new Error(`${context}: ${error.message}`)
 }
 
@@ -61,9 +61,11 @@ export type ComponentInput = Pick<
   | 'manufacturer'
   | 'part_number'
   | 'pricing_mode'
-  | 'unit_price'
+  | 'purchase_price'
+  | 'purchase_currency'
   | 'weight_per_unit'
   | 'material_rate_code'
+  | 'is_enclosure_cubicle'
 > & { company_id: string | null }
 
 export async function createComponent(input: ComponentInput): Promise<void> {
@@ -88,7 +90,7 @@ export async function setComponentActive(id: string, isActive: boolean): Promise
 function cleanForMode(input: ComponentInput): ComponentInput {
   return input.pricing_mode === 'fixed'
     ? { ...input, weight_per_unit: null, material_rate_code: null }
-    : { ...input, unit_price: null }
+    : { ...input, purchase_price: null }
 }
 
 export async function listPriceHistory(componentId: string): Promise<PriceHistoryRow[]> {
@@ -102,64 +104,11 @@ export async function listPriceHistory(componentId: string): Promise<PriceHistor
   return (data ?? []) as PriceHistoryRow[]
 }
 
-// --- rates -----------------------------------------------------------------
-
-/** Raw rows: master rows have company_id null, the company's own have its id. */
-export async function listLabourRates(): Promise<LabourRate[]> {
-  const { data, error } = await supabase.from('labour_rates').select('*')
-  fail('Could not load labour rates', error)
-  return (data ?? []) as LabourRate[]
-}
-
-export async function setLabourRate(
-  companyId: string,
-  processType: string,
-  hourlyRate: number,
-): Promise<void> {
-  const { error } = await supabase
-    .from('labour_rates')
-    .upsert(
-      { company_id: companyId, process_type: processType, hourly_rate: hourlyRate },
-      { onConflict: 'company_id,process_type' },
-    )
-  fail('Could not save the rate', error)
-}
-
-export async function listMaterialRates(): Promise<MaterialRate[]> {
-  const { data, error } = await supabase.from('material_rates').select('*').order('code')
-  fail('Could not load material rates', error)
-  return (data ?? []) as MaterialRate[]
-}
-
-/** What this company actually pays per kilogram, its own rate or the master. */
-export async function listEffectiveMaterialRates(): Promise<EffectiveMaterialRate[]> {
-  const { data, error } = await supabase.from('v_material_rates').select('*').order('code')
-  fail('Could not load material rates', error)
-  return (data ?? []) as EffectiveMaterialRate[]
-}
-
-export async function setMaterialRate(
-  companyId: string,
-  code: string,
-  name: string,
-  rate: number,
-): Promise<void> {
-  const { error } = await supabase
-    .from('material_rates')
-    .upsert({ company_id: companyId, code, name, unit: 'kg', rate }, { onConflict: 'company_id,code' })
-  fail('Could not save the rate', error)
-}
-
-export async function updateMasterMaterialRate(id: string, rate: number): Promise<void> {
-  const { error } = await supabase.from('material_rates').update({ rate }).eq('id', id)
-  fail('Could not save the rate', error)
-}
-
 // --- assemblies ------------------------------------------------------------
 
 export async function listAssemblies(): Promise<Assembly[]> {
   const { data, error } = await supabase.from('assemblies').select('*').order('code')
-  fail('Could not load assemblies', error)
+  fail('Could not load kits', error)
   return (data ?? []) as Assembly[]
 }
 
@@ -170,21 +119,21 @@ export async function createAssembly(input: {
   description: string | null
 }): Promise<Assembly> {
   const { data, error } = await supabase.from('assemblies').insert(input).select().single()
-  fail('Could not add the assembly', error)
+  fail('Could not add the kit', error)
   return data as Assembly
 }
 
 export async function updateAssembly(
   id: string,
-  input: { code: string; name: string; description: string | null },
+  input: Partial<Pick<Assembly, 'code' | 'name' | 'description' | 'kit_group_id' | 'rating' | 'rating_unit' | 'poles'>>,
 ): Promise<void> {
   const { error } = await supabase.from('assemblies').update(input).eq('id', id)
-  fail('Could not save the assembly', error)
+  fail('Could not save the kit', error)
 }
 
 export async function setAssemblyActive(id: string, isActive: boolean): Promise<void> {
   const { error } = await supabase.from('assemblies').update({ is_active: isActive }).eq('id', id)
-  fail('Could not change the assembly', error)
+  fail('Could not change the kit', error)
 }
 
 export async function listAssemblyComponents(assemblyId: string): Promise<AssemblyComponentRow[]> {

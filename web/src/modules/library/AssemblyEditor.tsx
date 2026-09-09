@@ -6,26 +6,19 @@ import { money } from '../../lib/format'
 import type { Assembly } from '../../lib/database.types'
 import { AssemblyHoursRow } from './AssemblyHoursRow'
 import { ComponentPicker } from './ComponentPicker'
-import {
-  addAssemblyComponent,
-  clearCompanyAssemblyHours,
-  listAssemblyComponents,
-  listAssemblyHours,
-  listComponentPrices,
-  listLabourRates,
-  removeAssemblyComponent,
-  setAssemblyComponentQuantity,
-  setAssemblyHours,
-  setCompanyAssemblyHours,
-} from './api'
+import { KitDetailsForm } from './KitDetailsForm'
+import { setMainDevice } from './kits-api'
+import { addAssemblyComponent, clearCompanyAssemblyHours, listAssemblyComponents, listAssemblyHours, listComponentPrices, removeAssemblyComponent, setAssemblyComponentQuantity, setAssemblyHours, setCompanyAssemblyHours } from './api'
+import { listLabourRates } from './rates-api'
 
 /**
- * One assembly: what goes in it and how long it takes.
+ * One kit: its group and rating, what goes in it (one line is the main
+ * device) and how long it takes.
  *
  * Who may change what:
- *   master assembly  — master admin edits material and hours; a company admin
- *                      may only set their own hours beside the master figure
- *   private assembly — that company's admin edits everything
+ *   master kit   — master admin edits details, material and hours; a company
+ *                  admin may only set their own hours beside the master figure
+ *   private kit  — that company's admin edits everything
  */
 export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBack: () => void }) {
   const { company, isMasterAdmin, hasRole } = useSession()
@@ -80,6 +73,11 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
     onSuccess: refreshLines,
   })
   const remove = useMutation({ mutationFn: removeAssemblyComponent, onSuccess: refreshLines })
+  const markMain = useMutation({
+    mutationFn: (lineId: string) => setMainDevice(assembly.id, lineId),
+    onSuccess: refreshLines,
+  })
+  const hasMainDevice = (lines.data ?? []).some((l) => l.is_main_device)
 
   const label = company?.currency_label ?? 'KES'
 
@@ -87,14 +85,26 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
     <>
       <div className="spread">
         <div>
-          <button onClick={onBack}>← All assemblies</button>
+          <button onClick={onBack}>← All kits</button>
           <h1 style={{ marginTop: '.75rem' }}>
             {assembly.code} — {assembly.name}
           </h1>
           <p className="muted">
-            {isMaster ? 'Master assembly, shared with every company.' : 'Your own assembly.'}
+            {isMaster ? 'Master kit, shared with every company.' : 'Your own kit.'}
             {assembly.description && ` ${assembly.description}`}
           </p>
+          {company && (
+            <KitDetailsForm
+              assembly={assembly}
+              isMaster={isMaster}
+              companyId={company.id}
+              editable={canEditContents}
+              onSaved={() => {
+                void queryClient.invalidateQueries({ queryKey: ['assemblies'] })
+                void refreshHours()
+              }}
+            />
+          )}
         </div>
         <div className="card" style={{ minWidth: '14rem', margin: 0 }}>
           <div className="spread">
@@ -117,12 +127,16 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
 
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Material</h2>
+        {!hasMainDevice && (lines.data ?? []).length > 0 && (
+          <p className="muted">No main device chosen yet — tick the breaker or switch this kit is built around.</p>
+        )}
         <div className="table-wrap">
           <Async query={lines} empty="Nothing in it yet.">
             {(rows) => (
               <table>
                 <thead>
                   <tr>
+                    <th title="Main device">Main</th>
                     <th>Component</th>
                     <th>Make</th>
                     <th className="right">Qty</th>
@@ -136,6 +150,16 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
                     const p = priceById.get(l.component_id)
                     return (
                       <tr key={l.id}>
+                        <td>
+                          <input
+                            type="radio"
+                            name="main-device"
+                            checked={l.is_main_device}
+                            disabled={!canEditContents}
+                            title="Main device"
+                            onChange={() => markMain.mutate(l.id)}
+                          />
+                        </td>
                         <td>
                           {p ? `${p.code} — ${p.name}` : 'Unknown component'}
                           {p?.part_number && <div className="muted">{p.part_number}</div>}
@@ -177,15 +201,15 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
             )}
           </Async>
         </div>
-        {(changeQty.error || remove.error) && (
-          <p className="error">{String(changeQty.error ?? remove.error)}</p>
+        {(changeQty.error || remove.error || markMain.error) && (
+          <p className="error">{String(changeQty.error ?? remove.error ?? markMain.error)}</p>
         )}
         {canEditContents && (
           <ComponentPicker
             candidates={(prices.data ?? []).filter(
               (p) =>
                 p.is_active &&
-                // A master assembly may only hold master components.
+                // A master kit may only hold master components.
                 (!isMaster || p.company_id === null) &&
                 !(lines.data ?? []).some((l) => l.component_id === p.id),
             )}
@@ -203,8 +227,8 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
         <h2 style={{ marginTop: 0 }}>Labour, in hours</h2>
         <p className="muted">
           {canOverrideHours
-            ? 'These are the master figures. Enter your own to use them instead; the master stays visible beside yours.'
-            : 'Hours per kind of work. Labour cost is these hours times the hourly rate.'}
+            ? 'These are the master figures (the kit\'s own, or its group\'s). Enter your own to use them instead; the master stays visible beside yours.'
+            : 'Hours per kind of work. Blank means the kit group\'s hours apply; a figure here overrides the group for that kind of work. Labour cost is hours times the hourly rate.'}
         </p>
         <div className="table-wrap">
           <Async query={hours}>

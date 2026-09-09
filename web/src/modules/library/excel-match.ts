@@ -18,9 +18,11 @@ export const COLUMNS = [
   { key: 'part_number', header: 'Part number' },
   { key: 'unit', header: 'Unit' },
   { key: 'pricing', header: 'Priced (fixed or weight)' },
-  { key: 'price', header: 'Price' },
+  { key: 'price', header: 'Purchase price' },
+  { key: 'currency', header: 'Currency' },
   { key: 'weight', header: 'Kg per unit' },
   { key: 'material_rate', header: 'Material rate code' },
+  { key: 'cubicle', header: 'Enclosure cubicle (yes/no)' },
   { key: 'description', header: 'Description' },
 ] as const
 
@@ -38,9 +40,11 @@ export interface ParsedComponent {
   unit: string
   description: string | null
   pricing_mode: PricingMode
-  unit_price: number | null
+  purchase_price: number | null
+  purchase_currency: string
   weight_per_unit: number | null
   material_rate_code: string | null
+  is_enclosure_cubicle: boolean
 }
 
 export interface FieldChange {
@@ -71,9 +75,11 @@ export function columnForHeader(header: string): ColumnKey | null {
     partnumber: 'part_number', reference: 'part_number', partno: 'part_number', ref: 'part_number',
     unit: 'unit', uom: 'unit',
     priced: 'pricing', pricing: 'pricing', pricedfixedorweight: 'pricing', pricingmode: 'pricing',
-    price: 'price', unitprice: 'price',
+    price: 'price', unitprice: 'price', purchaseprice: 'price',
+    currency: 'currency', purchasecurrency: 'currency', ccy: 'currency',
     kgperunit: 'weight', weight: 'weight', kg: 'weight',
     materialratecode: 'material_rate', materialrate: 'material_rate', rate: 'material_rate',
+    cubicle: 'cubicle', enclosurecubicle: 'cubicle', enclosurecubicleyesno: 'cubicle', iscubicle: 'cubicle',
     description: 'description', desc: 'description',
   }
   return aliases[norm] ?? null
@@ -102,10 +108,13 @@ export function parseRow(
   const price = parseNumber(row.price)
   const weight = parseNumber(row.weight)
   const rateCode = (row.material_rate ?? '').trim() || null
+  // The currency may sit in its own column or be written in front of the price.
+  const currency = ((row.currency ?? '').trim() || currencyPrefix(row.price) || 'KES').toUpperCase()
 
   if (pricing_mode === 'fixed') {
     if (price == null) return { ok: false, reason: 'no price' }
     if (price < 0) return { ok: false, reason: 'negative price' }
+    if (!/^[A-Z]{3}$/.test(currency)) return { ok: false, reason: `currency "${currency}" is not a three-letter code` }
   } else {
     if (weight == null || weight <= 0) return { ok: false, reason: 'weight pricing needs kg per unit' }
     if (!rateCode) return { ok: false, reason: 'weight pricing needs a material rate code' }
@@ -122,9 +131,12 @@ export function parseRow(
       unit: (row.unit ?? '').trim() || 'pcs',
       description: (row.description ?? '').trim() || null,
       pricing_mode,
-      unit_price: pricing_mode === 'fixed' ? price : null,
+      purchase_price: pricing_mode === 'fixed' ? price : null,
+      purchase_currency: pricing_mode === 'fixed' ? currency : 'KES',
       weight_per_unit: pricing_mode === 'weight_rate' ? weight : null,
       material_rate_code: pricing_mode === 'weight_rate' ? rateCode : null,
+      // Only an enclosure part can be a cubicle, whatever the cell says.
+      is_enclosure_cubicle: category_code === 'enclosure_parts' && /^(y|yes|true|1|cubicle)$/i.test((row.cubicle ?? '').trim()),
     },
   }
 }
@@ -169,9 +181,11 @@ export function diff(existing: ComponentPrice, parsed: ParsedComponent): FieldCh
   compare('part number', existing.part_number, parsed.part_number)
   compare('unit', existing.unit, parsed.unit)
   compare('pricing', existing.pricing_mode, parsed.pricing_mode)
-  compare('price', existing.raw_price, parsed.unit_price)
+  compare('price', existing.raw_price, parsed.purchase_price)
+  if (parsed.pricing_mode === 'fixed') compare('currency', existing.purchase_currency, parsed.purchase_currency)
   compare('kg per unit', existing.weight_per_unit, parsed.weight_per_unit)
   compare('material rate', existing.material_rate_code, parsed.material_rate_code)
+  compare('cubicle', existing.is_enclosure_cubicle ? 'yes' : 'no', parsed.is_enclosure_cubicle ? 'yes' : 'no')
   compare('description', existing.description, parsed.description)
   return out
 }
@@ -221,10 +235,18 @@ function norm(value: string | null | undefined): string {
 
 function parseNumber(text: string | undefined): number | null {
   if (text == null) return null
-  const cleaned = text.replace(/[,\s]/g, '').replace(/^(kes|ksh|usd|eur)/i, '')
+  const cleaned = text.replace(/[,\s]/g, '').replace(/^[a-z]{3}/i, '')
   if (cleaned === '') return null
   const n = Number(cleaned)
   return Number.isFinite(n) ? n : null
+}
+
+/** "EUR 42.00" → "EUR"; "KSH 5,000" → "KES"; a bare number → null. */
+function currencyPrefix(text: string | undefined): string | null {
+  const m = (text ?? '').trim().match(/^([a-z]{3})\b/i)
+  if (!m) return null
+  const code = m[1]!.toUpperCase()
+  return code === 'KSH' ? 'KES' : code
 }
 
 /** Accepts the category code, its name, or a reasonable abbreviation. */

@@ -142,33 +142,30 @@ converted price side by side.
 View **v_assembly_hours** — for the calling user's company: each assembly and process type
 with `effective_hours`, `source` (`master`, `company_override`, `private`) and `master_hours`.
 
-### Planned in migrations 0008 and 0009 (reference document §5, decisions 1, 2, 11)
+### Added by migrations 0008 and 0009 (reference document §5, decisions 1, 2, 11)
 
-**currency_factors** — new (decision 2)
-- `company_id` NULL = master default; `currency_code`, `exchange_rate` (KES per 1 unit), `landed_factor` (freight, duty and clearing as a multiplier; 1.0 for KES)
-- unique (`company_id`, `currency_code`); history table filled by trigger like `material_rate_history`
-- Master EUR row seeded 113 × 1.769912 (= 200 KES per EUR, from NPP-192)
+**currency_factors** (decision 2)
+- `company_id` NULL = master default; `currency_code` (three letters), `exchange_rate` (KES per 1 unit), `landed_factor` (freight, duty and clearing as a multiplier; 1 = none; eight decimals), `note`
+- unique (`company_id`, `currency_code`); master rows seeded `KES 1 × 1` and `EUR 113 × 1.7699115` (= 200 KES per landed EUR, from NPP-192); the migration also adds a master row for any currency an existing company already works in
+- **currency_factor_history** filled by a SECURITY DEFINER trigger on either column
 
-**components** — added columns
-- `purchase_price`, `purchase_currency` (what the supplier charges, in the supplier's currency); existing KES rows back-filled as purchase KES with factor 1
-- `is_enclosure_cubicle` (decision 1); `weight_per_unit` is shown as "kg per metre" in the UI (decision 3)
-- `v_component_prices` becomes purchase × exchange rate × landed factor × (1 − discount) ÷ company rate
+View **v_currency_factors** — per master currency: the company's own figures where set, else the master's, with `source`, the master figures, `master_id` and `own_id`.
 
-**kit_groups** — new (decision 11)
-- `company_id` NULL = master; `name`, `sort_order`
+**components** — `unit_price` and `currency_code` were **renamed** `purchase_price` and `purchase_currency` (one price, never two that can disagree); `is_enclosure_cubicle` added (decision 1). A trigger upper-cases the currency and refuses one with no master factor row. `component_price_history` gained `purchase_currency`.
 
-**kit_group_labour** — new
-- `kit_group_id`, `process_type`, `hours`; unique per pair. The group's hours apply to every kit in it unless the kit's own `assembly_labour` row overrides.
+`v_component_prices` now computes `landed_price_kes = purchase × exchange rate × landed factor` (company row else master row for that currency), then the discount (master rows only) and the company currency; `raw_price` is the purchase price; new columns `purchase_currency`, `factor_exchange_rate`, `landed_factor`, `landed_price_kes`, `is_enclosure_cubicle`.
 
-**assemblies** — added columns: `kit_group_id → kit_groups`, `rating`, `rating_unit`, `poles`. The UI calls an assembly a **kit**.
+**kit_groups** (decision 11) — `company_id` NULL = master; `name`, `description`, `sort_order`; unique name per owner.
 
-**assembly_components** — added `is_main_device`; partial unique index: one main device per kit.
+**kit_group_labour** — `kit_group_id`, `process_type`, `hours`; unique per pair. Applies to every kit in the group unless the kit's own `assembly_labour` row overrides that process type.
 
-**companies** / **costings** — `enclosure_uplift_pct` (company default, frozen on the costing).
+**assemblies** (= kits) — added `kit_group_id → kit_groups`, `rating`, `rating_unit` (`A` | `KVAR`), `poles` (1–4). Trigger: a master kit may only join a master group; a private kit a master group or its own.
 
-**costing_items** — added frozen `purchase_price`, `purchase_currency`, `landed_factor` beside the existing `master_price_kes`, `discount_pct`, `exchange_rate`, `weight_per_unit`, `material_rate`.
+**assembly_components** — added `is_main_device`; partial unique index: at most one main device per kit.
 
-`v_assembly_hours` resolves per-kit override → kit-group hours → zero.
+`v_assembly_hours`: `effective_hours = coalesce(company override, kit's own, kit group's, 0)`; `source` gains `kit_group`; new column `group_hours`.
+
+**companies** — `enclosure_uplift_pct` (company-set). **costings** — `enclosure_uplift_pct` frozen at creation. **costing_items** — frozen `purchase_price`, `purchase_currency`, `factor_exchange_rate`, `landed_factor`, and `uplift_pct` on cubicle lines; `master_price_kes` is the landed KES price before discount. `add_assembly_to_costing` applies the uplift to cubicles and freezes all of these.
 
 ## 3. Costing
 

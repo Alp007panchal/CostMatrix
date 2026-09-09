@@ -22,7 +22,7 @@ Column notes:
 
 - `purchase_price` is the catalogue price in `purchase_currency` (EUR throughout). The app
   converts to KES with the currency's exchange rate and landed-cost factor
-  (master default 113 × 1.769912 = 200 KES per EUR, back-solved from NPP-192).
+  (master default 113 × 1.7699115 = 200 KES per EUR, back-solved from NPP-192).
 - `kg_per_metre` is filled for busbar sizes only: width × thickness × 8.96 g/cm³. The app
   prices busbar as kg per metre × the copper rate (default 3,000 KES/kg), not from the EUR
   price, which is kept for reference.

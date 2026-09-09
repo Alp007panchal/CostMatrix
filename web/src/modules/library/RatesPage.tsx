@@ -2,20 +2,15 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
-import { money } from '../../lib/format'
-import {
-  listEffectiveMaterialRates,
-  listLabourRates,
-  listMaterialRates,
-  listProcessTypes,
-  setLabourRate,
-  setMaterialRate,
-  updateMasterMaterialRate,
-} from './api'
+import { listProcessTypes } from './api'
+import { listEffectiveCurrencyFactors, listEffectiveMaterialRates, listLabourRates, listMaterialRates, setLabourRate } from './rates-api'
+import { MaterialRateRow } from './MaterialRateRow'
+import { CurrencyFactorRow, NewCurrencyRow } from './CurrencyFactorRow'
 
 /**
- * What an hour costs, and what a kilogram of copper costs. These two screens
- * of numbers are what turn hours and weights into money, so they sit together.
+ * What an hour costs, what a kilogram of copper costs, and what a euro costs
+ * once it has landed. These three tables of numbers are what turn hours,
+ * weights and purchase prices into money, so they sit together.
  */
 export function RatesPage() {
   const { company, isMasterAdmin } = useSession()
@@ -28,8 +23,17 @@ export function RatesPage() {
     queryFn: listEffectiveMaterialRates,
   })
   const rawRates = useQuery({ queryKey: ['material-rates'], queryFn: listMaterialRates })
+  const factors = useQuery({
+    queryKey: ['currency-factors-effective'],
+    queryFn: listEffectiveCurrencyFactors,
+  })
 
   if (!company) return null
+
+  const factorsSaved = () => {
+    void queryClient.invalidateQueries({ queryKey: ['currency-factors-effective'] })
+    void queryClient.invalidateQueries({ queryKey: ['components'] })
+  }
 
   return (
     <>
@@ -88,6 +92,45 @@ export function RatesPage() {
                       }}
                     />
                   ))}
+                </tbody>
+              </table>
+            )}
+          </Async>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Currency factors</h2>
+        <p className="muted">
+          A purchase price lands in KES as price × exchange rate × landed factor. The landed factor
+          covers freight, duty and clearing; 1 means none. Master figures apply unless you set your
+          own for a currency.
+        </p>
+        <div className="table-wrap">
+          <Async query={factors} empty="No currencies yet.">
+            {(rows) => (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Currency</th>
+                    <th className="right">KES per 1</th>
+                    <th className="right">Landed factor</th>
+                    <th className="right">1 unit lands at</th>
+                    <th>Source</th>
+                    <th className="right"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <CurrencyFactorRow
+                      key={row.currency_code}
+                      row={row}
+                      companyId={company.id}
+                      isMasterAdmin={isMasterAdmin}
+                      onSaved={factorsSaved}
+                    />
+                  ))}
+                  {isMasterAdmin && <NewCurrencyRow onSaved={factorsSaved} />}
                 </tbody>
               </table>
             )}
@@ -196,92 +239,5 @@ function LabourRates({
         </button>
       </div>
     </div>
-  )
-}
-
-function MaterialRateRow(props: {
-  code: string
-  name: string
-  unit: string
-  rate: number
-  source: string
-  masterRateKes: number
-  companyId: string
-  currencyLabel: string
-  isMasterAdmin: boolean
-  masterRateId: string | undefined
-  onSaved: () => void
-}) {
-  const [editing, setEditing] = useState(false)
-  const [value, setValue] = useState(String(props.rate))
-  const [editMaster, setEditMaster] = useState(false)
-
-  const save = useMutation({
-    mutationFn: async () => {
-      if (editMaster && props.masterRateId) {
-        return updateMasterMaterialRate(props.masterRateId, Number(value))
-      }
-      return setMaterialRate(props.companyId, props.code, props.name, Number(value))
-    },
-    onSuccess: () => {
-      setEditing(false)
-      props.onSaved()
-    },
-  })
-
-  return (
-    <tr>
-      <td>
-        {props.name}
-        <div className="muted">per {props.unit}</div>
-      </td>
-      <td className="right">
-        {editing ? (
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            style={{ maxWidth: '9rem', textAlign: 'right' }}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-        ) : (
-          money(props.rate, props.currencyLabel)
-        )}
-      </td>
-      <td className="muted">
-        {props.source === 'company' ? 'Yours' : `Master default, KES ${props.masterRateKes}`}
-      </td>
-      <td className="right">
-        {editing ? (
-          <span className="row end" style={{ gap: '.35rem' }}>
-            {props.isMasterAdmin && props.masterRateId && (
-              <label className="row" style={{ gap: '.3rem', fontSize: '.8125rem' }}>
-                <input
-                  type="checkbox"
-                  checked={editMaster}
-                  onChange={(e) => setEditMaster(e.target.checked)}
-                />
-                master
-              </label>
-            )}
-            <button className="primary" disabled={save.isPending} onClick={() => save.mutate()}>
-              Save
-            </button>
-            <button onClick={() => setEditing(false)}>Cancel</button>
-          </span>
-        ) : (
-          <button
-            onClick={() => {
-              setValue(String(props.rate))
-              setEditing(true)
-            }}
-          >
-            Change
-          </button>
-        )}
-        {save.error && <div className="error">{String(save.error)}</div>}
-      </td>
-    </tr>
   )
 }

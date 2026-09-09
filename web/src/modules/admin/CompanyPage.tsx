@@ -40,6 +40,7 @@ export function CompanyPage() {
         labour_margin_pct: values.labour_margin_pct,
         tax_pct: values.tax_pct,
         price_rounding_step: values.price_rounding_step,
+        enclosure_uplift_pct: values.enclosure_uplift_pct,
         quotation_prefix: values.quotation_prefix.toUpperCase(),
         quotation_no_includes_year: values.quotation_no_includes_year,
         address: values.address,
@@ -184,6 +185,20 @@ export function CompanyPage() {
             value={form.price_rounding_step}
             required
             onChange={(e) => set('price_rounding_step', Number(e.target.value))}
+          />
+        </Field>
+
+        <Field
+          label="Enclosure uplift %"
+          hint="added to catalogue cubicle prices for fabrication and finishing; frozen into each costing"
+        >
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            value={form.enclosure_uplift_pct}
+            required
+            onChange={(e) => set('enclosure_uplift_pct', Number(e.target.value))}
           />
         </Field>
 

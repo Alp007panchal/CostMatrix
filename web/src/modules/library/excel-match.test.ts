@@ -9,8 +9,10 @@ function existing(over: Partial<ComponentPrice>): ComponentPrice {
     id: 'c1', company_id: null, category_code: 'switchgear', category_name: 'Switchgear',
     code: 'MCCB-160', name: '160A TP MCCB', description: null, unit: 'pcs',
     manufacturer: 'SIEMENS', part_number: '3VJ1216', pricing_mode: 'fixed',
-    raw_price: 10000, unit_price: 10000, currency_code: 'KES', currency_label: 'KES',
-    weight_per_unit: null, material_rate_code: null, is_active: true, source: 'master',
+    raw_price: 10000, unit_price: 10000, purchase_currency: 'KES', currency_code: 'KES',
+    currency_label: 'KES', weight_per_unit: null, material_rate_code: null, is_active: true,
+    source: 'master', is_enclosure_cubicle: false, factor_exchange_rate: 1, landed_factor: 1,
+    landed_price_kes: 10000,
     ...over,
   }
 }
@@ -51,13 +53,22 @@ describe('parseRow', () => {
   })
   it('reads prices with thousands separators and currency words', () => {
     const r = parseRow(row({ price: 'KES 5,784,800.00' }), CATEGORIES, 'switchgear')
-    expect(r.ok && r.parsed.unit_price).toBe(5784800)
+    expect(r.ok && r.parsed.purchase_price).toBe(5784800)
+    expect(r.ok && r.parsed.purchase_currency).toBe('KES')
+  })
+  it('reads the purchase currency from its column or from the price cell', () => {
+    const own = parseRow(row({ price: '42', currency: 'eur' }), CATEGORIES, 'switchgear')
+    expect(own.ok && own.parsed.purchase_currency).toBe('EUR')
+    const prefixed = parseRow(row({ price: 'EUR 42.00' }), CATEGORIES, 'switchgear')
+    expect(prefixed.ok && prefixed.parsed).toMatchObject({ purchase_price: 42, purchase_currency: 'EUR' })
+    const bad = parseRow(row({ price: '42', currency: 'euros' }), CATEGORIES, 'switchgear')
+    expect(bad.ok).toBe(false)
   })
   it('a weight-priced row needs kg and a rate code, and drops the price', () => {
     const bad = parseRow(row({ pricing: 'weight', weight: '2.8' }), CATEGORIES, 'busbar')
     expect(bad).toMatchObject({ ok: false, reason: 'weight pricing needs a material rate code' })
     const good = parseRow(row({ pricing: 'weight', weight: '2.8', material_rate: 'copper_busbar', price: '999' }), CATEGORIES, 'busbar')
-    expect(good.ok && good.parsed).toMatchObject({ pricing_mode: 'weight_rate', weight_per_unit: 2.8, unit_price: null })
+    expect(good.ok && good.parsed).toMatchObject({ pricing_mode: 'weight_rate', weight_per_unit: 2.8, purchase_price: null })
   })
 })
 
@@ -109,5 +120,15 @@ describe('buildPreview', () => {
     const p = buildPreview(rows, [existing({})], CATEGORIES, 'switchgear')
     expect(p.toUpdate).toHaveLength(1)
     expect(p.toUpdate[0]?.changes).toEqual([{ field: 'price', from: '10000', to: '11000' }])
+  })
+  it('describes a currency change in words', () => {
+    const p = buildPreview(
+      [{ rowNumber: 2, code: 'MCCB-160', name: '160A TP MCCB', manufacturer: 'SIEMENS', part_number: '3VJ1216', unit: 'pcs', price: '88.64', currency: 'EUR' }],
+      [existing({})], CATEGORIES, 'switchgear',
+    )
+    expect(p.toUpdate[0]?.changes).toEqual([
+      { field: 'price', from: '10000', to: '88.64' },
+      { field: 'currency', from: 'KES', to: 'EUR' },
+    ])
   })
 })

@@ -14,7 +14,7 @@ update public.companies set exchange_rate = 130 where id = :'beta'::uuid;
 
 -- A master component priced at 10,000 KES, and a master busbar priced by weight.
 insert into public.components (id, company_id, category_code, code, name, unit, manufacturer,
-                               part_number, pricing_mode, unit_price)
+                               part_number, pricing_mode, purchase_price)
 values ('00000000-0000-0000-0000-0000000000f1', null, 'switchgear', 'MCCB-160',
         '160A TP MCCB 25kA', 'pcs', 'SIEMENS', '3VJ1216-3DB32-0AA0', 'fixed', 10000);
 
@@ -77,7 +77,7 @@ select test.sign_in(:'alice');
 -- nothing and change nothing. Silently affecting zero rows is what row-level
 -- security does; an error would mean something else went wrong.
 with attempted as (
-  update public.components set unit_price = 1 where code = 'MCCB-160' returning 1
+  update public.components set purchase_price = 1 where code = 'MCCB-160' returning 1
 )
 select test.eq((select count(*) from attempted)::int, 0,
   'a company admin cannot reprice a master component');
@@ -134,7 +134,7 @@ rollback;
 begin;
 set local role authenticated;
 select test.sign_in(:'alice');
-insert into public.components (id, company_id, category_code, code, name, pricing_mode, unit_price)
+insert into public.components (id, company_id, category_code, code, name, pricing_mode, purchase_price)
 values ('00000000-0000-0000-0000-0000000000f3', :'alpha'::uuid, 'accessories_hardware',
         'ALP-BRACKET', 'Alpha''s own bracket', 'fixed', 250);
 
@@ -155,7 +155,7 @@ begin;
 set local role authenticated;
 select test.sign_in(:'carol');
 select test.refuses(
-  format('insert into public.components (company_id, category_code, code, name, pricing_mode, unit_price)
+  format('insert into public.components (company_id, category_code, code, name, pricing_mode, purchase_price)
           values (%L, ''switchgear'', ''X'', ''X'', ''fixed'', 1)', :'alpha'::uuid),
   'a costing engineer cannot add components',
   'row-level security');
@@ -174,7 +174,7 @@ select test.refuses(
   'master assembly may only use master components');
 
 -- A price change is recorded whoever makes it.
-update public.components set unit_price = 11000 where code = 'MCCB-160';
+update public.components set purchase_price = 11000 where code = 'MCCB-160';
 select test.eq((select new_price from public.component_price_history
                 where component_id = '00000000-0000-0000-0000-0000000000f1'
                 order by changed_at desc limit 1), 11000.00,
@@ -195,7 +195,7 @@ select test.refuses(
   'a fixed-price component must have a price',
   'components_pricing_fields');
 select test.refuses(
-  'insert into public.components (company_id, category_code, code, name, pricing_mode, unit_price, weight_per_unit)
+  'insert into public.components (company_id, category_code, code, name, pricing_mode, purchase_price, weight_per_unit)
    values (null, ''busbar'', ''BROKEN2'', ''Both kinds at once'', ''weight_rate'', 5, 2)',
   'a weight-priced component cannot also carry a fixed price',
   'components_pricing_fields');

@@ -84,7 +84,7 @@ margin, rounding and VAT arithmetic exactly.
 | VAT 16 % | 925,568.00 | 1,229,552.00 |
 | Total | **6,710,368.00** | **8,914,252.00** |
 
-Rates in force: 113 KES per EUR; landed factor 1.769912 (so 200 KES per landed EUR); copper
+Rates in force: 113 KES per EUR; landed factor 1.7699115 (so 200 KES per landed EUR); copper
 3,000 KES per kg; VAT 16 %; rounding increment 100.
 
 In the app the ÷ 0.8 step disappears: labour is hours × rate. The owner sets the hours in
@@ -149,10 +149,10 @@ acceptance test can be judged.
 
 | Subtotal | Workbook | App from the seed | Difference |
 |---|---|---|---|
-| Switchgear | 2,520,637.80 | 2,386,422.24 | −134,215.56 |
+| Switchgear | 2,520,637.80 | 2,386,421.80 | −134,216.00 |
 | Busbar & cable | 1,236,360.00 | 1,218,288.00 | −18,072.00 |
 | Enclosure | 408,000.00 | 408,000.00 (typed in) | 0.00 |
-| Material | 4,164,997.80 | 4,012,710.24 | −152,287.56 (−3.7 %) |
+| Material | 4,164,997.80 | 4,012,709.80 | −152,288.00 (−3.7 %) |
 
 Where the −152,288 comes from:
 

@@ -275,6 +275,8 @@ Existing costings do not change: their prices were frozen when they were built. 
 costings pick up the new discount. This is deliberate.
 
 ### Update prices from a supplier (slice 1)
+Prices are entered as the supplier charges them, in the supplier's currency (the *Purchase*
+column); the app lands them in KES with the currency factors and shows *Your price*.
 1. Library → Components → **Download Excel**.
 2. Send the file to the supplier, or edit the price column yourself.
 3. Library → Components → **Upload Excel**, choose the file.
@@ -286,6 +288,23 @@ Uploads never delete anything. To remove a component, deactivate it on its own s
 ### Change your own company's margins, VAT or currency
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
 margins are a share of the selling price rather than of cost.
+
+### Change an exchange rate or landed factor (session 1)
+Rates → Currency factors. Each currency shows KES per 1 unit, the landed factor (freight, duty
+and clearing; 1 means none) and what one unit lands at. **Change** writes your company's own
+figure; the master admin ticks *master* to change the default for everyone, and may add a new
+currency at the bottom of the table. A purchase price in a currency with no row cannot be saved.
+New costings use the new figures; existing ones keep what they froze.
+
+### Set the enclosure uplift (session 1)
+Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure
+cubicle*) when they enter a costing, and frozen there.
+
+### Set kit group hours (session 1)
+Kits → kit group (link in the intro) → type the hours per kind of work in each group's row;
+they save when you leave the cell. A kit with its own figure for one kind of work keeps it; blank
+on the kit means the group's hours apply. On a kit: choose its group, rating and poles under
+the title, and tick the radio button of the line that is its main device.
 
 ### Change the copper rate (slice 1)
 Library → Material rates → edit the rate per kilogram → Save. New costings use it; existing

@@ -26,7 +26,7 @@ insert into public.labour_rates (company_id, process_type, hourly_rate) values
 
 -- A master assembly: two 10,000 breakers, 8 hours assembly, 4 hours wiring.
 -- Material 20,000; labour 8 x 1000 + 4 x 1200 = 12,800.
-insert into public.components (id, company_id, category_code, code, name, pricing_mode, unit_price)
+insert into public.components (id, company_id, category_code, code, name, pricing_mode, purchase_price)
 values ('00000000-0000-0000-0000-00000000aa01', null, 'switchgear', 'ACB-1600',
         '1600A ACB', 'fixed', 10000);
 
@@ -127,7 +127,7 @@ update public.companies set material_margin_pct = 10, labour_margin_pct = 0
 
 -- Master library rows, added as the owner: only the master admin may write
 -- them, and Carol is a costing engineer.
-insert into public.components (id, company_id, category_code, code, name, pricing_mode, unit_price)
+insert into public.components (id, company_id, category_code, code, name, pricing_mode, purchase_price)
 values ('00000000-0000-0000-0000-00000000aa02', null, 'switchgear', 'REF-LOT',
         'Reference job material', 'fixed', 4164997.80);
 insert into public.assemblies (id, company_id, code, name)
@@ -164,7 +164,7 @@ values (:'costing_id'::uuid, :'alpha'::uuid, 'Panel', 1) returning id as panel_i
 select app.add_assembly_to_costing(:'panel_id'::uuid, '00000000-0000-0000-0000-00000000bb01', 1);
 
 set local role postgres;
-update public.components set unit_price = 999999 where code = 'ACB-1600';
+update public.components set purchase_price = 999999 where code = 'ACB-1600';
 set local role authenticated;
 select test.sign_in(:'carol');
 

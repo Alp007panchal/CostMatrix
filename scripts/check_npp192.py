@@ -20,7 +20,7 @@ from xlsx_reader import read_sheet  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK = ROOT / "docs" / "reference" / "costing-NPP-192-REV1.xlsm"
 KES_PER_EUR = 113.0
-LANDED_FACTOR = 1.769912          # 113 x 1.769912 = 200.0001
+LANDED_FACTOR = 1.7699115          # 113 x 1.7699115 = 200.0001
 COPPER_RATE = 3000.0              # KES per kg
 
 
