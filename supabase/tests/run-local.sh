@@ -8,6 +8,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$root"   # tests may \copy files by a path relative to the repository
 db="${TEST_DB:-costmatrix_test}"
 
 # Use an existing server if one is configured, else start a temporary one.

@@ -1,20 +1,25 @@
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
 import type { Assembly } from '../../lib/database.types'
 import { createAssembly, listAssemblies, setAssemblyActive } from './api'
+import { listKitGroups } from './kits-api'
 import { AssemblyEditor } from './AssemblyEditor'
 
 /**
- * The standard building blocks of a panel — enclosure, incomer section,
- * busbar set, wiring — each with its own material and its own hours. Called
- * "kits" in conversation. A costing is built by adding these.
+ * Kits: the standard building blocks of a panel — a main device with its
+ * busbar, cable and accessories — grouped into kit groups that carry the
+ * labour hours. A costing is built by adding these. (The table is still
+ * called assemblies; only the words on screen changed.)
  */
 export function AssembliesPage() {
   const { company, isMasterAdmin, hasRole } = useSession()
   const queryClient = useQueryClient()
   const assemblies = useQuery({ queryKey: ['assemblies'], queryFn: listAssemblies })
+  const groups = useQuery({ queryKey: ['kit-groups'], queryFn: listKitGroups })
+  const groupName = (id: string | null) => groups.data?.find((g) => g.id === id)?.name ?? '—'
 
   const [open, setOpen] = useState<Assembly | null>(null)
   const [adding, setAdding] = useState(false)
@@ -49,16 +54,17 @@ export function AssembliesPage() {
   return (
     <>
       <div className="spread">
-        <h1>Assemblies</h1>
+        <h1>Kits</h1>
         {canAdd && (
           <button className="primary" onClick={() => setAdding(true)}>
-            Add assembly
+            Add kit
           </button>
         )}
       </div>
       <p className="muted">
-        A panel is costed as a sum of these. Each carries its own material and its own hours per
-        kind of work, so labour is never a percentage of the parts.
+        A panel is costed as a sum of these. Each kit is a main device plus its busbar, cable and
+        accessories; its <Link to="/library/kit-groups">kit group</Link> carries the hours per kind
+        of work, which a kit may override. Labour is never a percentage of the parts.
       </p>
 
       {adding && (
@@ -88,13 +94,15 @@ export function AssembliesPage() {
           </label>
         </div>
         <div className="table-wrap">
-          <Async query={assemblies} empty="No assemblies yet. Add the first one.">
+          <Async query={assemblies} empty="No kits yet. Add the first one.">
             {() => (
               <table>
                 <thead>
                   <tr>
                     <th>Code</th>
                     <th>Name</th>
+                    <th>Group</th>
+                    <th className="right">Rating</th>
                     <th>Owner</th>
                     <th className="right"></th>
                   </tr>
@@ -109,6 +117,10 @@ export function AssembliesPage() {
                         <td>
                           {a.name}
                           {a.description && <div className="muted">{a.description}</div>}
+                        </td>
+                        <td className="muted">{groupName(a.kit_group_id)}</td>
+                        <td className="right muted">
+                          {a.rating != null ? `${a.rating} ${a.rating_unit ?? ''}${a.poles ? `, ${a.poles}P` : ''}` : ''}
                         </td>
                         <td className="muted">{a.company_id === null ? 'Master' : 'Yours'}</td>
                         <td className="right">
@@ -173,7 +185,7 @@ function NewAssemblyForm({
   return (
     <form className="card" onSubmit={submit}>
       <div className="spread">
-        <h2 style={{ marginTop: 0 }}>New assembly</h2>
+        <h2 style={{ marginTop: 0 }}>New kit</h2>
         <button type="button" onClick={onClose}>
           Cancel
         </button>
@@ -184,7 +196,7 @@ function NewAssemblyForm({
           Add to the master library, shared with every company
         </label>
       )}
-      <Field label="Code" hint="short and unique, e.g. INC-1600">
+      <Field label="Code" hint="short and unique, e.g. MCCB-250-KIT">
         <input value={code} required onChange={(e) => setCode(e.target.value)} />
       </Field>
       <Field label="Name">

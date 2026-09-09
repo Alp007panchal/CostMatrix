@@ -9,7 +9,7 @@ function detail(over: Partial<CostingDetail> = {}): CostingDetail {
       previous_revision_id: null, is_current: true, title: 'MCC', notes: null, status: 'approved',
       currency_code: 'KES', currency_label: 'KSH', exchange_rate: 1, discount_pct: 0,
       material_margin_pct: 10, labour_margin_pct: 20, negotiation_margin_pct: 0,
-      price_rounding_step: 100, tax_pct: 16, submitted_at: null, approved_at: null,
+      price_rounding_step: 100, tax_pct: 16, enclosure_uplift_pct: 0, submitted_at: null, approved_at: null,
       returned_at: null, return_comment: null, created_at: '', updated_at: '',
     },
     panels: [], assemblies: [], items: [], labour: [], assemblyTotals: [],

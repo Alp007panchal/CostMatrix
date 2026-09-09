@@ -17,6 +17,7 @@ export interface Company {
   labour_margin_pct: number
   tax_pct: number
   price_rounding_step: number
+  enclosure_uplift_pct: number
   quotation_prefix: string
   quotation_no_includes_year: boolean
   address: string | null
@@ -98,21 +99,70 @@ export interface Component {
   manufacturer: string | null
   part_number: string | null
   pricing_mode: PricingMode
-  unit_price: number | null
-  currency_code: string
+  /** What the supplier charges, in purchase_currency (fixed pricing only). */
+  purchase_price: number | null
+  purchase_currency: string
   weight_per_unit: number | null
   material_rate_code: string | null
+  is_enclosure_cubicle: boolean
+  /** Used by kits but not priced yet; cannot be costed until a purchase price is set. */
+  is_placeholder: boolean
+  rating: string | null
+  poles: string | null
+  breaking_capacity: string | null
+  frame_size: string | null
   is_active: boolean
 }
 
-/** A component as the signed-in company would pay for it. */
-export interface ComponentPrice extends Omit<Component, 'unit_price' | 'currency_code'> {
+/** What an import function reports, with or without having written anything. */
+export interface ImportReport {
+  new: number
+  changed: number
+  unchanged: number
+  rejected: { row: number; key: string; reason: string }[]
+  warnings?: { row?: number; key: string; reason: string }[]
+  changes: { key: string; changes: { field: string; from: unknown; to: unknown }[] }[]
+  applied: boolean
+  batch_id: string | null
+  groups_new?: number
+  overrides?: number
+  skipped_blank?: number
+  busbar_kg_derived?: number
+}
+
+/** A component as the signed-in company would pay for it (v_component_prices). */
+export interface ComponentPrice extends Omit<Component, 'purchase_price' | 'breaking_capacity' | 'frame_size'> {
   category_name: string
+  /** The purchase price in purchase_currency. */
   raw_price: number | null
+  /** What this company pays, in its own currency, after discount and conversion. */
   unit_price: number
   currency_code: string
   currency_label: string
   source: 'master' | 'company'
+  /** KES per 1 unit of the purchase currency, landed (one number, decision 2). */
+  landed_factor: number | null
+  /** purchase_price × landed factor, before any discount. */
+  landed_price_kes: number | null
+}
+
+export interface CurrencyFactor {
+  id: string
+  company_id: string | null
+  currency_code: string
+  /** KES per 1 unit of the currency, landed: exchange rate, freight, duty and handling in one number. */
+  landed_factor: number
+  note: string | null
+}
+
+/** The factor this company works with per currency: its own row or the master default (v_currency_factors). */
+export interface EffectiveCurrencyFactor {
+  currency_code: string
+  landed_factor: number
+  source: 'master' | 'company'
+  master_landed_factor: number
+  master_id: string
+  own_id: string | null
 }
 
 export interface LabourRate {
@@ -129,6 +179,7 @@ export interface MaterialRate {
   name: string
   unit: string
   rate: number
+  currency_code: string
 }
 
 /** The rate this company actually pays, its own or the master default. */
@@ -136,9 +187,16 @@ export interface EffectiveMaterialRate {
   code: string
   name: string
   unit: string
+  /** What this company pays per unit, in its own currency. */
   rate: number
   source: 'master' | 'company'
   master_rate_kes: number
+  kes_per_kg: number
+  /** The rate as typed and its currency (15 EUR). */
+  rate_entered: number
+  currency_code: string
+  master_rate: number
+  master_currency: string
 }
 
 export interface PriceHistoryRow {
@@ -146,16 +204,22 @@ export interface PriceHistoryRow {
   component_id: string
   old_price: number | null
   new_price: number
+  purchase_currency: string | null
   changed_at: string
   changed_by: string | null
 }
 
+/** A kit: a main device plus its busbar, cable and accessories. The table is still called assemblies. */
 export interface Assembly {
   id: string
   company_id: string | null
   code: string
   name: string
   description: string | null
+  kit_group_id: string | null
+  rating: number | null
+  rating_unit: 'A' | 'KVAR' | null
+  poles: number | null
   is_active: boolean
 }
 
@@ -164,7 +228,24 @@ export interface AssemblyComponentRow {
   assembly_id: string
   component_id: string
   quantity: number
+  is_main_device: boolean
   sort_order: number
+}
+
+/** A family of kits that share labour hours per process type. */
+export interface KitGroup {
+  id: string
+  company_id: string | null
+  name: string
+  description: string | null
+  sort_order: number
+}
+
+export interface KitGroupHours {
+  id: string
+  kit_group_id: string
+  process_type: string
+  hours: number
 }
 
 /** Hours per process type for one assembly, as this company plans them. */
@@ -174,9 +255,12 @@ export interface AssemblyHours {
   process_name: string
   sort_order: number
   effective_hours: number
+  /** The kit's own hours, if it has a row for this process type. */
   master_hours: number | null
   company_hours: number | null
-  source: 'master' | 'company_override' | 'private'
+  /** The kit group's hours, used when the kit has none of its own. */
+  group_hours: number | null
+  source: 'master' | 'company_override' | 'private' | 'kit_group'
 }
 
 // --- costing ---------------------------------------------------------------
@@ -204,6 +288,7 @@ export interface Costing {
   negotiation_margin_pct: number
   price_rounding_step: number
   tax_pct: number
+  enclosure_uplift_pct: number
   submitted_at: string | null
   approved_at: string | null
   returned_at: string | null
@@ -250,6 +335,10 @@ export interface CostingItem {
   part_number: string | null
   quantity: number
   pricing_mode: PricingMode
+  purchase_price: number | null
+  purchase_currency: string | null
+  landed_factor: number | null
+  uplift_pct: number | null
   unit_price: number
   sort_order: number
 }

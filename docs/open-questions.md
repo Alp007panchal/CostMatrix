@@ -3,11 +3,12 @@
 Nothing is blocking the build. What remains is material to be supplied, and assumptions you can
 overturn at any time. Answered questions live in `decisions.md`.
 
-## Now: correct the reference document, then PR 1
+## Now: review and merge PRs 1 to 6 in order
 
-`docs/reference/current-costing-and-quotation-reference.md` is a draft written from your files.
-Read §5 (the thirteen decisions) and §6.2 (what will differ when the app rebuilds NPP-192
-Option 1) and correct anything wrong. Merge PR 1 when you are satisfied; session 1 starts then.
+PR 1 holds your reference document and seed; PR 2 the schema for decisions 1, 2, 3 and 11;
+PR 3 the Import screen; PR 4 costing from kits and the NPP-192 acceptance test; PR 5 the
+technical offer from the kits; PR 6 the external-company and CRM review. Nothing reaches the
+live database until they merge; after PR 3 you run the three imports.
 
 ## Waiting on you
 
@@ -15,6 +16,7 @@ Option 1) and correct anything wrong. Merge PR 1 when you are satisfied; session
 |---|---|---|
 | Decision 2: the EUR landed factor is 200 today; change it under Rates → Currency factors when it moves | Whenever it moves | New costings pick it up; old ones keep what they froze. |
 | **Labour hours per labour group** — fill `data/seed/kit-group-labour-template.csv` (17 rows × 3 columns) and import it (step 3), or type them on the Kit groups screen | Before session 3 | Without them every kit costs zero labour (§5, decision 11). `kit-labour-template.csv` is for per-kit overrides only. |
+| **Prices for the seven placeholder parts** (decision 10) plus `CSMBS3ISO63X`: 8 parts show "no price" on the Components screen | Before costing a kit that uses them | A kit holding one is refused by the costing with the part named. |
 | **The uplift rule for form 3B/4B enclosures** (decision 1) | Before costing a real board | Percentage or fixed; the app has a company percentage today. |
 | **A busbar line for the C&S 400 A TP MCCB kit** (`kits-issues.csv`) | Before that kit is used | Every sibling kit has one. |
 | Two 800A ACBs at 330,432 on Option 1 versus 279,744 from the catalogue | Before session 3 | If accessories are included in 330,432, they should be kit lines. |

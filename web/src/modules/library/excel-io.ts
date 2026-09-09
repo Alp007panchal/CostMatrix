@@ -34,8 +34,10 @@ export async function downloadComponents(rows: ComponentPrice[], fileName: strin
       unit: c.unit,
       pricing: c.pricing_mode === 'weight_rate' ? 'weight' : 'fixed',
       price: c.pricing_mode === 'fixed' ? (c.raw_price ?? c.unit_price) : '',
+      currency: c.pricing_mode === 'fixed' ? c.purchase_currency : '',
       weight: c.weight_per_unit ?? '',
       material_rate: c.material_rate_code ?? '',
+      cubicle: c.is_enclosure_cubicle ? 'yes' : '',
       description: c.description ?? '',
     })
   }
@@ -44,7 +46,8 @@ export async function downloadComponents(rows: ComponentPrice[], fileName: strin
     // An empty library still downloads as a usable template.
     sheet.addRow({
       code: 'EXAMPLE-1', name: 'Example breaker, delete this row', category: 'switchgear',
-      manufacturer: 'SIEMENS', part_number: '3VJ1216', unit: 'pcs', pricing: 'fixed', price: 10000,
+      manufacturer: 'SIEMENS', part_number: '3VJ1216', unit: 'pcs', pricing: 'fixed', price: 88.64,
+      currency: 'EUR',
     })
   }
 

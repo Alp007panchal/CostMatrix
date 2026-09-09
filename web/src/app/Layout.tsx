@@ -20,8 +20,9 @@ export function Layout() {
           <NavLink to="/crm/follow-ups">Follow-ups</NavLink>
           <NavLink to="/crm/customers">Customers</NavLink>
           <NavLink to="/library/components">Components</NavLink>
-          <NavLink to="/library/assemblies">Assemblies</NavLink>
+          <NavLink to="/library/assemblies">Kits</NavLink>
           {canAdminister && <NavLink to="/library/rates">Rates</NavLink>}
+          {canAdminister && <NavLink to="/library/import">Import</NavLink>}
           {canAdminister && <NavLink to="/admin/people">People</NavLink>}
           {canAdminister && <NavLink to="/admin/company">Company</NavLink>}
           {canAdminister && <NavLink to="/admin/quotation-defaults">Quotation wording</NavLink>}

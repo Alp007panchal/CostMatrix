@@ -4,12 +4,8 @@ import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import { money } from '../../lib/format'
 import type { ComponentPrice } from '../../lib/database.types'
-import {
-  listCategories,
-  listComponentPrices,
-  listEffectiveMaterialRates,
-  setComponentActive,
-} from './api'
+import { listCategories, listComponentPrices, setComponentActive } from './api'
+import { listEffectiveCurrencyFactors, listEffectiveMaterialRates } from './rates-api'
 import { ComponentForm } from './ComponentForm'
 import { PriceHistory } from './PriceHistory'
 import { ExcelPanel } from './ExcelPanel'
@@ -26,6 +22,7 @@ export function ComponentsPage() {
   const components = useQuery({ queryKey: ['components'], queryFn: listComponentPrices })
   const categories = useQuery({ queryKey: ['categories'], queryFn: listCategories })
   const rates = useQuery({ queryKey: ['material-rates-effective'], queryFn: listEffectiveMaterialRates })
+  const factors = useQuery({ queryKey: ['currency-factors-effective'], queryFn: listEffectiveCurrencyFactors })
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -82,9 +79,10 @@ export function ComponentsPage() {
       )}
 
       <p className="muted">
-        Prices are what {company.name} pays: the master price less your{' '}
-        {company.discount_pct}% discount, in {company.currency_label}. Items priced by weight are
-        worked out from the rate per kilogram.
+        Purchase is what the supplier charges, in its currency. Your price is what {company.name}{' '}
+        pays: the purchase price landed into KES (exchange rate × landed factor, see Rates), less
+        your {company.discount_pct}% discount on master parts, in {company.currency_label}. Items
+        priced by weight are worked out from the rate per kilogram.
       </p>
 
       <div className="card">
@@ -135,6 +133,7 @@ export function ComponentsPage() {
                       <th>Make</th>
                       <th>Category</th>
                       <th>Unit</th>
+                      <th className="right">Purchase</th>
                       <th className="right">Your price</th>
                       <th></th>
                     </tr>
@@ -153,6 +152,13 @@ export function ComponentsPage() {
                         <td>{c.manufacturer}</td>
                         <td>{c.category_name}</td>
                         <td>{c.unit}</td>
+                        <td className="right muted">
+                          {c.pricing_mode === 'weight_rate'
+                            ? 'by weight'
+                            : c.raw_price != null
+                              ? `${c.purchase_currency} ${c.raw_price}`
+                              : <span className="error">no price</span>}
+                        </td>
                         <td className="right">
                           {money(c.unit_price, company.currency_label)}
                           {c.pricing_mode === 'weight_rate' && (
@@ -193,6 +199,7 @@ export function ComponentsPage() {
           existing={editing === 'new' ? null : editing}
           categories={categories.data ?? []}
           materialRates={rates.data ?? []}
+          currencyFactors={factors.data ?? []}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null)

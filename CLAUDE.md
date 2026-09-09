@@ -98,7 +98,10 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
 - Keep momentum inside an approved slice: build it to the end, verify, open the PR, report.
   Ask before anything destructive or outside the plan.
 - Branch `claude/costmatrix-planning-bq7j86`. **One pull request per feature; the owner
-  reviews and merges.** Migrations reach production automatically on merge to `main`.
+  reviews and merges.** While an earlier PR is still open, the next session goes on a branch
+  stacked on it (`…-s1-foundation`, `…-s2-importer`) with its PR targeting the earlier branch;
+  GitHub retargets to `main` when the earlier PR merges. Migrations reach production
+  automatically on merge to `main`.
 - Verify before claiming: `supabase/tests/run-local.sh` (it imports the real `data/seed`
   files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
   Never edit `data/seed/*` by hand: it is the owner's data. Say plainly what could not be

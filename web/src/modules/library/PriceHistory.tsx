@@ -19,7 +19,8 @@ export function PriceHistory({
     queryFn: () => listPriceHistory(component.id),
   })
 
-  const label = component.company_id === null ? 'KES' : (company?.currency_label ?? 'KES')
+  // Prices are held in the purchase currency; older rows predate the column.
+  const fallback = component.purchase_currency || (company?.currency_label ?? 'KES')
 
   return (
     <div className="card">
@@ -32,8 +33,8 @@ export function PriceHistory({
 
       <p className="muted">
         {component.company_id === null
-          ? 'Master prices are held in KES, before your discount.'
-          : `Your own component, priced in ${label}.`}
+          ? `Master purchase prices, in ${fallback}, before landing costs and your discount.`
+          : `Your own component, priced in ${fallback}.`}
       </p>
 
       <div className="table-wrap">
@@ -50,6 +51,7 @@ export function PriceHistory({
               </thead>
               <tbody>
                 {rows.map((row) => {
+                  const label = row.purchase_currency ?? fallback
                   const change =
                     row.old_price && row.old_price > 0
                       ? ((row.new_price - row.old_price) / row.old_price) * 100

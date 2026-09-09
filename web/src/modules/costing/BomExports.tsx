@@ -29,7 +29,7 @@ export function BomExports({ costingId, costingNo, revisionNo, currencyLabel }: 
     <div className="card">
       <h2 style={{ marginTop: 0 }}>Bills of materials</h2>
       <p className="muted">
-        One list per category, quantities multiplied through assembly and panel quantities.
+        One list per category, quantities multiplied through kit and panel quantities.
         Excel keeps the formatting; CSV opens anywhere.
       </p>
       <Async query={items} empty="Nothing in this costing yet.">

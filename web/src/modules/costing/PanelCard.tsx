@@ -134,7 +134,7 @@ export function PanelCard({
         <table>
           <thead>
             <tr>
-              <th>Assembly</th>
+              <th>Kit</th>
               <th className="right">Qty</th>
               <th className="right">Material each</th>
               <th className="right">Labour each</th>
@@ -145,7 +145,7 @@ export function PanelCard({
           <tbody>
             {assemblies.length === 0 && (
               <tr>
-                <td colSpan={6} className="muted">No assemblies yet — add one below.</td>
+                <td colSpan={6} className="muted">No kits yet — add one below.</td>
               </tr>
             )}
             {assemblies.map((a) => (
@@ -214,7 +214,7 @@ function AddAssembly({ library, onAdd }: { library: Assembly[]; onAdd: (id: stri
   return (
     <div className="row" style={{ marginTop: '.75rem' }}>
       <select value={choice} style={{ flex: 3, minWidth: '14rem' }} onChange={(e) => setChoice(e.target.value)}>
-        <option value="">Add an assembly…</option>
+        <option value="">Add a kit…</option>
         {active.map((a) => (
           <option key={a.id} value={a.id}>{a.code} — {a.name}{a.company_id ? ' (yours)' : ''}</option>
         ))}

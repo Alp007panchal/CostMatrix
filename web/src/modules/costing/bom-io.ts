@@ -41,7 +41,7 @@ export async function downloadBomXlsx(
     ws.columns.forEach((col, i) => { col.width = i === 1 ? 44 : 16 })
     ws.views = [{ state: 'frozen', ySplit: 1 }]
     ws.addRow([])
-    ws.addRow([`Prices in ${currencyLabel}. Quantities are multiplied through assembly and panel quantities.`])
+    ws.addRow([`Prices in ${currencyLabel}. Quantities are multiplied through kit and panel quantities.`])
   }
 
   const buffer = await wb.xlsx.writeBuffer()

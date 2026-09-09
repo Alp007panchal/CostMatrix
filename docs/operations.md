@@ -275,6 +275,8 @@ Existing costings do not change: their prices were frozen when they were built. 
 costings pick up the new discount. This is deliberate.
 
 ### Update prices from a supplier (slice 1)
+Prices are entered as the supplier charges them, in the supplier's currency (the *Purchase*
+column); the app lands them in KES with the currency factors and shows *Your price*.
 1. Library → Components → **Download Excel**.
 2. Send the file to the supplier, or edit the price column yourself.
 3. Library → Components → **Upload Excel**, choose the file.
@@ -287,8 +289,45 @@ Uploads never delete anything. To remove a component, deactivate it on its own s
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
 margins are a share of the selling price rather than of cost.
 
+### Import the seed (session 2)
+Import (in the top bar; administrators only). Three steps, in order, each fed by the files in
+`data/seed/` in the repository, exactly as they are there: **1 Components** — `components.csv`
+plus `category-map.csv` (the second file tells the importer which of the four BOM categories
+each catalogue category belongs to; a `BOM category:` note on a single row overrides it).
+Busbar rows become weight-priced parts: kg per metre = catalogue EUR ÷ the copper rate (15 EUR
+per kg), and the preview says how many were derived. **2 Kits and kit groups** — `kits.csv` plus
+`kit-labour-template.csv` (the second file gives each kit its labour group and main device, and
+any hours filled in for a single kit become that kit's own hours). **3 Kit group hours** —
+`kit-group-labour-template.csv` once you have filled the three hours columns; blank cells are
+skipped and counted. Choose the file(s) → **Preview** shows how many rows are new, changed,
+unchanged and rejected, with the reason for every rejection → **Apply** saves. Nothing is ever
+deleted, and a second import of the same files changes nothing. Expected on the first import:
+735 parts (7 placeholders without a price, plus one part whose price is blank in the export),
+296 kits in 17 groups with 720 lines. Placeholders show "no price" on the Components screen, and
+a kit that holds one cannot be added to a costing until you give it a purchase price. The master
+admin imports the master library; a company admin imports private parts and kits for their company.
+
+### Change a currency's landed factor (session 1)
+Rates → Currency factors. Each currency shows one figure: KES per 1 unit **landed**, with the
+exchange rate, freight, duty and handling in it (200 per EUR today). **Change** writes your
+company's own figure; the master admin ticks *master* to change the default for everyone, and may
+add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
+be saved. New costings use the new figure; existing ones keep what they froze.
+
+### Set the enclosure uplift (session 1)
+Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure
+cubicle*) when they enter a costing, and frozen there.
+
+### Set kit group hours (session 1)
+Kits → kit group (link in the intro) → type the hours per kind of work in each group's row;
+they save when you leave the cell. A kit with its own figure for one kind of work keeps it; blank
+on the kit means the group's hours apply. On a kit: choose its group, rating and poles under
+the title, and tick the radio button of the line that is its main device.
+
 ### Change the copper rate (slice 1)
-Library → Material rates → edit the rate per kilogram → Save. New costings use it; existing
+Rates → Material rates → **Change** on Copper busbar → type the rate per kilogram → Save. The
+master figure is in **EUR per kg (15)** and lands through the EUR factor; the *Lands at* column
+shows the KES per kg (3,000). A company's own figure is in its own currency. New costings use it; existing
 ones keep the rate they froze.
 
 ### Set up the quotation letterhead and wording

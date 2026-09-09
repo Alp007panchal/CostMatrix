@@ -2,14 +2,15 @@ import { useState, type FormEvent } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Field } from '../../ui/Async'
-import { money } from '../../lib/format'
 import type {
   ComponentCategory,
   ComponentPrice,
+  EffectiveCurrencyFactor,
   EffectiveMaterialRate,
   PricingMode,
 } from '../../lib/database.types'
 import { createComponent, updateComponent, type ComponentInput } from './api'
+import { PricingFields } from './PricingFields'
 
 /**
  * Add or change one component.
@@ -21,12 +22,14 @@ export function ComponentForm({
   existing,
   categories,
   materialRates,
+  currencyFactors,
   onClose,
   onSaved,
 }: {
   existing: ComponentPrice | null
   categories: ComponentCategory[]
   materialRates: EffectiveMaterialRate[]
+  currencyFactors: EffectiveCurrencyFactor[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -44,9 +47,11 @@ export function ComponentForm({
     manufacturer: existing?.manufacturer ?? '',
     part_number: existing?.part_number ?? '',
     pricing_mode: (existing?.pricing_mode ?? 'fixed') as PricingMode,
-    unit_price: existing?.raw_price != null ? String(existing.raw_price) : '',
+    purchase_price: existing?.raw_price != null ? String(existing.raw_price) : '',
+    purchase_currency: existing?.purchase_currency ?? currencyFactors[0]?.currency_code ?? 'KES',
     weight_per_unit: existing?.weight_per_unit != null ? String(existing.weight_per_unit) : '',
     material_rate_code: existing?.material_rate_code ?? materialRates[0]?.code ?? 'copper_busbar',
+    is_enclosure_cubicle: existing?.is_enclosure_cubicle ?? false,
   })
 
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
@@ -64,9 +69,13 @@ export function ComponentForm({
         manufacturer: form.manufacturer.trim() || null,
         part_number: form.part_number.trim() || null,
         pricing_mode: form.pricing_mode,
-        unit_price: form.pricing_mode === 'fixed' ? Number(form.unit_price) : null,
+        purchase_price: form.pricing_mode === 'fixed' ? Number(form.purchase_price) : null,
+        purchase_currency: form.pricing_mode === 'fixed' ? form.purchase_currency : 'KES',
         weight_per_unit: form.pricing_mode === 'weight_rate' ? Number(form.weight_per_unit) : null,
         material_rate_code: form.pricing_mode === 'weight_rate' ? form.material_rate_code : null,
+        is_enclosure_cubicle: form.category_code === 'enclosure_parts' && form.is_enclosure_cubicle,
+        // A placeholder stops being one the moment it gets a price.
+        is_placeholder: form.pricing_mode === 'fixed' && form.purchase_price === '',
       }
       return existing ? updateComponent(existing.id, input) : createComponent(input)
     },
@@ -77,13 +86,6 @@ export function ComponentForm({
     event.preventDefault()
     save.mutate()
   }
-
-  const chosenRate = materialRates.find((r) => r.code === form.material_rate_code)
-  const weight = Number(form.weight_per_unit)
-  const preview =
-    form.pricing_mode === 'weight_rate' && chosenRate && weight > 0
-      ? money(weight * chosenRate.rate, company?.currency_label)
-      : null
 
   return (
     <form className="card" onSubmit={submit}>
@@ -140,60 +142,24 @@ export function ComponentForm({
         </div>
       </div>
 
-      <Field label="How it is priced">
-        <select
-          value={form.pricing_mode}
-          onChange={(e) => set('pricing_mode', e.target.value as PricingMode)}
-        >
-          <option value="fixed">A price per {form.unit || 'unit'}</option>
-          <option value="weight_rate">By weight, at a rate per kilogram</option>
-        </select>
-      </Field>
+      <PricingFields
+        values={form}
+        unit={form.unit}
+        currencyLabel={company?.currency_label ?? 'KES'}
+        materialRates={materialRates}
+        currencyFactors={currencyFactors}
+        onChange={(key, value) => setForm((f) => ({ ...f, [key]: value }))}
+      />
 
-      {form.pricing_mode === 'fixed' ? (
-        <Field
-          label={`Price per ${form.unit || 'unit'}`}
-          hint={toMaster ? 'in KES, before any company discount' : `in ${company?.currency_label}`}
-        >
+      {form.category_code === 'enclosure_parts' && (
+        <label className="row" style={{ gap: '.4rem', marginBottom: '.9rem' }}>
           <input
-            type="number"
-            step="0.01"
-            min="0"
-            value={form.unit_price}
-            required
-            onChange={(e) => set('unit_price', e.target.value)}
+            type="checkbox"
+            checked={form.is_enclosure_cubicle}
+            onChange={(e) => set('is_enclosure_cubicle', e.target.checked)}
           />
-        </Field>
-      ) : (
-        <>
-          <Field label={`Kilograms per ${form.unit || 'unit'}`} hint="e.g. 2.8 for 30 x 10 mm bar">
-            <input
-              type="number"
-              step="0.001"
-              min="0"
-              value={form.weight_per_unit}
-              required
-              onChange={(e) => set('weight_per_unit', e.target.value)}
-            />
-          </Field>
-          <Field label="Priced at" hint="change the rate itself on the Rates screen">
-            <select
-              value={form.material_rate_code}
-              onChange={(e) => set('material_rate_code', e.target.value)}
-            >
-              {materialRates.map((r) => (
-                <option key={r.code} value={r.code}>
-                  {r.name} — {money(r.rate, company?.currency_label)} per {r.unit}
-                </option>
-              ))}
-            </select>
-          </Field>
-          {preview && (
-            <p className="muted">
-              At today&rsquo;s rate that is <strong>{preview}</strong> per {form.unit || 'unit'}.
-            </p>
-          )}
-        </>
+          This is an enclosure cubicle: the company&rsquo;s enclosure uplift is added when it is costed
+        </label>
       )}
 
       <Field label="Description" hint="optional">
