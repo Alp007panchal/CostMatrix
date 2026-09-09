@@ -93,24 +93,25 @@ be lower than 5,784,800 by design, and the comparison is made on the material su
 
 ## 5. The thirteen binding decisions
 
-Decisions 1, 2, 3, 5, 6, 7, 8, 9 and 11 are the owner's words from the brief. Decisions 4, 10,
-12 and 13 are **proposed** from the original brief to complete the set; strike or rewrite them.
+All thirteen decisions are the owner's. Decisions 1, 2, 3, 5, 6, 7, 8, 9 and 11 are the
+owner's words from the brief; 4, 10, 12 and 13 were written from the original brief and
+confirmed by the owner on 2026-09-09.
 
 | # | Decision | Status | What it means for the schema |
 |---|---|---|---|
 | 1 | The enclosure is priced as catalogue cubicles (the ENCLOSURE rows of the catalogue, by size and form) × quantity, plus a company-set uplift percentage for fabrication and finishing. | owner | `components.is_enclosure_cubicle`; `companies.enclosure_uplift_pct`, frozen on the costing. |
 | 2 | Every component carries a purchase price and a purchase currency. A landed-cost factor per currency (with the exchange rate) converts it to KES. Master defaults, company overrides. | owner | `currency_factors` table; `components.purchase_price`, `purchase_currency`; `costing_items` freezes price, currency, rate and factor. |
 | 3 | Busbar is priced from a copper rate in KES per kg and a kg-per-metre table by section. Both editable. | owner | Exists: `weight_per_unit` (renamed "kg per metre" in the UI) and `material_rates.copper_busbar`. |
-| 4 | Labour is hours × an hourly rate per process type (panel assembly, wiring, busbar); never a percentage of material. | **proposed** | Exists (D-001). |
+| 4 | Labour is hours × an hourly rate per process type (panel assembly, wiring, busbar); never a percentage of material. | owner (confirmed) | Exists (D-001). |
 | 5 | Profit and negotiation margins are percentages of the selling price: price = cost ÷ (1 − m). | owner | Exists (D-036). |
 | 6 | Each line of the price schedule (one panel) is rounded **up** to a company-set increment, default 100. | owner | Exists per panel (D-037); *to confirm that "line" means the panel line, not each component*. |
 | 7 | Reference numbers are the company prefix + a running sequence + the revision: `NPP-193-REV0`. | owner | Exists (D-035). |
 | 8 | Each company has default commercial terms (validity, payment, delivery, timelines), editable on every quotation. | owner | Exists (`company_settings`). |
 | 9 | Each company has a fixed letterhead: header logo, address block, partner and certification logos in the footer. | owner | Exists (`company_settings`, `company_footer_logos`). |
-| 10 | Draft → submitted → approved; an approver may return a submitted costing with a comment; any change after approval creates a revision; older revisions are read-only. | **proposed** | Exists (D-016–D-018). |
+| 10 | Draft → submitted → approved; an approver may return a submitted costing with a comment; any change after approval creates a revision; older revisions are read-only. | owner (confirmed) | Exists (D-016–D-018). |
 | 11 | A kit is a main device plus its lines (busbar, cable, accessories) with quantities. Kits belong to kit groups; the group carries the labour hours per process type; a kit may override them. | owner | New: `kit_groups`, `kit_group_labour`, `assemblies.kit_group_id`, `assemblies.rating`, `assembly_components.is_main_device`; existing per-assembly hours become the override. UI says "kit". |
-| 12 | Four bills of materials by category: switchgear, busbar & cable, accessories & hardware, enclosure parts. | **proposed** | Exists (`component_categories`). |
-| 13 | External companies buy master parts at a master-set discount, keep private kits and components, and work in their own currency at a rate frozen into each costing. | **proposed** | Exists (D-003, D-004, D-008). |
+| 12 | Four bills of materials by category: switchgear, busbar & cable, accessories & hardware, enclosure parts. | owner (confirmed) | Exists (`component_categories`). |
+| 13 | External companies buy master parts at a master-set discount, keep private kits and components, and work in their own currency at a rate frozen into each costing. | owner (confirmed) | Exists (D-003, D-004, D-008). |
 
 Frozen on every costing line, whatever the decision: purchase price, purchase currency,
 exchange rate, landed factor, discount, kg per metre, copper rate, computed unit price;
