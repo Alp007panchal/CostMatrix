@@ -69,7 +69,8 @@ export function ComponentForm({
         manufacturer: form.manufacturer.trim() || null,
         part_number: form.part_number.trim() || null,
         pricing_mode: form.pricing_mode,
-        purchase_price: form.pricing_mode === 'fixed' ? Number(form.purchase_price) : null,
+        // An empty box stays null (a placeholder), never 0: Number('') is 0.
+        purchase_price: form.pricing_mode === 'fixed' && form.purchase_price.trim() !== '' ? Number(form.purchase_price) : null,
         purchase_currency: form.pricing_mode === 'fixed' ? form.purchase_currency : 'KES',
         weight_per_unit: form.pricing_mode === 'weight_rate' ? Number(form.weight_per_unit) : null,
         material_rate_code: form.pricing_mode === 'weight_rate' ? form.material_rate_code : null,
