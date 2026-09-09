@@ -15,6 +15,7 @@ export function ImportCard({
   title,
   blurb,
   required,
+  second,
   run,
   onApplied,
 }: {
@@ -22,11 +23,15 @@ export function ImportCard({
   title: string
   blurb: string
   required: string[]
-  run: (rows: Rows, apply: boolean, fileName: string) => Promise<ImportReport>
+  /** An optional companion file (category map; kit template) with its own required columns. */
+  second?: { label: string; hint: string; required: string[]; optional?: boolean }
+  run: (rows: Rows, secondRows: Rows, apply: boolean, fileName: string) => Promise<ImportReport>
   onApplied: () => void
 }) {
   const [fileName, setFileName] = useState('')
   const [rows, setRows] = useState<Rows | null>(null)
+  const [secondRows, setSecondRows] = useState<Rows | null>(null)
+  const [secondName, setSecondName] = useState('')
   const [missing, setMissing] = useState<string[]>([])
   const [report, setReport] = useState<ImportReport | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -45,12 +50,31 @@ export function ImportCard({
     }
   }
 
+  async function pickSecond(file: File) {
+    setError(null)
+    setReport(null)
+    try {
+      const table = parseCsv(await file.text())
+      const absent = (second?.required ?? []).filter((h) => !table.headers.includes(h))
+      if (absent.length > 0) {
+        setError(`${file.name} is missing the column${absent.length > 1 ? 's' : ''} ${absent.join(', ')}.`)
+        setSecondRows(null)
+        return
+      }
+      setSecondRows(table.rows)
+      setSecondName(file.name)
+    } catch (e) {
+      setError(String(e))
+    }
+  }
+
+  const ready = rows !== null && (!second || second.optional || secondRows !== null)
   const preview = useMutation({
-    mutationFn: () => run(rows ?? [], false, fileName),
+    mutationFn: () => run(rows ?? [], secondRows ?? [], false, fileName),
     onSuccess: setReport,
   })
   const apply = useMutation({
-    mutationFn: () => run(rows ?? [], true, fileName),
+    mutationFn: () => run(rows ?? [], secondRows ?? [], true, fileName),
     onSuccess: (r) => {
       setReport(r)
       setRows(null)
@@ -86,12 +110,29 @@ export function ImportCard({
           {fileName} is missing the column{missing.length > 1 ? 's' : ''} {missing.join(', ')}.
         </p>
       )}
+      {second && (
+        <label className="field">
+          <span>
+            {second.label} <em className="hint">— {second.hint}; columns: {second.required.join(', ')}</em>
+          </span>
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            disabled={busy}
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) void pickSecond(f)
+            }}
+          />
+        </label>
+      )}
       {rows && !report && (
         <div className="row">
           <span className="muted">
-            {fileName}: {rows.length} rows read. Nothing is saved until you apply.
+            {fileName}: {rows.length} rows read{secondRows ? `; ${secondName}: ${secondRows.length} rows` : ''}.
+            {second && !second.optional && !secondRows ? ` Add ${second.label.toLowerCase()} to continue.` : ' Nothing is saved until you apply.'}
           </span>
-          <button className="primary" disabled={busy} onClick={() => preview.mutate()}>
+          <button className="primary" disabled={busy || !ready} onClick={() => preview.mutate()}>
             {preview.isPending ? 'Checking…' : 'Preview'}
           </button>
         </div>
@@ -124,11 +165,31 @@ function Report({ report }: { report: ImportReport }) {
         )}
         {report.skipped_blank != null && report.skipped_blank > 0 && (
           <>
-            , <strong>{report.skipped_blank}</strong> blank row{report.skipped_blank === 1 ? '' : 's'} skipped
+            , <strong>{report.skipped_blank}</strong> blank cell{report.skipped_blank === 1 ? '' : 's'} skipped
+          </>
+        )}
+        {report.busbar_kg_derived != null && report.busbar_kg_derived > 0 && (
+          <>
+            , <strong>{report.busbar_kg_derived}</strong> busbar size{report.busbar_kg_derived === 1 ? '' : 's'} priced by weight (kg/m = price ÷ copper rate)
+          </>
+        )}
+        {report.overrides != null && report.overrides > 0 && (
+          <>
+            , <strong>{report.overrides}</strong> kit{report.overrides === 1 ? '' : 's'} with their own hours
           </>
         )}
         .{!report.applied && ' Nothing has been saved yet.'}
       </p>
+      {report.warnings && report.warnings.length > 0 && (
+        <details open={report.warnings.length <= 15}>
+          <summary style={{ cursor: 'pointer' }}>Warnings ({report.warnings.length})</summary>
+          <ul>
+            {report.warnings.map((w, i) => (
+              <li key={i}>{w.row != null ? `Row ${w.row}: ` : ''}{w.key}: {w.reason}</li>
+            ))}
+          </ul>
+        </details>
+      )}
       {report.changes.length > 0 && (
         <details open={report.changes.length <= 10}>
           <summary style={{ cursor: 'pointer' }}>
@@ -153,18 +214,6 @@ function Report({ report }: { report: ImportReport }) {
               </tbody>
             </table>
           </div>
-        </details>
-      )}
-      {report.warnings && report.warnings.length > 0 && (
-        <details open>
-          <summary style={{ cursor: 'pointer' }}>Worth a look ({report.warnings.length})</summary>
-          <ul>
-            {report.warnings.map((w) => (
-              <li key={`${w.row}-${w.key}`}>
-                Row {w.row}: {w.reason} <span className="muted">— {w.key}</span>
-              </li>
-            ))}
-          </ul>
         </details>
       )}
       {report.rejected.length > 0 && (

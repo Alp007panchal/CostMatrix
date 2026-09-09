@@ -55,7 +55,8 @@ export function RatesPage() {
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Material rates</h2>
         <p className="muted">
-          Busbar is priced by weight: kilograms per metre times the rate below.
+          Busbar is priced by weight: kilograms per metre times the rate below. The master copper
+          rate is held in EUR per kg and lands through the EUR factor (15 × 200 = 3,000 KES/kg).
         </p>
         <div className="table-wrap">
           <Async query={effective} empty="No material rates.">
@@ -65,6 +66,7 @@ export function RatesPage() {
                   <tr>
                     <th>Material</th>
                     <th className="right">Your rate</th>
+                    <th className="right">Lands at</th>
                     <th>Source</th>
                     <th className="right"></th>
                   </tr>
@@ -79,7 +81,13 @@ export function RatesPage() {
                       rate={row.rate}
                       source={row.source}
                       masterRateKes={row.master_rate_kes}
+                      kesPerKg={row.kes_per_kg}
+                      rateEntered={row.rate_entered}
+                      rateCurrency={row.currency_code}
+                      masterRate={row.master_rate}
+                      masterCurrency={row.master_currency}
                       companyId={company.id}
+                      currencyCode={company.currency_code}
                       currencyLabel={company.currency_label}
                       isMasterAdmin={isMasterAdmin}
                       masterRateId={
@@ -102,9 +110,9 @@ export function RatesPage() {
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Currency factors</h2>
         <p className="muted">
-          A purchase price lands in KES as price × exchange rate × landed factor. The landed factor
-          covers freight, duty and clearing; 1 means none. Master figures apply unless you set your
-          own for a currency.
+          A purchase price lands in KES as price × the currency&rsquo;s landed factor: KES per 1 unit
+          with exchange rate, freight, duty and handling in one number (200 per EUR today). Master
+          figures apply unless you set your own for a currency.
         </p>
         <div className="table-wrap">
           <Async query={factors} empty="No currencies yet.">
@@ -113,9 +121,7 @@ export function RatesPage() {
                 <thead>
                   <tr>
                     <th>Currency</th>
-                    <th className="right">KES per 1</th>
-                    <th className="right">Landed factor</th>
-                    <th className="right">1 unit lands at</th>
+                    <th className="right">KES per 1, landed</th>
                     <th>Source</th>
                     <th className="right"></th>
                   </tr>
