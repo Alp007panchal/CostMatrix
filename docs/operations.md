@@ -227,6 +227,49 @@ phone locks you out of your own system.
 
 - [ ] Two-factor authentication on all three, recovery codes saved.
 
+### B9c. Send invitations from your own email address
+
+Skip this to finish setup, but do it before you invite more than one or two people. Until you
+do, invitation and password-reset emails go through Supabase's own sender, which allows only a
+handful of messages an hour ("email rate limit exceeded" on the invitation form) and often lands
+in spam. Your own sender fixes both, and the email arrives from your address rather than a
+stranger's.
+
+You need an email account the app can send through. A Google Workspace or Microsoft 365 mailbox
+you already own is ideal, for example `noreply@neiltd.com`.
+
+1. **Get a password for the app to use.** Not your normal password.
+   - *Google Workspace*: myaccount.google.com → Security → 2-Step Verification (turn it on if it
+     is not) → App passwords → create one named CostMatrix. Google shows a 16-character password
+     once. Copy it.
+   - *Microsoft 365*: an app password from your security settings, or ask whoever manages your
+     mail for SMTP credentials.
+2. **Supabase dashboard** → your project → **Project Settings** → **Authentication** → scroll to
+   **SMTP Settings** → turn on **Enable Custom SMTP**.
+3. Fill in, for Google Workspace:
+
+   | Field | Value |
+   |---|---|
+   | Sender email | the mailbox, e.g. `noreply@neiltd.com` |
+   | Sender name | CostMatrix |
+   | Host | `smtp.gmail.com` |
+   | Port | `465` |
+   | Username | the same mailbox address |
+   | Password | the app password from step 1 |
+
+   Microsoft 365 uses host `smtp.office365.com` and port `587`.
+4. **Save**. Supabase sends a test message; if it fails, the username or password is usually the
+   problem, not the host.
+5. **Authentication** → **Rate Limits**: raise "Emails per hour" from the free-tier default to
+   something sensible, say 100. This box only matters once your own sender is connected.
+6. Check it: People → invite somebody → the email should arrive within a minute, from your
+   address, and not in spam.
+
+The password stays in Supabase. Never paste it into this chat, the repository or a browser
+console; nobody, including me, needs to see it.
+
+- [ ] Invitations arrive from your own address, or noted for later.
+
 ### B10. Sign in
 
 Open the Vercel URL. You should get the CostMatrix sign-in page, and your email and password
@@ -273,9 +316,12 @@ One email address is one login, and a login belongs to one company. Inviting an 
 already has a login is refused, and the screen now shows the reason ("already been registered"):
 either use a different address, or move the person with **Move…** below.
 
-If the invitation fails for another reason, the invite-user function is not deployed (step B9),
-or Supabase's built-in email is rate limiting. Authentication → Users in the dashboard shows
-whether the account was created.
+"email rate limit exceeded" means Supabase's own sender has reached its hourly allowance, not
+that anything is broken: nothing was created, so send the same invitation again later. Connecting
+your own email sender (step B9c) removes the limit for good.
+
+If the invitation fails for another reason, the invite-user function may not be deployed (step
+B9). Authentication → Users in the Supabase dashboard shows whether the account was created.
 
 Roles, as a reminder: **company admin** manages settings and users, **costing engineer** builds
 costings, **approver** approves costings and releases quotations. One person can hold several.
