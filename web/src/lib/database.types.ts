@@ -78,6 +78,12 @@ export interface PersonWithRoles extends Profile {
 
 export type PricingMode = 'fixed' | 'weight_rate'
 
+/** A section name offered when something is added to a panel (panel_sections). */
+export interface PanelSection {
+  name: string
+  sort_order: number
+}
+
 export interface ComponentCategory {
   code: string
   name: string
@@ -319,6 +325,8 @@ export interface CostingAssembly {
   panel_id: string
   /** kit: a copy of a library kit. free: the panel's holder for loose components and typed lines. */
   kind: 'kit' | 'free'
+  /** Which part of the panel this line sits in, e.g. Incomer. Null: not placed in one. */
+  section: string | null
   source_assembly_id: string | null
   code: string
   name: string

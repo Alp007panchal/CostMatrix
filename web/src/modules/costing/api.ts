@@ -12,6 +12,7 @@ import type {
   CostingTotals,
   OptionTotals,
   PanelPrice,
+  PanelSection,
 } from '../../lib/database.types'
 
 /**
@@ -157,21 +158,29 @@ export async function addAssemblyToPanel(
   panelId: string,
   assemblyId: string,
   quantity: number,
+  section: string | null = null,
 ): Promise<void> {
   const { error } = await supabase.rpc('add_assembly_to_costing', {
     target_panel_id: panelId,
     source_assembly: assemblyId,
     qty: quantity,
+    section,
   })
   fail('Could not add the kit', error)
 }
 
-/** A catalogue component on its own, into the panel's components-and-enclosure line. */
-export async function addComponentToPanel(panelId: string, componentId: string, quantity: number): Promise<void> {
+/** A catalogue component on its own, into that section's loose-parts line. */
+export async function addComponentToPanel(
+  panelId: string,
+  componentId: string,
+  quantity: number,
+  section: string | null = null,
+): Promise<void> {
   const { error } = await supabase.rpc('add_component_to_costing', {
     target_panel_id: panelId,
     component: componentId,
     qty: quantity,
+    section,
   })
   fail('Could not add the component', error)
 }
@@ -187,7 +196,11 @@ export interface ManualItemInput {
 }
 
 /** A line typed in with its own price: a part no catalogue holds yet. */
-export async function addManualItem(panelId: string, input: ManualItemInput): Promise<void> {
+export async function addManualItem(
+  panelId: string,
+  input: ManualItemInput,
+  section: string | null = null,
+): Promise<void> {
   const { error } = await supabase.rpc('add_manual_item', {
     target_panel_id: panelId,
     item_name: input.name,
@@ -197,8 +210,22 @@ export async function addManualItem(panelId: string, input: ManualItemInput): Pr
     unit: input.unit,
     make: input.make,
     part_no: input.part_number,
+    section,
   })
   fail('Could not add the line', error)
+}
+
+/** The section names offered by the picker. Anything else typed is kept too. */
+export async function listPanelSections(): Promise<PanelSection[]> {
+  const { data, error } = await supabase.from('panel_sections').select('*').order('sort_order')
+  fail('Could not load the section names', error)
+  return (data ?? []) as PanelSection[]
+}
+
+/** Moves a kit line into another section of the same panel. */
+export async function setAssemblySection(id: string, section: string | null): Promise<void> {
+  const { error } = await supabase.from('costing_assemblies').update({ section }).eq('id', id)
+  fail('Could not move the line', error)
 }
 
 /** Kits with group, rating and main device, for the picker. */

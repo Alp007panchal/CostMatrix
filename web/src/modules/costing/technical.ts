@@ -2,14 +2,17 @@ import type { CostingAssembly, CostingItem, CostingPanel, Kit } from '../../lib/
 
 /**
  * A first draft of a panel's technical description (Annexure IV of the
- * quotation), written from what is actually in the panel: its kits, grouped
- * by kit group, each with its lines; then the loose components; then the
- * enclosure. The engineer edits the result. Pure, so it is unit-tested.
+ * quotation), written from what is actually in the panel: each line under the
+ * section it was built into — incomer, outgoers, APFC bank — with a kit's own
+ * lines indented beneath it. A line with no section falls back to its kit
+ * group, and loose parts with no section to "other components" and the
+ * enclosure, exactly as before sections existed.
+ * The engineer edits the result. Pure, so it is unit-tested.
  */
 
 export interface DescribeInput {
   panel: CostingPanel
-  assemblies: CostingAssembly[]     // this panel's lines (kits and the free holder)
+  assemblies: CostingAssembly[]     // this panel's lines (kits and the loose-parts holders)
   items: CostingItem[]              // every item of the costing; filtered here
   kits?: Kit[]                      // library kits, for group names and main devices
 }
@@ -18,27 +21,45 @@ const ENCLOSURE = 'enclosure_parts'
 
 export function describePanel({ panel, assemblies, items, kits = [] }: DescribeInput): string {
   const kitById = new Map(kits.map((k) => [k.id, k]))
-  const mine = assemblies.filter((a) => a.panel_id === panel.id)
-  const kitLines = mine.filter((a) => a.kind !== 'free').sort((a, b) => a.sort_order - b.sort_order)
-  const free = mine.find((a) => a.kind === 'free')
+  const mine = assemblies
+    .filter((a) => a.panel_id === panel.id)
+    .sort((a, b) => a.sort_order - b.sort_order)
 
-  // Kits, grouped by kit group in order of first appearance.
+  // One block per heading, in the order the panel uses them. A line's own
+  // section is the heading when it has one — that is how the panel was built,
+  // and how the customer reads it; a kit with no section falls back to its kit
+  // group, as it did before sections existed.
   const sections = new Map<string, string[]>()
-  for (const line of kitLines) {
-    const kit = line.source_assembly_id ? kitById.get(line.source_assembly_id) : undefined
-    const heading = (kit?.group_name ?? 'KITS').toUpperCase()
-    const block = [`${count(line.quantity)} ${line.name}${kit?.poles ? `, ${kit.poles}P` : ''}`]
-    for (const i of items.filter((x) => x.costing_assembly_id === line.id).sort((a, b) => a.sort_order - b.sort_order)) {
-      block.push(`   - ${itemText(i)}`)
-    }
-    sections.set(heading, [...(sections.get(heading) ?? []), ...block])
-  }
+  const add = (heading: string, lines: string[]) =>
+    sections.set(heading, [...(sections.get(heading) ?? []), ...lines])
 
-  const freeItems = free ? items.filter((i) => i.costing_assembly_id === free.id).sort((a, b) => a.sort_order - b.sort_order) : []
-  const loose = freeItems.filter((i) => i.category_code !== ENCLOSURE)
-  const enclosure = freeItems.filter((i) => i.category_code === ENCLOSURE)
-  if (loose.length) sections.set('OTHER COMPONENTS', loose.map((i) => `${itemText(i)}`))
-  if (enclosure.length) sections.set('ENCLOSURE', enclosure.map((i) => `${itemText(i)}`))
+  for (const line of mine) {
+    const section = (line.section ?? '').trim()
+    const lineItems = items
+      .filter((x) => x.costing_assembly_id === line.id)
+      .sort((a, b) => a.sort_order - b.sort_order)
+
+    if (line.kind !== 'free') {
+      const kit = line.source_assembly_id ? kitById.get(line.source_assembly_id) : undefined
+      const heading = (section || kit?.group_name || 'KITS').toUpperCase()
+      add(heading, [
+        `${count(line.quantity)} ${line.name}${kit?.poles ? `, ${kit.poles}P` : ''}`,
+        ...lineItems.map((i) => `   - ${itemText(i)}`),
+      ])
+      continue
+    }
+
+    // Loose parts: under their section when they have one, else split the old
+    // way into other components and the enclosure.
+    if (section) {
+      if (lineItems.length) add(section.toUpperCase(), lineItems.map((i) => itemText(i)))
+      continue
+    }
+    const loose = lineItems.filter((i) => i.category_code !== ENCLOSURE)
+    const enclosure = lineItems.filter((i) => i.category_code === ENCLOSURE)
+    if (loose.length) add('OTHER COMPONENTS', loose.map((i) => itemText(i)))
+    if (enclosure.length) add('ENCLOSURE', enclosure.map((i) => itemText(i)))
+  }
 
   const out: string[] = []
   for (const [heading, lines] of sections) {

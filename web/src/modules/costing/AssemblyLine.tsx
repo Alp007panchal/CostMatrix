@@ -20,8 +20,10 @@ export function AssemblyLine({
   label,
   editable,
   processNames,
+  sections,
   onQuantity,
   onRemove,
+  onSection,
   onItemQuantity,
   onItemRemove,
   onHours,
@@ -33,8 +35,11 @@ export function AssemblyLine({
   label: string
   editable: boolean
   processNames: Record<string, string>
+  /** The section names offered, for moving a kit to another part of the panel. */
+  sections: string[]
   onQuantity: (id: string, quantity: number) => void
   onRemove: (id: string) => void
+  onSection: (id: string, section: string | null) => void
   onItemQuantity: (id: string, quantity: number) => void
   onItemRemove: (id: string) => void
   onHours: (id: string, hours: number) => void
@@ -50,6 +55,20 @@ export function AssemblyLine({
             {open ? '▾' : '▸'}
           </button>
           {isFree ? <em>{line.name}</em> : `${line.code} — ${line.name}`}
+          {editable && !isFree && (
+            <select
+              aria-label="Section"
+              value={line.section ?? ''}
+              style={{ marginLeft: '.5rem', fontSize: '.75rem', padding: '.1rem .2rem' }}
+              onChange={(e) => onSection(line.id, e.target.value || null)}
+            >
+              <option value="">No section</option>
+              {sections.map((s) => <option key={s} value={s}>{s}</option>)}
+              {line.section && !sections.includes(line.section) && (
+                <option value={line.section}>{line.section}</option>
+              )}
+            </select>
+          )}
         </td>
         <td className="right">
           {isFree ? (

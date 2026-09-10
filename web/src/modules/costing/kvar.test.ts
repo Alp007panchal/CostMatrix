@@ -8,7 +8,7 @@ const kit = (id: string, rating: number | null, unit: 'A' | 'KVAR' | null): Kit 
   has_unpriced_part: false, line_count: 2,
 })
 const line = (source: string | null, quantity: number, kind: 'kit' | 'free' = 'kit'): CostingAssembly => ({
-  id: `${source}-${quantity}`, costing_id: 'c', panel_id: 'p', kind, source_assembly_id: source,
+  id: `${source}-${quantity}`, costing_id: 'c', panel_id: 'p', kind, section: null, source_assembly_id: source,
   code: source ?? 'FREE', name: '', quantity, sort_order: 0,
 })
 

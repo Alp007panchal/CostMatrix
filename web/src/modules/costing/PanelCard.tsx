@@ -11,7 +11,7 @@ import type {
   Kit,
   PanelPrice,
 } from '../../lib/database.types'
-import { AssemblyLine } from './AssemblyLine'
+import { PanelLines } from './PanelLines'
 import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
@@ -22,11 +22,12 @@ import type { ManualItemInput } from './api'
 interface Handlers {
   onPanelChange: (id: string, changes: Partial<CostingPanel>) => void
   onPanelRemove: (id: string) => void
-  onAddAssembly: (panelId: string, assemblyId: string, quantity: number) => Promise<void>
-  onAddComponent: (panelId: string, componentId: string, quantity: number) => Promise<void>
-  onAddManual: (panelId: string, input: ManualItemInput) => Promise<void>
+  onAddAssembly: (panelId: string, assemblyId: string, quantity: number, section: string | null) => Promise<void>
+  onAddComponent: (panelId: string, componentId: string, quantity: number, section: string | null) => Promise<void>
+  onAddManual: (panelId: string, input: ManualItemInput, section: string | null) => Promise<void>
   onAssemblyQuantity: (id: string, quantity: number) => void
   onAssemblyRemove: (id: string) => void
+  onAssemblySection: (id: string, section: string | null) => void
   onItemQuantity: (id: string, quantity: number) => void
   onItemRemove: (id: string) => void
   onHours: (id: string, hours: number) => void
@@ -43,6 +44,7 @@ export function PanelCard({
   kits,
   components,
   categories,
+  sections,
   label,
   editable,
   processNames,
@@ -57,16 +59,17 @@ export function PanelCard({
   kits: Kit[]
   components: ComponentPrice[]
   categories: ComponentCategory[]
+  /** The section names on offer; a section typed here is kept as it is. */
+  sections: string[]
   label: string
   editable: boolean
   processNames: Record<string, string>
   handlers: Handlers
 }) {
   const [showDetails, setShowDetails] = useState(false)
-  const totalsById = new Map(assemblyTotals.map((t) => [t.costing_assembly_id, t]))
-  // Kits first, the loose lines last, whatever order they were added in.
-  const ordered = [...assemblies].sort((a, b) => (a.kind === b.kind ? a.sort_order - b.sort_order : a.kind === 'free' ? 1 : -1))
+  const [section, setSection] = useState('')
   const kvar = kvarTotal(assemblies, kits)
+  const listId = `panel-sections-${panel.id}`
 
   const field = (key: keyof CostingPanel, value: string | number | null) =>
     handlers.onPanelChange(panel.id, { [key]: value })
@@ -163,70 +166,46 @@ export function PanelCard({
         </div>
       )}
 
-      <div className="table-wrap" style={{ marginTop: '.75rem' }}>
-        <table>
-          <thead>
-            <tr>
-              <th>Kit</th>
-              <th className="right">Qty</th>
-              <th className="right">Material each</th>
-              <th className="right">Labour each</th>
-              <th className="right">Total</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {assemblies.length === 0 && (
-              <tr>
-                <td colSpan={6} className="muted">Nothing yet — add a kit or a component below.</td>
-              </tr>
-            )}
-            {ordered.map((a) => (
-              <AssemblyLine
-                key={a.id}
-                line={a}
-                items={items.filter((i) => i.costing_assembly_id === a.id)}
-                labour={labour.filter((l) => l.costing_assembly_id === a.id)}
-                totals={totalsById.get(a.id)}
-                label={label}
-                editable={editable}
-                processNames={processNames}
-                onQuantity={handlers.onAssemblyQuantity}
-                onRemove={handlers.onAssemblyRemove}
-                onItemQuantity={handlers.onItemQuantity}
-                onItemRemove={handlers.onItemRemove}
-                onHours={handlers.onHours}
-              />
-            ))}
-          </tbody>
-          {price && (
-            <tfoot>
-              {kvar != null && (
-                <tr>
-                  <td colSpan={6} className="muted">APFC bank: {kvar} kVAr in steps (the kits above, rating × quantity)</td>
-                </tr>
-              )}
-              <tr>
-                <th colSpan={2}>Cost of one panel</th>
-                <th className="right">{money(price.material_cost, label)}</th>
-                <th className="right">{money(price.labour_cost, label)}</th>
-                <th className="right">{money(price.material_cost + price.labour_cost, label)}</th>
-                <th></th>
-              </tr>
-            </tfoot>
-          )}
-        </table>
-      </div>
+      <PanelLines
+        assemblies={assemblies}
+        items={items}
+        labour={labour}
+        assemblyTotals={assemblyTotals}
+        sections={sections}
+        price={price}
+        kvar={kvar}
+        label={label}
+        editable={editable}
+        processNames={processNames}
+        handlers={handlers}
+      />
 
       {editable && (
         <>
-          <KitPicker kits={kits} onAdd={(id, qty) => handlers.onAddAssembly(panel.id, id, qty)} />
+          <div className="row" style={{ marginTop: '.75rem', gap: '.4rem' }}>
+            <span className="muted" style={{ fontSize: '.8125rem' }}>Add to section</span>
+            <input
+              list={listId}
+              value={section}
+              placeholder="none"
+              aria-label="Section to add to"
+              style={{ width: '11rem' }}
+              onChange={(e) => setSection(e.target.value)}
+            />
+            <datalist id={listId}>
+              {sections.map((s) => <option key={s} value={s} />)}
+            </datalist>
+            <span className="muted" style={{ fontSize: '.75rem' }}>
+              — choose one or type your own; everything added below goes there.
+            </span>
+          </div>
+          <KitPicker kits={kits} onAdd={(id, qty) => handlers.onAddAssembly(panel.id, id, qty, clean(section))} />
           <AddFreeLine
             components={components}
             categories={categories}
             label={label}
-            onAddComponent={(cid, qty) => handlers.onAddComponent(panel.id, cid, qty)}
-            onAddManual={(input) => handlers.onAddManual(panel.id, input)}
+            onAddComponent={(cid, qty) => handlers.onAddComponent(panel.id, cid, qty, clean(section))}
+            onAddManual={(input) => handlers.onAddManual(panel.id, input, clean(section))}
           />
         </>
       )}
@@ -234,3 +213,7 @@ export function PanelCard({
   )
 }
 
+/** Blank or spaces mean no section, which is what the database stores. */
+function clean(section: string): string | null {
+  return section.trim() === '' ? null : section.trim()
+}

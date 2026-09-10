@@ -146,8 +146,8 @@ request straight to `main`; the owner reviews and merges.
     materials, history) instead of a two-column grid, and the history names the person who
     submitted, approved, returned or released (migration 0013, `v_costing_history`).
 15. **Sections inside a panel** — Incomer, AVR bypass, ATS, 2nd incomer, Outgoers, Accessories,
-    APFC bank, plus anything typed; a subtotal per section; Annexure IV takes its headings from
-    them.
+    APFC bank, plus anything typed; a subtotal per section; the loose parts of a section gather
+    in that section; Annexure IV takes its headings from them (migration 0014).
 16. **Copy a costing or a panel** — into a new enquiry or the same one, re-priced at today's
     rates, with a list of anything that could not be re-priced.
 17. **One enquiry, one decision** — revisions of one job group under their enquiry instead of

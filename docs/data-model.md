@@ -234,7 +234,7 @@ Functions:
 
 ### Added by migration 0011 — the costing engine
 
-- **costing_assemblies.kind** `kit | free`. Each panel has at most one `free` holder (unique partial index), created on demand by `app.free_line(panel_id)`; a trigger keeps its quantity at 1. It holds components added on their own and typed lines; it has no labour.
+- **costing_assemblies.kind** `kit | free`. Each panel had at most one `free` holder (0014 makes it one per section), created on demand by `app.free_line(panel_id)`; a trigger keeps its quantity at 1. It holds components added on their own and typed lines; it has no labour.
 - **costing_items.is_manual** — a typed line: `code MANUAL-nnn`, no source, price as entered.
 - **app.freeze_component(costing, holder, company, component, qty, sort)** — the one place a catalogue component is priced into a costing (every frozen column, cubicle uplift, refusal of an unpriced part). `add_assembly_to_costing` loops over the kit's lines with it; **app.add_component_to_costing(panel, component, qty)** uses it for a loose component (same component twice adds quantities); **app.add_manual_item(panel, name, category, unit_price, qty, unit, make, part_no)** writes a typed line.
 - **app.create_costing_revision** now copies `kind` and every column added since 0004 (`purchase_price`, `purchase_currency`, `landed_factor`, `uplift_pct`, `is_manual`, `enquiry_id`, `enclosure_uplift_pct`). Before 0011 a revision silently dropped the frozen workings.
@@ -310,6 +310,27 @@ Role checks per area:
 - **app.move_person(uid, to_company)** — master admin only; refuses a person with any records, the master admin, and an unknown or inactive company. Roles are rewritten for the new company because `user_roles` keys on `(user_id, company_id)`.
 - Public wrappers `person_footprint`, `person_footprints`, `move_person`; `grant execute` to `authenticated`.
 - Deleting a person is the **remove-user** Edge Function (it needs the secret key): master admin only, and only at a footprint of zero. `profiles.id` cascades from `auth.users`, so profile and roles go with the login.
+
+### Added by migration 0014 — sections inside a panel
+
+- **panel_sections** — `name` (primary key), `sort_order`. Master-only reference data with the
+  same policies as `component_categories`: everybody reads, the master admin writes. Seeded
+  Incomer, AVR bypass, ATS, 2nd incomer, Outgoers, Accessories, APFC bank.
+- **costing_assemblies.section** — free text, nullable. Deliberately not a foreign key to
+  `panel_sections`: the seeded names are what the pickers offer, not a constraint, so a panel
+  can hold a section nobody thought of. Null means the line is in no section and sorts last.
+- The unique index `costing_assemblies_one_free_per_panel` becomes
+  **costing_assemblies_one_free_per_section** on `(panel_id, coalesce(section, ''))` where
+  `kind = 'free'`: each section has its own loose-parts holder.
+- **app.clean_section(text)** — null, blank and spaces all mean "no section"; every function
+  below passes its argument through it.
+- **app.free_line(panel, section)**, **app.add_assembly_to_costing(panel, kit, qty, section)**,
+  **app.add_component_to_costing(panel, component, qty, section)** and
+  **app.add_manual_item(…, section)** each take the section as a last argument defaulting to
+  null. The old signatures are dropped rather than kept beside the new ones, because two
+  functions of one name where the extra argument has a default cannot be told apart.
+- **app.create_costing_revision** copies `section` — its column list drops anything not named
+  in it, which is the bug fixed in 0011.
 
 ### Added by migration 0013 — the history says who
 

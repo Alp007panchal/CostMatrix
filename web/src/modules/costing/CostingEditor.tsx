@@ -7,8 +7,9 @@ import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
   addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, removeCostingAssembly, removeItem, removePanel, returnCosting,
-  setCostingAssemblyQuantity, setItemQuantity, setLabourHours, submitCosting, updateCosting, updatePanel,
+  getCostingDetail, listBomItems, listPanelSections, removeCostingAssembly, removeItem, removePanel,
+  returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity, setLabourHours,
+  submitCosting, updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
 import { TotalsPanel } from './TotalsPanel'
@@ -32,6 +33,7 @@ export function CostingEditor() {
   const categories = useQuery({ queryKey: ['categories'], queryFn: listCategories })
   const processTypes = useQuery({ queryKey: ['process-types'], queryFn: listProcessTypes })
   const bom = useQuery({ queryKey: ['bom', id], queryFn: () => listBomItems(id), enabled: Boolean(id) })
+  const sections = useQuery({ queryKey: ['panel-sections'], queryFn: listPanelSections })
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['costing', id] })
@@ -149,17 +151,19 @@ export function CostingEditor() {
                 kits={kits}
                 components={components.data ?? []}
                 categories={categories.data ?? []}
+                sections={(sections.data ?? []).map((s) => s.name)}
                 label={label}
                 editable={editable}
                 processNames={processNames}
                 handlers={{
                   onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
                   onPanelRemove: (pid) => run(() => removePanel(pid)),
-                  onAddAssembly: async (pid, aid, qty) => { await addAssemblyToPanel(pid, aid, qty); await refresh() },
-                  onAddComponent: async (pid, cid, qty) => { await addComponentToPanel(pid, cid, qty); await refresh() },
-                  onAddManual: async (pid, input) => { await addManualItem(pid, input); await refresh() },
+                  onAddAssembly: async (pid, aid, qty, section) => { await addAssemblyToPanel(pid, aid, qty, section); await refresh() },
+                  onAddComponent: async (pid, cid, qty, section) => { await addComponentToPanel(pid, cid, qty, section); await refresh() },
+                  onAddManual: async (pid, input, section) => { await addManualItem(pid, input, section); await refresh() },
                   onAssemblyQuantity: (aid, q) => run(() => setCostingAssemblyQuantity(aid, q)),
                   onAssemblyRemove: (aid) => run(() => removeCostingAssembly(aid)),
+                  onAssemblySection: (aid, section) => run(() => setAssemblySection(aid, section)),
                   onItemQuantity: (iid, q) => run(() => setItemQuantity(iid, q)),
                   onItemRemove: (iid) => run(() => removeItem(iid)),
                   onHours: (lid, h) => run(() => setLabourHours(lid, h)),
