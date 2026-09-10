@@ -197,6 +197,12 @@ explicitly refreshes.
 - **Numbering**: the internal costing number is `CM-YYYY-NNNN` per company per year, issued when the costing is created. Revisions are shown as `CM-2026-0007 Rev 2`. The printed quotation reference is separate (see §9).
 - **History**: every status change, revision, price refresh, release and quotation status change is logged with user, timestamp and details. The log is visible on the costing and cannot be edited.
 
+An enquiry carries **files**: the drawing, the specification, the single-line diagram, the email
+thread — whatever came with the request. They live in a private bucket, one folder per company
+and enquiry, are opened through a link that lasts a few minutes, and are visible only to that
+company (and, read-only, to the master admin). Anyone who may build costings may attach or
+remove one. Deleting an enquiry deletes its file records.
+
 ## 9. Quotation
 
 - Released only by an approver, only from an approved, current costing.

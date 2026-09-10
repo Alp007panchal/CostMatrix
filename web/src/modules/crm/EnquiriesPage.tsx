@@ -79,7 +79,7 @@ export function EnquiriesPage() {
                   {rows.map((e) => (
                     <tr key={e.id}>
                       {byCompany.multi && <td className="muted">{byCompany.companyName(e.company_id)}</td>}
-                      <td>{e.enquiry_no}</td>
+                      <td><button style={{ padding: '.1rem .4rem' }} onClick={() => navigate(`/crm/enquiries/${e.id}`)}>{e.enquiry_no}</button></td>
                       <td><button style={{ padding: '.1rem .4rem' }} onClick={() => navigate(`/crm/customers/${e.customer_id}`)}>{customerName(e.customer_id)}</button></td>
                       <td>{e.title}{e.description && <div className="muted" style={{ fontSize: '.8125rem' }}>{e.description}</div>}</td>
                       <td className="muted">{e.received_on}</td>

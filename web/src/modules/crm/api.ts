@@ -1,6 +1,6 @@
 import { supabase } from '../../lib/supabase'
 import type {
-  Contact, Customer, Enquiry, EnquiryStatus, Project, QuotationFollowup,
+  Contact, Customer, Enquiry, EnquiryAttachment, EnquiryStatus, Project, QuotationFollowup,
 } from '../../lib/database.types'
 
 /**
@@ -143,4 +143,64 @@ export async function decideEnquiry(
     reason,
   })
   fail('Could not record the decision', error)
+}
+
+// --- files kept with an enquiry ----------------------------------------------
+
+export async function listEnquiryAttachments(enquiryId: string): Promise<EnquiryAttachment[]> {
+  const { data, error } = await supabase
+    .from('enquiry_attachments')
+    .select('*')
+    .eq('enquiry_id', enquiryId)
+    .order('created_at', { ascending: false })
+  fail('Could not load the files', error)
+  return (data ?? []) as EnquiryAttachment[]
+}
+
+/**
+ * The file goes into the private bucket first, under the company's own folder;
+ * only then is the record written. If the upload fails nothing is recorded, and
+ * if the record fails the file is taken back out, so the two never disagree.
+ */
+export async function addEnquiryAttachment(
+  companyId: string,
+  enquiryId: string,
+  file: File,
+  note: string | null,
+): Promise<void> {
+  const safeName = file.name.replace(/[^A-Za-z0-9._-]+/g, '-')
+  const path = `${companyId}/${enquiryId}/${Date.now()}-${safeName}`
+  const { error: uploadError } = await supabase.storage
+    .from('attachments')
+    .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false })
+  fail('Could not upload the file', uploadError)
+
+  const { error } = await supabase.from('enquiry_attachments').insert({
+    enquiry_id: enquiryId,
+    company_id: companyId,
+    file_name: file.name,
+    path,
+    mime_type: file.type || null,
+    size_bytes: file.size,
+    note,
+  })
+  if (error) {
+    await supabase.storage.from('attachments').remove([path])
+    fail('Could not record the file', error)
+  }
+}
+
+/** A link that works for a few minutes, long enough to open or save the file. */
+export async function attachmentUrl(path: string): Promise<string> {
+  const { data, error } = await supabase.storage.from('attachments').createSignedUrl(path, 300)
+  fail('Could not open the file', error)
+  if (!data) throw new Error('Could not open the file: no link was returned')
+  return data.signedUrl
+}
+
+/** Removes the record and the file itself; the record goes first. */
+export async function removeEnquiryAttachment(id: string, path: string): Promise<void> {
+  const { error } = await supabase.from('enquiry_attachments').delete().eq('id', id)
+  fail('Could not remove the file', error)
+  await supabase.storage.from('attachments').remove([path])
 }

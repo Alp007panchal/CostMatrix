@@ -25,7 +25,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | S3 — Costing engine + NPP-192 acceptance | **Built, PR 4 open** (stacked on PR 3). Kits by group and rating, loose components and typed lines per panel, cubicle uplift on loose lines, revision copy fixed, category subtotals on the Totals card; test 15 rebuilds NPP-192 Option 1 from the owner's seed to the cent (without the disregarded enclosure line) and proves the margin, rounding and VAT arithmetic. | 2026-09-09 |
 | S4 — Outputs | **Built, PR 5 open** (stacked on PR 4). Annexure IV drafted from the kits and lines (button and release fallback), BOMs and price schedule checked against loose and typed lines. | 2026-09-09 |
 | S5 — External companies | **Reviewed, PR 6 open** (stacked on PR 5). Discount, currency, private library, overrides and master-admin reads all existed; added the Company column and filter on the cross-company lists, invitation by company, the kit ownership check on screen, the new-company checklist in the runbook, test 16; 272 database assertions. | 2026-09-09 |
-| S6 — CRM gap review | **Reviewed, PR 6.** Customers, contacts, projects, numbered enquiries, costings against enquiries, quotations to customer records, status following the quotation and follow-ups all existed; added follow-ups on the home page and editing a customer's details. Not built: an enquiry detail page listing its costings and quotations (the Costings button on the enquiry filters the list instead). | 2026-09-09 |
+| S6 — CRM gap review | **Reviewed, PR 6.** Customers, contacts, projects, numbered enquiries, costings against enquiries, quotations to customer records, status following the quotation and follow-ups all existed; added follow-ups on the home page and editing a customer's details. Built later by PR 18: the enquiry detail page listing its costings, quotations and files. | 2026-09-09 |
 | — | **People: correcting a mistake (2026-09-10).** Migration 0012 and the remove-user function: the master administrator may move or remove somebody who has no records at all; everyone else is deactivated as before. Function errors now show their real message, and a new company reaches the People screen without a reload. | 2026-09-10 |
 | — | **The owner's notebook: nine changes in five pull requests (2026-09-10).** Read from the diary pages after using the live app. PR 14 costing screen in one column and the operator's name in the history; PR 15 sections inside a panel; PR 16 copy a costing or a panel; PR 17 one enquiry, one decision (and no busbar in Annexure IV); PR 18 attachments on an enquiry. | 2026-09-10 |
 
@@ -154,7 +154,8 @@ request straight to `main`; the owner reviews and merges.
 17. **One enquiry, one decision** — revisions of one job group under their enquiry instead of
     reading as separate quotations; Won and Lost are decided on the enquiry, naming the winning
     quotation, with the others superseded; busbar drops out of Annexure IV (migration 0016).
-18. **Attachments on an enquiry** — drawings, specifications and emails kept with the job.
+18. **Attachments on an enquiry** — drawings, specifications and emails kept with the job, on a
+    new enquiry page that also lists its costings and quotations (migration 0017).
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
