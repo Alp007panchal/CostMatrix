@@ -1,6 +1,9 @@
 import type { CostingAssembly, CostingItem, CostingPanel, Kit } from '../../lib/database.types'
 
 /**
+ * Busbar never appears: Annexure IV describes what is being offered, and the
+ * copper inside the board is not part of that.
+ *
  * A first draft of a panel's technical description (Annexure IV of the
  * quotation), written from what is actually in the panel: each line under the
  * section it was built into — incomer, outgoers, APFC bank — with a kit's own
@@ -18,6 +21,11 @@ export interface DescribeInput {
 }
 
 const ENCLOSURE = 'enclosure_parts'
+// Busbar is how a board is built, not what the customer is choosing between,
+// and printing its sizes and metres in the technical offer tells a competitor
+// how the board is made. Cable is filed under accessories and still prints,
+// which is what the owner asked for.
+const BUSBAR = 'busbar'
 
 export function describePanel({ panel, assemblies, items, kits = [] }: DescribeInput): string {
   const kitById = new Map(kits.map((k) => [k.id, k]))
@@ -36,7 +44,7 @@ export function describePanel({ panel, assemblies, items, kits = [] }: DescribeI
   for (const line of mine) {
     const section = (line.section ?? '').trim()
     const lineItems = items
-      .filter((x) => x.costing_assembly_id === line.id)
+      .filter((x) => x.costing_assembly_id === line.id && x.category_code !== BUSBAR)
       .sort((a, b) => a.sort_order - b.sort_order)
 
     if (line.kind !== 'free') {

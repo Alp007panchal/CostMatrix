@@ -28,8 +28,19 @@ describe('describePanel', () => {
       'INCOMER-KIT',
       '1 No. 1600A 4P WITHDRAWABLE MOTORIZED ACB-KIT, 4P',
       '   - 1 No. 1600A 4P WITHDRAWABLE MOTORIZED ACB, SIEMENS',
-      '   - 6.5 m 100X10MM',
     ].join('\n'))
+  })
+
+  it('leaves busbar out but keeps the cable', () => {
+    const text = describePanel({
+      panel,
+      assemblies: [line({ id: 'f', kind: 'free', source_assembly_id: null, code: 'FREE', name: 'Components and enclosure', sort_order: 0 })],
+      items: [
+        item({ id: 'b', costing_assembly_id: 'f', name: '50X10MM', code: '50X10MM', unit: 'm', quantity: 30, category_code: 'busbar' }),
+        item({ id: 'c', costing_assembly_id: 'f', name: '70SQMM', code: '70SQMM', unit: 'm', quantity: 18, category_code: 'accessories_hardware', sort_order: 1 }),
+      ],
+    })
+    expect(text).toBe(['OTHER COMPONENTS', '18 m 70SQMM'].join('\n'))
   })
   it('lists loose components and the enclosure in their own sections', () => {
     const text = describePanel({

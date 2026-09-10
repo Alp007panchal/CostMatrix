@@ -466,7 +466,8 @@ export interface CostingHistoryRow {
 
 // --- quotation -------------------------------------------------------------
 
-export type QuotationStatus = 'released' | 'sent' | 'won' | 'lost'
+/** superseded: another offer against the same enquiry won, so this one is off the table. */
+export type QuotationStatus = 'released' | 'sent' | 'won' | 'lost' | 'superseded'
 
 export interface QuotationTerms {
   scope_of_supply: string | null
@@ -512,6 +513,18 @@ export interface Quotation {
   decided_at: string | null
   lost_reason: string | null
 }
+
+/** The costing a quotation was released from: which job, which revision. */
+export interface QuotationCostingRef {
+  family_id: string
+  revision_no: number
+  costing_no: string
+  enquiry_id: string | null
+  title: string
+}
+
+/** A quotation with the costing behind it, which is how the list groups them. */
+export type QuotationRow = Quotation & { costing: QuotationCostingRef | null }
 
 /** What the approver types or accepts at release. Blanks fall back to company defaults. */
 export interface ReleaseTexts {
@@ -599,6 +612,9 @@ export interface Enquiry {
   stage: string | null
   owner_user_id: string | null
   created_at: string
+  /** The quotation that won the job; null while open, or when it was lost. */
+  won_quotation_id: string | null
+  lost_reason: string | null
 }
 
 export interface QuotationFollowup {

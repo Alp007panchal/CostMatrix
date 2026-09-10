@@ -1,5 +1,5 @@
 import { supabase } from '../../lib/supabase'
-import type { Quotation, QuotationStatus, ReleaseTexts } from '../../lib/database.types'
+import type { Quotation, QuotationRow, QuotationStatus, ReleaseTexts } from '../../lib/database.types'
 
 /**
  * Quotations. Releasing goes through a database function that checks the
@@ -11,13 +11,17 @@ function fail(context: string, error: { message: string } | null): void {
   if (error) throw new Error(`${context}: ${error.message}`)
 }
 
-export async function listQuotations(): Promise<Quotation[]> {
+/**
+ * Every quotation with the costing behind it, so the list can show one job as
+ * one job: its enquiry, its family and which revision this is.
+ */
+export async function listQuotations(): Promise<QuotationRow[]> {
   const { data, error } = await supabase
     .from('quotations')
-    .select('*')
+    .select('*, costing:costings(family_id, revision_no, costing_no, enquiry_id, title)')
     .order('released_at', { ascending: false })
   fail('Could not load quotations', error)
-  return (data ?? []) as Quotation[]
+  return (data ?? []) as QuotationRow[]
 }
 
 export async function getQuotationForCosting(costingId: string): Promise<Quotation | null> {

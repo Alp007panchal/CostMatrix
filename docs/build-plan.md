@@ -153,7 +153,7 @@ request straight to `main`; the owner reviews and merges.
     not be re-priced (migration 0015).
 17. **One enquiry, one decision** — revisions of one job group under their enquiry instead of
     reading as separate quotations; Won and Lost are decided on the enquiry, naming the winning
-    quotation; busbar drops out of Annexure IV.
+    quotation, with the others superseded; busbar drops out of Annexure IV (migration 0016).
 18. **Attachments on an enquiry** — drawings, specifications and emails kept with the job.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
