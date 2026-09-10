@@ -303,6 +303,14 @@ Role checks per area:
 - quotations: approver to release; costing_engineer or approver to change status and follow-ups
 - CRM tables: costing_engineer or approver
 
+### Added by migration 0012 — correcting a person added by mistake
+
+- **app.person_columns()** — every `uuid` column in `public` named `created_by`, `submitted_by`, `approved_by`, `returned_by`, `released_by`, `changed_by`, `user_id`, `assigned_to` or `owner_user_id`, except on `profiles` and `user_roles`. Listed by query, not by hand, so a table added later is counted without another migration.
+- **app.person_footprint(uid)** / **app.person_footprints()** — how many rows anywhere name a person; the second returns one row per person the caller administers (master admin: everybody; company admin: their own company; anyone else: nothing). Zero means an invitation can still be undone.
+- **app.move_person(uid, to_company)** — master admin only; refuses a person with any records, the master admin, and an unknown or inactive company. Roles are rewritten for the new company because `user_roles` keys on `(user_id, company_id)`.
+- Public wrappers `person_footprint`, `person_footprints`, `move_person`; `grant execute` to `authenticated`.
+- Deleting a person is the **remove-user** Edge Function (it needs the secret key): master admin only, and only at a footprint of zero. `profiles.id` cascades from `auth.users`, so profile and roles go with the login.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).

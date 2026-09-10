@@ -26,6 +26,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | S4 — Outputs | **Built, PR 5 open** (stacked on PR 4). Annexure IV drafted from the kits and lines (button and release fallback), BOMs and price schedule checked against loose and typed lines. | 2026-09-09 |
 | S5 — External companies | **Reviewed, PR 6 open** (stacked on PR 5). Discount, currency, private library, overrides and master-admin reads all existed; added the Company column and filter on the cross-company lists, invitation by company, the kit ownership check on screen, the new-company checklist in the runbook, test 16; 272 database assertions. | 2026-09-09 |
 | S6 — CRM gap review | **Reviewed, PR 6.** Customers, contacts, projects, numbered enquiries, costings against enquiries, quotations to customer records, status following the quotation and follow-ups all existed; added follow-ups on the home page and editing a customer's details. Not built: an enquiry detail page listing its costings and quotations (the Costings button on the enquiry filters the list instead). | 2026-09-09 |
+| — | **People: correcting a mistake (2026-09-10).** Migration 0012 and the remove-user function: the master administrator may move or remove somebody who has no records at all; everyone else is deactivated as before. Function errors now show their real message, and a new company reaches the People screen without a reload. | 2026-09-10 |
 
 ## Slice 0 — Foundation (about one week)
 

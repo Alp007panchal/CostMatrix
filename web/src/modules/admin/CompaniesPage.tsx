@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Async, Field } from '../../ui/Async'
 import { percent } from '../../lib/format'
 import type { CompanyKind } from '../../lib/database.types'
+import { useSession } from '../auth/session'
 import { createCompany, listCompanies, setCompanyDiscount } from './api'
 
 const KINDS: { value: CompanyKind; label: string }[] = [
@@ -18,8 +19,15 @@ const KINDS: { value: CompanyKind; label: string }[] = [
  */
 export function CompaniesPage() {
   const queryClient = useQueryClient()
+  const { refresh: refreshSession } = useSession()
   const companies = useQuery({ queryKey: ['companies'], queryFn: listCompanies })
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['companies'] })
+  // The session carries the company list every screen reads, so a new company
+  // must reach it too: without this the People screen keeps showing one company
+  // until the page is reloaded.
+  const refresh = () => {
+    void refreshSession()
+    return queryClient.invalidateQueries({ queryKey: ['companies'] })
+  }
 
   const saveDiscount = useMutation({
     mutationFn: (input: { id: string; discount: number }) =>

@@ -70,6 +70,8 @@ export interface UserRoleRow {
 /** A profile with the roles that belong to it, as the users screen shows them. */
 export interface PersonWithRoles extends Profile {
   roles: UserRole[]
+  /** How many records anywhere name this person. Zero means they can still be moved or removed; undefined when the caller may not ask. */
+  records: number | undefined
 }
 
 // --- library ---------------------------------------------------------------

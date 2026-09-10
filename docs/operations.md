@@ -269,9 +269,13 @@ You can read any company's costings, quotations, customers and enquiries (the li
 3. They receive an email with a link to set their own password. Nobody can sign themselves up.
 4. Check they appear in the list with the right roles ticked.
 
-If the invitation fails, the invite-user function is not deployed (step B9), or Supabase's
-built-in email is rate limiting. Authentication → Users in the dashboard shows whether the
-account was created.
+One email address is one login, and a login belongs to one company. Inviting an address that
+already has a login is refused, and the screen now shows the reason ("already been registered"):
+either use a different address, or move the person with **Move…** below.
+
+If the invitation fails for another reason, the invite-user function is not deployed (step B9),
+or Supabase's built-in email is rate limiting. Authentication → Users in the dashboard shows
+whether the account was created.
 
 Roles, as a reminder: **company admin** manages settings and users, **costing engineer** builds
 costings, **approver** approves costings and releases quotations. One person can hold several.
@@ -279,6 +283,17 @@ costings, **approver** approves costings and releases quotations. One person can
 ### Someone leaves
 **People** → **Deactivate** on their row. Do not delete: their name must stay attached to the
 costings they built. Deactivating stops them signing in immediately.
+
+### Somebody was invited by mistake (master administrator)
+Only while they have done nothing at all. Their row then shows two more buttons.
+
+- **Move…** puts them in another company, with the roles they were given. Use this when the
+  right person was invited into the wrong company.
+- **Remove** deletes their login for good, so the email address can be invited again.
+
+Once they have built, approved or released anything the buttons disappear and the row says
+*has records*: from then on **Deactivate** is the only option, because their name belongs on
+that work. The database enforces this, not just the screen.
 
 ### Someone forgets a password
 They click **Forgot password** on the sign-in page and get an email. If nothing arrives, send a

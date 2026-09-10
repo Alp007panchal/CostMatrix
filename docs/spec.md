@@ -74,6 +74,7 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 - Every price change is recorded in a price history with the currency, who changed it and when.
 
 ### 4.3 Kits and kit groups
+- A person who has done nothing at all may be moved to another company or removed altogether by the master administrator; from their first record onwards they can only be deactivated, so the name on a costing, an approval or a quotation always resolves.
 - A **kit** (the `assemblies` table; "assembly" in older text) is a main device plus its lines — busbar, cable, accessories — with quantities. It carries a rating (630 A, 50 KVAR) and poles so a costing can pick it by rating and the technical offer can describe it. At most one line is the main device; the importer requires exactly one.
 - A **kit group** (ACB, MCCB, ATS, APFC BANK…) carries the labour hours per process type for every kit in it. A kit may override one process type at a time with its own hours (decision 11).
 - Master kits and groups: created and edited only by the master admin; a master kit may reference only master components and master groups. Private kits and groups: created by a company admin; a private kit may reference master components and groups and the company's own.
