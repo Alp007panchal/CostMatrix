@@ -10,7 +10,8 @@
 # nothing the second time, and the importers report a second run as unchanged.
 #
 # Reads:
-#   SUPABASE_ACCESS_TOKEN        a Supabase personal access token (sbp_…)
+#   SUPABASE_STAGING_ACCESS_TOKEN  the SECOND Supabase account's token (sbp_…) —
+#                                staging lives there, see resolve-project.sh
 #   SUPABASE_STAGING_DB_PASSWORD the staging database password
 #   STAGING_REF                  the staging project ref
 #   STAGING_REGION               the staging project region, e.g. eu-west-1
@@ -27,7 +28,7 @@ set -euo pipefail
 api="https://api.supabase.com"
 out="${GITHUB_OUTPUT:-/dev/null}"
 
-: "${SUPABASE_ACCESS_TOKEN:?SUPABASE_ACCESS_TOKEN is not set}"
+: "${SUPABASE_STAGING_ACCESS_TOKEN:?SUPABASE_STAGING_ACCESS_TOKEN is not set}"
 : "${SUPABASE_STAGING_DB_PASSWORD:?SUPABASE_STAGING_DB_PASSWORD is not set}"
 : "${STAGING_REF:?STAGING_REF is not set}"
 : "${ADMIN_EMAIL:?ADMIN_EMAIL is not set}"
@@ -43,7 +44,7 @@ url="https://$STAGING_REF.supabase.co"
 keys_file="$(mktemp)"
 trap 'rm -f "$keys_file"' EXIT
 keys_status="$(curl -sS -o "$keys_file" -w '%{http_code}' "$api/v1/projects/$STAGING_REF/api-keys" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN")"
+  -H "Authorization: Bearer $SUPABASE_STAGING_ACCESS_TOKEN")"
 
 if [[ "$keys_status" != 2* ]]; then
   echo "::error::GET /v1/projects/$STAGING_REF/api-keys returned HTTP $keys_status" >&2

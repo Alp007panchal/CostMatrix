@@ -3,18 +3,31 @@
 # Finds, wakes, adopts or creates the "CostMatrix Staging" Supabase project, and
 # waits until it is healthy. Run by .github/workflows/create-staging.yml.
 #
+# Staging lives in a **second Supabase account**, because the first had reached
+# its two-free-project limit (D-181). That account holds nothing else, and its
+# token cannot see the production project at all — which is the strongest form of
+# the separation the two tracks are for. Everything here therefore uses
+# SUPABASE_STAGING_ACCESS_TOKEN; the production token is never in this job's
+# environment.
+#
+# Because production cannot be read from this account, two things that used to be
+# copied from it are now supplied instead: the organisation comes from the staging
+# token's own (it has exactly one), and the region is a workflow input.
+#
 # Safe to run again: an existing project of that name is reused, a paused one is
-# woken, and a healthy one is left alone. It never touches the production project
-# — that is asserted below, before anything is written.
+# woken, and a healthy one is left alone.
 #
 # Reads:
-#   SUPABASE_ACCESS_TOKEN        a Supabase personal access token (sbp_…)
-#   SUPABASE_PROJECT_REF         the PRODUCTION ref: read for its organisation and
-#                                region, and used as the ref this must never equal
-#   SUPABASE_STAGING_DB_PASSWORD the database password for a newly created project
-#   ADOPT_PROJECT_REF            optional: use this existing project as staging
-#                                instead of creating one
-#   STAGING_NAME                 optional, defaults to "CostMatrix Staging"
+#   SUPABASE_STAGING_ACCESS_TOKEN  the SECOND account's personal access token (sbp_…)
+#   SUPABASE_PROJECT_REF           the production ref — the one ref this must never
+#                                  resolve to. Compared, never used to call anything.
+#   SUPABASE_STAGING_DB_PASSWORD   the database password for a newly created project
+#   STAGING_REGION                 region for a new project, e.g. eu-west-1
+#   ADOPT_PROJECT_REF              optional: use this existing project as staging
+#                                  instead of creating one
+#   STAGING_NAME                   optional, defaults to "CostMatrix Staging"
+#   STAGING_ORG_NAME               optional, preferred organisation name when the
+#                                  account has more than one
 #
 # Writes ref, region and url to $GITHUB_OUTPUT (and echoes them).
 
@@ -22,10 +35,14 @@ set -euo pipefail
 
 api="https://api.supabase.com"
 name="${STAGING_NAME:-CostMatrix Staging}"
+org_name="${STAGING_ORG_NAME:-CostMatrix Staging Org}"
+region="${STAGING_REGION:-eu-west-1}"
 out="${GITHUB_OUTPUT:-/dev/null}"
 
-: "${SUPABASE_ACCESS_TOKEN:?SUPABASE_ACCESS_TOKEN is not set}"
-: "${SUPABASE_PROJECT_REF:?SUPABASE_PROJECT_REF is not set}"
+: "${SUPABASE_STAGING_ACCESS_TOKEN:?SUPABASE_STAGING_ACCESS_TOKEN is not set}"
+# Required, not optional: without it the production guard below would compare
+# against nothing and quietly pass, which is the one failure we cannot allow.
+: "${SUPABASE_PROJECT_REF:?SUPABASE_PROJECT_REF is not set — the production guard needs it}"
 
 # Every response body lands here, so that a caller can still read it after a
 # failed call — a 400's body is the only thing that explains the 400.
@@ -45,18 +62,19 @@ say_body() {
   echo
 }
 
-# curl against the Management API. Prints the body on stdout when the call
-# succeeded; on any non-2xx reports the status and the body and returns 1,
-# because a silent 403 here would otherwise look like "no projects found".
+# curl against the Management API, always as the staging account. Prints the body
+# on stdout when the call succeeded; on any non-2xx reports the status and the
+# body and returns 1, because a silent 403 here would otherwise look like
+# "no projects found".
 call() {
   local method="$1" path="$2" payload="${3:-}" status
   if [[ -n "$payload" ]]; then
     status="$(curl -sS -o "$response_file" -w '%{http_code}' -X "$method" "$api$path" \
-      -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+      -H "Authorization: Bearer $SUPABASE_STAGING_ACCESS_TOKEN" \
       -H 'Content-Type: application/json' -d "$payload")"
   else
     status="$(curl -sS -o "$response_file" -w '%{http_code}' -X "$method" "$api$path" \
-      -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN")"
+      -H "Authorization: Bearer $SUPABASE_STAGING_ACCESS_TOKEN")"
   fi
   if [[ "$status" != 2* ]]; then
     echo "::error::$method $path returned HTTP $status" >&2
@@ -66,43 +84,36 @@ call() {
   cat "$response_file"
 }
 
-projects="$(call GET /v1/projects)"
-
-# --- the production project, for its organisation and region -----------------
-prod="$(jq -r --arg ref "$SUPABASE_PROJECT_REF" '.[] | select(.id == $ref)' <<<"$projects")"
-if [[ -z "$prod" ]]; then
-  echo "::error::No project with ref $SUPABASE_PROJECT_REF is visible to this access token." >&2
-  echo "Check SUPABASE_PROJECT_REF, and that the token belongs to the right Supabase account." >&2
-  exit 1
-fi
-org="$(jq -r '.organization_id' <<<"$prod")"
-region="$(jq -r '.region' <<<"$prod")"
-echo "Production project $SUPABASE_PROJECT_REF is in organisation $org, region $region."
-
 # --- the guard: never the production project ----------------------------------
-# Checked before the first write, whichever way the ref was arrived at.
+# The staging token cannot reach production, so this can only ever fire if the
+# wrong ref were typed into the adopt box. Checked before the first write all the
+# same, whichever way the ref was arrived at.
 assert_not_production() {
   if [[ "$1" == "$SUPABASE_PROJECT_REF" ]]; then
     echo "::error::Refusing to continue: the staging ref resolved to the production project ($1)." >&2
-    echo "Nothing has been changed. Check that the production project is not itself named \"$name\"," >&2
-    echo "and that the ref given in \"Use this existing project instead\" is not production's." >&2
+    echo "Nothing has been changed. The ref given in \"Use this existing project instead\" is" >&2
+    echo "production's; staging must be a different project." >&2
     exit 1
   fi
 }
 
-# What a project row says about itself, or empty if this account cannot see it.
-row_for() { jq -r --arg ref "$1" 'first(.[] | select(.id == $ref)) // empty' <<<"$projects"; }
-
+projects="$(call GET /v1/projects)"
 ref=""
 status=""
 
 # --- a project the owner named, if any ----------------------------------------
+row_for() { jq -r --arg ref "$1" 'first(.[] | select(.id == $ref)) // empty' <<<"$projects"; }
+
 if [[ -n "${ADOPT_PROJECT_REF:-}" ]]; then
+  # Compared before it is looked up, so the answer is "that is production" rather
+  # than the more confusing "no such project" that this account would give for it.
+  assert_not_production "$ADOPT_PROJECT_REF"
   adopted="$(row_for "$ADOPT_PROJECT_REF")"
   if [[ -z "$adopted" ]]; then
-    echo "::error::No project with ref $ADOPT_PROJECT_REF is visible to this access token." >&2
-    echo "The projects this account can see:" >&2
+    echo "::error::No project with ref $ADOPT_PROJECT_REF is visible to the staging account's token." >&2
+    echo "The projects that token can see:" >&2
     jq -r '.[] | "  \(.name)  [\(.id)]  \(.status)"' <<<"$projects" >&2 || true
+    echo "If the project you meant is in the other Supabase account, it cannot be used here." >&2
     exit 1
   fi
   ref="$ADOPT_PROJECT_REF"
@@ -112,14 +123,13 @@ if [[ -n "${ADOPT_PROJECT_REF:-}" ]]; then
   echo "Using the project you named: $(jq -r '.name' <<<"$adopted") [$ref], status $status, region $region."
 else
   # --- find the staging project, if it exists ---------------------------------
-  staging="$(jq -r --arg name "$name" --arg org "$org" \
-    'first(.[] | select(.name == $name and .organization_id == $org)) // empty' <<<"$projects")"
+  staging="$(jq -r --arg name "$name" 'first(.[] | select(.name == $name)) // empty' <<<"$projects")"
   if [[ -n "$staging" ]]; then
     ref="$(jq -r '.id' <<<"$staging")"
     assert_not_production "$ref"
     status="$(jq -r '.status' <<<"$staging")"
     region="$(jq -r '.region' <<<"$staging")"
-    echo "Found \"$name\" already: ref $ref, status $status. Reusing it."
+    echo "Found \"$name\" already: ref $ref, status $status, region $region. Reusing it."
   fi
 fi
 
@@ -133,25 +143,22 @@ explain_create_failure() {
 
 What this means, in plain words
 ------------------------------
-Supabase allows two *active* projects per person on the free plan, and there are
-already two. It has refused to create a third. Nothing has been changed, and
-nothing is broken.
+Supabase allows two *active* projects per person on the free plan, and this
+account has reached that limit too. Nothing has been changed.
 
 Three ways forward. The workflow needs no change for any of them:
 
-  1. Pause a project you are not using: Supabase dashboard -> that project ->
-     Settings -> General -> Pause project. A paused project stops counting, so
-     re-running this workflow will then create the staging project. Leave the
-     production project running, of course.
+  1. Pause a project on this account that you are not using: Supabase dashboard
+     -> that project -> Settings -> General -> Pause project. A paused project
+     stops counting, so re-running this workflow will then create staging.
   2. Delete a project you no longer need, the same way.
-  3. Upgrade the organisation to a paid plan, which lifts the limit.
+  3. Upgrade that organisation to a paid plan, which lifts the limit.
 
-Or, if staging should be a project you already have (or one you create by hand
-and call anything you like), re-run this workflow and put its project ref in the
-"Use this existing project instead" box. It will then adopt that project and
-create nothing.
+Or, if staging should be a project this account already has, re-run the workflow
+and put its ref in the "Use this existing project instead" box. It will then
+adopt that project and create nothing.
 TEXT
-      echo "The projects on this account, so you can see which two hold the slots:" >&2
+      echo "The projects on the staging account, so you can see which hold the slots:" >&2
       jq -r '.[] | "  \(.name)  [\(.id)]  \(.status)"' <<<"$projects" >&2 || true
       echo >&2
       ;;
@@ -161,6 +168,31 @@ TEXT
 # --- create it if it is not there ---------------------------------------------
 if [[ -z "$ref" ]]; then
   : "${SUPABASE_STAGING_DB_PASSWORD:?SUPABASE_STAGING_DB_PASSWORD is not set}"
+
+  # The organisation comes from this token's own, since production is out of
+  # reach. There is normally exactly one; if there are several, the one named
+  # like STAGING_ORG_NAME wins rather than an arbitrary first.
+  orgs="$(call GET /v1/organizations)"
+  org_count="$(jq -r 'length' <<<"$orgs")"
+  if [[ "$org_count" == "0" ]]; then
+    echo "::error::The staging account's token can see no organisations." >&2
+    echo "Sign in to that Supabase account and check it has one, then generate the token again." >&2
+    exit 1
+  elif [[ "$org_count" == "1" ]]; then
+    org="$(jq -r '.[0].id' <<<"$orgs")"
+    echo "Staging organisation: $(jq -r '.[0].name' <<<"$orgs") [$org]."
+  else
+    org="$(jq -r --arg n "$org_name" 'first(.[] | select(.name == $n) | .id) // empty' <<<"$orgs")"
+    if [[ -z "$org" ]]; then
+      echo "::error::The staging account has $org_count organisations and none is called \"$org_name\"." >&2
+      echo "The organisations that token can see:" >&2
+      jq -r '.[] | "  \(.name)  [\(.id)]"' <<<"$orgs" >&2 || true
+      echo "Rename one, or tell me which to use and I will set STAGING_ORG_NAME." >&2
+      exit 1
+    fi
+    echo "Staging organisation: $org_name [$org], chosen from $org_count."
+  fi
+
   echo "Creating \"$name\" in organisation $org, region $region, on the free plan…"
   payload="$(jq -n \
     --arg name "$name" --arg org "$org" --arg region "$region" \
@@ -189,8 +221,8 @@ case "$status" in
       echo "Restore requested."
     else
       echo "::error::Could not restore the project through the API." >&2
-      echo "Open https://supabase.com/dashboard/project/$ref, press \"Restore project\"," >&2
-      echo "wait until it reports healthy, then run this workflow again." >&2
+      echo "Open https://supabase.com/dashboard/project/$ref in the staging account," >&2
+      echo "press \"Restore project\", wait until it reports healthy, then run this workflow again." >&2
       exit 1
     fi
     ;;

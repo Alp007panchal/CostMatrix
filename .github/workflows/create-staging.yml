@@ -8,13 +8,21 @@ name: Create staging project
 # paused it (free projects pause after about a week of no use), and applies any
 # migrations that are new since last time.
 #
+# Staging lives in a SECOND Supabase account, because the first had reached its
+# two-free-project limit (D-181). Nothing here can touch production: the token
+# used throughout belongs to that second account and cannot see the production
+# project at all.
+#
 # Needs these repository secrets — docs/reference/two-track-setup.md has the
 # click-by-click steps:
-#   SUPABASE_ACCESS_TOKEN         (already there; used by the other workflows too)
-#   SUPABASE_PROJECT_REF          (already there; read only to find the right
-#                                  Supabase organisation and region, and to make
-#                                  sure staging is never the production project)
-#   SUPABASE_STAGING_DB_PASSWORD  (new)
+#   SUPABASE_STAGING_ACCESS_TOKEN (new; the second account's token. This is the
+#                                  only token this workflow ever uses)
+#   SUPABASE_STAGING_DB_PASSWORD  the staging database password
+#   SUPABASE_PROJECT_REF          (already there; compared against, never called,
+#                                  so staging can never be the production project)
+#
+# The production token SUPABASE_ACCESS_TOKEN is deliberately NOT put in this
+# job's environment.
 #
 # At the end it prints everything you need to finish in Vercel, and it never
 # prints the secret key or any password.
@@ -41,6 +49,11 @@ on:
         required: false
         type: boolean
         default: true
+      region:
+        description: 'Region for a new project. Production is in eu-west-1 (Ireland).'
+        required: false
+        type: string
+        default: 'eu-west-1'
       existing_project_ref:
         description: 'Use this existing project instead — leave blank to create one. Only needed if Supabase refuses a new free project.'
         required: false
@@ -57,14 +70,20 @@ jobs:
     name: Create or refresh CostMatrix Staging
     runs-on: ubuntu-latest
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # The staging account's token, under both names: the scripts read the
+      # explicit one, and the Supabase CLI only ever reads SUPABASE_ACCESS_TOKEN.
+      # Mapping it here is what makes `supabase link`, `db push` and
+      # `functions deploy` act on the staging account — the production token is
+      # not in this environment at all.
+      SUPABASE_STAGING_ACCESS_TOKEN: ${{ secrets.SUPABASE_STAGING_ACCESS_TOKEN }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_STAGING_ACCESS_TOKEN }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
       SUPABASE_STAGING_DB_PASSWORD: ${{ secrets.SUPABASE_STAGING_DB_PASSWORD }}
     steps:
       - name: Check the secrets are present
         run: |
           missing=""
-          [ -z "${{ secrets.SUPABASE_ACCESS_TOKEN }}" ]        && missing="$missing SUPABASE_ACCESS_TOKEN"
+          [ -z "${{ secrets.SUPABASE_STAGING_ACCESS_TOKEN }}" ] && missing="$missing SUPABASE_STAGING_ACCESS_TOKEN"
           [ -z "${{ secrets.SUPABASE_PROJECT_REF }}" ]         && missing="$missing SUPABASE_PROJECT_REF"
           [ -z "${{ secrets.SUPABASE_STAGING_DB_PASSWORD }}" ] && missing="$missing SUPABASE_STAGING_DB_PASSWORD"
           if [ -n "$missing" ]; then
@@ -92,6 +111,7 @@ jobs:
         run: ./scripts/staging/resolve-project.sh
         env:
           ADOPT_PROJECT_REF: ${{ inputs.existing_project_ref }}
+          STAGING_REGION: ${{ inputs.region }}
 
       - name: Link the project
         run: supabase link --project-ref "${{ steps.project.outputs.ref }}"
