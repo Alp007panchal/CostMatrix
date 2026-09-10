@@ -14,10 +14,17 @@ back-up: if advanced work goes wrong, you still have a working app.
 CostMatrix Staging**, which holds its own copy of the library and its own costings. Nothing done
 on `advanced` can reach your real data — not by mistake, not by a bad migration, not by a bug.
 
+**Staging lives in a second Supabase account**, because the first had reached its limit of two
+free projects (D-181, D-182). That turned out to be the stronger arrangement: the access token
+the advanced track uses belongs to that second account and **cannot see the production project
+at all**. The separation is no longer a rule the code follows — it is simply out of reach.
+
 | | `main` | `advanced` |
 |---|---|---|
 | What goes here | Bug fixes, the NPP-192 trial findings, labour hours, prices, the enclosure uplift rule, small improvements | Foundations F1–F11, the AI assistant, anything new |
+| Supabase account | your first account | **a second account**, which holds nothing else |
 | Supabase project | production (`mssqjuzgycfpfmtjukvq`) | CostMatrix Staging |
+| Access token secret | `SUPABASE_ACCESS_TOKEN` | `SUPABASE_STAGING_ACCESS_TOKEN` |
 | Web address | cost-matrix-theta.vercel.app | the Vercel preview URL for the `advanced` branch |
 | Migration numbers | `0018` onwards | **`0100` onwards** |
 
@@ -43,24 +50,28 @@ And `main` is merged **into** `advanced` after every change to `main`, so the tw
 
 ## What you have to enter, once
 
-Two new entries. One is a secret (hidden after saving), one is a variable (visible, because it
-is not sensitive).
+Three new entries: two secrets (hidden after saving) and, once the workflow has run, one
+variable (visible, because a project ref is not sensitive).
 
-### 1. The staging database password — a secret
+### 1. Two secrets
 
-1. Think of a password for the staging database and put it in your password manager. It is not
-   your production password and it is not your login password. You will almost never type it:
-   the automated jobs use it from GitHub.
-2. Open **https://github.com/Alp007panchal/CostMatrix** → **Settings** (the tab on the right of
-   the repository's own menu bar, not your account settings).
-3. In the left-hand menu, **Secrets and variables** → **Actions**.
-4. You should see a page headed *Actions secrets and variables* with two tabs,
-   **Secrets** and **Variables**, and your three existing secrets listed under Secrets.
-5. On the **Secrets** tab, click the green **New repository secret**.
-6. Name: `SUPABASE_STAGING_DB_PASSWORD`. Secret: the password from step 1. Click
-   **Add secret**.
-7. You should now see four secrets listed. GitHub will never show you the value again —
-   that is correct, not a problem.
+Both go in the same place: **https://github.com/Alp007panchal/CostMatrix** → **Settings** (the
+tab on the right of the repository's own menu bar, not your account settings) → in the left-hand
+menu **Secrets and variables** → **Actions**. You should see a page headed *Actions secrets and
+variables* with two tabs, **Secrets** and **Variables**. On the **Secrets** tab, click the green
+**New repository secret** once for each.
+
+| Name | Value |
+|---|---|
+| `SUPABASE_STAGING_ACCESS_TOKEN` | An access token for the **second** Supabase account. Sign in to that account → your avatar, top right → **Access tokens** → **Generate new token**, name it `github-actions`. Copy it; it is shown once. |
+| `SUPABASE_STAGING_DB_PASSWORD` | A password you choose for the staging database. Put it in your password manager. It is not your production password and not your login password; you will almost never type it again. |
+
+GitHub hides both values after saving — even from you. That is what makes it safe for the
+automated jobs to use them.
+
+This is the one place the two accounts meet, and they meet only as two separate secrets. The
+production token `SUPABASE_ACCESS_TOKEN` is never placed in a staging job, and the staging token
+is never placed in a production one.
 
 ### 2. Run the workflow that creates the project
 
@@ -74,6 +85,11 @@ is not sensitive).
    - *The in-house company to create on staging* — anything; marking it "(Staging)" makes it
      obvious on screen which database you are looking at.
    - *Load data/seed into the staging library* — leave ticked.
+   - *Region for a new project* — leave as `eu-west-1` (Ireland), which is where production is.
+     It is a box rather than something read from production, because the staging account cannot
+     see the production project.
+   - *Use this existing project instead* — leave blank unless you are pointing staging at a
+     project that already exists on the second account.
 6. Click the green **Run workflow**. The page takes a few seconds to show the run; refresh if
    it does not appear.
 7. Click into the run. It takes **about five to ten minutes**, most of it waiting for Supabase
@@ -118,23 +134,25 @@ the login with a random password that it masks and throws away.
 
 ## If Supabase refuses to create the project
 
-The first run failed here, and the reason was not the workflow: Supabase allows
-**two active projects per person on the free plan**, and there were already two. The run
-stopped with Supabase's own sentence and changed nothing.
+This is what happened on the first run, and why staging now lives in a second account. Supabase
+allows **two active projects per person on the free plan**, and the first account already had
+two. The run stopped with Supabase's own sentence and changed nothing.
 
-Three ways forward, none of which needs the workflow changed:
+The resolution was a second Supabase account, which starts with no projects at all. If that
+account ever hits the same limit, the same three ways out apply, and none needs the workflow
+changed:
 
-1. **Pause a project you are not using** — Supabase dashboard → that project → **Settings** →
-   **General** → **Pause project**. A paused project stops counting against the limit, so
-   re-running the workflow then creates staging normally. Leave the production project running.
+1. **Pause a project on that account you are not using** — Supabase dashboard → that project →
+   **Settings** → **General** → **Pause project**. A paused project stops counting against the
+   limit, so re-running the workflow then creates staging normally.
 2. **Delete a project you no longer need**, the same way.
-3. **Upgrade the organisation to a paid plan**, which lifts the limit.
+3. **Upgrade that organisation to a paid plan**, which lifts the limit.
 
-Or point the workflow at a project you already have: re-run it and put that project's ref in
-the **Use this existing project instead** box. It then adopts that project — applying the
-migrations, creating your login and loading the library into it — and creates nothing. The
-project can be called anything; only the ref matters. It still refuses to run if the ref you
-give is the production project.
+Or point the workflow at a project the staging account already has: re-run it and put that
+project's ref in the **Use this existing project instead** box. It then adopts that project —
+applying the migrations, creating your login and loading the library into it — and creates
+nothing. The project can be called anything; only the ref matters. It still refuses to run if
+the ref you give is the production project, which is checked before anything else happens.
 
 When it fails, the run now prints Supabase's own sentence, the whole response body, a
 plain-language explanation, and the list of projects on the account with their status, so you
@@ -168,9 +186,10 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 
 | Name | Kind | Used by | What it is |
 |---|---|---|---|
-| `SUPABASE_ACCESS_TOKEN` | secret, existing | every Supabase workflow | Your Supabase personal access token. On the advanced track it is also what creates and wakes the staging project. |
-| `SUPABASE_PROJECT_REF` | secret, existing | `main` deploys | The production project. On the advanced track it is read **only** to find the right Supabase organisation and region, and to assert staging is not production. |
+| `SUPABASE_ACCESS_TOKEN` | secret, existing | `main` deploys only | Your **first** account's personal access token. Never placed in a staging job. |
+| `SUPABASE_PROJECT_REF` | secret, existing | `main` deploys; compared on `advanced` | The production project. On the advanced track it is **only ever compared against**, never used to call anything — it is how staging proves it is not production. |
 | `SUPABASE_DB_PASSWORD` | secret, existing | `main` deploys | The production database password. Never read by an `advanced` run. |
+| `SUPABASE_STAGING_ACCESS_TOKEN` | secret, new | staging only | The **second** account's access token. Every Management API call and every `supabase link`, `db push` and `functions deploy` on the advanced track uses this one. It cannot see the production project. |
 | `SUPABASE_STAGING_DB_PASSWORD` | secret, new | staging deploys | The staging database password. Never read by a `main` run. |
 | `SUPABASE_STAGING_PROJECT_REF` | variable, new | staging deploys | The staging project. A variable rather than a secret because a project ref is not sensitive and it helps to be able to read it back. |
 | `ADVANCED_PREVIEW_URL` | variable, optional | staging setup | If set, invitation emails sent from staging point at the preview URL instead of localhost. |
@@ -183,6 +202,18 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | **Deploy database** | push to `main` or `advanced` that changes `supabase/migrations/**` | Two separate jobs, each guarded by the branch: `main` → production, `advanced` → staging. Separate jobs rather than one that picks its secrets, so a run on one branch cannot reach the other's credentials whatever is added to the file later. |
 | **Create staging project** | by hand | Creates, wakes and sets up the staging project. Never production. |
 | **Deploy functions**, **Set up Supabase** | unchanged | Production only. |
+
+## Where the organisation and the region come from
+
+Production used to supply both, read from its project row. The staging account cannot see
+production, so instead:
+
+- **The organisation** comes from the staging token's own organisations (`GET /v1/organizations`).
+  There is one, `CostMatrix Staging Org`, and it is used. If that account ever has several, the
+  one with that name wins, and if none matches the run stops and lists them rather than guessing.
+- **The region** is the *Region for a new project* box on the workflow, defaulting to
+  `eu-west-1` — the same region as production. When the project already exists, or you adopt one,
+  its own region is used and the box is ignored.
 
 ## Where the seeding comes from
 
