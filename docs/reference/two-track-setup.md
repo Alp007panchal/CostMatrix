@@ -116,6 +116,32 @@ the login with a random password that it masks and throws away.
 
 ---
 
+## If Supabase refuses to create the project
+
+The first run failed here, and the reason was not the workflow: Supabase allows
+**two active projects per person on the free plan**, and there were already two. The run
+stopped with Supabase's own sentence and changed nothing.
+
+Three ways forward, none of which needs the workflow changed:
+
+1. **Pause a project you are not using** — Supabase dashboard → that project → **Settings** →
+   **General** → **Pause project**. A paused project stops counting against the limit, so
+   re-running the workflow then creates staging normally. Leave the production project running.
+2. **Delete a project you no longer need**, the same way.
+3. **Upgrade the organisation to a paid plan**, which lifts the limit.
+
+Or point the workflow at a project you already have: re-run it and put that project's ref in
+the **Use this existing project instead** box. It then adopts that project — applying the
+migrations, creating your login and loading the library into it — and creates nothing. The
+project can be called anything; only the ref matters. It still refuses to run if the ref you
+give is the production project.
+
+When it fails, the run now prints Supabase's own sentence, the whole response body, a
+plain-language explanation, and the list of projects on the account with their status, so you
+can see which two hold the slots.
+
+---
+
 ## Running it again
 
 **The workflow is safe to run as often as you like.** It:

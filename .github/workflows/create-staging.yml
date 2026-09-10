@@ -41,6 +41,11 @@ on:
         required: false
         type: boolean
         default: true
+      existing_project_ref:
+        description: 'Use this existing project instead — leave blank to create one. Only needed if Supabase refuses a new free project.'
+        required: false
+        type: string
+        default: ''
 
 # One at a time: two runs creating the same project would race each other.
 concurrency:
@@ -82,9 +87,11 @@ jobs:
 
       # Find it, wake it, or create it — and refuse to go on if the ref it
       # resolved to is the production project.
-      - name: Find, wake or create the project
+      - name: Find, wake, adopt or create the project
         id: project
         run: ./scripts/staging/resolve-project.sh
+        env:
+          ADOPT_PROJECT_REF: ${{ inputs.existing_project_ref }}
 
       - name: Link the project
         run: supabase link --project-ref "${{ steps.project.outputs.ref }}"
