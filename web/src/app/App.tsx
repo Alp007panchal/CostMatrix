@@ -22,6 +22,7 @@ const ReleasePage = lazy(() => import('../modules/quotation/ReleasePage').then((
 const QuotationsPage = lazy(() => import('../modules/quotation/QuotationsPage').then((m) => ({ default: m.QuotationsPage })))
 const CustomersPage = lazy(() => import('../modules/crm/CustomersPage').then((m) => ({ default: m.CustomersPage })))
 const EnquiriesPage = lazy(() => import('../modules/crm/EnquiriesPage').then((m) => ({ default: m.EnquiriesPage })))
+const EnquiryDetail = lazy(() => import('../modules/crm/EnquiryDetail').then((m) => ({ default: m.EnquiryDetail })))
 const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m) => ({ default: m.FollowUpsPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 
@@ -67,6 +68,7 @@ export function App() {
               <Route path="crm/customers" element={<CustomersPage />} />
               <Route path="crm/customers/:id" element={<CustomersPage />} />
               <Route path="crm/enquiries" element={<EnquiriesPage />} />
+              <Route path="crm/enquiries/:id" element={<EnquiryDetail />} />
               <Route path="crm/follow-ups" element={<FollowUpsPage />} />
               <Route
                 path="admin/quotation-defaults"

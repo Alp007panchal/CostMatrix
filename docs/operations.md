@@ -508,6 +508,13 @@ material value; **Excel** or **CSV** per category, or **All four as one workbook
 are already multiplied through assembly and panel quantities, so the figure is what to buy.
 Works on a draft too, which is handy for checking a costing before submitting it.
 
+### Keep the drawing and the specification with the enquiry
+**Enquiries** → click the enquiry number. The enquiry's own page shows what was asked for, the
+costings raised against it, the quotations released, and **Files**: type what the file is, then
+choose it, and it is uploaded. Up to 20 MB each, any kind — drawings, PDFs, spreadsheets, saved
+emails. Only your company can open them; the link a click produces lasts a few minutes, so send
+people the file rather than the link. *Remove* deletes the record and the file itself.
+
 ### Record the outcome of a job
 **Quotations** → **Mark sent** when a quotation goes to the customer. When you hear back, press
 **Won or lost?** on the job (or on the row in **Enquiries**) and decide the whole enquiry at once:

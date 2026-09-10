@@ -617,6 +617,20 @@ export interface Enquiry {
   lost_reason: string | null
 }
 
+/** A file kept with an enquiry: the drawing, the specification, the email. */
+export interface EnquiryAttachment {
+  id: string
+  enquiry_id: string
+  company_id: string
+  file_name: string
+  path: string
+  mime_type: string | null
+  size_bytes: number | null
+  note: string | null
+  created_at: string
+  created_by: string | null
+}
+
 export interface QuotationFollowup {
   id: string
   quotation_id: string

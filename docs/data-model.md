@@ -378,10 +378,24 @@ Role checks per area:
 - `app.set_quotation_status` is unchanged and still decides a quotation whose costing has no
   enquiry — there is nowhere else to decide it.
 
+### Added by migration 0017 — files kept with an enquiry
+
+- **enquiry_attachments** — `enquiry_id`, `company_id`, `file_name`, `path` (unique), `mime_type`,
+  `size_bytes`, `note`, timestamps, `created_by`. Composite foreign key
+  `(enquiry_id, company_id) → enquiries (id, company_id)` on delete cascade, so a file can never
+  hang off another company's enquiry and a deleted enquiry takes its records with it. Read for
+  the company (and the master admin); write for whoever may edit costings; audit triggers.
+- Bucket **attachments**, private, 20 MB a file, any type, in the same `do $$` storage guard as
+  0006 so the test harness still runs. Path `{company_id}/{enquiry_id}/{timestamp}-{name}`; the
+  policy checks the first folder, as the other two buckets do.
+- The screen uploads the file first and writes the row second, taking the file back out if the
+  row is refused, so the two never disagree.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).
 - Bucket `logos`, private, same pattern. Holds the header logo and the footer strip images.
+- Bucket `attachments`, private, same pattern. Holds the files kept with an enquiry.
 
 ### Tests
 `supabase/tests/` holds pgTAP tests run in CI on every migration change:
