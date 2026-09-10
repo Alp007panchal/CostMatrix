@@ -1,0 +1,172 @@
+# The two tracks: the basic app and the advanced app
+
+Decided 10 Sep 2026. This is the arrangement, what you have to enter by hand, and how to
+re-run the staging creation. Companion to `docs/operations.md`, which covers production.
+
+## Why there are two
+
+`main` is the app you use. It runs on the production Supabase project and
+cost-matrix-theta.vercel.app, and it has to stay releasable at all times, because it is the
+back-up: if advanced work goes wrong, you still have a working app.
+
+`advanced` is where the foundations (`roadmap-from-market-leaders.md` §2) and the AI assistant
+(`ai-assistant-spec.md`) are built. It runs against a **separate Supabase project called
+CostMatrix Staging**, which holds its own copy of the library and its own costings. Nothing done
+on `advanced` can reach your real data — not by mistake, not by a bad migration, not by a bug.
+
+| | `main` | `advanced` |
+|---|---|---|
+| What goes here | Bug fixes, the NPP-192 trial findings, labour hours, prices, the enclosure uplift rule, small improvements | Foundations F1–F11, the AI assistant, anything new |
+| Supabase project | production (`mssqjuzgycfpfmtjukvq`) | CostMatrix Staging |
+| Web address | cost-matrix-theta.vercel.app | the Vercel preview URL for the `advanced` branch |
+| Migration numbers | `0018` onwards | **`0100` onwards** |
+
+### Why the migration numbers are split
+
+Migrations are applied in number order, and Supabase records each one by its number. If `main`
+added `0018_price_fix.sql` while `advanced` had its own `0018_foundations.sql`, then when the two
+branches met, the second `0018` would be treated as already applied and **silently skipped** —
+the tables it creates would simply never exist. Reserving `0100` upwards for the advanced track
+makes that impossible. Basic-track work carries on at `0018`, `0019`, and so on.
+
+### How work moves from advanced to main
+
+An advanced feature is merged into `main` only when all three are true:
+
+1. All tests and the NPP-192 acceptance test pass on staging.
+2. It is behind a per-company switch that is **off by default**.
+3. You have tried it on the preview URL and approve it.
+
+And `main` is merged **into** `advanced` after every change to `main`, so the two never drift.
+
+---
+
+## What you have to enter, once
+
+Two new entries. One is a secret (hidden after saving), one is a variable (visible, because it
+is not sensitive).
+
+### 1. The staging database password — a secret
+
+1. Think of a password for the staging database and put it in your password manager. It is not
+   your production password and it is not your login password. You will almost never type it:
+   the automated jobs use it from GitHub.
+2. Open **https://github.com/Alp007panchal/CostMatrix** → **Settings** (the tab on the right of
+   the repository's own menu bar, not your account settings).
+3. In the left-hand menu, **Secrets and variables** → **Actions**.
+4. You should see a page headed *Actions secrets and variables* with two tabs,
+   **Secrets** and **Variables**, and your three existing secrets listed under Secrets.
+5. On the **Secrets** tab, click the green **New repository secret**.
+6. Name: `SUPABASE_STAGING_DB_PASSWORD`. Secret: the password from step 1. Click
+   **Add secret**.
+7. You should now see four secrets listed. GitHub will never show you the value again —
+   that is correct, not a problem.
+
+### 2. Run the workflow that creates the project
+
+1. Still in the repository, click the **Actions** tab (top of the page).
+2. In the left-hand list of workflows, click **Create staging project**.
+3. On the right, click the grey **Run workflow** button. A small panel opens.
+4. Set **Use workflow from** to `advanced`.
+5. Fill in the boxes:
+   - *Your email address* — the one you sign in with. Required.
+   - *Your name* — as the app should show it.
+   - *The in-house company to create on staging* — anything; marking it "(Staging)" makes it
+     obvious on screen which database you are looking at.
+   - *Load data/seed into the staging library* — leave ticked.
+6. Click the green **Run workflow**. The page takes a few seconds to show the run; refresh if
+   it does not appear.
+7. Click into the run. It takes **about five to ten minutes**, most of it waiting for Supabase
+   to finish building the project. A successful run is all green ticks and ends with a summary
+   box headed **CostMatrix Staging is ready**.
+
+That summary tells you the remaining two things to enter, with the values already filled in.
+
+### 3. The staging project ref — a variable
+
+From the summary, copy the project ref, then: **Settings** → **Secrets and variables** →
+**Actions** → the **Variables** tab → **New repository variable**. Name
+`SUPABASE_STAGING_PROJECT_REF`, value the ref from the summary.
+
+Until this is set, pushing a migration to `advanced` stops with a message telling you so — it
+does not guess, and it certainly does not fall back to production.
+
+### 4. Two Vercel environment variables
+
+From the summary, copy the project URL and the publishable key, then in Vercel → **CostMatrix**
+→ **Settings** → **Environment Variables**, add each of these with the **Preview** environment
+ticked and the branch set to `advanced`:
+
+| Name | Value |
+|---|---|
+| `VITE_SUPABASE_URL` | the staging project URL from the summary |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | the publishable key from the summary |
+
+Both are public values — they are what the browser itself uses. The secret key and the database
+password are not printed by the workflow and are not needed here.
+
+If you ever add a `VERCEL_TOKEN` secret, these two can be set automatically instead; say so and
+it will be added.
+
+### 5. Your staging password
+
+Open the `advanced` preview URL, click **Forgot password**, and enter your email. Your staging
+password is separate from your production one, and nobody else knows it — the workflow creates
+the login with a random password that it masks and throws away.
+
+---
+
+## Running it again
+
+**The workflow is safe to run as often as you like.** It:
+
+- reuses the project if one called `CostMatrix Staging` already exists, rather than making a
+  second one;
+- **wakes it if Supabase has paused it** — free projects pause after about a week of no use, and
+  then everything else would fail with a connection error, so the workflow asks Supabase to
+  restore it and waits;
+- applies whatever migrations are new since last time;
+- reuses your login if it is already there;
+- loads `data/seed` again, which reports as "unchanged" if nothing in the files has changed.
+
+It **refuses to do anything at all** if the project it resolved turns out to be the production
+project — that check runs before the first write.
+
+One thing it cannot do for you: if Supabase refuses the restore call, the run stops and prints
+the link to press **Restore project** in the dashboard, then asks you to run it again. That part
+of Supabase's API is the least settled, so it is deliberately a clear stop rather than a guess.
+
+---
+
+## What each secret and variable is for
+
+| Name | Kind | Used by | What it is |
+|---|---|---|---|
+| `SUPABASE_ACCESS_TOKEN` | secret, existing | every Supabase workflow | Your Supabase personal access token. On the advanced track it is also what creates and wakes the staging project. |
+| `SUPABASE_PROJECT_REF` | secret, existing | `main` deploys | The production project. On the advanced track it is read **only** to find the right Supabase organisation and region, and to assert staging is not production. |
+| `SUPABASE_DB_PASSWORD` | secret, existing | `main` deploys | The production database password. Never read by an `advanced` run. |
+| `SUPABASE_STAGING_DB_PASSWORD` | secret, new | staging deploys | The staging database password. Never read by a `main` run. |
+| `SUPABASE_STAGING_PROJECT_REF` | variable, new | staging deploys | The staging project. A variable rather than a secret because a project ref is not sensitive and it helps to be able to read it back. |
+| `ADVANCED_PREVIEW_URL` | variable, optional | staging setup | If set, invitation emails sent from staging point at the preview URL instead of localhost. |
+
+## How the workflows divide up
+
+| Workflow | Trigger | What it touches |
+|---|---|---|
+| **CI** | every push to `main`, `advanced` or `claude/**`, and every pull request | Nothing live. Runs the migrations and all database tests on a throwaway Postgres, then the web app's typecheck, tests and build. |
+| **Deploy database** | push to `main` or `advanced` that changes `supabase/migrations/**` | Two separate jobs, each guarded by the branch: `main` → production, `advanced` → staging. Separate jobs rather than one that picks its secrets, so a run on one branch cannot reach the other's credentials whatever is added to the file later. |
+| **Create staging project** | by hand | Creates, wakes and sets up the staging project. Never production. |
+| **Deploy functions**, **Set up Supabase** | unchanged | Production only. |
+
+## Where the seeding comes from
+
+The staging library is loaded by the same three importer functions the Import screen calls, with
+the same files in `data/seed/` and the same validation, so staging holds what production holds.
+The part that reads the CSVs lives in `supabase/seed-csv-load.sql` and is shared between
+`supabase/tests/14_seed_import.sql` and `supabase/seed-from-csv.sql`, so there is one copy of it
+rather than two that can drift apart.
+
+One wrinkle worth knowing about, in case it ever needs changing: the importers check who is
+asking through `auth.uid()`, and an automated database connection has no signed-in user. The
+seed script therefore sets the same `request.jwt.claims` setting that the test fixture uses, to
+act as the master administrator it has just created. That is the only unusual thing in it.
