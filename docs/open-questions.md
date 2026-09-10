@@ -21,6 +21,7 @@ live database until they merge; after PR 3 you run the three imports.
 | **A busbar line for the C&S 400 A TP MCCB kit** (`kits-issues.csv`) | Before that kit is used | Every sibling kit has one. |
 | Two 800A ACBs at 330,432 on Option 1 versus 279,744 from the catalogue | Before session 3 | If accessories are included in 330,432, they should be kit lines. |
 | Data-quality items in `data/seed/README.md` | Before session 2 | Fifteen kits with only a main device, stray cable lines, two 4000A kits that look like one, duplicate and double-priced parts. Fix in `data/raw/` or say "import as is". |
+| **Connect your own email sender** (operations B9c) | Before inviting more than one or two people | Supabase's built-in sender allows a few messages an hour and often lands in spam. A free Gmail app password is enough; move to a `neiltd.com` sender before other companies are invited. |
 | Upload the header logo and footer marks | Before the first real quotation | **Quotation wording** → Header logo and Footer strip. PNG with transparent background prints best. |
 | Run `docs/acceptance-test.md` on what is live | Any time | Findings are fixed inside the sessions above. |
 

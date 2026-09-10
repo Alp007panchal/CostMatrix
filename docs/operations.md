@@ -227,6 +227,63 @@ phone locks you out of your own system.
 
 - [ ] Two-factor authentication on all three, recovery codes saved.
 
+### B9c. Send invitations from your own email address
+
+Skip this to finish setup, but do it before you invite more than one or two people. Until you
+do, invitation and password-reset emails go through Supabase's own sender, which allows only a
+handful of messages an hour ("email rate limit exceeded" on the invitation form) and often lands
+in spam. Your own sender fixes both.
+
+No paid mail product is needed. **A free Gmail account works**, and is what we use.
+
+1. **Create an app password.** Not your normal Gmail password: a separate one that only this app
+   uses, which you can revoke on its own.
+   1. myaccount.google.com, signed in as the account invitations should come from.
+   2. **Security** → **2-Step Verification**. Turn it on if it is off. App passwords do not exist
+      without it.
+   3. Open **myaccount.google.com/apppasswords** directly. (Searching "app passwords" in the
+      account search box also works, but the link is more reliable.)
+   4. Type a name, `CostMatrix`, and press **Create**.
+   5. Google shows a 16-character password once, in four groups. Copy it. The spaces do not
+      matter.
+2. **Supabase dashboard** → your project → **Project Settings** → **Authentication** → scroll to
+   **SMTP Settings** → turn on **Enable Custom SMTP**.
+3. Fill in:
+
+   | Field | Value |
+   |---|---|
+   | Sender email | the Gmail address |
+   | Sender name | CostMatrix |
+   | Host | `smtp.gmail.com` |
+   | Port | `465` |
+   | Username | the same Gmail address |
+   | Password | the 16-character app password |
+
+   Sender email and username must be the same Gmail address. Google rejects a mismatched sender.
+4. **Save**. Supabase sends a test message. If it fails, the username or password is nearly
+   always the cause, not the host.
+5. **Authentication** → **Rate Limits**: set "Emails per hour" to `30`. A free Gmail account
+   allows roughly 500 messages a day, so 30 an hour leaves plenty of room. This box only matters
+   once your own sender is connected.
+6. Check it: People → invite somebody → the email should arrive within a minute, from your Gmail
+   address, and not in spam.
+
+Two things to know. Invitations will show the Gmail address as the sender, which is fine for
+your own team and testers but worth replacing with a `neiltd.com` sender before you invite other
+companies. And this affects login and password-reset emails only: quotations are PDFs you
+download and send yourself, so they are unaffected.
+
+**If you would rather not use Gmail.** An existing `neiltd.com` mailbox is better, because
+invitations then come from your own domain: ask whoever hosts that mail, or look in the hosting
+control panel under "Email accounts", for the outgoing server name, port, username and password,
+and put those in the same form. Brevo's free tier is the other option, 300 messages a day with
+no card, and gives its own SMTP details after you verify a sender address.
+
+The password stays in Supabase and your password manager. Never paste it into this chat, the
+repository or a browser console; nobody, including me, needs to see it.
+
+- [ ] Invitations arrive from your own sender, or noted for later.
+
 ### B10. Sign in
 
 Open the Vercel URL. You should get the CostMatrix sign-in page, and your email and password
@@ -273,9 +330,12 @@ One email address is one login, and a login belongs to one company. Inviting an 
 already has a login is refused, and the screen now shows the reason ("already been registered"):
 either use a different address, or move the person with **Move…** below.
 
-If the invitation fails for another reason, the invite-user function is not deployed (step B9),
-or Supabase's built-in email is rate limiting. Authentication → Users in the dashboard shows
-whether the account was created.
+"email rate limit exceeded" means Supabase's own sender has reached its hourly allowance, not
+that anything is broken: nothing was created, so send the same invitation again later. Connecting
+your own email sender (step B9c) removes the limit for good.
+
+If the invitation fails for another reason, the invite-user function may not be deployed (step
+B9). Authentication → Users in the Supabase dashboard shows whether the account was created.
 
 Roles, as a reminder: **company admin** manages settings and users, **costing engineer** builds
 costings, **approver** approves costings and releases quotations. One person can hold several.
