@@ -10,6 +10,12 @@
 > line to add; the Totals card shows the category split to compare. A panel built from kVAr
 > step kits shows the bank's total kVAr under its kit table (decision 4).
 
+> **2026-09-10:** the steps below cover what is live after the owner's notebook changes
+> (migrations 0013–0017): sections inside a panel, copying a costing or a panel, the operator's
+> name in the history, one decision per enquiry, and files kept with an enquiry. If you ran an
+> earlier version of this script, the new steps are §4 (files), §5 (sections, copy), §6 (who did
+> it) and §9 (won or lost on the enquiry).
+
 # Acceptance test — one real job, end to end
 
 The first time a human clicks through everything built so far. Do it in this order, with a
@@ -31,27 +37,35 @@ Roughly an hour. Have `docs/reference/costing-NPP-192-REV1.xlsm` and
 - [ ] Add one busbar by hand: **priced by weight**, 2.8 kg per metre, copper. Its price shows 8,400.
 - [ ] **Excel → Download**. The file opens in Excel with the same rows.
 
-## 3. Assemblies (Assemblies tab) — 10 minutes
-- [ ] Create one, e.g. `INC-1600 Incomer section`. Add three or four components with quantities.
+## 3. Kits (Kits tab) — 10 minutes
+- [ ] Create one, e.g. `INC-1600 Incomer section`. Give it a kit group, a rating and its poles. Add three or four components with quantities, and mark the main device.
 - [ ] Enter hours per kind of work. The labour cost beside each is hours × your rate.
 - [ ] The card top-right shows material, labour and the sum. Check one line by hand.
 
 ## 4. Customer and enquiry (Customers, Enquiries tabs) — 5 minutes
 - [ ] Add the customer, one contact, one project.
 - [ ] Log an enquiry against them. It gets `EN-2026-0001`.
+- [ ] Click the enquiry number. Its own page opens: what was asked for, its costings, its quotations, and **Files**.
+- [ ] Type what the file is, then attach the customer's drawing or specification (any kind, up to 20 MB). It appears in the list with its size and today's date.
+- [ ] Click the file name: it opens. Reload the page; it is still there.
 
 ## 5. Costing (Costings tab) — 15 minutes
 - [ ] **New costing**, pick the enquiry; the title fills in. It gets `CM-2026-0001`.
-- [ ] Add a panel, quantity 1. Add your assembly. Open it: material and hours are what you entered.
+- [ ] Add a panel, quantity 1. Set **Add to section** to *Incomer*, then add your kit. Open it: material and hours are what you entered.
+- [ ] Switch **Add to section** to *Outgoers* and add another kit, or a component on its own. The panel now reads in two sections, each with its own material and labour subtotal.
+- [ ] Type a section of your own, e.g. *Battery charger*, and add something to it. It is kept as you typed it and sorts after the seven offered names.
+- [ ] Move a kit to another section with the small box beside its name; the subtotals follow it.
 - [ ] Change an item quantity; the totals on the right change. Change hours; the "Library said" column shows the original and marks it changed.
 - [ ] **Compare with the spreadsheet:** material should match line for line. Labour will differ — it is now hours × rate.
 - [ ] Set a negotiation margin, watch the unit price move. Set it back to 0.
-- [ ] **Bills of materials**: download the switchgear one as Excel. Quantities are what to buy.
-- [ ] **Submit**. Try to edit something: you cannot.
+- [ ] **Bills of materials**: download the switchgear one as Excel. Quantities are what to buy — grouped by category, not by section, which is how parts are bought.
+- [ ] **Copy this panel** at the bottom of the panel, into this costing. The copy carries its sections and lines; what could not be re-priced (if anything) is named.
+- [ ] Remove the copy again, then **Submit**. Try to edit something: you cannot.
 
 ## 6. Approval — 3 minutes
 - [ ] As approver (you hold the role): **Return to draft** with a note. The note shows on the costing. Edit something, submit again.
-- [ ] **Approve**. The costing is read-only. History lists every step.
+- [ ] **Approve**. The costing is read-only. The screen reads top to bottom: totals, panels, bills of materials, history.
+- [ ] **History** at the bottom names who submitted, who returned it and who approved it, with the date beside each.
 
 ## 7. Quotation wording (Quotation wording tab) — 5 minutes
 - [ ] Upload the header logo and two footer marks. Fill in P.O. Box, phones, email, signatory.
@@ -61,13 +75,17 @@ Roughly an hour. Have `docs/reference/costing-NPP-192-REV1.xlsm` and
 - [ ] **Release quotation**. The customer record is pre-selected from the enquiry; name and address fill in.
 - [ ] Add two notes on the offer. **Preview PDF**.
 - [ ] **Compare the PDF page by page** with `quotation-NPP-192-REV1.pdf`: letterhead, cover letter, annexure list, notes, price schedule columns and totals, VAT line, terms, technical table. Note every difference.
+- [ ] **Annexure IV** takes its headings from the sections you built the panel in, and prints **no busbar** (cable still prints). If a panel's description was drafted before today, press *Draft from the kits* in its details to redraw it.
 - [ ] **Release**. The reference reads `NPP-0001-REV0` (after setting the prefix under Company). The Quotations tab lists it; **PDF** opens it.
 
 ## 9. After release — 5 minutes
 - [ ] **Mark sent**. On Enquiries, the enquiry is now *quoted* on its own.
 - [ ] **Follow up** with a date and note. It appears on Follow-ups. Mark it done.
 - [ ] **New revision** on the costing. Change a quantity, submit, approve, release again. The reference reads `NPP-0001-REV1`. The first PDF is unchanged.
-- [ ] Mark the first quotation **Lost** with a reason; refuse to accept an empty reason.
+- [ ] On **Quotations**, the job reads as one line: the enquiry at the top, the offer under it, and *1 earlier revision* folded behind the newest. Open it and check the older PDF is still there.
+- [ ] **Won or lost?** on the job. Choose *We won it* and name the newest quotation. It is marked won; the earlier revision reads **superseded**, not lost; the enquiry is won and names the winner.
+- [ ] Do the same on a second enquiry with *We lost it*: it refuses an empty reason, and the reason it takes shows on the quotation and on the enquiry.
+- [ ] Back on **Costings**, press **Copy** on the approved costing, give it a title, and copy it. It becomes a new number at revision 0, the original untouched; the screen says how many lines were priced again at today's rates and names anything that could not be.
 
 ## 10. Isolation — 3 minutes
 - [ ] Companies tab: create a second company. People tab: invite yourself at another email into it (or ask a colleague).
