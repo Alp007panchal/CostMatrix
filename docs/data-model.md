@@ -311,6 +311,17 @@ Role checks per area:
 - Public wrappers `person_footprint`, `person_footprints`, `move_person`; `grant execute` to `authenticated`.
 - Deleting a person is the **remove-user** Edge Function (it needs the secret key): master admin only, and only at a footprint of zero. `profiles.id` cascades from `auth.users`, so profile and roles go with the login.
 
+### Added by migration 0013 — the history says who
+
+- **v_costing_history** (security invoker) — `costing_history` left-joined to `profiles` for
+  `full_name`. `costing_history.user_id` is a bare uuid with no foreign key, so nothing could
+  follow it to a name; the view supplies the join and the screen reads the view instead of the
+  table. A **left** join and no foreign key on purpose: a history row outlives the person in it
+  (0012 removes a person with no records, but an approval written years ago stays), so
+  `full_name` is simply null when the person has gone, or when a master admin reads another
+  company's row. Row visibility is unchanged — the view runs as the caller, so the table's
+  policies still decide what is returned.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).

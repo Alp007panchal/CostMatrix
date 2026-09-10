@@ -104,7 +104,7 @@ export async function getCostingDetail(id: string): Promise<CostingDetail> {
 
 export async function listHistory(costingId: string): Promise<CostingHistoryRow[]> {
   const { data, error } = await supabase
-    .from('costing_history')
+    .from('v_costing_history')
     .select('*')
     .eq('costing_id', costingId)
     .order('at', { ascending: false })

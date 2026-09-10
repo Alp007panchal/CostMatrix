@@ -19,7 +19,7 @@ export function HistoryPanel({ costingId }: { costingId: string }) {
               <li key={row.id} style={{ padding: '.35rem 0', borderBottom: '1px solid var(--line)' }}>
                 <div>{row.action}</div>
                 <div className="muted" style={{ fontSize: '.75rem' }}>
-                  {new Date(row.at).toLocaleString('en-GB')}
+                  {row.full_name ?? 'Someone no longer here'} · {new Date(row.at).toLocaleString('en-GB')}
                 </div>
                 {row.details && typeof row.details['comment'] === 'string' && (
                   <div className="muted" style={{ fontStyle: 'italic' }}>

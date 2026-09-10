@@ -133,69 +133,66 @@ export function CostingEditor() {
               </>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 20rem', gap: '1rem', alignItems: 'start' }}>
-              <div>
-                {panels.map((panel) => (
-                  <PanelCard
-                    key={panel.id}
-                    panel={panel}
-                    price={panelPrices.find((p) => p.panel_id === panel.id)}
-                    assemblies={assemblies.filter((a) => a.panel_id === panel.id)}
-                    items={items}
-                    labour={labour}
-                    assemblyTotals={assemblyTotals}
-                    kits={kits}
-                    components={components.data ?? []}
-                    categories={categories.data ?? []}
-                    label={label}
-                    editable={editable}
-                    processNames={processNames}
-                    handlers={{
-                      onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
-                      onPanelRemove: (pid) => run(() => removePanel(pid)),
-                      onAddAssembly: async (pid, aid, qty) => { await addAssemblyToPanel(pid, aid, qty); await refresh() },
-                      onAddComponent: async (pid, cid, qty) => { await addComponentToPanel(pid, cid, qty); await refresh() },
-                      onAddManual: async (pid, input) => { await addManualItem(pid, input); await refresh() },
-                      onAssemblyQuantity: (aid, q) => run(() => setCostingAssemblyQuantity(aid, q)),
-                      onAssemblyRemove: (aid) => run(() => removeCostingAssembly(aid)),
-                      onItemQuantity: (iid, q) => run(() => setItemQuantity(iid, q)),
-                      onItemRemove: (iid) => run(() => removeItem(iid)),
-                      onHours: (lid, h) => run(() => setLabourHours(lid, h)),
-                    }}
+            {/* One column, read top to bottom: what it costs, how it is built, what
+                to export, what happened. */}
+            <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} bom={bom.data ?? []} categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))} />
+
+            {panels.map((panel) => (
+              <PanelCard
+                key={panel.id}
+                panel={panel}
+                price={panelPrices.find((p) => p.panel_id === panel.id)}
+                assemblies={assemblies.filter((a) => a.panel_id === panel.id)}
+                items={items}
+                labour={labour}
+                assemblyTotals={assemblyTotals}
+                kits={kits}
+                components={components.data ?? []}
+                categories={categories.data ?? []}
+                label={label}
+                editable={editable}
+                processNames={processNames}
+                handlers={{
+                  onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
+                  onPanelRemove: (pid) => run(() => removePanel(pid)),
+                  onAddAssembly: async (pid, aid, qty) => { await addAssemblyToPanel(pid, aid, qty); await refresh() },
+                  onAddComponent: async (pid, cid, qty) => { await addComponentToPanel(pid, cid, qty); await refresh() },
+                  onAddManual: async (pid, input) => { await addManualItem(pid, input); await refresh() },
+                  onAssemblyQuantity: (aid, q) => run(() => setCostingAssemblyQuantity(aid, q)),
+                  onAssemblyRemove: (aid) => run(() => removeCostingAssembly(aid)),
+                  onItemQuantity: (iid, q) => run(() => setItemQuantity(iid, q)),
+                  onItemRemove: (iid) => run(() => removeItem(iid)),
+                  onHours: (lid, h) => run(() => setLabourHours(lid, h)),
+                }}
+              />
+            ))}
+
+            {editable && (
+              <button onClick={() => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length))}>
+                + Add a panel
+              </button>
+            )}
+            {panels.length === 0 && !editable && <p className="empty">No panels.</p>}
+
+            {editable && (
+              <div className="card" style={{ marginTop: '1rem' }}>
+                <label className="field" style={{ margin: 0 }}>
+                  <span>Negotiation margin % <em className="hint">— optional buffer on top of everything, default 0</em></span>
+                  <input
+                    type="number" step="0.001" min="0" max="99.999"
+                    defaultValue={costing.negotiation_margin_pct}
+                    style={{ maxWidth: '8rem' }}
+                    onBlur={(e) => Number(e.target.value) !== costing.negotiation_margin_pct && run(() => updateCosting(costing.id, { negotiation_margin_pct: Number(e.target.value) }))}
                   />
-                ))}
-
-                {editable && (
-                  <button onClick={() => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length))}>
-                    + Add a panel
-                  </button>
-                )}
-                {panels.length === 0 && !editable && <p className="empty">No panels.</p>}
-
-                {editable && (
-                  <div className="card" style={{ marginTop: '1rem' }}>
-                    <label className="field" style={{ margin: 0 }}>
-                      <span>Negotiation margin % <em className="hint">— optional buffer on top of everything, default 0</em></span>
-                      <input
-                        type="number" step="0.001" min="0" max="99.999"
-                        defaultValue={costing.negotiation_margin_pct}
-                        style={{ maxWidth: '8rem' }}
-                        onBlur={(e) => Number(e.target.value) !== costing.negotiation_margin_pct && run(() => updateCosting(costing.id, { negotiation_margin_pct: Number(e.target.value) }))}
-                      />
-                    </label>
-                    <p className="muted" style={{ fontSize: '.8125rem', margin: '.4rem 0 0' }}>
-                      Material margin {percent(costing.material_margin_pct)} and labour margin {percent(costing.labour_margin_pct)} were frozen from the company settings when this costing was created.
-                    </p>
-                  </div>
-                )}
+                </label>
+                <p className="muted" style={{ fontSize: '.8125rem', margin: '.4rem 0 0' }}>
+                  Material margin {percent(costing.material_margin_pct)} and labour margin {percent(costing.labour_margin_pct)} were frozen from the company settings when this costing was created.
+                </p>
               </div>
+            )}
 
-              <div>
-                <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} bom={bom.data ?? []} categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))} />
-                <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
-                <HistoryPanel costingId={costing.id} />
-              </div>
-            </div>
+            <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
+            <HistoryPanel costingId={costing.id} />
           </>
         )
       }}

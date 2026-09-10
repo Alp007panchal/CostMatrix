@@ -424,6 +424,8 @@ export interface OptionTotals {
 export interface CostingHistoryRow {
   id: string
   user_id: string | null
+  /** Null when the person has since been removed, or for another company's row. */
+  full_name: string | null
   action: string
   details: Record<string, unknown> | null
   at: string

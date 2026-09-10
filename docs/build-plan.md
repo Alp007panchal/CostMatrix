@@ -27,6 +27,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | S5 — External companies | **Reviewed, PR 6 open** (stacked on PR 5). Discount, currency, private library, overrides and master-admin reads all existed; added the Company column and filter on the cross-company lists, invitation by company, the kit ownership check on screen, the new-company checklist in the runbook, test 16; 272 database assertions. | 2026-09-09 |
 | S6 — CRM gap review | **Reviewed, PR 6.** Customers, contacts, projects, numbered enquiries, costings against enquiries, quotations to customer records, status following the quotation and follow-ups all existed; added follow-ups on the home page and editing a customer's details. Not built: an enquiry detail page listing its costings and quotations (the Costings button on the enquiry filters the list instead). | 2026-09-09 |
 | — | **People: correcting a mistake (2026-09-10).** Migration 0012 and the remove-user function: the master administrator may move or remove somebody who has no records at all; everyone else is deactivated as before. Function errors now show their real message, and a new company reaches the People screen without a reload. | 2026-09-10 |
+| — | **The owner's notebook: nine changes in five pull requests (2026-09-10).** Read from the diary pages after using the live app. PR 14 costing screen in one column and the operator's name in the history; PR 15 sections inside a panel; PR 16 copy a costing or a panel; PR 17 one enquiry, one decision (and no busbar in Annexure IV); PR 18 attachments on an enquiry. | 2026-09-10 |
 
 ## Slice 0 — Foundation (about one week)
 
@@ -135,6 +136,24 @@ one pull request that the owner merges. Details in `CLAUDE.md` and the reference
    frozen rate: verify what exists, add the master-admin read-only browsing and onboarding
    checklist from the old slice 5.
 6. **CRM phase 1** — gap review against the brief; fixes only.
+
+## The owner's notebook — five pull requests (2026-09-10 onward)
+
+Nine findings from using the live app, in the order they are being built. Each is one pull
+request straight to `main`; the owner reviews and merges.
+
+14. **The costing screen reads top to bottom** — one column (totals, panels, bills of
+    materials, history) instead of a two-column grid, and the history names the person who
+    submitted, approved, returned or released (migration 0013, `v_costing_history`).
+15. **Sections inside a panel** — Incomer, AVR bypass, ATS, 2nd incomer, Outgoers, Accessories,
+    APFC bank, plus anything typed; a subtotal per section; Annexure IV takes its headings from
+    them.
+16. **Copy a costing or a panel** — into a new enquiry or the same one, re-priced at today's
+    rates, with a list of anything that could not be re-priced.
+17. **One enquiry, one decision** — revisions of one job group under their enquiry instead of
+    reading as separate quotations; Won and Lost are decided on the enquiry, naming the winning
+    quotation; busbar drops out of Annexure IV.
+18. **Attachments on an enquiry** — drawings, specifications and emails kept with the job.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
