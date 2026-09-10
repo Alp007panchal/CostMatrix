@@ -385,8 +385,9 @@ arrives with its lines priced today and its hours from the kit group (or its own
 unpriced part is greyed out with "unpriced part": price the part on the Components screen first.
 Under the kits, *Outside a kit* adds a catalogue component on its own (type to search; cubicles
 are uplifted) or a **typed line** with its own price for a part the catalogue does not hold.
-Loose lines gather in one *Components and enclosure* line per panel. The Totals card shows the
-material split by category, which is what the old sheets subtotalled.
+Loose lines gather in one *Components and enclosure* line per panel. The screen reads straight
+down: the **Totals** card at the top (it shows the material split by category, which is what the
+old sheets subtotalled), then the panels, then the bills of materials, then the history.
 
 ### Write the technical offer from the kits (session 4)
 In a panel → *Details* → **Draft from the kits**: the technical description is written from
@@ -472,7 +473,7 @@ too. You can also set the status by hand on the Enquiries screen.
 on **Follow-ups**, overdue ones first. Mark it **Done** when done.
 
 ### Export a bill of materials
-Open any costing → **Bills of materials** on the right. One line per category with the
+Open any costing → **Bills of materials**, below the panels. One line per category with the
 material value; **Excel** or **CSV** per category, or **All four as one workbook**. Quantities
 are already multiplied through assembly and panel quantities, so the figure is what to buy.
 Works on a draft too, which is handy for checking a costing before submitting it.
@@ -482,8 +483,10 @@ Works on a draft too, which is handy for checking a costing before submitting it
 for a reason. That reason is what the sales reports are built on later, so make it honest.
 
 ### Find out what happened to a costing (slice 1)
-Open the costing → **History** tab. Every submission, approval, return, revision and release is
-listed with who did it and when. The log cannot be edited by anyone, including you.
+Open the costing and scroll to **History** at the bottom. Every submission, approval, return,
+revision and release is listed with the name of the person who did it and when. The log cannot be
+edited by anyone, including you. A person removed since then leaves their entry behind, reading
+*Someone no longer here*: the record of what happened never goes with them.
 
 ### Check the app is running
 Open the Vercel URL. If the page loads and you can sign in, everything is working. For more
