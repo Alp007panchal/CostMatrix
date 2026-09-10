@@ -385,14 +385,26 @@ arrives with its lines priced today and its hours from the kit group (or its own
 unpriced part is greyed out with "unpriced part": price the part on the Components screen first.
 Under the kits, *Outside a kit* adds a catalogue component on its own (type to search; cubicles
 are uplifted) or a **typed line** with its own price for a part the catalogue does not hold.
-Loose lines gather in one *Components and enclosure* line per panel. The screen reads straight
+Loose lines gather in one *Components and enclosure* line per section. The screen reads straight
 down: the **Totals** card at the top (it shows the material split by category, which is what the
 old sheets subtotalled), then the panels, then the bills of materials, then the history.
 
+### Build a panel in sections
+Above the pickers is **Add to section**. Choose one of the offered names — Incomer, AVR bypass,
+ATS, 2nd incomer, Outgoers, Accessories, APFC bank — or type your own, and everything you add
+next goes there; leave it empty and the lines sit in no section, as they always did. The panel
+then reads section by section, each with its own material and labour subtotal. A kit put in the
+wrong place is moved with the small box beside its name.
+
+Sections change no price: they are how a panel is read. Two things follow them, though — the
+loose parts of each section gather in that section's own *components and enclosure* line, and
+**Draft from the kits** writes the technical description under the section headings. The bills
+of materials stay grouped by category, which is what they are bought by.
+
 ### Write the technical offer from the kits (session 4)
 In a panel → *Details* → **Draft from the kits**: the technical description is written from
-the panel's kits (grouped by kit group, each with its lines), then the loose components, then
-the enclosure. Edit it freely; the quotation prints what you leave. A panel whose description is
+the panel's kits under their section headings (a kit in no section falls back to its kit group),
+each with its lines, then the loose components and the enclosure. Edit it freely; the quotation prints what you leave. A panel whose description is
 left blank gets the same draft at release, so Annexure IV is never empty for a costed panel.
 
 ### Add a part that is not in the catalogue (session 3)

@@ -4,7 +4,7 @@ import { describePanel } from './technical'
 
 const panel = { id: 'p1', costing_id: 'c', company_id: 'co', name: 'MAIN LV BOARD', tag: null, option_label: 'Option 1', uom: 'PC', quantity: 1, technical_description: null, enclosure_dimensions: null, sort_order: 0 } as CostingPanel
 const line = (over: Partial<CostingAssembly>): CostingAssembly => ({
-  id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', source_assembly_id: 'k1', code: 'ACB-KIT', name: '1600A 4P WITHDRAWABLE MOTORIZED ACB-KIT', quantity: 1, sort_order: 0, ...over,
+  id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: 'k1', code: 'ACB-KIT', name: '1600A 4P WITHDRAWABLE MOTORIZED ACB-KIT', quantity: 1, sort_order: 0, ...over,
 })
 const item = (over: Partial<CostingItem>): CostingItem => ({
   id: 'i', costing_id: 'c', costing_assembly_id: 'a1', source_component_id: 'x', code: 'X', name: 'Thing',
@@ -42,6 +42,29 @@ describe('describePanel', () => {
     })
     expect(text).toBe(['OTHER COMPONENTS', '2 No. SYNCHRO CHECK RELAYS', '', 'ENCLOSURE', '5 No. FREE STANDING, LOCAL'].join('\n'))
   })
+  it('takes its headings from the sections the panel was built in', () => {
+    const text = describePanel({
+      panel,
+      assemblies: [
+        line({ id: 'a1', section: 'Incomer', sort_order: 0 }),
+        line({ id: 'f1', kind: 'free', section: 'Accessories', source_assembly_id: null, code: 'FREE', name: 'Loose components', sort_order: 1 }),
+      ],
+      items: [
+        item({ id: 'i1', name: '1600A 4P ACB', manufacturer: 'SIEMENS' }),
+        item({ id: 'i2', costing_assembly_id: 'f1', name: 'DOOR FURNITURE', quantity: 4, category_code: 'accessories_hardware' }),
+      ],
+      kits: [kit],
+    })
+    expect(text).toBe([
+      'INCOMER',
+      '1 No. 1600A 4P WITHDRAWABLE MOTORIZED ACB-KIT, 4P',
+      '   - 1 No. 1600A 4P ACB, SIEMENS',
+      '',
+      'ACCESSORIES',
+      '4 No. DOOR FURNITURE',
+    ].join('\n'))
+  })
+
   it('is empty for an empty panel and ignores other panels', () => {
     expect(describePanel({ panel, assemblies: [line({ panel_id: 'p2' })], items: [item({})] })).toBe('')
   })

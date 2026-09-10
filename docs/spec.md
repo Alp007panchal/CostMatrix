@@ -121,11 +121,21 @@ A panel is built from three kinds of line (session 3):
 
 - **Kits**, chosen by kit group and rating, times a quantity. Each brings its lines and its
   hours (§6) frozen at today's prices and this costing's rates.
-- **Components on their own**, from the catalogue, in the panel's one *components and
-  enclosure* line (quantity always 1, no labour). An enclosure cubicle added this way is
-  uplifted like one inside a kit. Adding the same component again adds to its quantity.
+- **Components on their own**, from the catalogue, in the *components and enclosure* line of
+  their section (quantity always 1, no labour; one such line per section). An enclosure cubicle
+  added this way is uplifted like one inside a kit. Adding the same component to the same
+  section again adds to its quantity; the same part in another section is its own line.
 - **Typed lines**: a name, category, unit price in the costing's currency and quantity, for a
   part no catalogue holds yet. They live in this costing only and are marked *typed*.
+
+Every line may carry a **section** — the part of the panel it belongs to: incomer, AVR bypass,
+ATS, second incomer, outgoers, accessories, APFC bank (the seeded list) or anything else typed.
+A section is free text, so a panel is never blocked by a name nobody thought of; the seeded
+names are offered wherever a section is chosen. The panel is read section by section with a
+material and labour subtotal for each, and Annexure IV takes its headings from them, falling
+back to the kit group for a line with no section. A line in no section sorts last and reads
+exactly as it did before sections existed. Sections are a way of reading a panel: they change
+no price, and the bills of materials stay grouped by category (decision 12).
 
 A part without a price (a placeholder) is refused with its code named, whether inside a kit or
 on its own.
