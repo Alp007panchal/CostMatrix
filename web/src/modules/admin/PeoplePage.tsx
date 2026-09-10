@@ -5,6 +5,7 @@ import { Async, Field } from '../../ui/Async'
 import { roleLabel } from '../../lib/format'
 import type { UserRole } from '../../lib/database.types'
 import { grantRole, invitePerson, listPeople, revokeRole, setPersonActive } from './api'
+import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 
 const ALL_ROLES: UserRole[] = ['company_admin', 'costing_engineer', 'approver']
 
@@ -13,6 +14,7 @@ export function PeoplePage() {
   const { company } = useSession()
   const queryClient = useQueryClient()
   const people = useQuery({ queryKey: ['people'], queryFn: () => listPeople() })
+  const byCompany = useCompanyFilter()
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['people'] })
 
@@ -45,12 +47,14 @@ export function PeoplePage() {
       )}
 
       <div className="card">
+        {byCompany.multi && <div className="row end" style={{ marginBottom: '.5rem' }}><CompanyFilterSelect filter={byCompany} /></div>}
         <div className="table-wrap">
           <Async query={people} empty="Nobody here yet.">
-            {(rows) => (
+            {(all) => (
               <table>
                 <thead>
                   <tr>
+                    {byCompany.multi && <th>Company</th>}
                     <th>Name</th>
                     <th>Email</th>
                     {ALL_ROLES.map((role) => (
@@ -60,8 +64,9 @@ export function PeoplePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((person) => (
+                  {all.filter((p) => byCompany.keep(p.company_id)).map((person) => (
                     <tr key={person.id} className={person.is_active ? undefined : 'inactive'}>
+                      {byCompany.multi && <td className="muted">{byCompany.companyName(person.company_id)}</td>}
                       <td>
                         {person.full_name}
                         {person.is_master_admin && <span className="badge">Master admin</span>}
@@ -112,19 +117,20 @@ export function PeoplePage() {
         </p>
       </div>
 
-      <InviteForm companyId={company.id} onInvited={refresh} />
+      <InviteForm companyId={company.id} companies={byCompany.multi ? byCompany.companies : []} onInvited={refresh} />
     </>
   )
 }
 
-function InviteForm({ companyId, onInvited }: { companyId: string; onInvited: () => void }) {
+function InviteForm({ companyId, companies, onInvited }: { companyId: string; companies: { id: string; name: string }[]; onInvited: () => void }) {
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
+  const [target, setTarget] = useState(companyId)
   const [roles, setRoles] = useState<UserRole[]>(['costing_engineer'])
   const [sent, setSent] = useState<string | null>(null)
 
   const invite = useMutation({
-    mutationFn: () => invitePerson({ email, full_name: fullName, company_id: companyId, roles }),
+    mutationFn: () => invitePerson({ email, full_name: fullName, company_id: target, roles }),
     onSuccess: () => {
       setSent(`An invitation is on its way to ${email}.`)
       setEmail('')
@@ -146,6 +152,13 @@ function InviteForm({ companyId, onInvited }: { companyId: string; onInvited: ()
         They receive an email with a link to set their own password. Nobody can sign themselves up.
       </p>
 
+      {companies.length > 0 && (
+        <Field label="Company" hint="the master administrator may invite a new company's first administrator">
+          <select value={target} onChange={(e) => setTarget(e.target.value)}>
+            {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </Field>
+      )}
       <Field label="Full name">
         <input value={fullName} required onChange={(e) => setFullName(e.target.value)} />
       </Field>

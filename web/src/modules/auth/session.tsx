@@ -15,6 +15,9 @@ export interface SessionState {
   session: Session | null
   profile: Profile | null
   company: Company | null
+  /** Every company this person may see: their own, or all of them for the master admin. */
+  companies: Company[]
+  companyName: (id: string | null | undefined) => string
   roles: UserRole[]
   loading: boolean
   isMasterAdmin: boolean
@@ -29,6 +32,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
+  const [companies, setCompanies] = useState<Company[]>([])
   const [roles, setRoles] = useState<UserRole[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -43,16 +47,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
     if (!profileRow) {
       setCompany(null)
+      setCompanies([])
       setRoles([])
       return
     }
 
-    const [{ data: companyRow }, { data: roleRows }] = await Promise.all([
-      supabase.from('companies').select('*').eq('id', profileRow.company_id).maybeSingle<Company>(),
+    // Row-level security returns one company to most people and all of them
+    // to the master admin, so one query serves both.
+    const [{ data: companyRows }, { data: roleRows }] = await Promise.all([
+      supabase.from('companies').select('*').order('name'),
       supabase.from('user_roles').select('role').eq('user_id', userId),
     ])
 
-    setCompany(companyRow ?? null)
+    const all = (companyRows ?? []) as Company[]
+    setCompanies(all)
+    setCompany(all.find((c) => c.id === profileRow.company_id) ?? null)
     setRoles((roleRows ?? []).map((r) => (r as { role: UserRole }).role))
   }
 
@@ -64,6 +73,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     } else {
       setProfile(null)
       setCompany(null)
+      setCompanies([])
       setRoles([])
     }
     setLoading(false)
@@ -80,6 +90,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null)
         setCompany(null)
+        setCompanies([])
         setRoles([])
       }
       setLoading(false)
@@ -92,6 +103,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     session,
     profile,
     company,
+    companies,
+    companyName: (id) => companies.find((c) => c.id === id)?.name ?? '—',
     roles,
     loading,
     isMasterAdmin: profile?.is_master_admin ?? false,

@@ -1,5 +1,6 @@
 import type { Letterhead, QuotationTerms } from '../../../lib/database.types'
 import type { CostingDetail } from '../../costing/api'
+import { describePanel } from '../../costing/technical'
 import type { PdfSchedule, PdfTechnicalRow, PdfTerm, QuotationPdfData } from './types'
 
 /**
@@ -112,9 +113,16 @@ export function buildTerms(terms: QuotationTerms): PdfTerm[] {
     .map(([heading, body]) => ({ heading, body: body.trim() }))
 }
 
+/**
+ * One row per panel. The engineer's own text when there is one; otherwise a
+ * description written from the panel's kits and lines, so the annexure is
+ * never blank for a costed panel.
+ */
 export function buildTechnical(detail: CostingDetail): PdfTechnicalRow[] {
   return detail.panels.map((panel, i) => {
-    const parts = [panel.technical_description?.trim() ?? '']
+    const written = panel.technical_description?.trim() ?? ''
+    const generated = written ? '' : describePanel({ panel, assemblies: detail.assemblies, items: detail.items, kits: detail.kits })
+    const parts = [written || generated]
     if (panel.enclosure_dimensions?.trim()) {
       parts.push(`Proposed Enclosure: ${panel.enclosure_dimensions.trim()}`)
     }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
+import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import type { EnquiryStatus } from '../../lib/database.types'
 import { createEnquiry, listContacts, listCustomers, listEnquiries, listProjects, updateEnquiry } from './api'
 
@@ -18,6 +19,7 @@ export function EnquiriesPage() {
   const [adding, setAdding] = useState(false)
   const [showClosed, setShowClosed] = useState(false)
   const canEdit = hasRole('costing_engineer') || hasRole('approver')
+  const byCompany = useCompanyFilter()
 
   const setStatus = useMutation({
     mutationFn: (input: { id: string; status: EnquiryStatus }) => updateEnquiry(input.id, { status: input.status }),
@@ -26,7 +28,7 @@ export function EnquiriesPage() {
 
   if (!company) return null
   const customerName = (id: string) => customers.data?.find((c) => c.id === id)?.name ?? '…'
-  const rows = (enquiries.data ?? []).filter((e) => showClosed || !['won', 'lost', 'closed'].includes(e.status))
+  const rows = (enquiries.data ?? []).filter((e) => (showClosed || !['won', 'lost', 'closed'].includes(e.status)) && byCompany.keep(e.company_id))
 
   return (
     <>
@@ -45,16 +47,18 @@ export function EnquiriesPage() {
 
       <div className="card">
         <div className="row end" style={{ marginBottom: '.5rem' }}>
+          <CompanyFilterSelect filter={byCompany} />
           <label className="row" style={{ gap: '.35rem' }}><input type="checkbox" checked={showClosed} onChange={(e) => setShowClosed(e.target.checked)} />Show won, lost and closed</label>
         </div>
         <div className="table-wrap">
           <Async query={enquiries} empty="No enquiries yet.">
             {() => rows.length === 0 ? <p className="empty">Nothing open.</p> : (
               <table>
-                <thead><tr><th>Number</th><th>Customer</th><th>Title</th><th>Received</th><th>Status</th><th className="right"></th></tr></thead>
+                <thead><tr>{byCompany.multi && <th>Company</th>}<th>Number</th><th>Customer</th><th>Title</th><th>Received</th><th>Status</th><th className="right"></th></tr></thead>
                 <tbody>
                   {rows.map((e) => (
                     <tr key={e.id}>
+                      {byCompany.multi && <td className="muted">{byCompany.companyName(e.company_id)}</td>}
                       <td>{e.enquiry_no}</td>
                       <td><button style={{ padding: '.1rem .4rem' }} onClick={() => navigate(`/crm/customers/${e.customer_id}`)}>{customerName(e.customer_id)}</button></td>
                       <td>{e.title}{e.description && <div className="muted" style={{ fontSize: '.8125rem' }}>{e.description}</div>}</td>

@@ -4,11 +4,13 @@ import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import type { Customer } from '../../lib/database.types'
 import { createContact, createProject, listContacts, listEnquiries, listProjects, updateContact, updateCustomer } from './api'
+import { CustomerEditForm } from './CustomerEditForm'
 
 /** One customer: its details, its people, its projects, its enquiries. */
 export function CustomerDetail({ customer, canEdit, onBack }: { customer: Customer; canEdit: boolean; onBack: () => void }) {
   const { company } = useSession()
   const queryClient = useQueryClient()
+  const [editing, setEditing] = useState(false)
   const contacts = useQuery({ queryKey: ['contacts', customer.id], queryFn: () => listContacts(customer.id) })
   const projects = useQuery({ queryKey: ['projects', customer.id], queryFn: () => listProjects(customer.id) })
   const enquiries = useQuery({ queryKey: ['enquiries'], queryFn: listEnquiries })
@@ -31,8 +33,21 @@ export function CustomerDetail({ customer, canEdit, onBack }: { customer: Custom
           <h1 style={{ margin: 0 }}>{customer.name}</h1>
           <p className="muted">{[customer.address, customer.city, customer.country].filter(Boolean).join(', ')}{customer.tax_pin && ` · PIN ${customer.tax_pin}`}</p>
         </div>
-        {canEdit && <button className="danger" onClick={() => { if (confirm('Retire this customer? It stays on old quotations but leaves the lists.')) retire.mutate() }}>Retire</button>}
+        {canEdit && (
+          <span className="row">
+            <button onClick={() => setEditing(true)}>Edit details</button>
+            <button className="danger" onClick={() => { if (confirm('Retire this customer? It stays on old quotations but leaves the lists.')) retire.mutate() }}>Retire</button>
+          </span>
+        )}
       </div>
+
+      {editing && (
+        <CustomerEditForm
+          customer={customer}
+          onClose={() => setEditing(false)}
+          onSaved={() => { setEditing(false); void queryClient.invalidateQueries({ queryKey: ['customers'] }) }}
+        />
+      )}
 
       <div className="card">
         <h2 style={{ marginTop: 0 }}>People</h2>

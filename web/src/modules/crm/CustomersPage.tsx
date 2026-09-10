@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
+import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { createCustomer, listCustomers, type CustomerInput } from './api'
 import { CustomerDetail } from './CustomerDetail'
 
@@ -16,6 +17,7 @@ export function CustomersPage() {
   const [adding, setAdding] = useState(false)
   const [search, setSearch] = useState('')
   const canEdit = hasRole('costing_engineer') || hasRole('approver')
+  const byCompany = useCompanyFilter()
 
   if (!company) return null
   if (id) {
@@ -26,7 +28,7 @@ export function CustomersPage() {
   }
 
   const needle = search.trim().toLowerCase()
-  const rows = (customers.data ?? []).filter((c) => c.is_active && (!needle || c.name.toLowerCase().includes(needle) || (c.city ?? '').toLowerCase().includes(needle)))
+  const rows = (customers.data ?? []).filter((c) => c.is_active && byCompany.keep(c.company_id) && (!needle || c.name.toLowerCase().includes(needle) || (c.city ?? '').toLowerCase().includes(needle)))
 
   return (
     <>
@@ -45,15 +47,19 @@ export function CustomersPage() {
       )}
 
       <div className="card">
-        <input placeholder="Search by name or city" value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginBottom: '.75rem' }} />
+        <div className="row" style={{ marginBottom: '.75rem' }}>
+          <input placeholder="Search by name or city" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1 }} />
+          <CompanyFilterSelect filter={byCompany} />
+        </div>
         <div className="table-wrap">
           <Async query={customers} empty="No customers yet. Add the first one.">
             {() => rows.length === 0 ? <p className="empty">Nothing matches.</p> : (
               <table>
-                <thead><tr><th>Name</th><th>City</th><th>Tax PIN</th><th></th></tr></thead>
+                <thead><tr>{byCompany.multi && <th>Company</th>}<th>Name</th><th>City</th><th>Tax PIN</th><th></th></tr></thead>
                 <tbody>
                   {rows.map((c) => (
                     <tr key={c.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/crm/customers/${c.id}`)}>
+                      {byCompany.multi && <td className="muted">{byCompany.companyName(c.company_id)}</td>}
                       <td>{c.name}</td><td className="muted">{c.city}</td><td className="muted">{c.tax_pin}</td>
                       <td className="right"><button>Open</button></td>
                     </tr>

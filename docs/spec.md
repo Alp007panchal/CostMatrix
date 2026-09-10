@@ -196,6 +196,10 @@ explicitly refreshes.
 - Status after release: `released` → `sent` → `won` or `lost`. A lost quotation requires a reason.
 - Follow-ups: a sent quotation may carry one or more follow-up reminders with a due date, note and assignee. A follow-up list shows due and overdue items per company.
 
+The technical description of a panel (Annexure IV) is drafted from its kits and lines — by
+kit group, each kit with its lines, then other components, then the enclosure — on request while
+costing and automatically at release when left blank; the engineer's own text always wins.
+
 ## 10. BOM exports
 
 From any costing (draft or approved), four separate exports, each in CSV and XLSX:

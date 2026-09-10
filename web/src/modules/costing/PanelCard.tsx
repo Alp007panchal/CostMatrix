@@ -16,6 +16,7 @@ import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
 import { Detail } from './PanelDetails'
+import { describePanel } from './technical'
 import type { ManualItemInput } from './api'
 
 interface Handlers {
@@ -132,9 +133,25 @@ export function PanelCard({
           <Detail label="Unit" value={panel.uom} editable={editable} onCommit={(v) => field('uom', v || 'PC')} />
           <Detail label="Enclosure" hint="e.g. 2100(H)×800(W)×800(D)" value={panel.enclosure_dimensions} editable={editable} onCommit={(v) => field('enclosure_dimensions', v)} />
           <div style={{ gridColumn: '1 / -1' }}>
-            <span className="muted" style={{ fontSize: '.8125rem' }}>Technical description (printed on the quotation)</span>
+            <div className="spread">
+              <span className="muted" style={{ fontSize: '.8125rem' }}>Technical description (printed on the quotation; left blank, it is written from the kits at release)</span>
+              {editable && assemblies.length > 0 && (
+                <button
+                  style={{ fontSize: '.8125rem' }}
+                  onClick={() => {
+                    const draft = describePanel({ panel, assemblies, items, kits })
+                    if (!panel.technical_description || window.confirm('Replace the current text with a draft written from the kits and lines?')) {
+                      field('technical_description', draft || null)
+                    }
+                  }}
+                >
+                  Draft from the kits
+                </button>
+              )}
+            </div>
             {editable ? (
               <textarea
+                key={panel.technical_description ?? ''}
                 defaultValue={panel.technical_description ?? ''}
                 style={{ minHeight: '7rem' }}
                 onBlur={(e) => e.target.value !== (panel.technical_description ?? '') && field('technical_description', e.target.value || null)}

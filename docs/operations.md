@@ -248,6 +248,21 @@ automated job uses them from GitHub secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
+### Set up a new company (sessions 5–6 review)
+Master administrator, in this order; each step is a screen that already exists.
+1. **Companies → Add company**: name, kind (external, buyer), currency code and printed label,
+   exchange rate (KES per 1 unit), and its discount on master prices.
+2. **People → Invite somebody**: choose the new company in the *Company* box, tick *Company
+   admin*. They get an email to set a password.
+3. Hand over. The new company admin then does, on their own screens: **Company** (margins,
+   VAT, rounding, enclosure uplift, quotation prefix, address), **Rates** (hourly rates per kind
+   of work, copper rate, any currency factor of their own), **Quotation wording** (letterhead,
+   logos, terms, signatory), **People** (their engineers and approvers).
+4. Their library: master parts and kits are already visible at their discount; private parts,
+   kits and kit groups are theirs to add (Components, Kits, Kit groups, or Import).
+You can read any company's costings, quotations, customers and enquiries (the lists gain a
+*Company* column and filter for you) but cannot change them; that is by design.
+
 ### Invite a user
 1. Sign in, open **People**.
 2. Fill in the name, email and roles under "Invite somebody", then send.
@@ -297,6 +312,12 @@ Under the kits, *Outside a kit* adds a catalogue component on its own (type to s
 are uplifted) or a **typed line** with its own price for a part the catalogue does not hold.
 Loose lines gather in one *Components and enclosure* line per panel. The Totals card shows the
 material split by category, which is what the old sheets subtotalled.
+
+### Write the technical offer from the kits (session 4)
+In a panel → *Details* → **Draft from the kits**: the technical description is written from
+the panel's kits (grouped by kit group, each with its lines), then the loose components, then
+the enclosure. Edit it freely; the quotation prints what you leave. A panel whose description is
+left blank gets the same draft at release, so Annexure IV is never empty for a costed panel.
 
 ### Add a part that is not in the catalogue (session 3)
 In the panel, *Outside a kit → typed in with a price*: name, category, price each in your
