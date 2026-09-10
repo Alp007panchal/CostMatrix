@@ -1,4 +1,5 @@
 import { supabase } from '../../lib/supabase'
+import { functionErrorMessage } from '../../lib/errors'
 import type {
   Company,
   CompanySettings,
@@ -120,9 +121,19 @@ export async function listPeople(companyId?: string): Promise<PersonWithRoles[]>
     rolesByUser.set(row.user_id, [...(rolesByUser.get(row.user_id) ?? []), row.role])
   }
 
+  // How much each person has done, so the screen knows who may still be moved
+  // or removed. It is one call for everybody, not one per row.
+  let footprints = new Map<string, number>()
+  try {
+    footprints = await listPersonFootprints()
+  } catch {
+    // An engineer may not ask; the screen simply shows no such buttons.
+  }
+
   return ((profiles ?? []) as Profile[]).map((profile) => ({
     ...profile,
     roles: rolesByUser.get(profile.id) ?? [],
+    records: footprints.get(profile.id),
   }))
 }
 
@@ -164,7 +175,33 @@ export async function invitePerson(input: {
   roles: UserRole[]
 }): Promise<void> {
   const { error } = await supabase.functions.invoke('invite-user', { body: input })
-  if (error) throw new Error(`Could not send the invitation: ${error.message}`)
+  if (error) throw new Error(await functionErrorMessage(error, 'Could not send the invitation'))
+}
+
+/**
+ * Deletes a login, but only for somebody who has done nothing yet; the function
+ * checks that in the database first. Everyone else is deactivated.
+ */
+export async function removePerson(userId: string): Promise<void> {
+  const { error } = await supabase.functions.invoke('remove-user', { body: { user_id: userId } })
+  if (error) throw new Error(await functionErrorMessage(error, 'Could not remove this person'))
+}
+
+/** Master admin only, and only before they have any records. */
+export async function movePerson(userId: string, companyId: string): Promise<void> {
+  const { error } = await supabase.rpc('move_person', { uid: userId, to_company: companyId })
+  fail('Could not move this person', error)
+}
+
+/** How many records name each person the caller administers. */
+export async function listPersonFootprints(): Promise<Map<string, number>> {
+  const { data, error } = await supabase.rpc('person_footprints')
+  fail('Could not count what people have done', error)
+  const counts = new Map<string, number>()
+  for (const row of (data ?? []) as { user_id: string; records: number }[]) {
+    counts.set(row.user_id, Number(row.records))
+  }
+  return counts
 }
 
 // --- logos ---------------------------------------------------------------------
