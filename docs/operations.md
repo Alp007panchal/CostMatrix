@@ -232,43 +232,57 @@ phone locks you out of your own system.
 Skip this to finish setup, but do it before you invite more than one or two people. Until you
 do, invitation and password-reset emails go through Supabase's own sender, which allows only a
 handful of messages an hour ("email rate limit exceeded" on the invitation form) and often lands
-in spam. Your own sender fixes both, and the email arrives from your address rather than a
-stranger's.
+in spam. Your own sender fixes both.
 
-You need an email account the app can send through. A Google Workspace or Microsoft 365 mailbox
-you already own is ideal, for example `noreply@neiltd.com`.
+No paid mail product is needed. **A free Gmail account works**, and is what we use.
 
-1. **Get a password for the app to use.** Not your normal password.
-   - *Google Workspace*: myaccount.google.com → Security → 2-Step Verification (turn it on if it
-     is not) → App passwords → create one named CostMatrix. Google shows a 16-character password
-     once. Copy it.
-   - *Microsoft 365*: an app password from your security settings, or ask whoever manages your
-     mail for SMTP credentials.
+1. **Create an app password.** Not your normal Gmail password: a separate one that only this app
+   uses, which you can revoke on its own.
+   1. myaccount.google.com, signed in as the account invitations should come from.
+   2. **Security** → **2-Step Verification**. Turn it on if it is off. App passwords do not exist
+      without it.
+   3. Open **myaccount.google.com/apppasswords** directly. (Searching "app passwords" in the
+      account search box also works, but the link is more reliable.)
+   4. Type a name, `CostMatrix`, and press **Create**.
+   5. Google shows a 16-character password once, in four groups. Copy it. The spaces do not
+      matter.
 2. **Supabase dashboard** → your project → **Project Settings** → **Authentication** → scroll to
    **SMTP Settings** → turn on **Enable Custom SMTP**.
-3. Fill in, for Google Workspace:
+3. Fill in:
 
    | Field | Value |
    |---|---|
-   | Sender email | the mailbox, e.g. `noreply@neiltd.com` |
+   | Sender email | the Gmail address |
    | Sender name | CostMatrix |
    | Host | `smtp.gmail.com` |
    | Port | `465` |
-   | Username | the same mailbox address |
-   | Password | the app password from step 1 |
+   | Username | the same Gmail address |
+   | Password | the 16-character app password |
 
-   Microsoft 365 uses host `smtp.office365.com` and port `587`.
-4. **Save**. Supabase sends a test message; if it fails, the username or password is usually the
-   problem, not the host.
-5. **Authentication** → **Rate Limits**: raise "Emails per hour" from the free-tier default to
-   something sensible, say 100. This box only matters once your own sender is connected.
-6. Check it: People → invite somebody → the email should arrive within a minute, from your
+   Sender email and username must be the same Gmail address. Google rejects a mismatched sender.
+4. **Save**. Supabase sends a test message. If it fails, the username or password is nearly
+   always the cause, not the host.
+5. **Authentication** → **Rate Limits**: set "Emails per hour" to `30`. A free Gmail account
+   allows roughly 500 messages a day, so 30 an hour leaves plenty of room. This box only matters
+   once your own sender is connected.
+6. Check it: People → invite somebody → the email should arrive within a minute, from your Gmail
    address, and not in spam.
 
-The password stays in Supabase. Never paste it into this chat, the repository or a browser
-console; nobody, including me, needs to see it.
+Two things to know. Invitations will show the Gmail address as the sender, which is fine for
+your own team and testers but worth replacing with a `neiltd.com` sender before you invite other
+companies. And this affects login and password-reset emails only: quotations are PDFs you
+download and send yourself, so they are unaffected.
 
-- [ ] Invitations arrive from your own address, or noted for later.
+**If you would rather not use Gmail.** An existing `neiltd.com` mailbox is better, because
+invitations then come from your own domain: ask whoever hosts that mail, or look in the hosting
+control panel under "Email accounts", for the outgoing server name, port, username and password,
+and put those in the same form. Brevo's free tier is the other option, 300 messages a day with
+no card, and gives its own SMTP details after you verify a sender address.
+
+The password stays in Supabase and your password manager. Never paste it into this chat, the
+repository or a browser console; nobody, including me, needs to see it.
+
+- [ ] Invitations arrive from your own sender, or noted for later.
 
 ### B10. Sign in
 
