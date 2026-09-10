@@ -4,10 +4,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
 import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
-import type { EnquiryStatus } from '../../lib/database.types'
+import type { Enquiry, EnquiryStatus } from '../../lib/database.types'
 import { createEnquiry, listContacts, listCustomers, listEnquiries, listProjects, updateEnquiry } from './api'
+import { DecideEnquiry } from './DecideEnquiry'
+import { listQuotations } from '../quotation/api'
 
-const STATUSES: EnquiryStatus[] = ['open', 'quoted', 'won', 'lost', 'closed']
+// Won and lost are not in this list: they are decided once, on the enquiry,
+// naming the quotation that won it (the Won or lost? button).
+const STATUSES: EnquiryStatus[] = ['open', 'quoted', 'closed']
 
 /** The enquiry log. Every costing hangs off one of these. */
 export function EnquiriesPage() {
@@ -16,7 +20,9 @@ export function EnquiriesPage() {
   const queryClient = useQueryClient()
   const enquiries = useQuery({ queryKey: ['enquiries'], queryFn: listEnquiries })
   const customers = useQuery({ queryKey: ['customers'], queryFn: listCustomers })
+  const quotations = useQuery({ queryKey: ['quotations'], queryFn: listQuotations })
   const [adding, setAdding] = useState(false)
+  const [deciding, setDeciding] = useState<Enquiry | null>(null)
   const [showClosed, setShowClosed] = useState(false)
   const canEdit = hasRole('costing_engineer') || hasRole('approver')
   const byCompany = useCompanyFilter()
@@ -37,12 +43,26 @@ export function EnquiriesPage() {
         {canEdit && <button className="primary" onClick={() => setAdding(true)} disabled={(customers.data ?? []).length === 0}>Log enquiry</button>}
       </div>
       <p className="muted">
-        Log each request as it comes in. Costings are created against an enquiry, and when the
-        quotation is sent, won or lost, the enquiry follows on its own.
+        Log each request as it comes in. Costings are created against an enquiry, and sending a
+        quotation marks the enquiry quoted. When you hear back, <strong>Won or lost?</strong>
+        decides the whole enquiry at once: winning it names the quotation that won, and the other
+        offers are marked superseded rather than lost.
         {(customers.data ?? []).length === 0 && ' Add a customer first.'}
       </p>
 
       {adding && <NewEnquiryForm onClose={() => setAdding(false)} onCreated={() => { setAdding(false); void queryClient.invalidateQueries({ queryKey: ['enquiries'] }) }} />}
+      {deciding && (
+        <DecideEnquiry
+          enquiry={deciding}
+          quotations={(quotations.data ?? []).filter((q) => q.costing?.enquiry_id === deciding.id)}
+          onClose={() => setDeciding(null)}
+          onDone={() => {
+            setDeciding(null)
+            void queryClient.invalidateQueries({ queryKey: ['enquiries'] })
+            void queryClient.invalidateQueries({ queryKey: ['quotations'] })
+          }}
+        />
+      )}
       {setStatus.error && <p className="error">{String(setStatus.error)}</p>}
 
       <div className="card">
@@ -64,13 +84,21 @@ export function EnquiriesPage() {
                       <td>{e.title}{e.description && <div className="muted" style={{ fontSize: '.8125rem' }}>{e.description}</div>}</td>
                       <td className="muted">{e.received_on}</td>
                       <td>
-                        {canEdit ? (
+                        {canEdit && !['won', 'lost'].includes(e.status) ? (
                           <select value={e.status} onChange={(ev) => setStatus.mutate({ id: e.id, status: ev.target.value as EnquiryStatus })} style={{ width: 'auto' }}>
                             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                           </select>
                         ) : <span className="badge">{e.status}</span>}
+                        {e.status === 'lost' && e.lost_reason && (
+                          <div className="muted" style={{ fontSize: '.75rem' }}>{e.lost_reason}</div>
+                        )}
                       </td>
-                      <td className="right"><button onClick={() => navigate(`/costings?enquiry=${e.id}`)}>Costings</button></td>
+                      <td className="right">
+                        {canEdit && !['won', 'lost'].includes(e.status) && (
+                          <><button className="primary" onClick={() => setDeciding(e)}>Won or lost?</button>{' '}</>
+                        )}
+                        <button onClick={() => navigate(`/costings?enquiry=${e.id}`)}>Costings</button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

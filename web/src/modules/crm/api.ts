@@ -124,3 +124,23 @@ export async function setFollowupDone(id: string, done: boolean): Promise<void> 
   const { error } = await supabase.from('quotation_followups').update({ done_at: done ? new Date().toISOString() : null }).eq('id', id)
   fail('Could not update the follow-up', error)
 }
+
+/**
+ * Won or lost, decided once for the whole enquiry. Winning names the quotation
+ * that won it and takes the other offers off the table; losing needs a reason,
+ * which every offer still live takes with it.
+ */
+export async function decideEnquiry(
+  enquiryId: string,
+  decision: 'won' | 'lost',
+  winningQuotationId: string | null,
+  reason: string | null,
+): Promise<void> {
+  const { error } = await supabase.rpc('decide_enquiry', {
+    target: enquiryId,
+    decision,
+    winning_quotation: winningQuotationId,
+    reason,
+  })
+  fail('Could not record the decision', error)
+}

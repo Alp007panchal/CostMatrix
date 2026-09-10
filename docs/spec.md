@@ -205,11 +205,16 @@ explicitly refreshes.
 - **Text sources**: letterhead, signatory and default terms come from company settings; prices, panels and VAT from the costing; subject, notes on the offer, terms wording and signatory are pre-filled and editable by the approver at release, then frozen with the quotation.
 - **Currency**: amounts in the company currency, labelled with the company's currency word (for example "KSH"). No second currency on the PDF in release 1.
 - The PDF is generated at release and stored. It is the document of record and is never regenerated silently. A changed costing needs a new revision and a new release.
-- Status after release: `released` → `sent` → `won` or `lost`. A lost quotation requires a reason.
+- Status after release: `released` → `sent`, then the **enquiry** is decided. `app.decide_enquiry(enquiry, won|lost, winning_quotation, reason)` marks the named quotation `won` and every other offer of that enquiry still live `superseded` — they were never turned down — or, when the job is lost, marks every live offer `lost` with the reason, which is also kept on the enquiry (`won_quotation_id`, `lost_reason`). One job is decided once. A quotation whose costing has no enquiry is still decided on its own row, because there is nowhere else to decide it; a lost quotation always requires a reason.
+- The quotations screen groups by enquiry, then by family, with the newest revision of each offer first and the earlier ones folded behind it.
 - Follow-ups: a sent quotation may carry one or more follow-up reminders with a due date, note and assignee. A follow-up list shows due and overdue items per company.
 
+**Busbar is not printed in Annexure IV.** It is how the board is built rather than what the
+customer is choosing, and its sizes and metres tell a competitor how the board is made. Cable is
+filed under accessories and still prints.
+
 The technical description of a panel (Annexure IV) is drafted from its kits and lines — by
-kit group, each kit with its lines, then other components, then the enclosure — on request while
+section, falling back to the kit group, then other components, then the enclosure — on request while
 costing and automatically at release when left blank; the engineer's own text always wins.
 
 ## 10. BOM exports

@@ -362,6 +362,22 @@ Role checks per area:
   `{costing_id, costing_no, title, from_costing_no, repriced, kept}`.
 - Public wrappers `copy_costing` and `copy_panel`; `grant execute` to `authenticated`.
 
+### Added by migration 0016 — one enquiry, one decision
+
+- **quotation_status** gains **superseded**: another offer against the same enquiry won, so this
+  one is off the table. It is not "lost": nobody turned it down.
+- **enquiries.won_quotation_id** (composite foreign key `(won_quotation_id, company_id) →
+  quotations (id, company_id)`, `on delete set null`) and **enquiries.lost_reason**. The
+  composite key needs `quotations` unique on `(id, company_id)`, added here.
+- **app.decide_enquiry(enquiry, 'won'|'lost', winning_quotation, reason)** — SECURITY DEFINER,
+  company and role checked. Won: the named quotation (which must belong to that enquiry) becomes
+  `won` and every other `released`/`sent` quotation of the enquiry becomes `superseded`; the
+  enquiry becomes `won` and names the winner. Lost: a reason is required, every live quotation of
+  the enquiry becomes `lost` with it, and the enquiry keeps it too. One history line per current
+  costing of the enquiry. Returns `{enquiry_id, decision, decided, superseded}`.
+- `app.set_quotation_status` is unchanged and still decides a quotation whose costing has no
+  enquiry — there is nowhere else to decide it.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).

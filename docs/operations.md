@@ -508,9 +508,20 @@ material value; **Excel** or **CSV** per category, or **All four as one workbook
 are already multiplied through assembly and panel quantities, so the figure is what to buy.
 Works on a draft too, which is handy for checking a costing before submitting it.
 
-### Record the outcome of a quotation
-**Quotations** → **Mark sent** when it goes to the customer, then **Won** or **Lost**. Lost asks
-for a reason. That reason is what the sales reports are built on later, so make it honest.
+### Record the outcome of a job
+**Quotations** → **Mark sent** when a quotation goes to the customer. When you hear back, press
+**Won or lost?** on the job (or on the row in **Enquiries**) and decide the whole enquiry at once:
+
+- **Won** asks which quotation won it. That one is marked won; every other offer still on the
+  table against the same enquiry is marked **superseded** — they were never turned down, they
+  are simply no longer live.
+- **Lost** asks why, and every offer still on the table takes that reason. It is what the sales
+  reports are built on later, so make it honest.
+
+The quotations screen reads one job as one job: the enquiry at the top, each offer under it, and
+the earlier revisions of an offer folded behind the newest — press *2 earlier revisions* to see
+them. A quotation whose costing was raised without an enquiry has nowhere to record won or lost;
+link its costing to an enquiry if you need to.
 
 ### Find out what happened to a costing (slice 1)
 Open the costing and scroll to **History** at the bottom. Every submission, approval, return,
