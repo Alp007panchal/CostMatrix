@@ -40,14 +40,28 @@ url="https://$STAGING_REF.supabase.co"
 # --- API keys -----------------------------------------------------------------
 # Projects created recently return publishable/secret keys; older ones anon and
 # service_role. Accept either naming.
-keys="$(curl -sS "$api/v1/projects/$STAGING_REF/api-keys" \
+keys_file="$(mktemp)"
+trap 'rm -f "$keys_file"' EXIT
+keys_status="$(curl -sS -o "$keys_file" -w '%{http_code}' "$api/v1/projects/$STAGING_REF/api-keys" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN")"
 
-anon_key="$(jq -r 'first(.[] | select(.name == "anon" or .name == "publishable") | .api_key) // empty' <<<"$keys")"
-secret_key="$(jq -r 'first(.[] | select(.name == "service_role" or .name == "secret") | .api_key) // empty' <<<"$keys")"
+if [[ "$keys_status" != 2* ]]; then
+  echo "::error::GET /v1/projects/$STAGING_REF/api-keys returned HTTP $keys_status" >&2
+  msg="$(jq -r '.message // .msg // .error // empty' "$keys_file" 2>/dev/null || true)"
+  if [[ -n "$msg" ]]; then echo "Supabase said: $msg" >&2; fi
+  echo "Full response body:" >&2
+  cat "$keys_file" >&2
+  exit 1
+fi
+
+anon_key="$(jq -r 'first(.[] | select(.name == "anon" or .name == "publishable") | .api_key) // empty' "$keys_file")"
+secret_key="$(jq -r 'first(.[] | select(.name == "service_role" or .name == "secret") | .api_key) // empty' "$keys_file")"
 
 if [[ -z "$anon_key" || -z "$secret_key" ]]; then
-  echo "::error::Could not read the project's API keys. Key names found: $(jq -r '[.[].name] | join(", ")' <<<"$keys")" >&2
+  echo "::error::Could not find a publishable and a secret key in the project's API keys." >&2
+  echo "Key names the project returned: $(jq -r '[.[].name] | join(", ")' "$keys_file" 2>/dev/null || echo '(unreadable)')" >&2
+  echo "Full response body:" >&2
+  cat "$keys_file" >&2
   exit 1
 fi
 # Mask the secret key so it cannot appear in the log even by accident.
