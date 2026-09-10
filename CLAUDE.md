@@ -97,12 +97,12 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   never paste or request secrets in chat.
 - Keep momentum inside an approved slice: build it to the end, verify, open the PR, report.
   Ask before anything destructive or outside the plan.
-- **Two tracks (D-168, `docs/reference/two-track-setup.md`).** `main` is the basic app on
+- **Two tracks (D-169, `docs/reference/two-track-setup.md`).** `main` is the basic app on
   production and must stay releasable: bug fixes, trial findings, labour hours, prices, the
   enclosure uplift rule. `advanced` is the long-lived branch for the foundations (F1–F11) and
   the AI assistant, against the separate CostMatrix Staging project. Work on a feature branch
   off the track you are on, **one pull request per feature, never stacked**, targeting that
-  track. Advanced migrations are numbered from **0100**, basic ones from 0018 (D-169).
+  track. Advanced migrations are numbered from **0100**, basic ones from 0018 (D-170).
   Migrations reach production on merge to `main`, and staging on merge to `advanced`.
 - Verify before claiming: `supabase/tests/run-local.sh` (it imports the real `data/seed`
   files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
