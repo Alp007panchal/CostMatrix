@@ -343,6 +343,25 @@ Role checks per area:
   company's row. Row visibility is unchanged — the view runs as the caller, so the table's
   policies still decide what is returned.
 
+### Added by migration 0015 — copying
+
+- **app.write_history(costing, action, details)** — the one way an ordinary function writes a
+  history row: SECURITY DEFINER (a signed-in user has no insert of their own on
+  `costing_history`, which is what makes it a log), and it still checks the costing belongs to
+  the caller's company.
+- **app.copy_panel(source_panel, target_costing, new_name)** — copies a panel with its
+  sections, lines and hours into an editable draft of the same company. Not SECURITY DEFINER:
+  it prices through `v_component_prices`, which resolves for the signed-in company, and every
+  insert goes through the ordinary policies. Catalogue lines are re-frozen through
+  `app.freeze_component` at today's rates; typed lines keep their price; a line that cannot be
+  re-priced is copied as it was. Returns `{panel_id, repriced, kept}` where `kept` lists those
+  lines with `code`, `name`, `unit_price` and a reason.
+- **app.copy_costing(source, new_title, enquiry)** — `app.create_costing` for the new job (new
+  number, new family, revision 0, today's company settings), then `copy_panel` for each panel,
+  then a `copied` history row naming the source. Returns
+  `{costing_id, costing_no, title, from_costing_no, repriced, kept}`.
+- Public wrappers `copy_costing` and `copy_panel`; `grant execute` to `authenticated`.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).

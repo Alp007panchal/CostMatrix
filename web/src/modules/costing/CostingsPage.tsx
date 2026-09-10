@@ -5,8 +5,9 @@ import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
 import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { longDate, money } from '../../lib/format'
-import type { CostingStatus } from '../../lib/database.types'
+import type { Costing, CostingStatus, CostingTotals } from '../../lib/database.types'
 import { createCosting, listCostings } from './api'
+import { CopyCostingForm } from './CopyCosting'
 import { listEnquiries } from '../crm/api'
 
 const STATUS_LABEL: Record<CostingStatus, string> = {
@@ -26,6 +27,7 @@ export function CostingsPage() {
   const enquiryFilter = params.get('enquiry')
 
   const [creating, setCreating] = useState(false)
+  const [copying, setCopying] = useState<Costing | null>(null)
   const [showOld, setShowOld] = useState(false)
   const canCreate = hasRole('costing_engineer') || hasRole('approver')
   const byCompany = useCompanyFilter()
@@ -58,6 +60,19 @@ export function CostingsPage() {
         />
       )}
 
+      {copying && (
+        <CopyCostingForm
+          source={copying}
+          enquiries={(enquiries.data ?? []).filter((e) => !['won', 'lost', 'closed'].includes(e.status))}
+          onClose={() => setCopying(null)}
+          onOpen={(id) => {
+            void queryClient.invalidateQueries({ queryKey: ['costings'] })
+            setCopying(null)
+            navigate(`/costings/${id}`)
+          }}
+        />
+      )}
+
       <div className="card">
         <div className="row end" style={{ marginBottom: '.5rem' }}>
           <CompanyFilterSelect filter={byCompany} />
@@ -79,6 +94,7 @@ export function CostingsPage() {
                     <th>Status</th>
                     <th>Created</th>
                     <th className="right">Total</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,6 +119,16 @@ export function CostingsPage() {
                       <td className="muted">{longDate(c.created_at)}</td>
                       <td className="right">
                         {c.totals ? money(c.totals.grand_total, c.currency_label) : '—'}
+                      </td>
+                      <td className="right">
+                        {canCreate && (
+                          <button
+                            title="Start a new job from this one, priced today"
+                            onClick={(e) => { e.stopPropagation(); setCopying(stripTotals(c)) }}
+                          >
+                            Copy
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -172,4 +198,10 @@ function NewCostingForm({
       </div>
     </form>
   )
+}
+
+/** The list carries each costing's totals alongside it; the copy form wants the costing itself. */
+function stripTotals(row: Costing & { totals: CostingTotals | null }): Costing {
+  const { totals: _totals, ...costing } = row
+  return costing
 }

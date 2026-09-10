@@ -148,8 +148,9 @@ request straight to `main`; the owner reviews and merges.
 15. **Sections inside a panel** — Incomer, AVR bypass, ATS, 2nd incomer, Outgoers, Accessories,
     APFC bank, plus anything typed; a subtotal per section; the loose parts of a section gather
     in that section; Annexure IV takes its headings from them (migration 0014).
-16. **Copy a costing or a panel** — into a new enquiry or the same one, re-priced at today's
-    rates, with a list of anything that could not be re-priced.
+16. **Copy a costing or a panel** — as a new job (own number, revision 0, source untouched),
+    into a new enquiry or none, re-priced at today's rates, with a list of anything that could
+    not be re-priced (migration 0015).
 17. **One enquiry, one decision** — revisions of one job group under their enquiry instead of
     reading as separate quotations; Won and Lost are decided on the enquiry, naming the winning
     quotation; busbar drops out of Annexure IV.
