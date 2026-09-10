@@ -9,8 +9,10 @@ import type {
   CostingItem,
   CostingLabour,
   CostingPanel,
+  CopyReport,
   CostingTotals,
   OptionTotals,
+  PanelCopyReport,
   PanelPrice,
   PanelSection,
 } from '../../lib/database.types'
@@ -284,6 +286,42 @@ export async function createRevision(id: string): Promise<Costing> {
   const { data, error } = await supabase.rpc('create_costing_revision', { target: id })
   fail('Could not create a revision', error)
   return data as Costing
+}
+
+// --- copying ------------------------------------------------------------------
+
+/**
+ * A copy is a new job: its own number, revision 0, the source untouched. Every
+ * catalogue line is priced again at today's rates; the report names anything
+ * that could not be, so the engineer checks it rather than trusting it.
+ */
+export async function copyCosting(
+  source: string,
+  title: string | null,
+  enquiryId: string | null,
+): Promise<CopyReport> {
+  const { data, error } = await supabase.rpc('copy_costing', {
+    source,
+    new_title: title,
+    enquiry: enquiryId,
+  })
+  fail('Could not copy the costing', error)
+  return data as CopyReport
+}
+
+/** One panel, into this costing or another draft of the same company. */
+export async function copyPanel(
+  sourcePanelId: string,
+  targetCostingId: string,
+  newName: string | null,
+): Promise<PanelCopyReport> {
+  const { data, error } = await supabase.rpc('copy_panel', {
+    source_panel: sourcePanelId,
+    target_costing: targetCostingId,
+    new_name: newName,
+  })
+  fail('Could not copy the panel', error)
+  return data as PanelCopyReport
 }
 
 // --- bill of materials -------------------------------------------------------

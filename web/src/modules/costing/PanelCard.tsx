@@ -4,6 +4,7 @@ import type {
   AssemblyTotals,
   ComponentCategory,
   ComponentPrice,
+  Costing,
   CostingAssembly,
   CostingItem,
   CostingLabour,
@@ -12,6 +13,7 @@ import type {
   PanelPrice,
 } from '../../lib/database.types'
 import { PanelLines } from './PanelLines'
+import { CopyPanel } from './CopyPanel'
 import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
@@ -31,11 +33,14 @@ interface Handlers {
   onItemQuantity: (id: string, quantity: number) => void
   onItemRemove: (id: string) => void
   onHours: (id: string, hours: number) => void
+  onPanelCopied: () => Promise<void> | void
 }
 
 /** One panel: its details, its price, the kits it is made of and its loose lines. */
 export function PanelCard({
   panel,
+  costing,
+  drafts,
   price,
   assemblies,
   items,
@@ -51,6 +56,9 @@ export function PanelCard({
   handlers,
 }: {
   panel: CostingPanel
+  costing: Costing
+  /** The company's other open drafts, so a panel can be copied into one. */
+  drafts: Costing[]
   price: PanelPrice | undefined
   assemblies: CostingAssembly[]
   items: CostingItem[]
@@ -207,6 +215,7 @@ export function PanelCard({
             onAddComponent={(cid, qty) => handlers.onAddComponent(panel.id, cid, qty, clean(section))}
             onAddManual={(input) => handlers.onAddManual(panel.id, input, clean(section))}
           />
+          <CopyPanel panel={panel} costing={costing} drafts={drafts} onCopied={handlers.onPanelCopied} />
         </>
       )}
     </div>

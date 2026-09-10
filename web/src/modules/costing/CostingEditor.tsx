@@ -7,7 +7,7 @@ import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
   addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, listPanelSections, removeCostingAssembly, removeItem, removePanel,
+  getCostingDetail, listBomItems, listCostings, listPanelSections, removeCostingAssembly, removeItem, removePanel,
   returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity, setLabourHours,
   submitCosting, updateCosting, updatePanel,
 } from './api'
@@ -34,6 +34,7 @@ export function CostingEditor() {
   const processTypes = useQuery({ queryKey: ['process-types'], queryFn: listProcessTypes })
   const bom = useQuery({ queryKey: ['bom', id], queryFn: () => listBomItems(id), enabled: Boolean(id) })
   const sections = useQuery({ queryKey: ['panel-sections'], queryFn: listPanelSections })
+  const costings = useQuery({ queryKey: ['costings'], queryFn: listCostings })
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['costing', id] })
@@ -143,6 +144,10 @@ export function CostingEditor() {
               <PanelCard
                 key={panel.id}
                 panel={panel}
+                costing={costing}
+                drafts={(costings.data ?? []).filter(
+                  (c) => c.status === 'draft' && c.is_current && c.company_id === costing.company_id,
+                )}
                 price={panelPrices.find((p) => p.panel_id === panel.id)}
                 assemblies={assemblies.filter((a) => a.panel_id === panel.id)}
                 items={items}
@@ -167,6 +172,7 @@ export function CostingEditor() {
                   onItemQuantity: (iid, q) => run(() => setItemQuantity(iid, q)),
                   onItemRemove: (iid) => run(() => removeItem(iid)),
                   onHours: (lid, h) => run(() => setLabourHours(lid, h)),
+                  onPanelCopied: refresh,
                 }}
               />
             ))}

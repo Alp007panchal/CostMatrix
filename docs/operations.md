@@ -401,6 +401,24 @@ loose parts of each section gather in that section's own *components and enclosu
 **Draft from the kits** writes the technical description under the section headings. The bills
 of materials stay grouped by category, which is what they are bought by.
 
+### Copy a costing, or one panel, for a similar job
+On **Costings**, the **Copy** button at the end of a row starts a new job from that one: give it
+a title, point it at an enquiry if you have one, and press *Copy at today's prices*. You get a new
+costing number, revision 0, a draft — and the costing you copied is left exactly as it was.
+
+**A copy is priced again from scratch.** Every catalogue line takes today's purchase price,
+landed factor and copper rate, and your company's settings as they are now. That is the point:
+a job quoted last year at last year's copper price would be quoted wrong. A line you typed in
+keeps the price you typed, because nothing else knows what it cost. If a part has since left the
+catalogue or lost its price, the line comes across at its **old** price and the screen lists it —
+check those before quoting.
+
+Inside a costing, **Copy this panel** at the bottom of a panel does the same for one panel: into
+the same costing (a second, near-identical board) or into another of your open drafts.
+
+A copy is not a revision. A revision is another version of the *same* job, keeps the number and
+supersedes the one before it; a copy is a *different* job that happens to start from this one.
+
 ### Write the technical offer from the kits (session 4)
 In a panel → *Details* → **Draft from the kits**: the technical description is written from
 the panel's kits under their section headings (a kit in no section falls back to its kit group),

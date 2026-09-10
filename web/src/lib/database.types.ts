@@ -78,6 +78,31 @@ export interface PersonWithRoles extends Profile {
 
 export type PricingMode = 'fixed' | 'weight_rate'
 
+/** A catalogue line a copy could not re-price, and why (app.copy_costing). */
+export interface KeptLine {
+  code: string
+  name: string
+  unit_price: number
+  reason: string
+}
+
+/** What app.copy_costing did. */
+export interface CopyReport {
+  costing_id: string
+  costing_no: string
+  title: string
+  from_costing_no: string
+  repriced: number
+  kept: KeptLine[]
+}
+
+/** What app.copy_panel did. */
+export interface PanelCopyReport {
+  panel_id: string
+  repriced: number
+  kept: KeptLine[]
+}
+
 /** A section name offered when something is added to a panel (panel_sections). */
 export interface PanelSection {
   name: string
