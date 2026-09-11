@@ -553,6 +553,22 @@ Refused, as for any other edit: a costing that is not an open draft, a proposal 
 (to them it is not there), a person without `app.can_edit_costings()`, an empty set of accepted
 lines, the same proposal or the same finding twice.
 
+### Added by migration 0105 — supplier price lists (advanced track)
+
+No tables: the F9 framework (0102) already had them. Functions, all SECURITY INVOKER, so
+`app.assert_may_import` and the library policies decide who may re-price what.
+
+| Function | What it does |
+|---|---|
+| `app.normalise_part_key(text)` | A reference with every non-alphanumeric character stripped, upper case. The basis of the loose match. |
+| `app.match_price_list_row(to_company, key, maker)` | Four attempts, most trustworthy first: `code`, `part_number`, `manufacturer_part_number`, `part_number_loose`. Returns the part, the method, and how many answered — more than one is a warning, never a guess. |
+| `start_price_list(to_company, file_name, rows, mapping, document)` | One `import_jobs` row of type `price_list` plus one `import_rows` row per line, each with its match, old → new, `change_pct` and a status (`changed` / `unchanged` / `new` / `warning` / `rejected`). **Writes nothing else.** |
+| `accept_price_rows(job, row_ids)` | Applies the rows a person accepted (all the `changed` ones when `row_ids` is null): sets `purchase_price`, `purchase_currency`, `price_valid_from`, `price_source`, clears `is_placeholder`, marks the row `accepted`, recounts the job and writes `price_list.accepted` to the activity log. |
+| `discard_import_job(job, reason)` | A `preview` job nobody wants becomes `discarded`, with the reason kept. |
+
+`app.record_component_price_change` (0008) is re-derived to write `component_price_history.source`
+from the component's own `price_source`, so every price change says where it came from (D-212).
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

@@ -150,3 +150,51 @@ function widthFor(key: ColumnKey): number {
     default: return 16
   }
 }
+
+/**
+ * Any spreadsheet, read as a table of text: the header row is found rather than
+ * assumed, and the cells come back keyed by whatever the file calls its columns.
+ * Used by the price-list upload, where the columns are the supplier's, not ours.
+ */
+export interface SheetTable {
+  name: string
+  headers: string[]
+  rows: Record<string, string>[]
+  /** The file row the first data row came from, so the review can name it. */
+  firstRowNumber: number
+}
+
+export async function readSheetTables(file: File): Promise<SheetTable[]> {
+  const ExcelJS = await excel()
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(await file.arrayBuffer())
+
+  const tables: SheetTable[] = []
+  workbook.eachSheet((ws) => {
+    let headerRow = 0
+    let headers: string[] = []
+    for (let r = 1; r <= Math.min(ws.rowCount, 30); r++) {
+      const cells = cellStrings(ws.getRow(r))
+      // A header row is the first with at least two words in it and no blanks
+      // between them — a title line has one cell, a data row has numbers.
+      const filled = cells.filter((c) => c !== '')
+      if (filled.length >= 2 && filled.every((c) => c.length < 60)) {
+        headerRow = r
+        headers = cells.map((c, i) => (c === '' ? `Column ${i + 1}` : c))
+        break
+      }
+    }
+    if (headerRow === 0) return
+
+    const rows: Record<string, string>[] = []
+    for (let r = headerRow + 1; r <= ws.rowCount; r++) {
+      const cells = cellStrings(ws.getRow(r))
+      if (cells.every((c) => c === '')) continue
+      const row: Record<string, string> = {}
+      headers.forEach((h, i) => { row[h] = cells[i] ?? '' })
+      rows.push(row)
+    }
+    tables.push({ name: ws.name, headers, rows, firstRowNumber: headerRow + 1 })
+  })
+  return tables
+}
