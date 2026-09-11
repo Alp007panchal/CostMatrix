@@ -558,6 +558,29 @@ the panel's kits under their section headings (a kit in no section falls back to
 each with its lines, then the loose components and the enclosure. Edit it freely; the quotation prints what you leave. A panel whose description is
 left blank gets the same draft at release, so Annexure IV is never empty for a costed panel.
 
+### Start a costing from somebody else's parts list (phase 2.3)
+
+When a consultant sends a schedule, a customer attaches their own list, or you have an EPLAN
+export: **Costings** → open a draft costing → **Import a parts list** → *Import a file…*
+
+1. Choose the CSV or Excel file. Say which column holds the **part number**; the app guesses from
+   the column names. A missing quantity column means one of each.
+2. **Match … rows.** Nothing is added to the costing yet.
+3. Read the review. Each row offers a choice, already set to what the app thinks:
+   - **Kit** — the row named a device that is a kit's main device, so the kit is offered first.
+     That is usually what you want: the kit carries the busbar, cable, accessories and labour that
+     the bare device does not.
+   - **Part on its own** — for a part no kit is built around, or when you want just the device.
+   - **Placeholder** — for a part number nobody has. It is added to your company's library with no
+     price; it does **not** go on the costing, because an unpriced part cannot be costed. Price it
+     on the Components screen, then add it. Only an administrator can do this.
+   - **Leave this row out.**
+4. Set the quantities if the file's are wrong, name the new panel, and **Bring in …**.
+
+What comes in lands on a panel of its own, priced by the engine exactly as hand-added lines are,
+and every line records that it came from that file. Rows the app could not read at all — no part
+number, a quantity like "as required" — are listed with the reason and brought in by nobody.
+
 ### Add a part that is not in the catalogue (session 3)
 In the panel, *Outside a kit → typed in with a price*: name, category, price each in your
 currency, quantity. It lives in that costing only. When you know its purchase price, add it to

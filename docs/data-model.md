@@ -568,6 +568,22 @@ No tables: the F9 framework (0102) already had them. Functions, all SECURITY INV
 
 `app.record_component_price_change` (0008) is re-derived to write `component_price_history.source`
 from the component's own `price_source`, so every price change says where it came from (D-212).
+### Added by migration 0107 — importing somebody else's parts list (advanced track)
+
+No tables: the F9 framework again, with `import_jobs.type = 'bom'` and the costing it is for kept
+in `summary.costing_id`.
+
+| Function | What it does |
+|---|---|
+| `match_catalogue_row(key, maker)` | The four attempts of 0105 over every component the caller can see — master and own. |
+| `kits_with_main_device(component)` | The active kits that part is the main device of, with their group, line count and whether any line is unpriced. |
+| `start_bom_import(costing, file_name, rows, mapping, document)` | One job and one row per line: matched part, the kit proposed where exactly one kit uses it as its main device, quantity (blank means one), and a status — `new`, `warning` (nothing matched, or several parts answer to the reference) or `rejected`. Writes nothing to the costing. |
+| `add_line_with_origin(panel, kind, ref, qty, section, origin, origin_ref)` | 0104's `apply_proposal_line` with the origin as an argument, merge rule included. |
+| `apply_bom_import(job, decisions)` | Brings the chosen rows onto a new panel: each row a kit, a part, a new placeholder (library only, no line) or nothing. Writes `bom.imported` to the activity log. |
+
+The two import policies of 0102 are re-derived with one extra clause each: a `bom` job of this
+company may be written by anybody who may edit costings, not only a company administrator (D-222).
+
 ### Added by migration 0106 — foundations F12, physical dimensions (advanced track)
 
 Groundwork for the panel layout canvas (roadmap 3.8). Everything nullable; nothing in the engine
