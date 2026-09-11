@@ -17,6 +17,7 @@ import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
 import { DocumentFiles } from '../documents/DocumentFiles'
+import { BomImportCard } from './BomImportCard'
 import { AssistantPanel } from '../assistant/AssistantPanel'
 
 /**
@@ -202,6 +203,9 @@ export function CostingEditor() {
                 </p>
               </div>
             )}
+
+            {/* Somebody else's parts list, matched to kits and parts (roadmap 2.3). */}
+            <BomImportCard costingId={costing.id} editable={editable} />
 
             {/* The spec, the tender schedule, the drawing this costing answers.
                 Kept with it, and read so the assistant can use them later. */}
