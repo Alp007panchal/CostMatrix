@@ -106,6 +106,25 @@ If company settings are separate columns today (rounding increment, VAT, currenc
 
 Defined in `ai-assistant-spec.md` §6: `assistant_conversations`, `assistant_messages`, `assistant_proposals`. Create them in the foundations slice even though the assistant UI comes in phase 2, so the provenance field in F4 and the activity log in F6 can reference them.
 
+### F12. Physical dimensions
+
+Groundwork for the panel layout canvas (3.8), added 11 Sep 2026 at the owner's request and built as
+migration 0106. Nothing reads it until the canvas exists, and every column is nullable, so the
+library stays valid while it is unmeasured.
+
+- `components`: `width_mm`, `height_mm`, `depth_mm`, `mounting_type` (din_rail / plate /
+  withdrawable / door / busbar_chamber / other), `clearances` jsonb (top, bottom, left, right in
+  mm) and `weight_kg`.
+- `components.enclosure_layout` jsonb, on an enclosure cubicle only: the usable internal mounting
+  area (w, h, d), the busbar and cable chamber sizes, and the form of separation it is built to.
+- `assemblies`: `footprint_w_mm`, `footprint_h_mm`, `footprint_d_mm` — optional overrides; null
+  means "the main device plus its clearances", which is right for most kits.
+- `panel_layouts`: one arrangement of one panel line item, versioned — its cubicles, each with the
+  placements of kit lines at x, y, w, h and rotation in mm. Empty until 3.8.
+- `app.panel_fit(panel)`: an area-only check — the footprints on the panel against the usable area
+  of its cubicles, times a per-company safety factor (`company_options.layout_safety_factor`,
+  default 1.3) — shown as one advisory line on the costing screen. No price or hour changes.
+
 **Not foundations, do not build now:** busbar run calculator, 3D/space checks, e-signature, email sending, external portals. They sit on top of the above without changing it.
 
 ---
@@ -135,6 +154,7 @@ Ordered by dependency and value. Each is one Claude Code session and one PR, as 
 | 3.4 | **Compatibility checks**: rules on kits/components (frame vs enclosure depth, accessory fits device, feeder total vs incomer rating sanity check) surfaced as warnings, also used by the AI review | EPLAN parts checks | F1 attributes, F2 rules |
 | 3.5 | **Labour standards from actuals**: Opsmatrix timesheet feed into `labour_actuals`; admin screen to accept suggested standard hours per kit group | Accubid | F3, Opsmatrix |
 | 3.6 | **Sales analytics**: win/loss by customer, product group, value band and reason; hit rate; margin achieved vs quoted; pipeline view | CPQ / CRM phase 2 | F6, CRM |
+| 3.8 | **Panel layout canvas**: a front view per cubicle at true scale; kits dragged onto mounting-plate and DIN-rail zones with their clearances respected; busbar and cable chambers drawn as unavailable space; a fit / no-fit verdict that proposes the cubicle count and width for the enclosure line; later exported as the general-arrangement sketch in Annexure IV | Rittal RiPanel, EPLAN Pro Panel | F12, F2 |
 | 3.7 | **AI assistant phase 2**: natural-language questions over the company's own data; drafting cover letters, follow-ups and clarification questions; external companies switched on per company | — | 2.4 |
 
 ## 5. Phase 4 — deeper integration (6–12 months)
@@ -142,7 +162,7 @@ Ordered by dependency and value. Each is one Claude Code session and one PR, as 
 | # | Feature | Borrowed from |
 |---|---|---|
 | 4.1 | Busbar run calculator (the `CU-OPT1` logic, reference §1.4) as an optional way to fill busbar kit parameters | Current workbook |
-| 4.2 | Enclosure fill/space check from component dimensions in `attributes` | Rittal RiPanel |
+| 4.2 | ~~Enclosure fill/space check from component dimensions in `attributes`~~ — **brought forward**: the dimensions are F12 and the check is 3.8 | Rittal RiPanel |
 | 4.3 | Technical offer export to Word/EPLAN-compatible parts list; import of EPLAN project metadata (project name, drawing numbers) onto the costing | EPLAN |
 | 4.4 | Email sending from the app, e-signature on quotations, customer portal for external buyers to view and accept | CPQ |
 | 4.5 | Supplier connectors: scheduled price-list pulls where a supplier offers a feed | EPLAN Data Portal |

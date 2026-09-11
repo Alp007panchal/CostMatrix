@@ -15,6 +15,9 @@ function existing(over: Partial<ComponentPrice>): ComponentPrice {
     // added by migration 0100 (foundations F1)
     supplier: null, attributes: {}, replaced_by: null, datasheet_url: null, lead_time_days: null,
     price_valid_from: null, price_source: null, status: 'active',
+    // added by migration 0106 (foundations F12)
+    width_mm: null, height_mm: null, depth_mm: null, mounting_type: null, clearances: {},
+    weight_kg: null, enclosure_layout: {},
     landed_price_kes: 10000,
     ...over,
   }

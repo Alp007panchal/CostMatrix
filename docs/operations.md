@@ -484,6 +484,30 @@ column); the app lands them in KES with the currency factors and shows *Your pri
 
 Uploads never delete anything. To remove a component, deactivate it on its own screen.
 
+### Measure the parts, so the app can warn about space (F12)
+
+Optional, and useful once you have a cubicle drawing to hand. Nothing breaks while parts are
+unmeasured; the space line on a costing panel simply stays quiet.
+
+**One part at a time:** Components → open a part → **Size and mounting…** → width, height and
+depth in millimetres, what it mounts on, what it weighs, and the clearances the maker asks for
+around it. For an enclosure cubicle the same panel also asks for the **usable area inside it**, the
+busbar and cable chamber sizes, and the form it is built to.
+
+**Many parts at once:** ask me to regenerate `data/seed/dimensions-template.csv` (it already lists
+all 735 part numbers with their descriptions), fill in the columns you know in Excel, save as CSV,
+then Import → **step 4, Dimensions**. It changes nothing but the measurements — never a price or a
+category — blank rows count as "not done yet", and re-generating the file keeps what you typed.
+
+**A kit's footprint:** Kits → open a kit → the three footprint boxes. Leave them blank unless the
+kit takes more room than its main device and clearances, for instance accessories mounted beside it.
+
+**What it buys you:** once the kits on a panel and the cubicles costed for it are both measured, the
+panel shows one line — how full the board is, or that it will not fit with a suggestion to add a
+cubicle. The figure includes a safety factor of 1.3 for wiring and access, which a company
+administrator can change. It is a warning only: it changes no price, and the real arrangement comes
+with the layout canvas later.
+
 ### Change your own company's margins, VAT or currency
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
 margins are a share of the selling price rather than of cost.

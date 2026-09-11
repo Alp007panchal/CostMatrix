@@ -81,6 +81,14 @@ export type ComponentInput = Pick<
       | 'lead_time_days'
       | 'price_valid_from'
       | 'price_source'
+      // Added by migration 0106 (foundations F12).
+      | 'width_mm'
+      | 'height_mm'
+      | 'depth_mm'
+      | 'mounting_type'
+      | 'clearances'
+      | 'weight_kg'
+      | 'enclosure_layout'
     >
   >
 
@@ -156,6 +164,10 @@ export async function updateAssembly(
       | 'customer_wording'
       | 'tags'
       | 'version'
+      // Added by migration 0106 (foundations F12).
+      | 'footprint_w_mm'
+      | 'footprint_h_mm'
+      | 'footprint_d_mm'
     >
   >,
 ): Promise<void> {

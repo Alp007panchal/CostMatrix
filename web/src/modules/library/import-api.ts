@@ -30,3 +30,8 @@ export function importKits(rows: Rows, kitTemplate: Rows, toCompany: string | nu
 export function importKitGroupHours(rows: Rows, toCompany: string | null, apply: boolean) {
   return call('import_kit_group_hours', { rows, to_company: toCompany, apply }, 'Could not import the hours')
 }
+
+/** dimensions-template.csv: part number plus measurements, nothing priced. */
+export function importDimensions(rows: Rows, toCompany: string | null, apply: boolean) {
+  return call('import_dimensions', { rows, to_company: toCompany, apply }, 'Could not import the dimensions')
+}

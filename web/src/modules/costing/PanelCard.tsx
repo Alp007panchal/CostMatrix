@@ -18,6 +18,7 @@ import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
 import { Detail } from './PanelDetails'
+import { PanelFitLine } from './PanelFitLine'
 import { describePanel } from './technical'
 import type { ManualItemInput } from './api'
 
@@ -119,6 +120,9 @@ export function PanelCard({
           >
             {showDetails ? 'Hide details' : 'Details: tag, option, description'}
           </button>
+          {/* Foundations F12: will this fit the cubicles bought for it? Silent
+              until the kits and the cubicle have been measured. */}
+          <PanelFitLine panelId={panel.id} />
         </div>
 
         <div style={{ textAlign: 'right', minWidth: '11rem' }}>
