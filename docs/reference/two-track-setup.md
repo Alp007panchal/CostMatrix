@@ -202,7 +202,8 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | **Deploy database** | push to `main` or `advanced` that changes `supabase/migrations/**` | Two separate jobs, each guarded by the branch: `main` → production, `advanced` → staging. Separate jobs rather than one that picks its secrets, so a run on one branch cannot reach the other's credentials whatever is added to the file later. |
 | **Create staging project** | by hand | Creates, wakes and sets up the staging project. Never production. |
 | **Check staging** | by hand | Counts what is in the staging library and prints it as a job summary. Read-only — SELECTs and nothing else — so it is safe to run at any time. Use it to answer "did the seed land?" without opening the dashboard. |
-| **Deploy functions**, **Set up Supabase** | unchanged | Production only. |
+| **Deploy functions** | push to `main` or `advanced` that changes `supabase/functions/**` | Two separate jobs guarded by branch, exactly as "Deploy database": `main` → production, `advanced` → staging. This is how an Edge Function such as `extract-document` reaches staging on merge. |
+| **Set up Supabase** | unchanged | Production only. |
 
 ## Where the organisation and the region come from
 
