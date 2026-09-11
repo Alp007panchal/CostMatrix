@@ -111,6 +111,16 @@ export function seedFixtures(): SeedFixtures {
       unit: isBusbar || isCable ? 'm' : (r['unit'] ?? '') || 'pcs',
       manufacturer: (r['brand'] ?? '') || null,
       part_number: null,
+      // added by migration 0100 (foundations F1): every one optional, and the
+      // owner's seed fills none of them.
+      supplier: null,
+      attributes: {},
+      replaced_by: null,
+      datasheet_url: null,
+      lead_time_days: null,
+      price_valid_from: null,
+      price_source: null,
+      status: price == null && !isBusbar ? 'placeholder' : 'active',
       pricing_mode: isBusbar ? 'weight_rate' : 'fixed',
       purchase_currency: isBusbar ? 'KES' : (r['purchaseCurrency'] ?? '') || 'EUR',
       weight_per_unit: weight,
@@ -168,6 +178,12 @@ export function seedFixtures(): SeedFixtures {
         description: null,
         kit_group_id: groupIdFor(tpl?.group ?? row['kitGroup'] ?? 'Other'),
         is_active: true,
+        // added by migration 0100 (foundations F2)
+        version: 1,
+        customer_wording: null,
+        tags: [],
+        compatibility_rules: {},
+        status: 'active',
         ...parseKitName(name),
       }
       assemblies.push(kit)
