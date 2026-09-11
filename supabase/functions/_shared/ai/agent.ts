@@ -1,4 +1,4 @@
-import type { ContentPart, Provider, ProviderMessage, Usage } from './provider.ts'
+import type { ContentPart, Provider, ProviderErrorCode, ProviderMessage, Usage } from './provider.ts'
 import { ProviderError } from './provider.ts'
 import { TOOL_SPECS, runTool, type Db, type ToolContext } from './tools.ts'
 
@@ -33,7 +33,7 @@ export type AgentEvent =
   | { type: 'tool_result'; name: string; is_error: boolean; chars: number }
   | { type: 'proposal'; proposal_id: string }
   | { type: 'refused'; text: string }
-  | { type: 'error'; text: string; retryable: boolean }
+  | { type: 'error'; text: string; retryable: boolean; code: ProviderErrorCode }
   | {
       type: 'done'
       usage: Usage
@@ -104,12 +104,12 @@ export async function* runAgent(input: AgentInput): AsyncIterable<AgentEvent> {
       }
     } catch (error) {
       const e = error instanceof ProviderError ? error : new ProviderError(String(error), false)
-      yield { type: 'error', text: e.message, retryable: e.retryable }
+      yield { type: 'error', text: e.message, retryable: e.retryable, code: e.code }
       yield done('error', step)
       return
     }
     if (!final) {
-      yield { type: 'error', text: 'The model ended without a reply.', retryable: true }
+      yield { type: 'error', text: 'The model ended without a reply.', retryable: true, code: 'unknown' }
       yield done('error', step)
       return
     }

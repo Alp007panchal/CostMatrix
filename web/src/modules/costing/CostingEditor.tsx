@@ -17,6 +17,7 @@ import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
 import { DocumentFiles } from '../documents/DocumentFiles'
+import { AssistantPanel } from '../assistant/AssistantPanel'
 
 /**
  * One costing. Editable while it is a current draft and the person may build
@@ -205,6 +206,16 @@ export function CostingEditor() {
             {/* The spec, the tender schedule, the drawing this costing answers.
                 Kept with it, and read so the assistant can use them later. */}
             <DocumentFiles entityType="costing" entityId={costing.id} companyId={costing.company_id} canEdit={editable} />
+
+            {/* Reads this costing and those documents, and proposes; a person
+                applies. Nothing it does reaches the costing on its own. */}
+            <AssistantPanel
+              entityType="costing"
+              entityId={costing.id}
+              panels={panels}
+              canApply={editable}
+              onApplied={() => void refresh()}
+            />
 
             <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
             <HistoryPanel costingId={costing.id} />

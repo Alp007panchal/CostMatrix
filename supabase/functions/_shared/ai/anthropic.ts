@@ -31,6 +31,7 @@ export const DEFAULT_FAST_MODEL = 'claude-haiku-4-5'
 
 /** US dollars per million tokens, input and output. Used for the cost column only. */
 const PRICES: Record<string, { input: number; output: number }> = {
+  'claude-fable-5-1': { input: 10, output: 50 },
   'claude-opus-5': { input: 5, output: 25 },
   'claude-opus-4-8': { input: 5, output: 25 },
   'claude-sonnet-5': { input: 2, output: 10 },
@@ -173,23 +174,76 @@ function mapStop(reason: string | null): StopReason {
   }
 }
 
-/** Most specific first, as the SDK's own guidance has it. */
+/**
+ * One plain sentence per kind of failure, with what to do about it, because the
+ * panel shows this to a costing engineer (not a developer) and "a generic error"
+ * was the owner's specific objection. Most specific class first, as the SDK's
+ * own guidance has it; 402 has no class of its own, so it is matched on status.
+ */
 function translate(error: unknown): ProviderError {
   if (error instanceof ProviderError) return error
+
   if (error instanceof Anthropic.AuthenticationError) {
-    return new ProviderError('The assistant’s API key was refused. Check ANTHROPIC_API_KEY on the function.', false)
+    return new ProviderError(
+      'The assistant’s API key was refused. Check ANTHROPIC_API_KEY in the Supabase project’s Edge Function secrets.',
+      false,
+      'bad_key',
+    )
+  }
+  if (error instanceof Anthropic.NotFoundError) {
+    return new ProviderError(
+      `The model “${DEFAULT_MODEL_HINT(error)}” was not found, or this Anthropic account may not use it. Check the AI_MODEL setting.`,
+      false,
+      'unknown_model',
+    )
+  }
+  if (error instanceof Anthropic.PermissionDeniedError) {
+    return new ProviderError(
+      'The Anthropic account is not permitted to do this. Check the key’s workspace and permissions.',
+      false,
+      'not_allowed',
+    )
   }
   if (error instanceof Anthropic.RateLimitError) {
-    return new ProviderError('The model is busy right now. Try again in a moment.', true)
-  }
-  if (error instanceof Anthropic.BadRequestError) {
-    return new ProviderError(`The model refused the request as malformed: ${error.message}`, false)
+    return new ProviderError('The model is busy right now. Try again in a moment.', true, 'rate_limit')
   }
   if (error instanceof Anthropic.APIConnectionError) {
-    return new ProviderError('Could not reach the model. Try again in a moment.', true)
+    return new ProviderError('Could not reach the model. Try again in a moment.', true, 'unreachable')
   }
   if (error instanceof Anthropic.APIError) {
-    return new ProviderError(`The model returned an error (${error.status ?? '?'}): ${error.message}`, (error.status ?? 0) >= 500)
+    // 402, and any 400 whose body says the balance is too low: the commonest
+    // first-run failure, and nothing about the app is wrong when it happens.
+    if (error.status === 402 || isCredit(error)) {
+      return new ProviderError(
+        'The Anthropic account has no credit left, so the model would not answer. Top it up at console.anthropic.com → Billing; nothing else needs changing.',
+        false,
+        'no_credit',
+      )
+    }
+    if (error instanceof Anthropic.BadRequestError) {
+      return new ProviderError(`The model refused the request as malformed: ${error.message}`, false, 'bad_request')
+    }
+    const status = error.status ?? 0
+    return new ProviderError(
+      status >= 500
+        ? 'The model had a problem at its end. Try again in a moment.'
+        : `The model returned an error (${status || '?'}): ${error.message}`,
+      status >= 500,
+      status >= 500 ? 'unreachable' : 'unknown',
+    )
   }
-  return new ProviderError(error instanceof Error ? error.message : String(error), false)
+  return new ProviderError(error instanceof Error ? error.message : String(error), false, 'unknown')
+}
+
+/** Anthropic's own words for a spent balance, whatever status it arrives under. */
+function isCredit(error: { message?: string; type?: string | null }): boolean {
+  if (error.type === 'billing_error') return true
+  const message = (error.message ?? '').toLowerCase()
+  return message.includes('credit balance') || message.includes('insufficient credit') || message.includes('billing')
+}
+
+/** The model name out of the error's own message, so the sentence names it. */
+function DEFAULT_MODEL_HINT(error: { message?: string }): string {
+  const found = /model:\s*([A-Za-z0-9._-]+)/.exec(error.message ?? '')
+  return found?.[1] ?? 'the configured one'
 }

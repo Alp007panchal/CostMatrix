@@ -250,6 +250,47 @@ Reading happens on Supabase, in the `extract-document` function. Like the other 
 deploys to production automatically when it changes on `main`. On staging, re-run **Create
 staging project**, which deploys every function.
 
+### B9e. The assistant (advanced app only)
+
+On the advanced app — the `advanced` preview, not production — the enquiry page and the costing
+page have an **Assistant** card under the Files card. It is closed until you press **Open**.
+
+What you can ask it, from the buttons above the box:
+
+| Button | What it does |
+|---|---|
+| **Draft this costing from the attached documents** | Reads every attached file, works out the boards and their parameters, and proposes panel lines from your own kits. Greyed out until something is attached. |
+| **Review before submission** | Checks the costing against the documents and your company's policy and writes findings, most serious first. |
+| **What kits match a 630 A outgoer?** | An ordinary question about this costing and your library. |
+
+It **proposes; it never changes anything.** A proposal appears as a card under the conversation:
+
+- Every line shows the kit it proposes, the quantity, the sentence from the document it came from,
+  and how sure it is. **High** and **Medium** start accepted; **Low** starts rejected, because a
+  Low line is its nearest guess.
+- **Accept**, **Change** (choose another kit) or **Reject** each line, and edit any quantity.
+- The button says how many lines it will apply. Pressing it adds them exactly as if you had picked
+  them yourself: same prices, same freeze, same totals. Each one is marked as having come from the
+  assistant, and the costing's history says who applied it.
+- Items it could not match are listed underneath, with a link to create a placeholder part.
+- A review's findings each offer **Apply this fix** where a one-click fix is possible.
+
+If it cannot answer, the card says why and what to do. The four you are most likely to see:
+
+| What it says | What to do |
+|---|---|
+| The Anthropic account has no credit left | Top it up at console.anthropic.com → Billing. Nothing in CostMatrix needs changing. |
+| Anthropic refused the key | Check `ANTHROPIC_API_KEY` in the Supabase project's Edge Function secrets. |
+| The model it is set to use does not exist | Check `AI_MODEL` and `AI_MODEL_FAST` on the function. |
+| The assistant is switched off for your company | The master administrator switches it on (below). |
+
+**Assistant** in the top navigation (company administrators) holds the switch, the monthly token
+budget, the two thresholds a review uses, and the usage: tokens by month, who used it this month,
+and what it has cost. Only the master administrator can switch it on or off; the thresholds and the
+budget are the company administrator's. A rough guide: drafting from a ten-page specification costs
+about 30,000 to 60,000 tokens, a review 10,000 to 20,000 — cents, not pounds — and the assistant
+warns at 80 % of the budget and stops at 100 %.
+
 ### B9b. Turn on two-factor authentication
 
 Not required to finish setup, so skip the prompts if they interrupt you — but do it before real

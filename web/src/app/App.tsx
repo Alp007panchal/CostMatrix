@@ -26,6 +26,7 @@ const EnquiriesPage = lazy(() => import('../modules/crm/EnquiriesPage').then((m)
 const EnquiryDetail = lazy(() => import('../modules/crm/EnquiryDetail').then((m) => ({ default: m.EnquiryDetail })))
 const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m) => ({ default: m.FollowUpsPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
+const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +84,14 @@ export function App() {
                 element={
                   <RequireRole role="company_admin">
                     <QuotationDefaultsPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/assistant"
+                element={
+                  <RequireRole role="company_admin">
+                    <AssistantSettingsPage />
                   </RequireRole>
                 }
               />

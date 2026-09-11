@@ -17,7 +17,10 @@ export interface Allowance {
 
 export type Decision =
   | { ok: true; warning: string | null; remaining: number }
-  | { ok: false; status: 403 | 429; reason: string }
+  | { ok: false; status: 403 | 429; reason: string; code: RefusalCode }
+
+/** Why it was refused, so the panel can offer the right next step. */
+export type RefusalCode = 'switched_off' | 'no_budget' | 'budget_spent' | 'too_many'
 
 export const WARN_AT = 0.8
 
@@ -29,6 +32,7 @@ export function decideAllowance(raw: unknown): Decision {
       ok: false,
       status: 403,
       reason: 'The assistant is switched off for your company. The master administrator can turn it on.',
+      code: 'switched_off',
     }
   }
 
@@ -37,6 +41,7 @@ export function decideAllowance(raw: unknown): Decision {
       ok: false,
       status: 429,
       reason: `That is ${a.recent_requests} requests in the last minute; the limit is ${a.rate_limit_per_minute}. Wait a moment.`,
+      code: 'too_many',
     }
   }
 
@@ -47,6 +52,7 @@ export function decideAllowance(raw: unknown): Decision {
       ok: false,
       status: 403,
       reason: 'No monthly token budget is set for your company, so the assistant will not run. Your administrator sets it.',
+      code: 'no_budget',
     }
   }
 
@@ -56,6 +62,7 @@ export function decideAllowance(raw: unknown): Decision {
       ok: false,
       status: 429,
       reason: `Your company has used its assistant budget for this month (${fmt(a.used_this_month)} of ${fmt(a.monthly_token_budget)} tokens). It resets on the 1st; your administrator can raise it.`,
+      code: 'budget_spent',
     }
   }
 
