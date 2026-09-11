@@ -536,6 +536,23 @@ granted to `authenticated`, so row-level security answers as it does for the scr
 | `assistant_allowance()` | `enabled`, `monthly_token_budget`, `used_this_month` (summed from this month's `assistant_messages`), `recent_requests` (this user's, last 60 s), `rate_limit_per_minute` 20. |
 | `assistant_record_usage(conversation, in, out, cost)` | Adds to the conversation's token and cost totals. The one writer, and it writes only its own row. |
 
+### Added by migration 0104 — applying what the assistant proposed (advanced track)
+
+No tables and no columns. Functions, `security invoker`, wrapped in `public.` and granted to
+`authenticated` (D-205):
+
+| Function | What it does |
+|---|---|
+| `apply_proposal(proposal, decisions)` | Applies the lines a person accepted. `decisions` is `{lines: [{panel, line, kind, ref_id, qty, section}], title?}` for a draft, `{finding, panel_id?}` for a review, `{panel_id?}` for a line change. A draft on an enquiry creates a draft costing through `create_costing`; lines go in through `add_assembly_to_costing` / `add_component_to_costing` and are stamped `origin = ai_proposal`, `origin_ref` = the proposal. Sets the proposal to `applied` or `partially_applied`, records `result` (the costing, the lines, the findings applied) and writes `proposal.applied` to the activity log — `actor_kind = user`, because the assistant proposed and a person applied. |
+| `apply_line_change(proposal, costing, change, panel)` | One `add` / `change_qty` / `remove` / `set_parameter`: a review's inline fix, or a `line_change` proposal. |
+| `apply_proposal_line(proposal, panel, kind, ref, qty, section)` | One line through the engine, with its provenance stamped. Reports `merged` when the engine added to a line that was already there, rather than claiming it. |
+| `reject_proposal(proposal, reason)` | Status `rejected` with the reason, and `proposal.rejected` in the activity log. What was already applied stays applied. |
+| `assistant_usage()` | For the Assistant admin screen: six months of tokens and answers, this month by person, the month's cost, the proposal counts, and the allowance. |
+
+Refused, as for any other edit: a costing that is not an open draft, a proposal of another company
+(to them it is not there), a person without `app.can_edit_costings()`, an empty set of accepted
+lines, the same proposal or the same finding twice.
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

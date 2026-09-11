@@ -19,4 +19,8 @@ lets `web/`'s vitest run these files with a fake provider and no key.
 | `agent.ts` | The loop: at most 12 steps, a wall-clock cap, every tool result of a turn returned together. Emits events for the stream. |
 | `examples/npp192.ts` | The worked example the draft task shows the model, as data. |
 
-Tests live beside the code as `*.test.ts` and are picked up by `web/vitest.config.ts`.
+Tests live beside the code as `*.test.ts` and are picked up by `web/vitest.config.ts`:
+`budget.test.ts`, `proposals.test.ts`, `context.test.ts` and `agent.test.ts` for the machinery, and
+`npp192.test.ts` for acceptance tests 1 and 2 — the NPP-192 draft and the review of a broken
+costing, scripted through the fake provider. What happens after a proposal is accepted is SQL:
+`supabase/tests/26_assistant_apply.sql`.

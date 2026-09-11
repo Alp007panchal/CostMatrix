@@ -677,3 +677,138 @@ export interface QuotationFollowup {
   done_at: string | null
   created_at: string
 }
+
+// --- the assistant (migrations 0102 to 0104) --------------------------------
+
+export type AssistantEntityType = 'enquiry' | 'costing'
+export type ProposalType = 'draft_costing' | 'review' | 'line_change'
+export type ProposalStatus = 'open' | 'partially_applied' | 'applied' | 'rejected' | 'expired'
+
+export interface AssistantConversation {
+  id: string
+  company_id: string
+  user_id: string
+  entity_type: AssistantEntityType
+  entity_id: string
+  title: string | null
+  tokens_in: number
+  tokens_out: number
+  cost_usd: number
+  created_at: string
+  updated_at: string
+}
+
+export interface AssistantMessage {
+  id: string
+  conversation_id: string
+  role: 'user' | 'assistant' | 'tool'
+  content: string | null
+  tool_calls: { name: string; input: Record<string, unknown> }[] | null
+  tool_results: { name: string; is_error: boolean; summary: string }[] | null
+  model: string | null
+  tokens_in: number | null
+  tokens_out: number | null
+  latency_ms: number | null
+  created_at: string
+}
+
+export interface AssistantProposal {
+  id: string
+  conversation_id: string
+  message_id: string | null
+  company_id: string
+  entity_type: AssistantEntityType
+  entity_id: string
+  type: ProposalType
+  status: ProposalStatus
+  payload: ProposalPayload
+  applied_by: string | null
+  applied_at: string | null
+  result: ProposalResult | null
+  created_at: string
+}
+
+/** What the model cited for a line or a finding (AI spec §6.3). */
+export interface Evidence {
+  document_id?: string
+  page?: number
+  quote?: string
+}
+
+export interface DraftLine {
+  section?: string
+  kind: 'kit' | 'component'
+  ref_id: string
+  name: string
+  qty: number
+  confidence: 'high' | 'medium' | 'low'
+  reason?: string
+  evidence?: Evidence
+}
+
+export interface DraftPanel {
+  name: string
+  qty?: number
+  parameters?: Record<string, unknown>
+  lines?: DraftLine[]
+  unresolved?: { text: string; evidence?: Evidence; suggestion?: string }[]
+}
+
+export interface LineChange {
+  panel_line_item_id?: string
+  line_id?: string
+  action: 'add' | 'change_qty' | 'remove' | 'set_parameter'
+  ref?: string
+  qty?: number
+  section?: string
+  parameter?: string
+  value?: unknown
+  reason: string
+}
+
+export interface ReviewFinding {
+  severity: 'blocker' | 'warning' | 'note'
+  code: string
+  text: string
+  evidence?: Evidence
+  proposal?: LineChange
+}
+
+export type ProposalPayload =
+  | { summary?: string; panels?: DraftPanel[]; notes_for_engineer?: string[] }
+  | { summary?: string; findings?: ReviewFinding[] }
+  | LineChange
+
+export interface ProposalResult {
+  costing_id?: string
+  created_costing?: boolean
+  lines?: Record<string, unknown>[]
+  findings_applied?: number[]
+  rejected_reason?: string | null
+}
+
+/** What app.assistant_allowance() answers. */
+export interface AssistantAllowance {
+  enabled: boolean
+  monthly_token_budget: number
+  used_this_month: number
+  recent_requests: number
+  rate_limit_per_minute: number
+}
+
+/** What app.assistant_usage() answers, for the admin screen. */
+export interface AssistantUsage {
+  months: { month: string; turns: number; tokens_in: number; tokens_out: number; conversations: number }[]
+  cost_usd_this_month: number
+  by_user_this_month: { user_id: string; name: string | null; turns: number; tokens: number }[]
+  proposals: Partial<Record<ProposalStatus, number>>
+  allowance: AssistantAllowance
+}
+
+export interface CompanyOption {
+  id: string
+  company_id: string
+  key: string
+  value: unknown
+  value_type: 'boolean' | 'number' | 'text' | 'json'
+}

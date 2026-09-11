@@ -74,8 +74,31 @@ export class ProviderError extends Error {
     message: string,
     /** `retryable` means the same request may work in a moment: rate limit, outage. */
     readonly retryable: boolean,
+    /**
+     * What kind of failure it is, so the panel can say what to do about it
+     * rather than showing one generic sentence. The four the owner asked to see
+     * named are `no_credit`, `bad_key`, `unknown_model` and `not_allowed`.
+     */
+    readonly code: ProviderErrorCode = 'unknown',
   ) {
     super(message)
     this.name = 'ProviderError'
   }
 }
+
+export type ProviderErrorCode =
+  /** The account has no credit, or billing is not set up. */
+  | 'no_credit'
+  /** The key is missing, wrong, or revoked. */
+  | 'bad_key'
+  /** The configured model name does not exist, or this account may not use it. */
+  | 'unknown_model'
+  /** The key is valid but not permitted to do this. */
+  | 'not_allowed'
+  /** Too many requests, or the model is busy. */
+  | 'rate_limit'
+  /** The provider is down or unreachable. */
+  | 'unreachable'
+  /** We sent something the provider would not accept: a bug, not a setting. */
+  | 'bad_request'
+  | 'unknown'

@@ -91,7 +91,7 @@ Deno.serve(async (request: Request) => {
     return reply({ error: e instanceof Error ? e.message : String(e) }, 500)
   }
   const decision = decideAllowance(allowance)
-  if (!decision.ok) return reply({ error: decision.reason, refused: true }, decision.status)
+  if (!decision.ok) return reply({ error: decision.reason, refused: true, code: decision.code }, decision.status)
 
   // --- 2. the conversation and the user's message ---------------------------
   const { data: me } = await client.auth.getUser()
@@ -176,7 +176,7 @@ Deno.serve(async (request: Request) => {
           else send(event)
         }
       } catch (e) {
-        send({ type: 'error', text: e instanceof Error ? e.message : String(e), retryable: false })
+        send({ type: 'error', text: e instanceof Error ? e.message : String(e), retryable: false, code: 'unknown' })
       }
 
       // --- 5. the log ----------------------------------------------------------

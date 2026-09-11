@@ -184,6 +184,25 @@ tell it is on in three ways:
 the first query shows `true`; **Check staging** will show it once that workflow is extended; and
 the function itself answers a turn instead of *"The assistant is switched off for your company"*.
 
+### 8. Trying the assistant on staging
+
+With §6 and §7 done, on the `advanced` preview:
+
+1. Open an enquiry, attach the NPP-192 PDF (or any specification) and wait for the Files card to
+   say **read**.
+2. Press **Open** on the **Assistant** card, then **Draft this costing from the attached
+   documents**. The reply appears as it is written; short grey lines say what it is doing.
+3. A **Proposed costing** card follows. Check a few lines against the document, accept or reject,
+   then **Apply**. You land on a new draft costing whose lines are marked as the assistant's, priced
+   by the ordinary engine.
+4. On that costing, **Review before submission** gives findings, with a one-click fix where one is
+   possible.
+5. **Assistant** in the top navigation shows what the two actions cost in tokens.
+
+Until the Anthropic account has credit, step 2 ends with *"the Anthropic account has no credit
+left"* and the remedy, which is the intended behaviour rather than a fault: everything up to the
+model call is working.
+
 ---
 
 ## If Supabase refuses to create the project

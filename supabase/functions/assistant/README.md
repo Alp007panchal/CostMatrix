@@ -65,3 +65,15 @@ This function has not been run against Anthropic from the build environment,
 which has no Deno, no Supabase project and no key. The request shape in
 `_shared/ai/anthropic.ts` is the one thing verified only by the first real run on
 staging; every other part is covered by the vitest and SQL tests.
+
+## The screens that use it
+
+`web/src/modules/assistant/` — the panel on the enquiry and costing pages, the Proposal and Review
+cards, and the company's Assistant screen. The panel reads the stream with `fetch` rather than
+`supabase.functions.invoke`, which buffers the whole body and would hide the reply until it was
+finished. A failure arrives as a code (`no_credit`, `bad_key`, `unknown_model`, …) and the panel
+pairs it with a remedy from `events.ts` (D-204).
+
+Applying what the model proposed is not this function's business at all: it is
+`app.apply_proposal` in migration 0104, called from the browser, which puts the lines in through
+the ordinary engine functions (D-205).
