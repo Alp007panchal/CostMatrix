@@ -1,0 +1,77 @@
+name: Check staging
+
+# Counts what is in the staging library and prints it as a job summary. Read
+# only: it runs SELECTs and nothing else, so it is safe to run at any time and as
+# often as you like.
+#
+# Use it to answer "did the seed really land?" and "is staging still in step with
+# data/seed?" without opening the Supabase dashboard.
+#
+# Needs the same secrets as the other staging jobs, and the repository variable
+# SUPABASE_STAGING_PROJECT_REF that "Create staging project" tells you to set:
+#   SUPABASE_STAGING_ACCESS_TOKEN, SUPABASE_STAGING_DB_PASSWORD
+#
+# The production token is not in this job's environment.
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Region the staging project is in'
+        required: false
+        type: string
+        default: 'eu-west-1'
+
+jobs:
+  check:
+    name: Count what is in the staging library
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_STAGING_ACCESS_TOKEN: ${{ secrets.SUPABASE_STAGING_ACCESS_TOKEN }}
+      SUPABASE_STAGING_DB_PASSWORD: ${{ secrets.SUPABASE_STAGING_DB_PASSWORD }}
+      STAGING_REF: ${{ vars.SUPABASE_STAGING_PROJECT_REF }}
+      STAGING_REGION: ${{ inputs.region }}
+    steps:
+      - name: Check the settings are present
+        run: |
+          missing=""
+          [ -z "${{ vars.SUPABASE_STAGING_PROJECT_REF }}" ]      && missing="$missing SUPABASE_STAGING_PROJECT_REF (a variable)"
+          [ -z "${{ secrets.SUPABASE_STAGING_DB_PASSWORD }}" ]   && missing="$missing SUPABASE_STAGING_DB_PASSWORD (a secret)"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing:$missing"
+            echo "See docs/reference/two-track-setup.md."
+            exit 1
+          fi
+          if [ "${{ vars.SUPABASE_STAGING_PROJECT_REF }}" = "${{ secrets.SUPABASE_PROJECT_REF }}" ]; then
+            echo "::error::SUPABASE_STAGING_PROJECT_REF is the production project. Refusing to read it here."
+            exit 1
+          fi
+          echo "Staging project is set, and is not production."
+
+      - uses: actions/checkout@v4
+
+      - name: Install the PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Count
+        run: |
+          db_url="$(./scripts/staging/db-url.sh)"
+          psql "$db_url" -v ON_ERROR_STOP=1 -A -F' | ' -f supabase/check-staging.sql > /tmp/counts.txt
+          cat /tmp/counts.txt
+          {
+            echo "## What is in staging"
+            echo ""
+            echo "Project \`${STAGING_REF}\`, read at $(date -u '+%Y-%m-%d %H:%M UTC')."
+            echo ""
+            echo '```'
+            cat /tmp/counts.txt
+            echo '```'
+            echo ""
+            echo "Expected from \`data/seed\`: **735** components, **296** kits, **720** kit lines,"
+            echo "**17** kit groups, **8** fixed-price parts with no price (the seven placeholders"
+            echo "and CSMBS3ISO63X), **10** busbar sizes priced by weight, and one main device on"
+            echo "every one of the 296 kits."
+            echo ""
+            echo "\`kit groups with hours filled\` is **0** until the labour hours are entered —"
+            echo "that is the one thing still outstanding in \`docs/open-questions.md\`, not a fault."
+          } >> "$GITHUB_STEP_SUMMARY"
