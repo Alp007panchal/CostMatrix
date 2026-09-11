@@ -144,6 +144,21 @@ export interface Component {
   poles: string | null
   breaking_capacity: string | null
   frame_size: string | null
+  // --- added by migration 0100 (foundations F1). All optional. ---
+  /** Who invoices, which may be a local distributor. `manufacturer` is the brand the quotation prints. */
+  supplier: string | null
+  /** Structured extras typed by category: mounting, operation, IP, dimensions, kVAr. */
+  attributes: Record<string, unknown>
+  /** The part that replaces this one once it is obsolete. */
+  replaced_by: string | null
+  datasheet_url: string | null
+  lead_time_days: number | null
+  /** When this price started. */
+  price_valid_from: string | null
+  /** Where the price came from: a supplier list and date, or who typed it. */
+  price_source: string | null
+  /** Derived from is_active and is_placeholder; read-only until a later migration makes it authoritative. */
+  status: 'active' | 'obsolete' | 'placeholder'
   is_active: boolean
 }
 
@@ -254,6 +269,17 @@ export interface Assembly {
   rating_unit: 'A' | 'KVAR' | null
   poles: number | null
   is_active: boolean
+  // --- added by migration 0100 (foundations F2). All optional. ---
+  /** Bumped by hand when the composition changes. A costing records the version it copied. */
+  version: number
+  /** The Annexure IV wording, separate from the internal kit name. */
+  customer_wording: string | null
+  /** Free labels — incomer, outgoer, apfc — so the configurator and the assistant can find kits. */
+  tags: string[]
+  /** Populated in a later phase; empty today. */
+  compatibility_rules: Record<string, unknown>
+  /** Derived from is_active; read-only. */
+  status: 'active' | 'retired'
 }
 
 export interface AssemblyComponentRow {

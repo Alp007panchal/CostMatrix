@@ -11,6 +11,8 @@ import type {
 } from '../../lib/database.types'
 import { createComponent, updateComponent, type ComponentInput } from './api'
 import { PricingFields } from './PricingFields'
+import { ComponentExtraFields } from './ComponentExtraFields'
+import { parseAttributes } from './library-fields'
 
 /**
  * Add or change one component.
@@ -52,13 +54,31 @@ export function ComponentForm({
     weight_per_unit: existing?.weight_per_unit != null ? String(existing.weight_per_unit) : '',
     material_rate_code: existing?.material_rate_code ?? materialRates[0]?.code ?? 'copper_busbar',
     is_enclosure_cubicle: existing?.is_enclosure_cubicle ?? false,
+    // The optional fields of foundations F1. Held as text like the rest of the
+    // form and converted on save, so a half-typed number is never sent.
+    supplier: existing?.supplier ?? '',
+    datasheet_url: existing?.datasheet_url ?? '',
+    lead_time_days: existing?.lead_time_days != null ? String(existing.lead_time_days) : '',
+    price_valid_from: existing?.price_valid_from ?? '',
+    price_source: existing?.price_source ?? '',
+    attributes:
+      existing?.attributes && Object.keys(existing.attributes).length > 0
+        ? JSON.stringify(existing.attributes, null, 2)
+        : '',
   })
+  const [attributesError, setAttributesError] = useState<string | null>(null)
 
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }))
 
   const save = useMutation({
     mutationFn: async () => {
+      // Checked here so a mistyped bracket is one sentence rather than a
+      // Postgres message about JSON syntax.
+      const attrs = parseAttributes(form.attributes)
+      if ('error' in attrs) throw new Error(attrs.error)
+      const attributes = attrs.value
+
       const input: ComponentInput = {
         company_id: toMaster ? null : (company?.id ?? null),
         category_code: form.category_code,
@@ -77,6 +97,12 @@ export function ComponentForm({
         is_enclosure_cubicle: form.category_code === 'enclosure_parts' && form.is_enclosure_cubicle,
         // A placeholder stops being one the moment it gets a price.
         is_placeholder: form.pricing_mode === 'fixed' && form.purchase_price === '',
+        supplier: form.supplier.trim() || null,
+        datasheet_url: form.datasheet_url.trim() || null,
+        lead_time_days: form.lead_time_days.trim() !== '' ? Number(form.lead_time_days) : null,
+        price_valid_from: form.price_valid_from.trim() || null,
+        price_source: form.price_source.trim() || null,
+        attributes,
       }
       return existing ? updateComponent(existing.id, input) : createComponent(input)
     },
@@ -85,6 +111,9 @@ export function ComponentForm({
 
   function submit(event: FormEvent) {
     event.preventDefault()
+    const attrs = parseAttributes(form.attributes)
+    setAttributesError('error' in attrs ? attrs.error : null)
+    if ('error' in attrs) return
     save.mutate()
   }
 
@@ -162,6 +191,13 @@ export function ComponentForm({
           This is an enclosure cubicle: the company&rsquo;s enclosure uplift is added when it is costed
         </label>
       )}
+
+      <ComponentExtraFields
+        values={form}
+        status={existing?.status ?? null}
+        attributesError={attributesError}
+        onChange={(key, value) => setForm((f) => ({ ...f, [key]: value }))}
+      />
 
       <Field label="Description" hint="optional">
         <textarea value={form.description} onChange={(e) => set('description', e.target.value)} />

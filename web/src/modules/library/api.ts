@@ -67,7 +67,22 @@ export type ComponentInput = Pick<
   | 'material_rate_code'
   | 'is_enclosure_cubicle'
   | 'is_placeholder'
-> & { company_id: string | null }
+> & { company_id: string | null } &
+  // Added by migration 0100 (foundations F1). Optional in the type as well as in
+  // the database, so the Excel upload and the seed importer, which set none of
+  // them, still typecheck. `status` is deliberately absent: it is a generated
+  // column and writing it is an error.
+  Partial<
+    Pick<
+      Component,
+      | 'supplier'
+      | 'attributes'
+      | 'datasheet_url'
+      | 'lead_time_days'
+      | 'price_valid_from'
+      | 'price_source'
+    >
+  >
 
 export async function createComponent(input: ComponentInput): Promise<void> {
   const { error } = await supabase.from('components').insert(cleanForMode(input))
@@ -126,7 +141,23 @@ export async function createAssembly(input: {
 
 export async function updateAssembly(
   id: string,
-  input: Partial<Pick<Assembly, 'code' | 'name' | 'description' | 'kit_group_id' | 'rating' | 'rating_unit' | 'poles'>>,
+  // `status` is absent on purpose: it is a generated column derived from
+  // is_active, and writing it is an error (migration 0100).
+  input: Partial<
+    Pick<
+      Assembly,
+      | 'code'
+      | 'name'
+      | 'description'
+      | 'kit_group_id'
+      | 'rating'
+      | 'rating_unit'
+      | 'poles'
+      | 'customer_wording'
+      | 'tags'
+      | 'version'
+    >
+  >,
 ): Promise<void> {
   const { error } = await supabase.from('assemblies').update(input).eq('id', id)
   fail('Could not save the kit', error)

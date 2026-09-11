@@ -391,6 +391,63 @@ Role checks per area:
 - The screen uploads the file first and writes the row second, taking the file back out if the
   row is refused, so the two never disagree.
 
+### Added by migration 0100 — foundations F1 to F3 (advanced track)
+
+The first advanced-track migration, numbered from 0100 so it can never collide with a
+basic-track number on `main` (D-170). Nothing in it changes a price.
+
+**components** (F1) — `supplier` (who invoices, as against `manufacturer`, which is the brand the
+quotation prints); `attributes` jsonb typed by category; `replaced_by → components` with a check
+that a part cannot replace itself; `datasheet_url`; `lead_time_days`; `price_valid_from` and
+`price_source`. **`status`** is a **generated** column — `placeholder` when `is_placeholder`,
+`obsolete` when not `is_active`, else `active` — because `is_placeholder` is load-bearing today
+(the `components_pricing_fields` constraint allows a null price only for a placeholder, and
+`app.freeze_component` refuses an unpriced non-placeholder). Writing it raises *"column status can
+only be updated to DEFAULT"*, which is the point: a silent revert would be worse (D-175).
+**component_price_history** gained `source`.
+
+**assemblies** (= kits, F2) — `version` (default 1), `customer_wording`, `compatibility_rules`
+jsonb, `tags text[]` with a GIN index, and a generated `status` of `active`/`retired` from
+`is_active`. **assembly_components** — `qty_expression` (null everywhere today; the engine rule is
+null means use `quantity`) and `customer_wording`.
+
+**kit_parameters** — `assembly_id`, `name`, `value_type`, `unit`, `default_value`, `min_value`,
+`max_value`, `sort_order`; unique per kit and name; `kit_parameters_min_not_above_max` named so the
+message says what is wrong. Empty in phase 1. Parent-derived RLS, like `assembly_components`.
+
+**costing_assemblies.source_version** — the kit version a line was copied from. The composition
+freeze itself already existed: `add_assembly_to_costing` snapshots the kit's code and name and
+copies every line into `costing_items` with its price frozen, and `source_assembly_id` is
+`on delete set null` provenance only, so editing or deleting a master kit cannot reach an existing
+costing (D-177). Test 23 proves it: a kit is renamed, a line's quantity changed, a line removed, a
+line added, the version bumped and the kit retired, and the costing's lines stay identical.
+
+**costing_panels.productivity_factor** (F3) — `numeric(6,3) not null default 1.0`, `> 0`. The one
+change that touches the pricing views: `v_costing_panel_costs.labour_cost` and `.hours` are
+multiplied by it, so every view above — panel prices, totals, the price schedule — picks it up
+unchanged. `labour_cost_standard` and `hours_standard` are appended beside them so the adjustment
+can always be explained, the same rule the frozen price columns follow. At 1.0 the arithmetic is
+identical, which is why test 15 is unmodified. There is deliberately no costing-wide factor
+(D-186).
+
+**labour_actuals** — `company_id`, `costing_id`, `panel_id`, `process_type`, `hours`, `source`
+(`manual`/`timesheet`), `note`, `recorded_at`, with the same composite foreign keys the costing
+tables use. Never read by the pricing engine. Tenant-owned RLS.
+
+**labour_rate_history** — `labour_rate_id`, `old_hourly_rate`, `new_hourly_rate`, `changed_by`,
+`changed_at`, filled by a SECURITY DEFINER trigger. `labour_rates` was the only rate table with no
+history; `components`, `material_rates` and `currency_factors` all keep a current value plus a
+history table, and effective dating exists nowhere in this schema, so this matches the pattern
+rather than the roadmap's `valid_from` wording (D-176).
+
+**v_component_prices** gained the new component columns (appended, so everything selecting by name
+is unaffected), which is how the component form shows and edits them without a second query.
+
+`app.add_assembly_to_costing` records `source_version`; `app.create_costing_revision` and
+`app.copy_panel` carry `source_version` and `productivity_factor`. Those three column lists are
+written by hand, and a column added later and forgotten in them is dropped silently — the bug
+migration 0011 had to fix once already.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).
