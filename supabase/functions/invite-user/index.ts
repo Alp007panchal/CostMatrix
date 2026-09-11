@@ -100,7 +100,9 @@ Deno.serve(async (request: Request) => {
   // --- do it ---------------------------------------------------------------
   const siteUrl = Deno.env.get('SITE_URL') ?? ''
   const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: siteUrl ? `${siteUrl}/` : undefined,
+    // The page that sets a password. Sending people to the app root instead
+    // signs them in with no password of their own and no way to choose one.
+    redirectTo: siteUrl ? `${siteUrl}/reset-password` : undefined,
   })
 
   if (inviteError || !invited.user) {

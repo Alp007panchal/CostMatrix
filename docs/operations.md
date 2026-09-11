@@ -209,6 +209,32 @@ page rather than to CostMatrix.
 
 - [ ] Done, or noted for later.
 
+### B9a. Where a password link lands
+
+Both kinds of email link — the **invitation** sent from the People screen, and the
+**Forgot password** link from the sign-in page — send the person to one page:
+
+| | |
+|---|---|
+| The page | `/reset-password` |
+| On production | `https://cost-matrix-theta.vercel.app/reset-password` |
+| On the advanced preview | `https://cost-matrix-git-advanced-alp-team.vercel.app/reset-password` |
+
+It asks for a new password twice and saves it. Nobody needs to be told the address: the links in
+the emails go there by themselves. It is the only page in the app you can reach without signing
+in first, because somebody following an invitation has no password yet.
+
+Three things it says, rather than failing silently:
+
+- a link that has already been used, or has expired, is named as such, with Supabase's own reason,
+  and points back to **Forgot password** for a fresh one;
+- two passwords that do not match, or one shorter than eight characters, are refused before
+  Supabase is called;
+- anything Supabase itself refuses (a password that is too common, say) is shown in its words.
+
+If somebody reports "No such page" after following a link, the deployment they landed on is older
+than September 2026 — the page did not exist before then, and the link pointed at nothing.
+
 ### B9b. Turn on two-factor authentication
 
 Not required to finish setup, so skip the prompts if they interrupt you — but do it before real
