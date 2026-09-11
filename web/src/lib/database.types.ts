@@ -222,6 +222,55 @@ export interface ImportReport {
   busbar_kg_derived?: number
 }
 
+/** One upload of any kind, from the import framework F9 added in 0102. */
+export interface ImportJob {
+  id: string
+  company_id: string | null
+  user_id: string | null
+  type: 'catalogue' | 'kits' | 'kit_group_hours' | 'bom' | 'price_list' | 'labour_hours'
+  document_id: string | null
+  file_name: string | null
+  status: 'preview' | 'applied' | 'failed' | 'discarded'
+  column_mapping: Record<string, string>
+  summary: Record<string, unknown>
+  rows_total: number | null
+  started_at: string
+  finished_at: string | null
+}
+
+/** One line of an upload: what it matched, what would happen, what happened. */
+export interface ImportRow {
+  id: string
+  job_id: string
+  row_number: number | null
+  raw: PriceListRowPreview
+  matched_entity_id: string | null
+  match_method: string | null
+  status: 'new' | 'changed' | 'unchanged' | 'rejected' | 'warning' | 'accepted' | 'skipped'
+  message: string | null
+}
+
+/** What a price-list row's `raw` holds after the preview (migration 0105). */
+export interface PriceListRowPreview {
+  key?: string
+  maker?: string
+  description?: string
+  new_price?: number
+  new_currency?: string
+  supplier?: string
+  valid_from?: string
+  old_price?: number
+  old_currency?: string
+  component_code?: string
+  component_name?: string
+  pricing_mode?: PricingMode
+  is_placeholder?: boolean
+  change_pct?: number
+  applied_old_price?: number
+  applied_old_currency?: string
+  applied_at?: string
+}
+
 /** A component as the signed-in company would pay for it (v_component_prices). */
 export interface ComponentPrice extends Omit<Component, 'purchase_price' | 'breaking_capacity' | 'frame_size'> {
   category_name: string

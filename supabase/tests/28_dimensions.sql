@@ -13,6 +13,11 @@
 \set bob    '00000000-0000-0000-0000-0000000000a3'
 \set master '00000000-0000-0000-0000-0000000000a1'
 
+-- How much price history exists before this file runs: measuring parts must not
+-- add to it. Counted rather than timed, because the price-list test (27) runs
+-- just before and legitimately writes history of its own.
+select count(*)::int as history_before from public.component_price_history \gset
+
 -- === Nothing is measured yet, and that is a legal state =====================
 select test.eq((select count(*)::int from public.components where width_mm is not null), 0,
   'the catalogue arrives unmeasured: every width is null, which is allowed');
@@ -299,9 +304,8 @@ select test.eq((:'blanks'::jsonb ->> 'skipped_blank')::int, 1,
   'an unfilled row is counted as not done yet, not rejected');
 
 -- === Nothing priced changed ==================================================
-select test.eq((select count(*)::int from public.component_price_history
-                where changed_at > now() - interval '1 minute'), 0,
-  'measuring parts wrote no price history');
+select test.eq((select count(*)::int from public.component_price_history), :history_before,
+  'measuring parts wrote no price history: not one row more than before');
 select test.ok((select purchase_price > 0 from public.components where id = :'dev_id'::uuid),
   'and the prices are as they were');
 
