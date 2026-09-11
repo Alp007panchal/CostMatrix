@@ -130,6 +130,60 @@ Open the `advanced` preview URL, click **Forgot password**, and enter your email
 password is separate from your production one, and nobody else knows it — the workflow creates
 the login with a random password that it masks and throws away.
 
+### 6. The assistant's key — Edge Function secrets on the staging project
+
+The assistant's server side is an Edge Function on the staging project (D-180), and its API key
+lives there: never in GitHub, never in Vercel, never in the browser. Enter it once, by hand, in
+the Supabase dashboard of the **second** account:
+
+1. Sign in at **https://supabase.com/dashboard** with the staging account and open the
+   **CostMatrix Staging** project.
+2. In the left-hand menu click **Edge Functions**, then the **Secrets** tab (in some layouts it is
+   **Project Settings** → **Edge Functions**). You should see a table headed *Secrets* listing the
+   ones Supabase injects itself (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, …).
+3. Click **Add new secret**. Name `ANTHROPIC_API_KEY`, value: the key from
+   console.anthropic.com → **API keys** → **Create key** (copy it once; the console never shows it
+   again). Click **Save**.
+4. Add four more the same way, each optional, each with its default if left out:
+
+   | Name | Value | If missing |
+   |---|---|---|
+   | `AI_PROVIDER` | `anthropic` | `anthropic`. `fake` makes a dry run that calls nobody. |
+   | `AI_MODEL` | `claude-opus-5` | `claude-opus-5` — drafts and reviews |
+   | `AI_MODEL_FAST` | `claude-haiku-4-5` | `claude-haiku-4-5` — plain questions |
+   | `AI_FALLBACKS` | leave out | on; `off` disables server-side refusal fallbacks |
+
+5. Secrets take effect on the function's next cold start; nothing to redeploy. The table shows
+   names only — a saved value is never displayed again, which is the point.
+
+### 7. Switching the assistant on for the staging company
+
+The assistant is **off for every company** until the master administrator turns it on (D-193),
+and it refuses with "switched off" until then. Phase 1 has no screen for the switch yet (the admin
+settings screen is assistant PR B), so on staging it is one query, run as the master administrator
+from the staging project's **SQL Editor** (the switch is guarded by a trigger: anyone but the master
+administrator is refused):
+
+```sql
+-- who has it on, and what budget (0 = none set, so the assistant refuses)
+select c.name, o.key, o.value
+from public.company_options o join public.companies c on c.id = o.company_id
+where o.key in ('ai_enabled', 'ai_monthly_token_budget') order by c.name, o.key;
+```
+
+The SQL Editor runs as the database owner, not as a signed-in person, so the trigger stands
+aside (D-193) and this flips it for the company named:
+
+```sql
+update public.company_options set value = 'true'::jsonb
+ where key = 'ai_enabled' and company_id = (select id from public.companies where kind = 'in_house');
+```
+
+(Staging has one in-house company, yours; a budget of `2000000` tokens is already seeded.) You can
+tell it is on in three ways:
+the first query shows `true`; **Check staging** will show it once that workflow is extended; and
+the function itself answers a turn instead of *"The assistant is switched off for your company"*.
+
 ---
 
 ## If Supabase refuses to create the project
@@ -193,6 +247,7 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | `SUPABASE_STAGING_DB_PASSWORD` | secret, new | staging deploys | The staging database password. Never read by a `main` run. |
 | `SUPABASE_STAGING_PROJECT_REF` | variable, new | staging deploys | The staging project. A variable rather than a secret because a project ref is not sensitive and it helps to be able to read it back. |
 | `ADVANCED_PREVIEW_URL` | variable, optional | staging setup | If set, invitation emails sent from staging point at the preview URL instead of localhost. |
+| `ANTHROPIC_API_KEY` | Edge Function secret on the **staging project**, not GitHub | the `assistant` function | The assistant's key (D-180). Entered once in the Supabase dashboard (§6). Production has none until the assistant reaches `main`. |
 
 ## How the workflows divide up
 
