@@ -448,11 +448,86 @@ is unaffected), which is how the component form shows and edits them without a s
 written by hand, and a column added later and forgotten in them is dropped silently — the bug
 migration 0011 had to fix once already.
 
+### Added by migration 0101 — foundations F4 to F6 (advanced track)
+
+**costing_panels** — `parameters` jsonb (the board's defining answers: incomer rating, sources,
+form, IP, access, cable entry, APFC kVAr, enclosure dimensions; empty today) and `is_option`
+(priced and printed but left out of the total; `option_label` stays the grouping, D-179).
+
+**costing_assemblies** and **costing_items** — `origin` (`manual` / `kit` / `configurator` /
+`import` / `ai_proposal`, checked) and `origin_ref`, a bare uuid naming an assistant proposal or an
+import job (D-189). Back-filled: `kit` where the holder is a kit, `manual` otherwise.
+`app.freeze_component` gained `line_origin` and `line_origin_ref` as trailing parameters with
+defaults; `add_assembly_to_costing` passes `kit`; the apply step of an assistant proposal will pass
+`ai_proposal` and the proposal id. `create_costing_revision` and `copy_panel` carry all four
+columns; test 24 proves it through a revision and a copy.
+
+**documents** — replaces `enquiry_attachments` (D-190). `company_id`, `entity_type` (`enquiry` /
+`costing` / `quotation` / `component` / `supplier_price_list`), `entity_id` (nullable for a price
+list that belongs to nothing yet), `file_name`, `path` (unique), `mime_type`, `size_bytes`, `note`,
+`extracted_text`, `extraction_status` (`pending` / `done` / `failed` / `unsupported`),
+`extraction_error`, `extracted_at`. Two triggers replace the composite foreign key:
+`documents_check_entity` refuses an enquiry, costing or quotation that is not the company's, and
+`documents_follow_entity` on those three tables deletes the rows when the record goes. Rows from
+`enquiry_attachments` were copied with their paths unchanged, so nothing in storage moved. Read for
+the company and the master admin; write for whoever may edit costings. The `attachments` bucket is
+unchanged.
+
+**activity_log** — `company_id`, `actor_user_id` (null for the assistant or a job), `actor_kind`
+(`user` / `assistant` / `system`), `entity_type`, `entity_id`, `action`, `before`, `after`, `note`,
+`created_at`. Append-only: only `app.write_activity(...)` (SECURITY DEFINER, company from the
+caller) may insert, and nobody may update or delete. `costing_history` is untouched (D-178).
+
+### Added by migration 0102 — foundations F7 to F11 (advanced track)
+
+**approval_rules** — per company, ordered: `name`, `condition` (a jsonb list of
+`{field, op, value}`, all of which must hold; `[]` always holds), `outcome` (`auto_approve` /
+`require_approver` / `require_master_admin` / `block`), `is_active`. One rule per company is
+seeded, "Always require an approver", and a new company gets it at birth.
+`app.costing_facts(costing)` returns what a rule can test (`total_ex_vat`, the margins,
+`profit_margin_pct` = the lower of material and labour, `uses_placeholder_part`,
+`price_age_days`, `status`); `app.evaluate_approval_rules(costing)` returns the first holding rule
+with the facts, or `require_approver` when none holds. **The lifecycle does not call it** (D-192).
+
+**quotations.valid_until** — set by `release_quotation` to today plus `validity_days`.
+**costings.price_snapshot_at** — set by `create_costing`, carried by a revision, fresh on a copy;
+back-filled to `created_at` (D-194).
+
+**import_jobs** (`company_id` null = master library, `user_id`, `type` = `catalogue` / `kits` /
+`kit_group_hours` / `bom` / `price_list` / `labour_hours`, `document_id → documents`, `file_name`,
+`status` = `preview` / `applied` / `failed` / `discarded`, `column_mapping`, `summary`,
+`rows_total`, `legacy_batch_id → import_batches` unique, `started_at`, `finished_at`) and
+**import_rows** (`job_id`, `row_number`, `raw`, `matched_entity_id`, `match_method`, `status`,
+`message`). Filled by the `import_batches_mirror` trigger on insert and update of
+`import_batches`, so the three importers of 0010 are untouched; batches from before 0102 got a job
+row each (D-191).
+
+**company_options** — `company_id`, `key`, `value` jsonb, `value_type`; unique per company and
+key. `app.company_option(key, fallback)` reads the caller's own. Seeded for every company, and
+for a new one at birth, with `ai_enabled` false, `ai_monthly_token_budget`,
+`ai_price_age_warning_days` 90 and `ai_min_margin_pct`. A company admin writes; only the master
+administrator may change `ai_enabled` (trigger `company_options_protect_master`, D-193).
+`company_settings`, the older wide table, is unchanged.
+
+**assistant_conversations** (`company_id`, `user_id`, `entity_type` enquiry / costing,
+`entity_id`, `title`, `tokens_in`, `tokens_out`, `cost_usd`), **assistant_messages**
+(`conversation_id`, `role` user / assistant / tool, `content`, `tool_calls`, `tool_results`
+trimmed, `model`, tokens, `latency_ms`) and **assistant_proposals** (`conversation_id`,
+`message_id`, `company_id`, `entity_type`, `entity_id`, `type` draft_costing / review /
+line_change, `status` open / partially_applied / applied / rejected / expired, `payload`,
+`applied_by`, `applied_at`, `result`) — AI spec §6, empty, tenant-owned RLS, no screen yet. A line
+created by applying a proposal carries `origin = ai_proposal` and `origin_ref` = the proposal id.
+
+### Edge Functions
+- **invite-user**, **remove-user** — as before.
+- **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain
+  text; the row's `extraction_status` says what happened. Called by the browser after an upload.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).
 - Bucket `logos`, private, same pattern. Holds the header logo and the footer strip images.
-- Bucket `attachments`, private, same pattern. Holds the files kept with an enquiry.
+- Bucket `attachments`, private, same pattern. Holds every `documents` row's file: enquiry and costing attachments today.
 
 ### Tests
 `supabase/tests/` holds pgTAP tests run in CI on every migration change:

@@ -16,6 +16,7 @@ import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
+import { DocumentFiles } from '../documents/DocumentFiles'
 
 /**
  * One costing. Editable while it is a current draft and the person may build
@@ -200,6 +201,10 @@ export function CostingEditor() {
                 </p>
               </div>
             )}
+
+            {/* The spec, the tender schedule, the drawing this costing answers.
+                Kept with it, and read so the assistant can use them later. */}
+            <DocumentFiles entityType="costing" entityId={costing.id} companyId={costing.company_id} canEdit={editable} />
 
             <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
             <HistoryPanel costingId={costing.id} />
