@@ -11,16 +11,12 @@ end to end on a real job, which now covers sections inside a panel, copying a co
 panel, the operator's name in the history, one decision per enquiry, and files on an enquiry.
 Send the findings in one numbered list.
 
-## And before any advanced work can be tried
+## The advanced track
 
-The basic app (`main`) is live and is the back-up. Advanced work — the foundations F1–F11 and the
-AI assistant — happens on the `advanced` branch against a separate **CostMatrix Staging** Supabase
-project, so your real data is never touched (D-169).
-
-One thing needs you before anything advanced can run: the click-by-click steps in
-`docs/reference/two-track-setup.md` — add the `SUPABASE_STAGING_DB_PASSWORD` secret, run the
-**Create staging project** workflow from the Actions tab, then add the one variable and the two
-Vercel values its summary gives you. About ten minutes, most of it waiting.
+Staging is live in its second Supabase account (`docs/reference/two-track-setup.md`), the
+`advanced` preview is at cost-matrix-git-advanced-alp-team.vercel.app, and foundations A is on
+it. Foundations B (PR into `advanced`) is the last schema work before the assistant; nothing
+in it changes a price, and test 15 is unmodified. Your real data is never touched (D-169).
 
 ## Waiting on you
 
@@ -33,7 +29,8 @@ Vercel values its summary gives you. About ten minutes, most of it waiting.
 | **A busbar line for the C&S 400 A TP MCCB kit** (`kits-issues.csv`) | Before that kit is used | Every sibling kit has one. |
 | Two 800A ACBs at 330,432 on Option 1 versus 279,744 from the catalogue | Before trusting the NPP-192 comparison | If accessories are included in 330,432, they should be kit lines. |
 | Data-quality items in `data/seed/README.md` | Before the next seed import | Fifteen kits with only a main device, stray cable lines, two 4000A kits that look like one, duplicate and double-priced parts. Fix in `data/raw/` or say "import as is". |
-| **The staging secret and variable** — `docs/reference/two-track-setup.md`, steps 1 to 4 | Before any advanced work can be tried | A password you choose, then one workflow run; the run's summary hands you the other three values. |
+| **Which documents may be sent to the AI provider** (AI spec §11, point 4) — all attachments, or exclude ones marked confidential? | Before the assistant reads a document | The default is all enquiry and costing attachments. Excluding some needs a flag on `documents`, which is a one-line migration if you want it. |
+| **The Edge Functions on staging** — `extract-document` is new and "Deploy functions" only runs for `main` | Before trying a file upload on the advanced preview | Re-run **Create staging project**, which deploys every function; or say so and I make that workflow branch-aware like "Deploy database". |
 | **Connect your own email sender** (operations B9c) | Before inviting more than one or two people | Supabase's built-in sender allows a few messages an hour and often lands in spam. A free Gmail app password is enough; move to a `neiltd.com` sender before other companies are invited. |
 | Upload the header logo and footer marks | Before the first real quotation | **Quotation wording** → Header logo and Footer strip. PNG with transparent background prints best. |
 | Run `docs/acceptance-test.md` on what is live | **Now** | Each finding comes back as its own pull request, as the notebook changes did. |

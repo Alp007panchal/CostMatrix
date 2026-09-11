@@ -4,7 +4,7 @@ import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import { longDate, money } from '../../lib/format'
 import { getEnquiry, listCustomers } from './api'
-import { EnquiryFiles } from './EnquiryFiles'
+import { DocumentFiles } from '../documents/DocumentFiles'
 import { listCostings } from '../costing/api'
 import { listQuotations } from '../quotation/api'
 
@@ -48,7 +48,7 @@ export function EnquiryDetail() {
               </div>
             </div>
 
-            <EnquiryFiles enquiryId={e.id} companyId={e.company_id} canEdit={canEdit} />
+            <DocumentFiles entityType="enquiry" entityId={e.id} companyId={e.company_id} canEdit={canEdit} />
 
             <div className="card">
               <h2 style={{ marginTop: 0 }}>Costings</h2>

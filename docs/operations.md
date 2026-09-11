@@ -235,6 +235,21 @@ Three things it says, rather than failing silently:
 If somebody reports "No such page" after following a link, the deployment they landed on is older
 than September 2026 — the page did not exist before then, and the link pointed at nothing.
 
+### B9d. Files on an enquiry or a costing, and their text
+
+Both the enquiry page and the costing page have a **Files** card. Anything attached there is kept
+in the app's private storage, visible only to your company, and opened through a link that lasts
+a few minutes.
+
+Each file also has its **text read**, so the assistant can use it later without being handed the
+PDF: the **Text** column says *waiting*, *read*, *not readable* (only PDF, Word, Excel and plain
+text are read) or *could not read*, with a **retry** button. Nothing in the app depends on the
+text having been read; it is for the assistant.
+
+Reading happens on Supabase, in the `extract-document` function. Like the other two functions it
+deploys to production automatically when it changes on `main`. On staging, re-run **Create
+staging project**, which deploys every function.
+
 ### B9b. Turn on two-factor authentication
 
 Not required to finish setup, so skip the prompts if they interrupt you — but do it before real

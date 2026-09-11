@@ -644,15 +644,25 @@ export interface Enquiry {
 }
 
 /** A file kept with an enquiry: the drawing, the specification, the email. */
-export interface EnquiryAttachment {
+export type DocumentEntityType = 'enquiry' | 'costing' | 'quotation' | 'component' | 'supplier_price_list'
+
+/** A file kept with a record (documents, migration 0101). The file itself is in the private `attachments` bucket. */
+export interface Document {
   id: string
-  enquiry_id: string
   company_id: string
+  entity_type: DocumentEntityType
+  entity_id: string | null
   file_name: string
   path: string
   mime_type: string | null
   size_bytes: number | null
   note: string | null
+  /** Filled by the extract-document function; null until then. */
+  extracted_text: string | null
+  extraction_status: 'pending' | 'done' | 'failed' | 'unsupported'
+  /** The reason it failed or was unsupported, or a truncation note when done. */
+  extraction_error: string | null
+  extracted_at: string | null
   created_at: string
   created_by: string | null
 }
