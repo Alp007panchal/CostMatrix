@@ -518,10 +518,36 @@ line_change, `status` open / partially_applied / applied / rejected / expired, `
 `applied_by`, `applied_at`, `result`) — AI spec §6, empty, tenant-owned RLS, no screen yet. A line
 created by applying a proposal carries `origin = ai_proposal` and `origin_ref` = the proposal id.
 
+### Added by migration 0103 — what the assistant may ask (advanced track)
+
+No tables and no columns: read-only `security invoker` functions, each with a `public.` wrapper
+granted to `authenticated`, so row-level security answers as it does for the screen (D-198).
+
+| Function | Returns |
+|---|---|
+| `costing_snapshot(costing)` | The costing as one JSON document: header, frozen settings, panels with `parameters`, every line with its items, labour, `origin`, `origin_ref` and `source_version`, the totals from `v_costing_totals`, attached documents. Null when the caller may not see it. |
+| `enquiry_snapshot(enquiry)` | Customer, contact, project, the enquiry's costings and documents. |
+| `document_text(document, max_chars = 200000)` | `extracted_text` cut to the ceiling, with `truncated` and the extraction status. |
+| `search_kits(q, filters, lim = 20)` | Up to 50 active kits by full-text search over name, code, customer wording and labels (plus `ilike`), filtered by `rating_a`, `poles`, `category` (group name), `tag`, `brand`, `frame`; each with today's price (`v_component_prices` × quantity) and hours (`v_assembly_hours`). |
+| `search_components(q, filters, lim = 20)` | Up to 50 active components by name, code, part number, description; filters `category`, `bom_category`, `brand`, `rating_a`, `poles`, `unit`; price in the caller's currency, `status`. |
+| `kit_detail(kit)` | One kit with lines, prices, parameters, wording, rules, hours. |
+| `company_policy()` | The caller's company: margins, rounding, VAT, terms, the four assistant options, approval rules, kit groups, categories. Never a purchase price (spec §8). |
+| `price_preview(lines)` | Indicative material, labour and selling price for `[{kit_id \| component_id, qty}]` by the same divisor-and-ceil arithmetic as `v_costing_panel_prices`, nothing written; unpriced parts named under `unpriced`. |
+| `assistant_allowance()` | `enabled`, `monthly_token_budget`, `used_this_month` (summed from this month's `assistant_messages`), `recent_requests` (this user's, last 60 s), `rate_limit_per_minute` 20. |
+| `assistant_record_usage(conversation, in, out, cost)` | Adds to the conversation's token and cost totals. The one writer, and it writes only its own row. |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain
   text; the row's `extraction_status` says what happened. Called by the browser after an upload.
+- **assistant** (0103) — one POST per user turn, streamed back as server-sent events. Acts as the
+  caller (no service role): asks `assistant_allowance` before building any provider, stores the
+  user's message and an empty assistant row, builds the system prompt from `company_policy` and the
+  record's snapshot, runs the loop in `supabase/functions/_shared/ai/` (at most 12 rounds), then
+  fills the assistant row with text, tool calls, trimmed results, model, tokens and latency,
+  records usage on the conversation and writes an `activity_log` row (`actor_kind = assistant`)
+  per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
+  `AI_FALLBACKS`.
 
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.

@@ -14,9 +14,12 @@ Send the findings in one numbered list.
 ## The advanced track
 
 Staging is live in its second Supabase account (`docs/reference/two-track-setup.md`), the
-`advanced` preview is at cost-matrix-git-advanced-alp-team.vercel.app, and foundations A is on
-it. Foundations B (PR into `advanced`) is the last schema work before the assistant; nothing
-in it changes a price, and test 15 is unmodified. Your real data is never touched (D-169).
+`advanced` preview is at cost-matrix-git-advanced-alp-team.vercel.app, and foundations A and B
+are on it. The assistant's core (PR into `advanced`) is built and tested without a key; **two
+things are yours** before it can answer on staging: add `ANTHROPIC_API_KEY` to the staging
+project's Edge Function secrets, and switch the assistant on for the staging company
+(`two-track-setup.md` §6 and §7). Nothing in it changes a price, test 15 is unmodified, and your
+real data is never touched (D-169).
 
 ## Waiting on you
 

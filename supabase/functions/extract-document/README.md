@@ -37,10 +37,9 @@ natural addition when there is a scheduler.
 
 ## Deploying
 
-`supabase functions deploy extract-document`. The production "Deploy functions"
-workflow does this on every push to `main` that touches `supabase/functions/`.
-Staging is not yet covered by that workflow: re-run **Create staging project**,
-which deploys every function as part of its run.
+`supabase functions deploy extract-document`. The "Deploy functions" workflow does
+this on every push to `main` (production) or `advanced` (staging) that touches
+`supabase/functions/`; **Create staging project** also deploys every function.
 
 The three environment variables it reads — `SUPABASE_URL`,
 `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY` — are injected by Supabase into
