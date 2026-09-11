@@ -106,32 +106,9 @@ fi
 echo "Master administrator will be $ADMIN_EMAIL."
 
 # --- a database connection ----------------------------------------------------
-# Direct connections (db.<ref>.supabase.co) are IPv6-only on newer projects and
-# GitHub's runners have no IPv6, so the pooler is tried first. The pooler host's
-# numbering differs between projects, hence the candidates.
-enc_password="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' \
-  "$SUPABASE_STAGING_DB_PASSWORD")"
-
-db_url=""
-for candidate in \
-  "postgresql://postgres.$STAGING_REF:$enc_password@aws-0-$region.pooler.supabase.com:5432/postgres" \
-  "postgresql://postgres.$STAGING_REF:$enc_password@aws-1-$region.pooler.supabase.com:5432/postgres" \
-  "postgresql://postgres:$enc_password@db.$STAGING_REF.supabase.co:5432/postgres"
-do
-  if psql "$candidate" -q -c 'select 1' >/dev/null 2>&1; then
-    db_url="$candidate"
-    echo "Connected through ${candidate#*@}" | sed 's/:5432.*//'
-    break
-  fi
-done
-
-if [[ -z "$db_url" ]]; then
-  echo "::error::Could not connect to the staging database on any known host." >&2
-  echo "The project is up (migrations were applied), so this is the connection string alone." >&2
-  echo "Supabase dashboard → Project Settings → Database → Connection string shows the right one;" >&2
-  echo "tell me what it looks like (host and port only, never the password) and I will add it." >&2
-  exit 1
-fi
+# Resolved by one script shared with the "Check staging" workflow, so there is a
+# single place that knows how to reach this database.
+db_url="$(STAGING_REF="$STAGING_REF" STAGING_REGION="$region" ./scripts/staging/db-url.sh)"
 
 # --- the master administrator -------------------------------------------------
 # supabase/bootstrap.sql is the owner's own script, with three values to fill in

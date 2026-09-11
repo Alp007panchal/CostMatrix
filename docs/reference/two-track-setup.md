@@ -201,6 +201,7 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | **CI** | every push to `main`, `advanced` or `claude/**`, and every pull request | Nothing live. Runs the migrations and all database tests on a throwaway Postgres, then the web app's typecheck, tests and build. |
 | **Deploy database** | push to `main` or `advanced` that changes `supabase/migrations/**` | Two separate jobs, each guarded by the branch: `main` → production, `advanced` → staging. Separate jobs rather than one that picks its secrets, so a run on one branch cannot reach the other's credentials whatever is added to the file later. |
 | **Create staging project** | by hand | Creates, wakes and sets up the staging project. Never production. |
+| **Check staging** | by hand | Counts what is in the staging library and prints it as a job summary. Read-only — SELECTs and nothing else — so it is safe to run at any time. Use it to answer "did the seed land?" without opening the dashboard. |
 | **Deploy functions**, **Set up Supabase** | unchanged | Production only. |
 
 ## Where the organisation and the region come from

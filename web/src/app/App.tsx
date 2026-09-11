@@ -5,6 +5,7 @@ import { SessionProvider } from '../modules/auth/session'
 import { RequireAuth, RequireRole } from './guards'
 import { Layout } from './Layout'
 import { HomePage } from '../modules/dashboard/HomePage'
+import { SetPasswordPage } from '../modules/auth/SetPasswordPage'
 
 // Each area of the app is fetched the first time somebody opens it, so signing
 // in does not download the costing editor for a person who only sets rates.
@@ -44,6 +45,13 @@ export function App() {
       <SessionProvider>
         <BrowserRouter>
           <Routes>
+            {/*
+              Outside RequireAuth: a recovery or invitation link lands here, and
+              somebody following an invitation has a session but may not belong to
+              a company yet. This is the address resetPasswordForEmail sends
+              people to, and the one the invitation function uses.
+            */}
+            <Route path="reset-password" element={<SetPasswordPage />} />
             <Route
               element={
                 <RequireAuth>
