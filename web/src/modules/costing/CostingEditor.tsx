@@ -7,9 +7,9 @@ import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
   addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, listCostings, listPanelSections, removeCostingAssembly, removeItem, removePanel,
-  returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity, setLabourHours,
-  submitCosting, updateCosting, updatePanel,
+  getCostingDetail, listBomItems, listCostings, listPanelSections, reissueCosting, removeCostingAssembly,
+  removeItem, removePanel, returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity,
+  setLabourHours, submitCosting, updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
 import { TotalsPanel } from './TotalsPanel'
@@ -18,6 +18,7 @@ import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
 import { DocumentFiles } from '../documents/DocumentFiles'
 import { BomImportCard } from './BomImportCard'
+import { ApprovalPanel } from './ApprovalPanel'
 import { AssistantPanel } from '../assistant/AssistantPanel'
 
 /**
@@ -104,12 +105,25 @@ export function CostingEditor() {
                   </>
                 )}
                 {costing.status === 'approved' && costing.is_current && canBuild && (
-                  <button className="primary" onClick={() => act.mutate(async () => {
-                    const rev = await createRevision(costing.id)
-                    navigate(`/costings/${rev.id}`)
-                  })}>
-                    New revision
-                  </button>
+                  <>
+                    {/* Roadmap 2.6: the same job at today's prices, for a quotation
+                        that has run out. A revision, so the approved one stands. */}
+                    <button
+                      title="A new revision with every line priced at today's prices"
+                      onClick={() => act.mutate(async () => {
+                        const out = await reissueCosting(costing.id)
+                        navigate(`/costings/${out.costing_id}`)
+                      })}
+                    >
+                      Re-issue at today's prices
+                    </button>
+                    <button className="primary" onClick={() => act.mutate(async () => {
+                      const rev = await createRevision(costing.id)
+                      navigate(`/costings/${rev.id}`)
+                    })}>
+                      New revision
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -141,6 +155,9 @@ export function CostingEditor() {
 
             {/* One column, read top to bottom: what it costs, how it is built, what
                 to export, what happened. */}
+            {/* Roadmap 2.5: what the company's rules make of this costing. */}
+            <ApprovalPanel costingId={costing.id} status={costing.status} />
+
             <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} bom={bom.data ?? []} categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))} />
 
             {panels.map((panel) => (
