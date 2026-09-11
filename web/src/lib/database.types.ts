@@ -160,6 +160,50 @@ export interface Component {
   /** Derived from is_active and is_placeholder; read-only until a later migration makes it authoritative. */
   status: 'active' | 'obsolete' | 'placeholder'
   is_active: boolean
+  // --- added by migration 0106 (foundations F12). All optional, all in mm. ---
+  width_mm: number | null
+  height_mm: number | null
+  depth_mm: number | null
+  mounting_type: MountingType | null
+  /** Millimetres to leave clear around it: {top, bottom, left, right}. */
+  clearances: Clearances
+  weight_kg: number | null
+  /** An enclosure cubicle only: the usable area inside it and its chambers. */
+  enclosure_layout: EnclosureLayout
+}
+
+/** What a device mounts on. The layout canvas of phase 3.8 chooses the zone by it. */
+export type MountingType = 'din_rail' | 'plate' | 'withdrawable' | 'door' | 'busbar_chamber' | 'other'
+
+export interface Clearances {
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export interface EnclosureLayout {
+  usable_w_mm?: number
+  usable_h_mm?: number
+  usable_d_mm?: number
+  busbar_chamber?: { w_mm?: number; h_mm?: number }
+  cable_chamber?: { w_mm?: number; h_mm?: number }
+  form?: string
+}
+
+/** app.panel_fit: the area a panel's kits need against what its cubicles offer. */
+export interface PanelFit {
+  verdict: 'fits' | 'tight' | 'no_fit' | 'unknown'
+  safety_factor: number
+  kits_measured: number
+  kits_unmeasured: number
+  unmeasured: { name: string; reason: string }[]
+  cubicles: { code: string; quantity: number; known: boolean }[]
+  kit_area_mm2: number
+  required_area_mm2: number
+  usable_area_mm2: number
+  used_pct: number | null
+  reason?: string
 }
 
 /** What an import function reports, with or without having written anything. */
@@ -280,6 +324,11 @@ export interface Assembly {
   compatibility_rules: Record<string, unknown>
   /** Derived from is_active; read-only. */
   status: 'active' | 'retired'
+  // --- added by migration 0106 (foundations F12). Null = work it out from the
+  // main device and its clearances, which is right for most kits. ---
+  footprint_w_mm: number | null
+  footprint_h_mm: number | null
+  footprint_d_mm: number | null
 }
 
 export interface AssemblyComponentRow {

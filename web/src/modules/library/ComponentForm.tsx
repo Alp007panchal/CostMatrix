@@ -12,6 +12,8 @@ import type {
 import { createComponent, updateComponent, type ComponentInput } from './api'
 import { PricingFields } from './PricingFields'
 import { ComponentExtraFields } from './ComponentExtraFields'
+import { DimensionFields, type DimensionValues } from './DimensionFields'
+import { fromDimensionValues, toDimensionValues } from './dimension-fields'
 import { parseAttributes } from './library-fields'
 
 /**
@@ -67,6 +69,9 @@ export function ComponentForm({
         : '',
   })
   const [attributesError, setAttributesError] = useState<string | null>(null)
+  // Foundations F12: how big it is and what room it needs. Held apart from the
+  // rest of the form because it converts into two jsonb columns, not into fields.
+  const [dimensions, setDimensions] = useState<DimensionValues>(() => toDimensionValues(existing))
 
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -103,6 +108,7 @@ export function ComponentForm({
         price_valid_from: form.price_valid_from.trim() || null,
         price_source: form.price_source.trim() || null,
         attributes,
+        ...fromDimensionValues(dimensions, form.category_code === 'enclosure_parts' && form.is_enclosure_cubicle),
       }
       return existing ? updateComponent(existing.id, input) : createComponent(input)
     },
@@ -191,6 +197,12 @@ export function ComponentForm({
           This is an enclosure cubicle: the company&rsquo;s enclosure uplift is added when it is costed
         </label>
       )}
+
+      <DimensionFields
+        values={dimensions}
+        isCubicle={form.category_code === 'enclosure_parts' && form.is_enclosure_cubicle}
+        onChange={(key, value) => setDimensions((d) => ({ ...d, [key]: value }))}
+      />
 
       <ComponentExtraFields
         values={form}

@@ -14,6 +14,7 @@ import type {
   OptionTotals,
   PanelCopyReport,
   PanelPrice,
+  PanelFit,
   PanelSection,
 } from '../../lib/database.types'
 
@@ -327,6 +328,16 @@ export async function copyPanel(
 // --- bill of materials -------------------------------------------------------
 
 /** Every distinct component in a costing with its total quantity, for the exports. */
+/**
+ * Does what is on this panel fit the cubicles bought for it (app.panel_fit)?
+ * Advisory, read-only, and "unknown" until the parts have been measured.
+ */
+export async function panelFit(panelId: string): Promise<PanelFit> {
+  const { data, error } = await supabase.rpc('panel_fit', { target: panelId })
+  fail('Could not check the space', error)
+  return data as PanelFit
+}
+
 export async function listBomItems(costingId: string): Promise<BomItem[]> {
   const { data, error } = await supabase
     .from('v_costing_items_by_category')

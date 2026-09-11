@@ -553,6 +553,32 @@ Refused, as for any other edit: a costing that is not an open draft, a proposal 
 (to them it is not there), a person without `app.can_edit_costings()`, an empty set of accepted
 lines, the same proposal or the same finding twice.
 
+### Added by migration 0106 — foundations F12, physical dimensions (advanced track)
+
+Groundwork for the panel layout canvas (roadmap 3.8). Everything nullable; nothing in the engine
+reads it.
+
+**components** — `width_mm`, `height_mm`, `depth_mm` (each > 0 or null), `mounting_type`
+(`din_rail` / `plate` / `withdrawable` / `door` / `busbar_chamber` / `other`), `clearances` jsonb
+(`{top, bottom, left, right}` in mm), `weight_kg`, and `enclosure_layout` jsonb — the latter
+allowed only on a row marked `is_enclosure_cubicle` (constraint `components_layout_is_enclosure`),
+holding `usable_w_mm` / `usable_h_mm` / `usable_d_mm`, `busbar_chamber`, `cable_chamber` and `form`.
+Appended to `v_component_prices`, which was re-derived from the 0100 text by insertion.
+
+**assemblies** — `footprint_w_mm`, `footprint_h_mm`, `footprint_d_mm`: optional overrides. Null
+means "derive it from the main device and its clearances".
+
+**panel_layouts** — `company_id`, `panel_id`, `version` (unique per panel), `cubicles` jsonb
+(each cubicle with its size and a `placements` array of kit lines at `x_mm`, `y_mm`, `w_mm`,
+`h_mm`, `rotation`), `note`. Tenant-owned RLS, written by nobody yet.
+
+| Function | Returns |
+|---|---|
+| `component_footprint(component)` | The space it takes: its size plus its clearances, with `area_mm2`, or `known: false`. |
+| `kit_footprint(kit)` | The kit's own footprint if set, else the main device's, else `known: false` naming what is unmeasured. |
+| `panel_fit(panel)` | Footprints on the panel × quantity against the usable area of its cubicles × `company_options.layout_safety_factor` (1.3): verdict `fits` / `tight` / `no_fit` / `unknown`, the areas, `used_pct`, and which kits are unmeasured. Advisory and read-only. |
+| `import_dimensions(rows, to_company, apply)` | Reads `dimensions-template.csv`. Touches only the F12 columns; a blank row counts as not filled in yet. |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

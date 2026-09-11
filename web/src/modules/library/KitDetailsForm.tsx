@@ -28,7 +28,17 @@ export function KitDetailsForm({
   // and the assistant use to find this kit instead of parsing its name.
   const [wording, setWording] = useState(assembly.customer_wording ?? '')
   const [tags, setTags] = useState((assembly.tags ?? []).join(', '))
+  // Foundations F12: the room this kit takes on a mounting plate, when it is not
+  // simply its main device plus clearances. Blank = work it out from the device.
+  const [fpW, setFpW] = useState(assembly.footprint_w_mm != null ? String(assembly.footprint_w_mm) : '')
+  const [fpH, setFpH] = useState(assembly.footprint_h_mm != null ? String(assembly.footprint_h_mm) : '')
+  const [fpD, setFpD] = useState(assembly.footprint_d_mm != null ? String(assembly.footprint_d_mm) : '')
   const [saved, setSaved] = useState(false)
+
+  const mm = (value: string): number | null => {
+    const n = Number(value.trim())
+    return value.trim() === '' || !Number.isFinite(n) || n <= 0 ? null : n
+  }
 
   const save = useMutation({
     mutationFn: () =>
@@ -39,6 +49,9 @@ export function KitDetailsForm({
         poles: poles === '' ? null : Number(poles),
         customer_wording: wording.trim() || null,
         tags: parseTags(tags),
+        footprint_w_mm: mm(fpW),
+        footprint_h_mm: mm(fpH),
+        footprint_d_mm: mm(fpD),
       }),
     onSuccess: () => {
       setSaved(true)
@@ -54,7 +67,10 @@ export function KitDetailsForm({
     unit !== (assembly.rating_unit ?? 'A') ||
     poles !== (assembly.poles != null ? String(assembly.poles) : '') ||
     wording !== (assembly.customer_wording ?? '') ||
-    parseTags(tags).join(',') !== (assembly.tags ?? []).join(',')
+    parseTags(tags).join(',') !== (assembly.tags ?? []).join(',') ||
+    mm(fpW) !== assembly.footprint_w_mm ||
+    mm(fpH) !== assembly.footprint_h_mm ||
+    mm(fpD) !== assembly.footprint_d_mm
 
   if (!editable) {
     const g = choices.find((c) => c.id === assembly.kit_group_id)
@@ -65,6 +81,9 @@ export function KitDetailsForm({
         {assembly.poles ? `, ${assembly.poles} pole` : ''}.
         {assembly.customer_wording ? ` Customer wording: “${assembly.customer_wording}”.` : ''}
         {assembly.tags.length > 0 ? ` Labels: ${assembly.tags.join(', ')}.` : ''}
+        {assembly.footprint_w_mm != null && assembly.footprint_h_mm != null
+          ? ` Footprint: ${assembly.footprint_w_mm} × ${assembly.footprint_h_mm} mm.`
+          : ''}
       </p>
     )
   }
@@ -132,6 +151,25 @@ export function KitDetailsForm({
             onChange={(e) => { setSaved(false); setTags(e.target.value) }}
           />
         </label>
+        <div className="row" style={{ alignItems: 'flex-end' }}>
+          <div className="muted" style={{ flexBasis: '100%', fontSize: '.8125rem' }}>
+            Footprint in millimetres <span style={{ fontWeight: 400 }}>— only when this kit takes
+            more room than its main device and clearances, e.g. accessories mounted beside it.
+            Leave blank otherwise; the space check works it out from the device.</span>
+          </div>
+          {([['Width', fpW, setFpW], ['Height', fpH, setFpH], ['Depth', fpD, setFpD]] as const).map(
+            ([label, value, setter]) => (
+              <label key={label} style={{ flex: 1, minWidth: '7rem' }}>
+                <div className="muted">{label}</div>
+                <input
+                  type="number" step="0.1" min="0" inputMode="decimal"
+                  value={value}
+                  onChange={(e) => { setSaved(false); setter(e.target.value) }}
+                />
+              </label>
+            ),
+          )}
+        </div>
         <p className="muted" style={{ fontSize: '.8125rem' }}>
           Version {assembly.version}, {assembly.status}. A costing keeps the version it was built
           from, so changing this kit never changes a costing already made.

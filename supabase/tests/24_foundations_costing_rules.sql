@@ -210,8 +210,9 @@ select test.eq((select value from public.company_options where company_id = :'al
   'the assistant is off for every company until somebody turns it on');
 select test.eq((select value from public.company_options where company_id = :'alpha'::uuid and key = 'ai_price_age_warning_days'), '90'::jsonb,
   'with a 90-day price-age warning');
-select test.eq((select count(*)::int from public.company_options where company_id = :'beta'::uuid), 4,
-  'and every company has all four settings');
+select test.eq((select count(*)::int from public.company_options where company_id = :'beta'::uuid
+                 and key like 'ai_%'), 4,
+  'and every company has all four assistant settings');
 
 begin;
 set local role authenticated;
@@ -251,7 +252,8 @@ begin;
 insert into public.companies (name, kind) values ('Newborn Ltd', 'external') returning id as newco \gset
 select test.eq((select count(*)::int from public.approval_rules where company_id = :'newco'::uuid), 1,
   'a company created today starts with its one rule');
-select test.eq((select count(*)::int from public.company_options where company_id = :'newco'::uuid), 4,
+select test.eq((select count(*)::int from public.company_options where company_id = :'newco'::uuid
+                 and key like 'ai_%'), 4,
   'and its four assistant settings, off');
 rollback;
 

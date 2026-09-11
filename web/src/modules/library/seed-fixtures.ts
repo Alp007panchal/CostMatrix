@@ -120,6 +120,14 @@ export function seedFixtures(): SeedFixtures {
       lead_time_days: null,
       price_valid_from: null,
       price_source: null,
+      // Foundations F12: nothing in the seed is measured yet.
+      width_mm: null,
+      height_mm: null,
+      depth_mm: null,
+      mounting_type: null,
+      clearances: {},
+      weight_kg: null,
+      enclosure_layout: {},
       status: price == null && !isBusbar ? 'placeholder' : 'active',
       pricing_mode: isBusbar ? 'weight_rate' : 'fixed',
       purchase_currency: isBusbar ? 'KES' : (r['purchaseCurrency'] ?? '') || 'EUR',
@@ -184,6 +192,11 @@ export function seedFixtures(): SeedFixtures {
         tags: [],
         compatibility_rules: {},
         status: 'active',
+        // added by migration 0106 (foundations F12): no kit overrides its
+        // footprint until somebody measures one.
+        footprint_w_mm: null,
+        footprint_h_mm: null,
+        footprint_d_mm: null,
         ...parseKitName(name),
       }
       assemblies.push(kit)
