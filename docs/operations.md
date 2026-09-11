@@ -446,7 +446,34 @@ reset from Supabase → Authentication → Users.
 Existing costings do not change: their prices were frozen when they were built. Only new
 costings pick up the new discount. This is deliberate.
 
-### Update prices from a supplier (slice 1)
+### Update prices from a supplier's price list (phase 2.2)
+
+The way to re-price from a list the supplier sent you, in their format. **Price lists** in the
+menu (administrators only).
+
+1. **Price lists** → choose the file. CSV, Excel and PDF all work; a PDF is uploaded, its text is
+   read, and the rows it found are shown — check for rows it missed, since a PDF is read line by
+   line.
+2. If you are the master administrator, tick **Price the master catalogue** for the shared
+   catalogue, or leave it clear to price your own company's private parts.
+3. Say which column is the **part number** and which is the **price**. The app guesses from the
+   column names; correct it if the guess is wrong. Currency, make and description are optional.
+4. Press **See what … rows would change**. Nothing has been saved at this point, and nothing will
+   be until step 6.
+5. Read the review:
+   - **Price changes** — the part, how it was matched, the price it has now, the price the
+     supplier asks, and the percentage. A part that had no price at all is marked *was unpriced*.
+   - **Needs a person** — a reference the library does not have ("add the part first"), a
+     reference two parts answer to, a busbar size (priced by weight, so change the copper rate
+     instead), a cell that is not a price, or a currency with no landed factor.
+   - A line saying how many rows already match the price you have.
+6. Tick the rows you believe and **Accept … ticked**, or **Accept all**. Each accepted price is
+   dated from the list, records the supplier as its source, and appears in that part's price
+   history. **Discard this upload** throws the whole thing away and changes nothing.
+
+Old costings never move: every price on a costing was frozen when the line was added.
+
+### Update prices from a spreadsheet of our own (slice 1)
 Prices are entered as the supplier charges them, in the supplier's currency (the *Purchase*
 column); the app lands them in KES with the currency factors and shows *Your price*.
 1. Library → Components → **Download Excel**.
