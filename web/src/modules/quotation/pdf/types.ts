@@ -27,6 +27,14 @@ export interface PdfSchedule {
   taxLabel: string           // "16% VAT-IN KSH."
   tax: string
   total: string
+  /**
+   * Extras offered with this option: priced and printed under the schedule, and
+   * deliberately not in the total above. Empty on an ordinary job.
+   */
+  optionalRows: PdfScheduleRow[]
+  optionalSubtotal: string
+  optionalTax: string
+  optionalTotal: string
 }
 
 export interface PdfTechnicalRow {

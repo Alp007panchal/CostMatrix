@@ -5,7 +5,7 @@ import { bomCells, bomFileName, bomToCsv, groupBom } from './bom'
 const item = (over: Partial<BomItem>): BomItem => ({
   costing_id: 'c', category_code: 'switchgear', category_name: 'Switchgear', code: 'X', name: 'Thing',
   manufacturer: 'SIEMENS', part_number: 'PN', unit: 'pcs', unit_price: 10, option_label: null,
-  quantity: 2, line_total: 20, ...over,
+  quantity: 2, line_total: 20, is_option: false, in_chosen_offer: true, ...over,
 })
 const NAMES = { switchgear: 'Switchgear', busbar: 'Busbar and cable', accessories_hardware: 'Accessories and hardware', enclosure_parts: 'Fabricated enclosure parts' }
 
@@ -44,6 +44,29 @@ describe('bomCells and bomToCsv', () => {
     const [g] = groupBom([item({ option_label: 'Option 2' })], NAMES)
     expect(bomCells(g!)[0]?.[0]).toBe('Option')
     expect(bomCells(g!)[1]?.[0]).toBe('Option 2')
+  })
+  it('marks optional extras, keeps them in the list and out of the total', () => {
+    const [g] = groupBom([
+      item({ code: 'MCCB', line_total: 20 }),
+      item({ code: 'SPARE', line_total: 7, is_option: true }),
+    ], NAMES)
+    const cells = bomCells(g!)
+    expect(g?.total).toBe(20)
+    expect(g?.optionalTotal).toBe(7)
+    expect(cells[0]?.[0]).toBe('Optional')
+    expect(cells.map((r) => r[1])).toContain('SPARE')
+    expect(cells[cells.length - 2]?.[0]).toBe('TOTAL')
+    expect(cells[cells.length - 2]?.[8]).toBe(20)
+    expect(cells[cells.length - 1]?.[0]).toBe('OPTIONAL EXTRAS (not in the total)')
+    expect(cells[cells.length - 1]?.[8]).toBe(7)
+  })
+  it('leaves the options nobody is buying out of the total, still listed', () => {
+    const [g] = groupBom([
+      item({ code: 'MCCB', line_total: 20, option_label: 'Option 1', in_chosen_offer: true }),
+      item({ code: 'ACB', line_total: 90, option_label: 'Option 2', in_chosen_offer: false }),
+    ], NAMES)
+    expect(g?.total).toBe(20)
+    expect(g?.rows.map((r) => r.code)).toEqual(['MCCB', 'ACB'])
   })
   it('quotes commas and doubles quotes in CSV, with a BOM for Excel', () => {
     const [g] = groupBom([item({ name: 'Breaker, 160A "adj"' })], NAMES)

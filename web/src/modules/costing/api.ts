@@ -122,7 +122,7 @@ export async function listHistory(costingId: string): Promise<CostingHistoryRow[
 
 export async function updateCosting(
   id: string,
-  changes: Partial<Pick<Costing, 'title' | 'notes' | 'negotiation_margin_pct'>>,
+  changes: Partial<Pick<Costing, 'title' | 'notes' | 'negotiation_margin_pct' | 'chosen_option_label'>>,
 ): Promise<void> {
   const { error } = await supabase.from('costings').update(changes).eq('id', id)
   fail('Could not save the costing', error)
@@ -145,7 +145,7 @@ export async function updatePanel(
   changes: Partial<
     Pick<
       CostingPanel,
-      'name' | 'tag' | 'option_label' | 'uom' | 'quantity' | 'technical_description' | 'enclosure_dimensions'
+      'name' | 'tag' | 'option_label' | 'is_option' | 'uom' | 'quantity' | 'technical_description' | 'enclosure_dimensions'
     >
   >,
 ): Promise<void> {

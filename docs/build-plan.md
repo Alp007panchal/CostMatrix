@@ -169,6 +169,12 @@ straight to `main`, reviewed and merged by the owner the same day.
 18. **Attachments on an enquiry** — drawings, specifications and emails kept with the job, on a
     new enquiry page that also lists its costings and quotations (migration 0017).
 
+19. **Options, alternatives and optional extras** (advanced track, roadmap 2.7) — a costing names
+    which option it is offered as, so its total is the price of the job rather than the sum of two
+    offers; a panel can be an optional extra, priced and printed but out of the total; the
+    quotation prints each option's extras under its schedule and the BOM marks them (migration
+    0109).
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 

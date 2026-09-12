@@ -193,7 +193,8 @@ View **v_currency_factors** — per master currency: the company's own figures w
 
 **costing_panels**
 - `costing_id`, `company_id`, `name`, `tag`, `quantity`, `uom` default `PC`, `sort_order`
-- `option_label` text nullable — panels sharing a label form one priced option
+- `option_label` text nullable — panels sharing a label form one priced option; the costing names
+  which one it means in `chosen_option_label` (0109)
 - `technical_description` text — printed in Annexure IV; drafted by the app, edited by the engineer
 - `enclosure_dimensions` text, e.g. `2100(H) x 3500(W) x 800(D) mm`
 
@@ -622,6 +623,33 @@ status, not a status (D-227). **v_quotation_validity** derives `days_left` and `
 | `expire_quotations()` | The nightly sweep: marks every quotation whose validity passed while still released or sent, logs it as `actor_kind = system`, and raises a follow-up on the ones that had been sent. Scheduled by pg_cron where it exists; **revoked from `authenticated`**. |
 | `check_my_quotation_expiry()` | The same work for the caller's own company, from a button. |
 | `reissue_costing(costing)` | A new revision of an approved costing with every line priced today: `create_costing_revision` for the numbering and history, then `copy_panel` per panel for the re-pricing, and a fresh `price_snapshot_at`. |
+
+### Added by migration 0109 — options, alternatives and optional extras (advanced track)
+
+**costings.chosen_option_label** — which of the job's options the costing's own total means,
+matching `costing_panels.option_label`. Null means no choice has been made, and the totals add
+every option together exactly as they did before, which is why nothing about an existing costing
+changes (D-231). Panels with no option label are common to every option and always count. Carried
+by `create_costing_revision` (its hand-written column list) and by `copy_costing` (which starts
+from `create_costing`, so the label is set afterwards).
+
+**costing_panels.is_option** — read at last: an optional extra, priced and printed but out of the
+total (D-230).
+
+**v_costing_option_choice** — one row per costing: the option its total means (null when none is
+chosen, **or when the label matches no panel**, so a stale label falls back to counting everything
+rather than silently dropping panels), the label as typed, and how many options the job is on offer
+as.
+
+The four costing views were re-derived by insertion, appending columns only:
+
+| View | Appended | Meaning |
+|---|---|---|
+| `v_costing_panel_costs` | `is_option` | An extra is costed like anything else. |
+| `v_costing_panel_prices` | `is_option`, `in_chosen_offer`, `counts_in_total` | `counts_in_total` is the **one place** that decides what a total counts (D-232); the views above it sum on it. |
+| `v_costing_totals` | `optional_subtotal`, `optional_tax`, `optional_total`, `chosen_option_label`, `option_count` | The first ten columns keep their names and now count the offer: the chosen option, without extras. |
+| `v_costing_option_totals` | `optional_subtotal`, `optional_tax`, `optional_total`, `is_chosen` | Every option's own figures, whichever is chosen — the comparison table. Labels are trimmed. |
+| `v_costing_items_by_category` | `is_option`, `in_chosen_offer` | The BOM keeps every row and marks it (D-233). |
 
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.

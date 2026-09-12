@@ -589,6 +589,33 @@ the same costing (a second, near-identical board) or into another of your open d
 A copy is not a revision. A revision is another version of the *same* job, keeps the number and
 supersedes the one before it; a copy is a *different* job that happens to start from this one.
 
+### Offer one job two ways, and quote an extra separately (phase 2.7)
+
+Two different things, and the app keeps them apart.
+
+**Two alternatives the customer picks one of** — the ACB board or the MCCB board, Option 1 or
+Option 2 in the old workbook. In each panel → *Details* → **Option**, type the same label on every
+panel belonging to that option, e.g. `Option 1`. A panel you leave blank is common to both, and is
+counted whichever option is taken. The **Totals** card then shows a *Per option* table, and the
+quotation prints a price schedule per option exactly as the NPP-192 quotation did.
+
+Then, under that table, **Offered as**: choose the option the job's own total should mean. Until you
+choose, the grand total is the two offers added together — which is not the price of anything — and
+the card says so. Choosing Option 2 makes the total the common panels plus Option 2; Option 1's
+panels stay on the quotation, stay priced, and are marked *not the chosen option* on the screen.
+The BOM total follows the same choice, so what it says to buy is the board you are building.
+
+**An extra the customer may take or leave** — a spare feeder, a second set of keys. Tick
+**Optional extra** in that panel's *Details*. It is priced like any other panel and printed on the
+quotation, but it is left out of the total; the Totals card shows it as *Optional extras, if the
+customer takes them*, and the quotation prints it in its own table under the schedule it belongs
+to, headed "not included in the total above". On the bill of materials it keeps its row, with an
+**Optional** column marking it and a separate OPTIONAL EXTRAS line under the total, so the buyer
+can see what is only bought if the customer says yes.
+
+Both travel: a revision and a copy keep the option labels, the extras and which option the job is
+offered as.
+
 ### Write the technical offer from the kits (session 4)
 In a panel → *Details* → **Draft from the kits**: the technical description is written from
 the panel's kits under their section headings (a kit in no section falls back to its kit group),

@@ -1,7 +1,7 @@
 import type { Letterhead, QuotationTerms } from '../../../lib/database.types'
 import type { CostingDetail } from '../../costing/api'
 import { describePanel } from '../../costing/technical'
-import type { PdfSchedule, PdfTechnicalRow, PdfTerm, QuotationPdfData } from './types'
+import type { PdfSchedule, PdfScheduleRow, PdfTechnicalRow, PdfTerm, QuotationPdfData } from './types'
 
 /**
  * Turns a costing, the company's letterhead and the approver's wording into
@@ -77,25 +77,32 @@ export function buildSchedules(detail: CostingDetail, label: string): PdfSchedul
 
   return [...groups.entries()].map(([optionLabel, panels]) => {
     const totals = optionTotals.get(optionLabel)
+    const row = (panel: (typeof panels)[number], i: number): PdfScheduleRow => {
+      const price = priceByPanel.get(panel.id)
+      return {
+        itemNo: i + 1,
+        description: panel.name.toUpperCase(),
+        uom: panel.uom,
+        qty: formatQty(panel.quantity),
+        unitPrice: formatMoney(price?.unit_price ?? 0),
+        total: formatMoney(price?.line_total ?? 0),
+      }
+    }
     return {
       heading: optionLabel
         ? `${optionLabel.toUpperCase()} — PRICE SCHEDULE`
         : 'LV BOARDS PRICE SCHEDULE',
-      rows: panels.map((panel, i) => {
-        const price = priceByPanel.get(panel.id)
-        return {
-          itemNo: i + 1,
-          description: panel.name.toUpperCase(),
-          uom: panel.uom,
-          qty: formatQty(panel.quantity),
-          unitPrice: formatMoney(price?.unit_price ?? 0),
-          total: formatMoney(price?.line_total ?? 0),
-        }
-      }),
+      // Roadmap 2.7: the extras are quoted under the schedule they belong to, so
+      // the subtotal and VAT above them are what the customer owes for the offer.
+      rows: panels.filter((p) => !p.is_option).map(row),
       subtotal: formatMoney(totals?.subtotal ?? 0),
       taxLabel: `${trimPct(taxPct)}% VAT-IN ${label}.`,
       tax: formatMoney(totals?.tax ?? 0),
       total: formatMoney(totals?.grand_total ?? 0),
+      optionalRows: panels.filter((p) => p.is_option).map(row),
+      optionalSubtotal: formatMoney(totals?.optional_subtotal ?? 0),
+      optionalTax: formatMoney(totals?.optional_tax ?? 0),
+      optionalTotal: formatMoney(totals?.optional_total ?? 0),
     }
   })
 }
@@ -128,7 +135,8 @@ export function buildTechnical(detail: CostingDetail): PdfTechnicalRow[] {
     }
     return {
       srNo: i + 1,
-      particular: [panel.name, panel.option_label].filter(Boolean).join(' - ').toUpperCase(),
+      particular: [panel.name, panel.option_label, panel.is_option ? 'optional extra' : null]
+        .filter(Boolean).join(' - ').toUpperCase(),
       description: parts.filter(Boolean).join('\n\n'),
       qty: formatQty(panel.quantity),
     }

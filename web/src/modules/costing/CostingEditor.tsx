@@ -158,7 +158,15 @@ export function CostingEditor() {
             {/* Roadmap 2.5: what the company's rules make of this costing. */}
             <ApprovalPanel costingId={costing.id} status={costing.status} />
 
-            <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} bom={bom.data ?? []} categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))} />
+            <TotalsPanel
+              costing={costing}
+              totals={totals}
+              optionTotals={optionTotals}
+              bom={bom.data ?? []}
+              categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))}
+              editable={editable}
+              onChooseOption={(chosen) => run(() => updateCosting(costing.id, { chosen_option_label: chosen }))}
+            />
 
             {panels.map((panel) => (
               <PanelCard
