@@ -210,6 +210,7 @@ export function seedFixtures(): SeedFixtures {
       id: `${kit.id}-l${lines.length + 1}`,
       assembly_id: kit.id,
       component_id: part.id,
+      qty_expression: null,
       quantity: Number(row['quantity'] ?? '1'),
       is_main_device: (template.get(name)?.main ?? '').toUpperCase() === part.code.toUpperCase(),
       sort_order: lines.length + 1,

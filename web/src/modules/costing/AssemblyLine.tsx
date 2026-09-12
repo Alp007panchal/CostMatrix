@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { money } from '../../lib/format'
+import { describeAnswers } from '../library/kit-parameters'
 import type {
   AssemblyTotals,
   CostingAssembly,
@@ -55,6 +56,10 @@ export function AssemblyLine({
             {open ? '▾' : '▸'}
           </button>
           {isFree ? <em>{line.name}</em> : `${line.code} — ${line.name}`}
+          {/* What a parameterised kit was worked out from, frozen on the line. */}
+          {Object.keys(line.parameters ?? {}).length > 0 && (
+            <div className="muted" style={{ fontSize: '.75rem' }}>{describeAnswers(line.parameters)}</div>
+          )}
           {editable && !isFree && (
             <select
               aria-label="Section"
