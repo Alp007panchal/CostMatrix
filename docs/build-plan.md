@@ -216,13 +216,18 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| Roadmap 3.6, sales analytics | session_01V2JYoFAXHLt58eBvbV8woQ | 2026-09-12 15:20 UTC |
+| (nothing in hand) | | |
 
 26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
     correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
     then applied through the ordinary kit function with the answers frozen on the panel
     (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
+
+27. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
+    by customer, value band, month and product group, why jobs were lost in the words they were
+    heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
+    with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

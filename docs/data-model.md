@@ -761,6 +761,23 @@ The answers as the screen asks them: `sources[]`, `incomer_rating_a`, `incomer_t
 (ats / manual / switch / sync), `feeders[{rating_a, quantity, type}]`, `apfc_kvar`, `metering`,
 `form`, `ip`, `access`, `cable_entry`. The last four are recorded, not priced (decision 1).
 
+### Added by migration 0116 — sales analytics (advanced track)
+
+**No table and no write** (D-260). Four views over what the app already records, plus one setting.
+
+| View | What it gives |
+|---|---|
+| `v_sales_outcomes` | One row per enquiry: its decision, why it was lost, days to decide, offers released, and the job's **ex-VAT value** from the offer that won, else the latest released, else the current costing (D-261), with its value band. Grouping by customer, band and month is done in the web layer from these rows. |
+| `v_sales_group_outcomes` | The same outcome against each kit group the job used, with that group's material, labour and hours — so win and loss by product group sit beside the money at stake. |
+| `v_margin_achieved` | Margin quoted against margin achieved: the same arithmetic with recorded hours in place of the estimate, panel by panel, plus `labour_measured_pct` (D-263). |
+| `v_sales_pipeline` | Open and quoted enquiries with value, age, the latest offer's state and how long it has left. |
+
+| Function | What it does |
+|---|---|
+| `app.value_band(value)` | Which band a job falls in, from `company_options.analytics_value_bands` (default `500000,2000000,10000000`). |
+| `app.money_words(value)` | "500 K", "2 M" — short enough for a column heading. |
+| `app.seed_company_options` | Re-derived to seed `analytics_value_bands` **and `apfc_step_pattern`**, which 0113 never added, so a company created since has had no row for it (D-264). |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

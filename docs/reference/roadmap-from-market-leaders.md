@@ -158,7 +158,7 @@ comes next rather than in its numbered place.
 | 3.3 | **Parameterised kits** in the engine (`qty_expression` evaluated against `kit_parameters`); busbar metres as a kit parameter so a non-standard board adjusts metres in one place | EPLAN macros, Accubid assemblies | F2 |
 | 3.4 | **Compatibility checks**: rules on kits/components (frame vs enclosure depth, accessory fits device, feeder total vs incomer rating sanity check) surfaced as warnings, also used by the AI review | EPLAN parts checks | F1 attributes, F2 rules |
 | 3.5 | **Labour standards from actuals**: Opsmatrix timesheet feed into `labour_actuals`; admin screen to accept suggested standard hours per kit group | Accubid | F3, Opsmatrix |
-| 3.6 | **Sales analytics**: win/loss by customer, product group, value band and reason; hit rate; margin achieved vs quoted; pipeline view | CPQ / CRM phase 2 | F6, CRM |
+| 3.6 ✅ | **Sales analytics** (built 2026-09-12, migration 0116): win/loss by customer, product group, value band and reason; hit rate; margin achieved vs quoted; pipeline view | CPQ / CRM phase 2 | F6, CRM |
 | 3.8 | **Panel layout canvas**: a front view per cubicle at true scale; kits dragged onto mounting-plate and DIN-rail zones with their clearances respected; busbar and cable chambers drawn as unavailable space; a fit / no-fit verdict that proposes the cubicle count and width for the enclosure line; later exported as the general-arrangement sketch in Annexure IV | Rittal RiPanel, EPLAN Pro Panel | F12, F2 |
 | 3.7 | **AI assistant phase 2**: natural-language questions over the company's own data; drafting cover letters, follow-ups and clarification questions; external companies switched on per company | — | 2.4 |
 

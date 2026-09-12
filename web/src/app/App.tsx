@@ -29,6 +29,7 @@ const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m)
 const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage').then((m) => ({ default: m.ApprovalRulesPage })))
 const CompatibilityRulesPage = lazy(() => import('../modules/admin/CompatibilityRulesPage').then((m) => ({ default: m.CompatibilityRulesPage })))
 const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePage').then((m) => ({ default: m.LabourVariancePage })))
+const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
 
@@ -78,6 +79,7 @@ export function App() {
                 }
               />
               <Route path="quotations" element={<QuotationsPage />} />
+              <Route path="sales" element={<SalesPage />} />
               <Route path="crm/customers" element={<CustomersPage />} />
               <Route path="crm/customers/:id" element={<CustomersPage />} />
               <Route path="crm/enquiries" element={<EnquiriesPage />} />
