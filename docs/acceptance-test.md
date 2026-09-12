@@ -16,6 +16,11 @@
 > earlier version of this script, the new steps are §4 (files), §5 (sections, copy), §6 (who did
 > it) and §9 (won or lost on the enquiry).
 
+> **2026-09-12:** this script is the **basic app on production** (`main`), which is unchanged by
+> the advanced work. The eleven features built on `advanced` against the staging project have
+> their own click-through: `docs/trials/advanced-trial.md`. Keeping them apart means this one
+> stays a true test of what your team quotes on today.
+
 # Acceptance test — one real job, end to end
 
 The first time a human clicks through everything built so far. Do it in this order, with a

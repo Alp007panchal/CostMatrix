@@ -14,7 +14,28 @@ It builds a throwaway PostgreSQL, applies the auth shim, applies every migration
 runs each test file. Any failure stops it with a non-zero exit code. The same script runs in CI
 on every push.
 
+## Rehearsing an upgrade
+
+```sh
+./supabase/tests/upgrade-rehearsal.sh
+```
+
+`run-local.sh` applies every migration to an **empty** database. That proves the migrations are
+self-consistent; it cannot prove they can be applied to a database that is already at 0017 **and
+already holds rows** — which is what production is, and what merging `advanced` into `main` does
+to it (D-272).
+
+So this script builds production's shape (migrations `00xx`, then every test written before the
+advanced track, which imports the real `data/seed` files and builds NPP-192, plus a released
+quotation because no test leaves one behind), writes down fourteen figures with
+`upgrade-snapshot.sql`, applies the `01xx` migrations, reads the same figures again, and
+`upgrade-compare.sql` **refuses any difference**. It runs in CI beside the suite.
+
+If it fails, the message names the figure that moved and both values. That is a migration which is
+fine on an empty database and wrong on a full one — the kind that is otherwise found on live data.
+
 ## The files
+
 
 | File | What it covers |
 |---|---|

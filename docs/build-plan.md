@@ -222,20 +222,26 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| (nothing in hand) | | |
+| Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
-26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
+27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
     correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
     then applied through the ordinary kit function with the answers frozen on the panel
     (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
 
-27. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
+28. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
     by customer, value band, month and product group, why jobs were lost in the words they were
     heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
     with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
 
-29. **The busbar run calculator** (advanced track, roadmap 4.1) — the owner's `CU-OPT1` sheet in the
+29. **The staging trial** (advanced track) — `docs/trials/advanced-trial.md`, a click-through for
+    the fifteen features now on staging, in the order a real job flows, each step saying what to
+    expect; and `supabase/checks/deployed-features.sql`, one query the owner pastes into the
+    Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 41 so the list
+    cannot drift. No application change.
+
+30. **The busbar run calculator** (advanced track, roadmap 4.1) — the owner's `CU-OPT1` sheet in the
     app: a run a row at `phases × runs per phase × length × sets`, totals per bar size in metres,
     kilograms and money, bar sizes read from his own kits, a starting schedule built from the
     board's parameters, and the schedule set beside the metres the panel is actually costed at
@@ -243,6 +249,11 @@ the work begins, removed when the pull request opens.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
+
+31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+    migrations to a database already at 0017 and already full of rows, refusing any figure that
+    moves (in CI on every pull request), a go-live section in the runbook, and then the release
+    itself: one pull request from `advanced` into `main`, every feature off.
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
