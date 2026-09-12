@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider } from '../modules/auth/session'
+import { FeatureGate } from '../modules/admin/FeatureGate'
 import { RequireAuth, RequireRole } from './guards'
 import { Layout } from './Layout'
 import { HomePage } from '../modules/dashboard/HomePage'
@@ -27,6 +28,7 @@ const EnquiriesPage = lazy(() => import('../modules/crm/EnquiriesPage').then((m)
 const EnquiryDetail = lazy(() => import('../modules/crm/EnquiryDetail').then((m) => ({ default: m.EnquiryDetail })))
 const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m) => ({ default: m.FollowUpsPage })))
 const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage').then((m) => ({ default: m.ApprovalRulesPage })))
+const FeaturesPage = lazy(() => import('../modules/admin/FeaturesPage').then((m) => ({ default: m.FeaturesPage })))
 const CompatibilityRulesPage = lazy(() => import('../modules/admin/CompatibilityRulesPage').then((m) => ({ default: m.CompatibilityRulesPage })))
 const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePage').then((m) => ({ default: m.LabourVariancePage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
@@ -87,7 +89,17 @@ export function App() {
                 path="admin/approval-rules"
                 element={
                   <RequireRole role="company_admin">
-                    <ApprovalRulesPage />
+                    <FeatureGate code="approval_rules">
+                      <ApprovalRulesPage />
+                    </FeatureGate>
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/features"
+                element={
+                  <RequireRole role="company_admin">
+                    <FeaturesPage />
                   </RequireRole>
                 }
               />
@@ -95,7 +107,9 @@ export function App() {
                 path="admin/compatibility-rules"
                 element={
                   <RequireRole role="company_admin">
-                    <CompatibilityRulesPage />
+                    <FeatureGate code="compatibility_checks">
+                      <CompatibilityRulesPage />
+                    </FeatureGate>
                   </RequireRole>
                 }
               />
@@ -103,7 +117,9 @@ export function App() {
                 path="admin/labour-variance"
                 element={
                   <RequireRole role="company_admin">
-                    <LabourVariancePage />
+                    <FeatureGate code="labour_actuals">
+                      <LabourVariancePage />
+                    </FeatureGate>
                   </RequireRole>
                 }
               />
@@ -119,7 +135,9 @@ export function App() {
                 path="admin/assistant"
                 element={
                   <RequireRole role="company_admin">
-                    <AssistantSettingsPage />
+                    <FeatureGate code="assistant">
+                      <AssistantSettingsPage />
+                    </FeatureGate>
                   </RequireRole>
                 }
               />
@@ -146,7 +164,9 @@ export function App() {
                 path="library/price-lists"
                 element={
                   <RequireRole role="company_admin">
-                    <PriceListsPage />
+                    <FeatureGate code="price_lists">
+                      <PriceListsPage />
+                    </FeatureGate>
                   </RequireRole>
                 }
               />

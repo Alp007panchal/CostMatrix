@@ -206,6 +206,18 @@ export interface PanelFit {
   reason?: string
 }
 
+/** One advanced feature and whether it is switched on here (v_company_features). */
+export interface CompanyFeature {
+  code: string
+  name: string
+  blurb: string
+  /** Does switching this on change what an existing costing does? Three do. */
+  changes_costings: boolean
+  option_key: string
+  sort_order: number
+  is_on: boolean
+}
+
 /** One finding of one compatibility rule against one panel (v_panel_warnings). */
 export interface PanelWarning {
   company_id: string

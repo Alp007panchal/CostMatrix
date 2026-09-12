@@ -746,6 +746,35 @@ allowed fields of the main device it must name; `{"max_ratio": 4, "incomer_secti
 | `fill_message(template, vars)` | Puts the findings into the rule's own sentence. |
 | `costing_facts` | Re-derived from 0102 by insertion: gains `compatibility_blockers` and `compatibility_warnings`, so an approval rule (0108) can refuse a costing that does not fit. Nothing else acts on a blocker (D-249). |
 
+### Added by migration 0116 — a switch per advanced feature (advanced track)
+
+**features** — master rows, one per advanced feature: `code`, `name`, `blurb` (what it does in
+the owner's own words, printed on the Features screen), `changes_costings` (does switching it on
+change what an existing costing does? three do), `option_key`, `sort_order`. Everybody reads it;
+the master administrator writes it.
+
+The per-company answer is a `company_options` row under `feature.<code>`, **absent or false
+meaning off**, which is how every company starts. The assistant's row names its own older
+`ai_enabled` key, so one thing has one switch. `app.protect_master_options` (0102) is widened
+from `ai_enabled` to every `feature.%` key: **only the master administrator may flip one**
+(D-256), which is what makes "off by default" worth anything for an external company.
+
+| Function or view | What it gives |
+|---|---|
+| `feature_on(code, company)` | Whether one feature is on for a company — the caller's own unless another is named. SECURITY DEFINER, because the nightly sweep runs with no signed-in user and the pricing view is read by a master administrator looking at somebody else's costing; what it discloses is one boolean the Features screen shows anyway. |
+| `v_company_features` | The register with the caller's own answer beside each row. One query for the navigation, the costing screen and the Features page. |
+| `seed_feature_options(company)` | Every feature off for one company; called for every company that exists and by the company-creation trigger for every new one. |
+
+**The three gates.** Everything else is inert until somebody uses it, so its switch only decides
+whether the way in is shown. These three change what an existing costing does, and each is
+written so that *off* reproduces the older text exactly (D-257):
+
+| Gate | Off |
+|---|---|
+| `evaluate_approval_rules` | No rule is read; an approver is required, as before 0108. `submit_costing` and `approve_costing` are untouched — one gate, in the function that decides. |
+| `expire_quotations` | The nightly sweep passes that company by, and reports `skipped` beside `expired`. The only thing in the app that writes with nobody watching. |
+| `v_costing_panel_prices.counts_in_total` | Every panel counts and an optional extra is simply a panel, as before 0109. |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

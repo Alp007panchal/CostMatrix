@@ -44,6 +44,17 @@ An advanced feature is merged into `main` only when all three are true:
 2. It is behind a per-company switch that is **off by default**.
 3. You have tried it on the preview URL and approve it.
 
+**Condition 2 is built** (migration 0116, D-256). Every advanced feature has a row on the
+**Features** screen and arrives switched off for every company; only the master administrator can
+switch one on. Three of them change what an existing costing does and are marked as such — the
+rules engine, the nightly expiry sweep, and which panels count towards the total — and each is
+gated so that *off* behaves exactly as the app did before that feature was written.
+
+So the merge to `main` is now an ordinary one: `main` gets the whole of `advanced`, every feature
+off, and the live app behaves as it does today until you switch something on. What is left is
+condition 3, which is yours: try each feature on the staging preview and say which ones you want
+to be able to switch on for real work.
+
 And `main` is merged **into** `advanced` after every change to `main`, so the two never drift.
 
 ---

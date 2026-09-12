@@ -15,6 +15,7 @@ import {
 import { PanelCard } from './PanelCard'
 import { CostingGrid } from './CostingGrid'
 import { costingWarningSummary, warningsByPanel } from './warnings'
+import { useFeatures } from '../admin/use-features'
 import { readCostingView, writeCostingView, type CostingView } from './costing-view'
 import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
@@ -36,6 +37,9 @@ export function CostingEditor() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { company, hasRole } = useSession()
+  // Which advanced features this company has switched on (the road to
+  // production). One query for every card below, not one each.
+  const { on } = useFeatures()
 
   const detail = useQuery({ queryKey: ['costing', id], queryFn: () => getCostingDetail(id), enabled: Boolean(id) })
   const components = useQuery({ queryKey: ['components'], queryFn: listComponentPrices })
@@ -49,7 +53,7 @@ export function CostingEditor() {
   const warnings = useQuery({
     queryKey: ['panel-warnings', id],
     queryFn: () => listPanelWarnings(id),
-    enabled: Boolean(id),
+    enabled: Boolean(id) && on('compatibility_checks'),
   })
 
   const refresh = async () => {
@@ -186,6 +190,7 @@ export function CostingEditor() {
             {/* Two ways of reading the same costing: panel by panel, or the whole
                 thing as a grid (roadmap 2.9). The grid edits through the same
                 functions, so neither view is the privileged one. */}
+            {on('costing_grid') && (
             <div className="row" style={{ marginTop: '.75rem', gap: '.4rem' }}>
               <button
                 className={view === 'panels' ? 'primary' : undefined}
@@ -202,11 +207,12 @@ export function CostingEditor() {
                 Grid
               </button>
             </div>
+            )}
 
             {/* One column, read top to bottom: what it costs, how it is built, what
                 to export, what happened. */}
             {/* Roadmap 2.5: what the company's rules make of this costing. */}
-            <ApprovalPanel costingId={costing.id} status={costing.status} />
+            {on('approval_rules') && <ApprovalPanel costingId={costing.id} status={costing.status} />}
 
             <TotalsPanel
               costing={costing}
@@ -220,14 +226,14 @@ export function CostingEditor() {
 
             {/* Roadmap 3.4: one line so nobody has to scroll every panel to find
                 out whether the checks found anything. */}
-            {costingWarningSummary(warnings.data ?? []) && (
+            {on('compatibility_checks') && costingWarningSummary(warnings.data ?? []) && (
               <p className="muted" style={{ margin: '.4rem 0 0' }}>
                 Compatibility checks: {costingWarningSummary(warnings.data ?? [])}. They are shown on the panels
                 themselves, and change no figure.
               </p>
             )}
 
-            {view === 'grid' && (
+            {on('costing_grid') && view === 'grid' && (
               <CostingGrid
                 costing={costing}
                 panels={panels}
@@ -255,7 +261,7 @@ export function CostingEditor() {
               />
             )}
 
-            {view === 'panels' && panels.map((panel) => (
+            {(view === 'panels' || !on('costing_grid')) && panels.map((panel) => (
               <PanelCard
                 key={panel.id}
                 panel={panel}
@@ -293,7 +299,7 @@ export function CostingEditor() {
               />
             ))}
 
-            {view === 'panels' && editable && (
+            {(view === 'panels' || !on('costing_grid')) && editable && (
               <button onClick={() => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length))}>
                 + Add a panel
               </button>
@@ -318,22 +324,26 @@ export function CostingEditor() {
             )}
 
             {/* Somebody else's parts list, matched to kits and parts (roadmap 2.3). */}
-            <BomImportCard costingId={costing.id} editable={editable} />
+            {on('bom_import') && <BomImportCard costingId={costing.id} editable={editable} />}
 
             {/* What the boards actually took (roadmap 2.8). Available whatever the
                 costing's status, because the work happens after approval, and it
                 changes nothing this costing was priced on. */}
-            <ActualHoursCard
-              costingId={costing.id}
-              panels={panels}
-              processTypes={processTypes.data ?? []}
-              currencyLabel={label}
-              canRecord={canBuild}
-            />
+            {on('labour_actuals') && (
+              <ActualHoursCard
+                costingId={costing.id}
+                panels={panels}
+                processTypes={processTypes.data ?? []}
+                currencyLabel={label}
+                canRecord={canBuild}
+              />
+            )}
 
             {/* The spec, the tender schedule, the drawing this costing answers.
                 Kept with it, and read so the assistant can use them later. */}
-            <DocumentFiles entityType="costing" entityId={costing.id} companyId={costing.company_id} canEdit={editable} />
+            {on('documents') && (
+              <DocumentFiles entityType="costing" entityId={costing.id} companyId={costing.company_id} canEdit={editable} />
+            )}
 
             {/* Reads this costing and those documents, and proposes; a person
                 applies. Nothing it does reaches the costing on its own. */}

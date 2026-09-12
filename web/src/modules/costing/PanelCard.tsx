@@ -22,6 +22,7 @@ import { AddFreeLine } from './AddFreeLine'
 import { Detail } from './PanelDetails'
 import { PanelFitLine } from './PanelFitLine'
 import { PanelWarnings } from './PanelWarnings'
+import { useFeatures } from '../admin/use-features'
 import { describePanel } from './technical'
 import type { ManualItemInput } from './api'
 
@@ -82,6 +83,7 @@ export function PanelCard({
   handlers: Handlers
 }) {
   const [showDetails, setShowDetails] = useState(false)
+  const { on } = useFeatures()
   const [section, setSection] = useState('')
   const kvar = kvarTotal(assemblies, kits)
   const listId = `panel-sections-${panel.id}`
@@ -128,10 +130,10 @@ export function PanelCard({
           </button>
           {/* Foundations F12: will this fit the cubicles bought for it? Silent
               until the kits and the cubicle have been measured. */}
-          <PanelFitLine panelId={panel.id} />
+          {on('dimensions') && <PanelFitLine panelId={panel.id} />}
           {/* Roadmap 3.4: what the compatibility rules found here. Advisory, and
               silent about parts nobody has measured or described. */}
-          <PanelWarnings warnings={warnings} />
+          {on('compatibility_checks') && <PanelWarnings warnings={warnings} />}
         </div>
 
         <div style={{ textAlign: 'right', minWidth: '11rem' }}>
@@ -253,7 +255,7 @@ export function PanelCard({
             onAddManual={(input) => handlers.onAddManual(panel.id, input, clean(section))}
           />
           {/* A bank worked out from a target, rather than counted by hand. */}
-          <ApfcCard panelId={panel.id} onApplied={handlers.onPanelCopied} />
+          {on('apfc_configurator') && <ApfcCard panelId={panel.id} onApplied={handlers.onPanelCopied} />}
           <CopyPanel panel={panel} costing={costing} drafts={drafts} onCopied={handlers.onPanelCopied} />
         </>
       )}
