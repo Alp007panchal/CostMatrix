@@ -185,19 +185,22 @@ straight to `main`, reviewed and merged by the owner the same day.
     to, so the kit-group report reached none of them and they left no trace. They are now named
     beside the report, with what usually causes it (migration 0111).
 
-<<<<<<< HEAD
-24. **Compatibility checks** (advanced track, roadmap 3.4) — three questions asked of every panel
-    as rows anybody can read: will that device go into that cubicle, does that part belong to that
-    device, do the outgoing ways add up against the incomer. Warnings under the panel name, a
-    screen to change or silence each check, and a blocker an approval rule can act on
-    (migration 0114). Advisory: no price, hour or total moves.
-=======
 22. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
     and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
     its steps, works its line quantities out from the answers, refuses a formula that is anything
     but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
     unchanged (migration 0112). What 3.2 and 3.1 stand on.
->>>>>>> origin/advanced
+
+23. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
+    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
+    family of step kit; the engineer edits the quantities and applies, and the steps land as
+    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
+
+24. **Compatibility checks** (advanced track, roadmap 3.4) — three questions asked of every panel
+    as rows anybody can read: will that device go into that cubicle, does that part belong to that
+    device, do the outgoing ways add up against the incomer. Warnings under the panel name, a
+    screen to change or silence each check, and a blocker an approval rule can act on
+    (migration 0114). Advisory: no price, hour or total moves.
 
 ## In hand right now
 

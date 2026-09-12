@@ -703,6 +703,27 @@ said in their own comments that nothing read them yet. This is the engine readin
 Nothing about a kit with no parameters changes, which is what the existing suite passing
 unaltered — NPP-192 included — is there to prove.
 
+### Added by migration 0113 — the APFC configurator (advanced track)
+
+Roadmap 3.2, and decision 4's "a configurator later".
+
+- **company_options.apfc_step_pattern** — the shares of a target that go to each size, largest
+  first, seeded `50,25,18.75,6.25`: the grading of the owner's own NPP-192 bank (50×4, 25×4,
+  12.5×6, 5×5 for 400 kVAr). A setting rather than an opinion in code, so it changes without a
+  deploy and another company can grade differently.
+- **v_apfc_kits** — the kVAr-rated active kits the caller can see, with the
+  **family** read off the kit name (`APFC-FUSE`, `APFC-BREAKER`, else `OTHER`). A bank is built
+  from one family, never a mixture.
+- **app.propose_apfc(panel, target_kvar, family, pattern)** — writes nothing. The family defaults
+  to the one already on the panel, else the one with the most priced sizes. The shares are floored
+  to whole kits and the remainder topped up with the largest size that still fits; what the sizes
+  cannot reach is returned as **shortfall_kvar** rather than papered over. A family whose kits all
+  hold an unpriced part — true of every breaker step kit in the owner's library today — is refused
+  with that reason and the other family suggested.
+- **app.apply_apfc_steps(panel, steps)** — one transaction, through the ordinary
+  `add_assembly_to_costing`, into the panel's `APFC bank` section, with `apfc.applied` in the
+  activity log. What is applied is what the engineer had on screen, not what the proposal said.
+
 ### Added by migration 0114 — compatibility checks (advanced track)
 
 **compatibility_rules** — `company_id` (null = a master rule for everybody), `rule_kind`

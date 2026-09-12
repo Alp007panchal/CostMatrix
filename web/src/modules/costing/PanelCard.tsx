@@ -15,6 +15,7 @@ import type {
 } from '../../lib/database.types'
 import { PanelLines } from './PanelLines'
 import { CopyPanel } from './CopyPanel'
+import { ApfcCard } from './ApfcCard'
 import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
@@ -251,6 +252,8 @@ export function PanelCard({
             onAddComponent={(cid, qty) => handlers.onAddComponent(panel.id, cid, qty, clean(section))}
             onAddManual={(input) => handlers.onAddManual(panel.id, input, clean(section))}
           />
+          {/* A bank worked out from a target, rather than counted by hand. */}
+          <ApfcCard panelId={panel.id} onApplied={handlers.onPanelCopied} />
           <CopyPanel panel={panel} costing={costing} drafts={drafts} onCopied={handlers.onPanelCopied} />
         </>
       )}
