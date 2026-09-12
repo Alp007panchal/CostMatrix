@@ -34,6 +34,7 @@ changes a price, test 15 is unmodified, and your real data is never touched (D-1
 | Data-quality items in `data/seed/README.md` | Before the next seed import | Fifteen kits with only a main device, stray cable lines, two 4000A kits that look like one, duplicate and double-priced parts. Fix in `data/raw/` or say "import as is". |
 | **Connect your own email sender** (operations B9c) | Before inviting more than one or two people | Supabase's built-in sender allows a few messages an hour and often lands in spam. A free Gmail app password is enough; move to a `neiltd.com` sender before other companies are invited. |
 | Upload the header logo and footer marks | Before the first real quotation | **Quotation wording** → Header logo and Footer strip. PNG with transparent background prints best. |
+| Sizes and fittings for the compatibility checks (roadmap 3.4): the depth of a device, the usable depth inside a cubicle, and the devices a part is listed for | Before the checks can say anything | Until they are recorded the checks stay silent, which is correct rather than broken. The dimensions importer (`dimensions-template.csv`) takes the sizes in bulk; the rest is the Components screen. |
 | Run `docs/acceptance-test.md` on what is live | **Now** | Each finding comes back as its own pull request, as the notebook changes did. |
 
 ## Assumptions in force until you say otherwise

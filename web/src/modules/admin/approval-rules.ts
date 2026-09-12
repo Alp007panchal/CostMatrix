@@ -38,6 +38,8 @@ export const FACTS: { field: string; label: string; kind: 'money' | 'percent' | 
   { field: 'uses_placeholder_part', label: 'Has a part with no price', kind: 'yes_no' },
   { field: 'placeholder_parts', label: 'How many parts have no price', kind: 'number' },
   { field: 'price_age_days', label: 'How old the prices are, in days', kind: 'days' },
+  { field: 'compatibility_blockers', label: 'Compatibility findings marked as blockers', kind: 'number' },
+  { field: 'compatibility_warnings', label: 'Compatibility warnings', kind: 'number' },
   { field: 'revision_no', label: 'Revision number', kind: 'number' },
 ]
 
