@@ -180,6 +180,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
+21. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
+    and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
+    its steps, works its line quantities out from the answers, refuses a formula that is anything
+    but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
+    unchanged (migration 0112). What 3.2 and 3.1 stand on.
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing
@@ -188,7 +194,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.3 Parameterised kits (migration 0112) | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+| 3.2 APFC configurator, then 3.4 compatibility checks | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

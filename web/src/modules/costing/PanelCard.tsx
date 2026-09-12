@@ -25,7 +25,7 @@ import type { ManualItemInput } from './api'
 interface Handlers {
   onPanelChange: (id: string, changes: Partial<CostingPanel>) => void
   onPanelRemove: (id: string) => void
-  onAddAssembly: (panelId: string, assemblyId: string, quantity: number, section: string | null) => Promise<void>
+  onAddAssembly: (panelId: string, assemblyId: string, quantity: number, section: string | null, params: Record<string, string> | null) => Promise<void>
   onAddComponent: (panelId: string, componentId: string, quantity: number, section: string | null) => Promise<void>
   onAddManual: (panelId: string, input: ManualItemInput, section: string | null) => Promise<void>
   onAssemblyQuantity: (id: string, quantity: number) => void
@@ -235,7 +235,7 @@ export function PanelCard({
               — choose one or type your own; everything added below goes there.
             </span>
           </div>
-          <KitPicker kits={kits} onAdd={(id, qty) => handlers.onAddAssembly(panel.id, id, qty, clean(section))} />
+          <KitPicker kits={kits} onAdd={(id, qty, params) => handlers.onAddAssembly(panel.id, id, qty, clean(section), params)} />
           <AddFreeLine
             components={components}
             categories={categories}

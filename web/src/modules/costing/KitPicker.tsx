@@ -1,11 +1,24 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import type { Kit } from '../../lib/database.types'
+import { listKitParameters } from '../library/kits-api'
+import { answerProblems, startingAnswers } from '../library/kit-parameters'
 
 /**
  * Choose a kit the way the costing team thinks: kit group, then rating, then
  * the kit itself (main device and poles shown), then how many.
+ *
+ * A kit that asks for parameters (roadmap 3.3) asks here, with its own defaults
+ * filled in: the quantities of its lines are worked out from the answers, so
+ * they are wanted before it can be added.
  */
-export function KitPicker({ kits, onAdd }: { kits: Kit[]; onAdd: (kitId: string, qty: number) => Promise<void> }) {
+export function KitPicker({
+  kits,
+  onAdd,
+}: {
+  kits: Kit[]
+  onAdd: (kitId: string, qty: number, params: Record<string, string> | null) => Promise<void>
+}) {
   const [group, setGroup] = useState('')
   const [rating, setRating] = useState('')
   const [choice, setChoice] = useState('')
@@ -27,6 +40,18 @@ export function KitPicker({ kits, onAdd }: { kits: Kit[]; onAdd: (kitId: string,
     rating === '' ? true : rating === '—' ? k.rating == null : `${k.rating} ${k.rating_unit ?? ''}`.trim() === rating,
   )
   const chosen = candidates.find((k) => k.id === choice)
+
+  // Only the chosen kit's parameters, and only once one is chosen: almost every
+  // kit in the library has none, and this must stay out of the way of those.
+  const parameters = useQuery({
+    queryKey: ['kit-parameters', choice],
+    queryFn: () => listKitParameters(choice),
+    enabled: Boolean(choice),
+  })
+  const wanted = parameters.data ?? []
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  useEffect(() => { setAnswers(startingAnswers(wanted)) }, [choice, parameters.dataUpdatedAt])
+  const problems = wanted.length > 0 ? answerProblems(wanted, answers) : []
 
   return (
     <div style={{ marginTop: '.75rem' }}>
@@ -52,11 +77,11 @@ export function KitPicker({ kits, onAdd }: { kits: Kit[]; onAdd: (kitId: string,
         <input type="number" step="1" min="1" value={qty} style={{ width: '5rem' }} aria-label="Quantity" onChange={(e) => setQty(e.target.value)} />
         <button
           className="primary"
-          disabled={!choice || busy}
+          disabled={!choice || busy || problems.length > 0}
           onClick={() => {
             setBusy(true); setError(null)
-            onAdd(choice, Number(qty) || 1)
-              .then(() => { setChoice(''); setQty('1') })
+            onAdd(choice, Number(qty) || 1, wanted.length > 0 ? answers : null)
+              .then(() => { setChoice(''); setQty('1'); setAnswers({}) })
               .catch((e: unknown) => setError(String(e)))
               .finally(() => setBusy(false))
           }}
@@ -64,6 +89,28 @@ export function KitPicker({ kits, onAdd }: { kits: Kit[]; onAdd: (kitId: string,
           {busy ? 'Adding…' : 'Add kit'}
         </button>
       </div>
+
+      {wanted.length > 0 && (
+        <div className="row" style={{ flexWrap: 'wrap', marginTop: '.4rem' }}>
+          <span className="muted" style={{ fontSize: '.8125rem' }}>This kit asks for</span>
+          {wanted.map((p) => (
+            <label key={p.id} className="row" style={{ gap: '.3rem', fontSize: '.8125rem' }}>
+              <span className="muted">{p.name.replace(/_/g, ' ')}</span>
+              <input
+                value={answers[p.name] ?? ''}
+                aria-label={p.name}
+                style={{ width: '5.5rem' }}
+                onChange={(e) => setAnswers((a) => ({ ...a, [p.name]: e.target.value }))}
+              />
+              {p.unit && <span className="muted">{p.unit}</span>}
+            </label>
+          ))}
+          <span className="muted" style={{ fontSize: '.75rem', width: '100%' }}>
+            The line quantities are worked out from these — busbar metres, steps, and the like.
+          </span>
+        </div>
+      )}
+      {problems.length > 0 && <p className="error" style={{ fontSize: '.8125rem' }}>{problems.join('. ')}.</p>}
       {chosen && (
         <p className="muted" style={{ margin: '.3rem 0 0', fontSize: '.8125rem' }}>
           {chosen.line_count} line{chosen.line_count === 1 ? '' : 's'}

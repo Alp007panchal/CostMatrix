@@ -9,7 +9,7 @@ const kit = (id: string, rating: number | null, unit: 'A' | 'KVAR' | null): Kit 
 })
 const line = (source: string | null, quantity: number, kind: 'kit' | 'free' = 'kit'): CostingAssembly => ({
   id: `${source}-${quantity}`, costing_id: 'c', panel_id: 'p', kind, section: null, source_assembly_id: source,
-  code: source ?? 'FREE', name: '', quantity, sort_order: 0,
+  code: source ?? 'FREE', name: '', quantity, parameters: {}, sort_order: 0,
 })
 
 describe('kvarTotal', () => {

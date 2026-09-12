@@ -668,6 +668,31 @@ the pricing engine: a costing keeps the hours it froze (D-235).
 | `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
 | `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
 
+### Added by migration 0112 — kits that work out their own quantities (advanced track)
+
+Roadmap 3.3. `assembly_components.qty_expression` and `kit_parameters` came with F2 in 0100 and
+said in their own comments that nothing read them yet. This is the engine reading them.
+
+- **app.eval_qty_expression(expression, params)** — the parameters are substituted first
+  (longest name first, so `steps` cannot eat `steps_spare`), and what remains must be digits,
+  `+ - * / ( ) . ,` and `ceil`/`floor`/`round`/`greatest`/`least`. A surviving name is refused
+  **by name** ("the formula uses gremlins, which is not one of this kit's parameters"), which is
+  both the error message an engineer needs and the reason a formula cannot be anything but
+  arithmetic. A result that is null, not-a-number or negative is refused too.
+- **app.kit_parameter_values(assembly, given)** — the answers over the kit's defaults, checked
+  against its ranges, with a name the kit does not have refused rather than ignored.
+- **costing_assemblies.parameters** — what the line was worked out from, frozen like every other
+  figure. Carried by `create_costing_revision` and `copy_panel`, whose hand-written column lists
+  are the trap 0011 and 0014 each fixed once.
+- **app.add_assembly_to_costing(panel, kit, qty, section, params)** — the fifth argument defaults
+  to null, so the assistant (0104) and the BOM import (0107) call it unchanged. Each line's
+  quantity is its formula worked out against the answers, or the fixed quantity where there is no
+  formula, which is every line in the owner's library. **A line whose formula comes to zero is not
+  written**: a bank of four steps has four lines, not four and an empty fifth.
+
+Nothing about a kit with no parameters changes, which is what the existing suite passing
+unaltered — NPP-192 included — is there to prove.
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain
