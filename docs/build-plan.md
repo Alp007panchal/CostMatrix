@@ -175,6 +175,11 @@ straight to `main`, reviewed and merged by the owner the same day.
     quotation prints each option's extras under its schedule and the BOM marks them (migration
     0109).
 
+20. **Estimate against actual labour** (advanced track, roadmap 2.8) — hours actually worked
+    recorded against a panel and process type, an estimate-against-actual table on the costing, and
+    a labour variance report by kit group with a suggested new standard that only a person applies
+    (migration 0110). Completes roadmap phase 2.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 

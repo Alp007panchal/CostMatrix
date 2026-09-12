@@ -19,6 +19,7 @@ import { BomExports } from './BomExports'
 import { DocumentFiles } from '../documents/DocumentFiles'
 import { BomImportCard } from './BomImportCard'
 import { ApprovalPanel } from './ApprovalPanel'
+import { ActualHoursCard } from './ActualHoursCard'
 import { AssistantPanel } from '../assistant/AssistantPanel'
 
 /**
@@ -231,6 +232,17 @@ export function CostingEditor() {
 
             {/* Somebody else's parts list, matched to kits and parts (roadmap 2.3). */}
             <BomImportCard costingId={costing.id} editable={editable} />
+
+            {/* What the boards actually took (roadmap 2.8). Available whatever the
+                costing's status, because the work happens after approval, and it
+                changes nothing this costing was priced on. */}
+            <ActualHoursCard
+              costingId={costing.id}
+              panels={panels}
+              processTypes={processTypes.data ?? []}
+              currencyLabel={label}
+              canRecord={canBuild}
+            />
 
             {/* The spec, the tender schedule, the drawing this costing answers.
                 Kept with it, and read so the assistant can use them later. */}

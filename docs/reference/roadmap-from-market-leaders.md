@@ -133,8 +133,8 @@ library stays valid while it is unmeasured.
 
 Ordered by dependency and value. Each is one Claude Code session and one PR, as per the working agreement.
 
-**Built on `advanced` so far:** 2.1 (migrations 0100–0102), 2.2 (0105), 2.3 (0107), 2.4 (0103–0104),
-2.5 and 2.6 (0108), 2.7 (0109). Left: 2.8.
+**Built on `advanced`:** the whole of phase 2 — 2.1 (migrations 0100–0102), 2.2 (0105), 2.3 (0107),
+2.4 (0103–0104), 2.5 and 2.6 (0108), 2.7 (0109), 2.8 (0110).
 
 | # | Feature | Borrowed from | Depends on |
 |---|---|---|---|

@@ -27,6 +27,7 @@ const EnquiriesPage = lazy(() => import('../modules/crm/EnquiriesPage').then((m)
 const EnquiryDetail = lazy(() => import('../modules/crm/EnquiryDetail').then((m) => ({ default: m.EnquiryDetail })))
 const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m) => ({ default: m.FollowUpsPage })))
 const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage').then((m) => ({ default: m.ApprovalRulesPage })))
+const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePage').then((m) => ({ default: m.LabourVariancePage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
 
@@ -86,6 +87,14 @@ export function App() {
                 element={
                   <RequireRole role="company_admin">
                     <ApprovalRulesPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/labour-variance"
+                element={
+                  <RequireRole role="company_admin">
+                    <LabourVariancePage />
                   </RequireRole>
                 }
               />
