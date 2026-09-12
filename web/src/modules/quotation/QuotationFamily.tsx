@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { longDate } from '../../lib/format'
-import type { QuotationRow } from '../../lib/database.types'
+import type { QuotationRow, QuotationValidity } from '../../lib/database.types'
+import { validityLabel } from './validity'
 import type { FamilyGroup } from './quotation-groups'
 import { STATUS } from './QuotationsPage'
 
@@ -13,6 +14,7 @@ export function QuotationFamily({
   family,
   canChange,
   decidedOnEnquiry,
+  validity,
   onOpenCosting,
   onPdf,
   onSent,
@@ -22,6 +24,8 @@ export function QuotationFamily({
   canChange: boolean
   /** True when an enquiry carries the decision, so this row does not offer it. */
   decidedOnEnquiry: boolean
+  /** How long this one has left (roadmap 2.6); absent while it is loading. */
+  validity?: QuotationValidity | undefined
   onOpenCosting: (costingId: string) => void
   onPdf: (path: string) => void
   onSent: (id: string) => void
@@ -39,6 +43,15 @@ export function QuotationFamily({
           </button>
           {q.costing && q.costing.revision_no > 0 && <span className="badge">Rev {q.costing.revision_no}</span>}
           <div className="muted" style={{ fontSize: '.8125rem' }}>{q.subject}</div>
+          {validity && ['released', 'sent'].includes(q.status) && (
+            <div
+              className={validityLabel(validity).tone === 'error' ? 'error' : 'muted'}
+              style={{ fontSize: '.8125rem' }}
+            >
+              {validityLabel(validity).text}
+              {validity.valid_until && ` · until ${validity.valid_until}`}
+            </div>
+          )}
           {family.earlier.length > 0 && (
             <button
               style={{ padding: '.1rem .4rem', fontSize: '.75rem', marginTop: '.25rem' }}

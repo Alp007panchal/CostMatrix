@@ -6,7 +6,8 @@ import { Async } from '../../ui/Async'
 import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { longDate } from '../../lib/format'
 import type { Enquiry, QuotationRow, QuotationStatus } from '../../lib/database.types'
-import { listQuotations, pdfDownloadUrl, setQuotationStatus } from './api'
+import { checkMyQuotationExpiry, listQuotations, listValidity, pdfDownloadUrl, setQuotationStatus } from './api'
+import { sweepLabel } from './validity'
 import { groupQuotations } from './quotation-groups'
 import { QuotationFamily } from './QuotationFamily'
 import { createFollowup, listCustomers, listEnquiries } from '../crm/api'
@@ -26,6 +27,10 @@ export function QuotationsPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const quotations = useQuery({ queryKey: ['quotations'], queryFn: listQuotations })
+  // Roadmap 2.6: how long each one has left, and the button that marks the ones
+  // that have run out without waiting for the nightly job.
+  const validity = useQuery({ queryKey: ['quotation-validity'], queryFn: listValidity })
+  const [swept, setSwept] = useState<string | null>(null)
   const enquiries = useQuery({ queryKey: ['enquiries'], queryFn: listEnquiries })
   const customers = useQuery({ queryKey: ['customers'], queryFn: listCustomers })
   const [deciding, setDeciding] = useState<Enquiry | null>(null)
@@ -46,6 +51,16 @@ export function QuotationsPage() {
     void queryClient.invalidateQueries({ queryKey: ['quotations'] })
     void queryClient.invalidateQueries({ queryKey: ['enquiries'] })
   }
+
+  const sweep = useMutation({
+    mutationFn: checkMyQuotationExpiry,
+    onSuccess: (outcome) => {
+      setSwept(sweepLabel(outcome))
+      void queryClient.invalidateQueries({ queryKey: ['quotations'] })
+      void queryClient.invalidateQueries({ queryKey: ['quotation-validity'] })
+      void queryClient.invalidateQueries({ queryKey: ['followups'] })
+    },
+  })
 
   const canChange = hasRole('costing_engineer') || hasRole('approver')
   const byCompany = useCompanyFilter()
@@ -88,7 +103,20 @@ export function QuotationsPage() {
         </div>
       )}
 
-      {byCompany.multi && <div className="row end"><CompanyFilterSelect filter={byCompany} /></div>}
+      <div className="row end">
+        {swept && <span className="ok" style={{ fontSize: '.8125rem' }}>{swept}</span>}
+        {canChange && (
+          <button
+            title="Mark the quotations whose validity has passed, and raise a follow-up on the ones that were sent"
+            disabled={sweep.isPending}
+            onClick={() => sweep.mutate()}
+          >
+            {sweep.isPending ? 'Checking…' : 'Check what has run out'}
+          </button>
+        )}
+        {byCompany.multi && <CompanyFilterSelect filter={byCompany} />}
+      </div>
+      {sweep.error && <p className="error">{String(sweep.error)}</p>}
 
       <Async query={quotations} empty="No quotations released yet. Approve a costing, then release one from it.">
         {(all) => (
@@ -132,7 +160,8 @@ export function QuotationsPage() {
                             decidedOnEnquiry={Boolean(enquiry)}
                             onOpenCosting={(id) => navigate(`/costings/${id}`)}
                             onPdf={openPdf}
-                            onSent={(id) => change.mutate({ id, status: 'sent', reason: null })}
+                            validity={(validity.data ?? []).find((v) => v.quotation_id === family.latest.id)}
+                  onSent={(id) => change.mutate({ id, status: 'sent', reason: null })}
                             onChase={setChasing}
                           />
                         ))}

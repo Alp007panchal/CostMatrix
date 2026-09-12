@@ -508,6 +508,43 @@ cubicle. The figure includes a safety factor of 1.3 for wiring and access, which
 administrator can change. It is a warning only: it changes no price, and the real arrangement comes
 with the layout canvas later.
 
+### Decide when a costing needs an approver (phase 2.5)
+
+**Approval rules** in the menu (administrators only). Rules are read top to bottom and the first
+one whose conditions **all** hold decides what happens when a costing is submitted.
+
+Every company starts with one rule, *Always require an approver*, which is what the app did before
+rules existed. Leave it alone and nothing changes.
+
+A rule can test the job total, either margin, the profit margin, whether anything on it has no
+price, how many such parts there are, how old the prices are, and the revision number. It can then:
+
+| Outcome | What happens |
+|---|---|
+| Approve it automatically | Submitting approves it; nobody is asked. The history records which rule did it, and no name goes in the approver's place, because no person approved it. |
+| An approver must approve it | What happens today. |
+| Only the master administrator may approve it | For the largest jobs. Note this means a master administrator **of your own company**; for another company's costing nobody can satisfy it, because the master administrator's access there is read-only. |
+| It cannot be submitted at all | The engineer is told which rule stopped it, and fixes the costing. |
+
+Put the narrow rules first: a rule that blocks unpriced parts is useless below one that approves
+everything small. Each costing shows an **Approval** card saying which rule decided and, when you
+have written rules of your own, every rule with the figures it looked at.
+
+### When a quotation runs out (phase 2.6)
+
+Each quotation carries a validity date, set when it was released from your company's validity days.
+The app checks every night: one whose date has passed while it was still released or sent is marked
+as run out, and if it had actually been **sent** to the customer a follow-up is raised for somebody
+to chase it. The status does not change — an expired quotation can still be won.
+
+- The **Quotations** screen shows *Valid for 20 more days*, *Runs out today* or *Ran out 3 days ago*
+  under each one, and has a **Check what has run out** button for anybody who does not want to wait
+  for the night.
+- To quote the same job again at current prices: open the approved costing and press **Re-issue at
+  today's prices**. That makes a new revision with every line priced again — what could not be
+  re-priced is named — and leaves the approved revision exactly as it was agreed. Check it, submit,
+  approve and release as usual.
+
 ### Change your own company's margins, VAT or currency
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
 margins are a share of the selling price rather than of cost.

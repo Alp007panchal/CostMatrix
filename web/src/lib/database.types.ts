@@ -222,6 +222,49 @@ export interface ImportReport {
   busbar_kg_derived?: number
 }
 
+/** A company's approval rule (0102), wired into submit and approve by 0108. */
+export interface ApprovalRule {
+  id: string
+  company_id: string
+  sort_order: number
+  name: string
+  /** All of them must hold. An empty list always holds. */
+  condition: { field: string; op: string; value: unknown }[]
+  outcome: 'auto_approve' | 'require_approver' | 'require_master_admin' | 'block'
+  is_active: boolean
+}
+
+/** app.approval_review: the verdict for one costing, and every rule behind it. */
+export interface ApprovalReview {
+  outcome: 'auto_approve' | 'require_approver' | 'require_master_admin' | 'block'
+  rule_name: string | null
+  rule_id: string | null
+  facts: Record<string, unknown>
+  rules: {
+    rule_id: string
+    name: string
+    outcome: ApprovalRule['outcome']
+    holds: boolean
+    decided: boolean
+    conditions: { field: string; op: string; value: unknown; holds: boolean; actual: unknown }[]
+  }[]
+}
+
+/** app.v_quotation_validity: how long a quotation has left. */
+export interface QuotationValidity {
+  quotation_id: string
+  company_id: string
+  costing_id: string
+  reference_no: string
+  status: QuotationStatus
+  valid_until: string | null
+  expired_at: string | null
+  sent_at: string | null
+  customer_name: string
+  days_left: number | null
+  has_run_out: boolean
+}
+
 /** One upload of any kind, from the import framework F9 added in 0102. */
 export interface ImportJob {
   id: string

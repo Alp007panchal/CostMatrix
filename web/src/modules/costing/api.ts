@@ -14,6 +14,8 @@ import type {
   OptionTotals,
   PanelCopyReport,
   PanelPrice,
+  ApprovalReview,
+  KeptLine,
   PanelFit,
   PanelSection,
 } from '../../lib/database.types'
@@ -336,6 +338,29 @@ export async function panelFit(panelId: string): Promise<PanelFit> {
   const { data, error } = await supabase.rpc('panel_fit', { target: panelId })
   fail('Could not check the space', error)
   return data as PanelFit
+}
+
+/** Why this costing needs an approver, or does not (app.approval_review). */
+export async function approvalReview(costingId: string): Promise<ApprovalReview> {
+  const { data, error } = await supabase.rpc('approval_review', { target: costingId })
+  fail('Could not read the approval rules', error)
+  return data as ApprovalReview
+}
+
+/**
+ * A new revision of an approved costing with every line priced today
+ * (app.reissue_costing). The approved revision is untouched.
+ */
+export async function reissueCosting(costingId: string): Promise<{
+  costing_id: string
+  costing_no: string
+  revision_no: number
+  repriced: number
+  kept: KeptLine[]
+}> {
+  const { data, error } = await supabase.rpc('reissue_costing', { source: costingId })
+  fail('Could not re-issue the costing', error)
+  return data as { costing_id: string; costing_no: string; revision_no: number; repriced: number; kept: KeptLine[] }
 }
 
 export async function listBomItems(costingId: string): Promise<BomItem[]> {

@@ -610,6 +610,19 @@ means "derive it from the main device and its clearances".
 | `panel_fit(panel)` | Footprints on the panel × quantity against the usable area of its cubicles × `company_options.layout_safety_factor` (1.3): verdict `fits` / `tight` / `no_fit` / `unknown`, the areas, `used_pct`, and which kits are unmeasured. Advisory and read-only. |
 | `import_dimensions(rows, to_company, apply)` | Reads `dimensions-template.csv`. Touches only the F12 columns; a blank row counts as not filled in yet. |
 
+### Added by migration 0108 — approval rules in force, and validity (advanced track)
+
+**quotations.expired_at** — when the sweep noticed `valid_until` had passed. A fact beside the
+status, not a status (D-227). **v_quotation_validity** derives `days_left` and `has_run_out`.
+
+| Function | What it does |
+|---|---|
+| `approval_review(costing)` | The verdict, and every active rule with each condition, whether it holds and the figure it looked at. Read-only; behind the "why this needs approval" panel. |
+| `submit_costing` / `approve_costing` | Re-derived from 0004 by insertion: the verdict is asked for, `block` refuses naming the rule, `auto_approve` approves on the spot with `approved_by = null` and a "approved by rule" history line, `require_master_admin` refuses an ordinary approver, and the deciding rule is written into the history. With only the default rule, behaviour is unchanged. |
+| `expire_quotations()` | The nightly sweep: marks every quotation whose validity passed while still released or sent, logs it as `actor_kind = system`, and raises a follow-up on the ones that had been sent. Scheduled by pg_cron where it exists; **revoked from `authenticated`**. |
+| `check_my_quotation_expiry()` | The same work for the caller's own company, from a button. |
+| `reissue_costing(costing)` | A new revision of an approved costing with every line priced today: `create_costing_revision` for the numbering and history, then `copy_panel` per panel for the re-pricing, and a fresh `price_snapshot_at`. |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

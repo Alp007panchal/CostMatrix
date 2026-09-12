@@ -26,6 +26,7 @@ const CustomersPage = lazy(() => import('../modules/crm/CustomersPage').then((m)
 const EnquiriesPage = lazy(() => import('../modules/crm/EnquiriesPage').then((m) => ({ default: m.EnquiriesPage })))
 const EnquiryDetail = lazy(() => import('../modules/crm/EnquiryDetail').then((m) => ({ default: m.EnquiryDetail })))
 const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m) => ({ default: m.FollowUpsPage })))
+const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage').then((m) => ({ default: m.ApprovalRulesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
 
@@ -80,6 +81,14 @@ export function App() {
               <Route path="crm/enquiries" element={<EnquiriesPage />} />
               <Route path="crm/enquiries/:id" element={<EnquiryDetail />} />
               <Route path="crm/follow-ups" element={<FollowUpsPage />} />
+              <Route
+                path="admin/approval-rules"
+                element={
+                  <RequireRole role="company_admin">
+                    <ApprovalRulesPage />
+                  </RequireRole>
+                }
+              />
               <Route
                 path="admin/quotation-defaults"
                 element={
