@@ -44,7 +44,7 @@ An advanced feature is merged into `main` only when all three are true:
 2. It is behind a per-company switch that is **off by default**.
 3. You have tried it on the preview URL and approve it.
 
-**Condition 2 is built** (migration 0116, D-256). Every advanced feature has a row on the
+**Condition 2 is built** (migration 0116, D-260). Every advanced feature has a row on the
 **Features** screen and arrives switched off for every company; only the master administrator can
 switch one on. Three of them change what an existing costing does and are marked as such — the
 rules engine, the nightly expiry sweep, and which panels count towards the total — and each is

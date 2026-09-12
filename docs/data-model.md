@@ -745,10 +745,25 @@ allowed fields of the main device it must name; `{"max_ratio": 4, "incomer_secti
 | `component_field(component, field)` | The five fields a rule may name — an allowlist, so a rule that is data never reaches a column by name. |
 | `fill_message(template, vars)` | Puts the findings into the rule's own sentence. |
 | `costing_facts` | Re-derived from 0102 by insertion: gains `compatibility_blockers` and `compatibility_warnings`, so an approval rule (0108) can refuse a costing that does not fit. Nothing else acts on a blocker (D-249). |
+### Added by migration 0115 — the guided board configurator (advanced track)
+
+No new table: the answers live in `costing_panels.parameters` (foundation F4) and the kits are
+ordinary costing lines.
+
+| View / function | What it is |
+|---|---|
+| `v_board_kits` | Every active kit with the part it can play in a board — incomer, outgoer, changeover, sync, metering, apfc, accessory — read off its kit group, plus the kind of device (`flavour`: acb / mccb / mcb / switch / manual / ats) where the answer names one (D-256). Role `other` is never proposed. |
+| `pick_board_kit(role, rating, flavour)` | The next size up: the smallest kit of that role and kind whose rating reaches what was asked; else the largest there is with a note saying so; else a reason nothing could be chosen (D-257). The one place that rule is written. |
+| `propose_board(panel, answers)` | The answers → lines (`role`, `section`, `quantity`, `why`, `exact`), `missing` (what this library cannot answer, each with a reason), and `parameters` to freeze. **Writes nothing.** The kVAr answer is handed to `propose_apfc` (D-258). |
+| `apply_board(panel, lines, parameters)` | Adds what the engineer settled on through `add_assembly_to_costing`, each into its section, and merges the answers onto the panel's `parameters` — merged, so an engineer's own note there survives (D-259). Writes one `activity_log` row, `board.configured`. |
+
+The answers as the screen asks them: `sources[]`, `incomer_rating_a`, `incomer_type`, `changeover`
+(ats / manual / switch / sync), `feeders[{rating_a, quantity, type}]`, `apfc_kvar`, `metering`,
+`form`, `ip`, `access`, `cable_entry`. The last four are recorded, not priced (decision 1).
 
 ### Added by migration 0116 — a switch per advanced feature (advanced track)
 
-**features** — master rows, one per advanced feature: `code`, `name`, `blurb` (what it does in
+**features** — master rows, one per advanced feature (fourteen, the guided board configurator of 0115 included): `code`, `name`, `blurb` (what it does in
 the owner's own words, printed on the Features screen), `changes_costings` (does switching it on
 change what an existing costing does? three do), `option_key`, `sort_order`. Everybody reads it;
 the master administrator writes it.
@@ -757,7 +772,7 @@ The per-company answer is a `company_options` row under `feature.<code>`, **abse
 meaning off**, which is how every company starts. The assistant's row names its own older
 `ai_enabled` key, so one thing has one switch. `app.protect_master_options` (0102) is widened
 from `ai_enabled` to every `feature.%` key: **only the master administrator may flip one**
-(D-256), which is what makes "off by default" worth anything for an external company.
+(D-260), which is what makes "off by default" worth anything for an external company.
 
 | Function or view | What it gives |
 |---|---|
@@ -767,7 +782,7 @@ from `ai_enabled` to every `feature.%` key: **only the master administrator may 
 
 **The three gates.** Everything else is inert until somebody uses it, so its switch only decides
 whether the way in is shown. These three change what an existing costing does, and each is
-written so that *off* reproduces the older text exactly (D-257):
+written so that *off* reproduces the older text exactly (D-261):
 
 | Gate | Off |
 |---|---|

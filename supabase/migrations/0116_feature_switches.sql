@@ -104,7 +104,10 @@ insert into public.features (code, name, blurb, changes_costings, option_key, so
    false, 'feature.apfc_configurator', 120),
   ('compatibility_checks', 'Compatibility checks',
    'Three questions asked of every panel: will that device go into that cubicle, does that part belong to that device, do the outgoing ways add up. Advisory, and silent until the library holds what they read.',
-   false, 'feature.compatibility_checks', 130)
+   false, 'feature.compatibility_checks', 130),
+  ('board_configurator', 'The guided board configurator',
+   'Answer what the board is — supply, incomer rating, changeover, the feeder schedule, kVAr — and the kits come back with their quantities for you to edit before anything is added.',
+   false, 'feature.board_configurator', 140)
 on conflict (code) do nothing;
 
 -- ===========================================================================

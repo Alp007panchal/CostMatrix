@@ -16,6 +16,7 @@ import type {
 import { PanelLines } from './PanelLines'
 import { CopyPanel } from './CopyPanel'
 import { ApfcCard } from './ApfcCard'
+import { BoardCard } from './BoardCard'
 import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
@@ -255,6 +256,14 @@ export function PanelCard({
             onAddManual={(input) => handlers.onAddManual(panel.id, input, clean(section))}
           />
           {/* A bank worked out from a target, rather than counted by hand. */}
+          {/* Roadmap 3.1: answer what the board is and the kits come back. */}
+          {on('board_configurator') && (
+            <BoardCard
+              panelId={panel.id}
+              hasLines={assemblies.some((a) => a.kind === 'kit')}
+              onApplied={handlers.onPanelCopied}
+            />
+          )}
           {on('apfc_configurator') && <ApfcCard panelId={panel.id} onApplied={handlers.onPanelCopied} />}
           <CopyPanel panel={panel} costing={costing} drafts={drafts} onCopied={handlers.onPanelCopied} />
         </>
