@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Async } from '../../ui/Async'
-import type { KitGroupLabourVariance } from '../../lib/database.types'
-import { applyLabourSuggestion, listKitGroupVariance } from './labour-variance-api'
+import type { KitGroupLabourVariance, UnattributedLabourHours } from '../../lib/database.types'
+import { applyLabourSuggestion, listKitGroupVariance, listUnattributedHours } from './labour-variance-api'
 import { byHoursAtStake, groupLabel, varianceSentence, weigh, weightSentence, worthChanging } from './labour-variance'
 
 /**
@@ -16,6 +16,7 @@ import { byHoursAtStake, groupLabel, varianceSentence, weigh, weightSentence, wo
 export function LabourVariancePage() {
   const queryClient = useQueryClient()
   const rows = useQuery({ queryKey: ['labour-variance-groups'], queryFn: listKitGroupVariance })
+  const stray = useQuery({ queryKey: ['labour-unattributed'], queryFn: listUnattributedHours })
   const apply = useMutation({
     mutationFn: (row: KitGroupLabourVariance) =>
       applyLabourSuggestion(row.kit_group_id as string, row.process_type),
@@ -96,6 +97,45 @@ export function LabourVariancePage() {
           </div>
         )}
       </Async>
+
+      <UnattributedHours rows={stray.data ?? []} />
     </>
+  )
+}
+
+/**
+ * Every hour recorded is either shared out above or named here. A panel costed at
+ * no hours of that kind gives the allocation nothing to divide by — a board of
+ * loose parts, or a kit group whose standard is still blank — and hours that were
+ * worked must not vanish because the report has nowhere to put them.
+ */
+function UnattributedHours({ rows }: { rows: UnattributedLabourHours[] }) {
+  if (rows.length === 0) return null
+  const total = rows.reduce((sum, row) => sum + Number(row.hours), 0)
+
+  return (
+    <div className="card">
+      <h2 style={{ marginTop: 0 }}>Hours no kit group can be blamed for</h2>
+      <p className="muted">
+        {total.toFixed(2)} hours were recorded against boards costed at none of that work, so there
+        was no estimate to share them out in proportion to. They are in none of the figures above.
+        Usually it is a board of loose parts, or a kit group whose standard hours are still blank —
+        fill those in on <strong>Kits → kit groups</strong> and the hours join the report.
+      </p>
+      <div className="table-wrap">
+        <table>
+          <thead><tr><th>Board</th><th>Process</th><th className="right">Hours</th></tr></thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={`${row.panel_id}-${row.process_type}`}>
+                <td>{row.panel_name}</td>
+                <td className="muted">{row.process_name}</td>
+                <td className="right">{Number(row.hours).toFixed(2)} h</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   )
 }

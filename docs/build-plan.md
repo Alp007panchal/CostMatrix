@@ -180,6 +180,16 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
+21. **The hours that belong to nobody** (advanced track, a gap in 2.8) — where a panel was costed
+    at none of a kind of work there is no estimate to share its recorded hours out in proportion
+    to, so the kit-group report reached none of them and they left no trace. They are now named
+    beside the report, with what usually causes it (migration 0111).
+
+23. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
+    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
+    family of step kit; the engineer edits the quantities and applies, and the steps land as
+    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing
@@ -188,12 +198,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.4 Compatibility checks | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
-
-21. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
-    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
-    family of step kit; the engineer edits the quantities and applies, and the steps land as
-    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
+| (nothing in hand) | | |
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

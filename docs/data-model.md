@@ -668,6 +668,16 @@ the pricing engine: a costing keeps the hours it froze (D-235).
 | `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
 | `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
 
+### Added by migration 0111 — hours that belong to no kit group (advanced track)
+
+**v_panel_labour_unattributed** — hours recorded against a panel costed at **none** of that kind
+of work. 0110 shares a panel's hours across its kit lines in proportion to the estimate and
+divides by the panel's estimated hours for that process, so where that figure is zero — a board
+of loose parts, a kit group whose standard hours are still blank, a line added by hand — the
+hours reach no kit group and, until this view, left no trace. They are named beside the report
+instead: every hour recorded is either shared out or listed here, which test 33 asserts by adding
+the two together.
+
 ### Added by migration 0113 — the APFC configurator (advanced track)
 
 Roadmap 3.2, and decision 4's "a configurator later".
