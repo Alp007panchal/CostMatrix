@@ -710,6 +710,21 @@ export interface PanelLabourVariance {
 }
 
 /** v_kit_group_labour_variance: the same by kit group, apportioned by the estimate. */
+/**
+ * Hours recorded against a panel costed at none of that work, which the kit-group
+ * report has no estimate to share out (v_panel_labour_unattributed).
+ */
+export interface UnattributedLabourHours {
+  company_id: string
+  costing_id: string
+  panel_id: string
+  panel_name: string
+  process_type: string
+  process_name: string
+  process_sort: number
+  hours: number
+}
+
 export interface KitGroupLabourVariance {
   company_id: string
   /** Null for kit lines whose library kit has since gone, or which had no group. */

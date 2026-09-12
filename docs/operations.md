@@ -611,6 +611,12 @@ Read the sample size before you act. A board's hours are shared across its kits 
 they were costed at, because the shop records hours per board rather than per kit, so one unusual job
 can move a figure.
 
+**Hours the report cannot place.** Under the table a card may appear, *Hours no kit group can be
+blamed for*. Those hours were worked on a board the costing gave no hours of that kind — usually a
+board of loose parts, or one built from a kit whose group still has blank standard hours. They are
+in none of the figures above, which is exactly why they are listed rather than dropped: fill the
+group's hours in under *Set kit group hours* and they join the report.
+
 **Nothing changes a standard until you press *Apply*.** That sets the kit group's hours for that
 process to the suggested figure; you are asked to confirm, and the confirmation says the part that
 matters — new costings use the new figure, and existing costings keep the hours they froze. A master

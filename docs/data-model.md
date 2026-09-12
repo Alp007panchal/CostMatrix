@@ -668,6 +668,16 @@ the pricing engine: a costing keeps the hours it froze (D-235).
 | `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
 | `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
 
+### Added by migration 0111 — hours that belong to no kit group (advanced track)
+
+**v_panel_labour_unattributed** — hours recorded against a panel costed at **none** of that kind
+of work. 0110 shares a panel's hours across its kit lines in proportion to the estimate and
+divides by the panel's estimated hours for that process, so where that figure is zero — a board
+of loose parts, a kit group whose standard hours are still blank, a line added by hand — the
+hours reach no kit group and, until this view, left no trace. They are named beside the report
+instead: every hour recorded is either shared out or listed here, which test 33 asserts by adding
+the two together.
+
 ### Added by migration 0114 — compatibility checks (advanced track)
 
 **compatibility_rules** — `company_id` (null = a master rule for everybody), `rule_kind`
@@ -675,7 +685,7 @@ the pricing engine: a costing keeps the hours it froze (D-235).
 jsonb, `severity` (`warning` | `blocker`), `message` (the sentence, with `{placeholders}`),
 `is_active`, `sort_order`. Library RLS: everybody reads master rows and their own; the master
 admin writes master rows, a company admin its own. A trigger refuses a rule that could never fire
-— an unknown device field, a ratio of zero, a message with no placeholder in it (D-242).
+— an unknown device field, a ratio of zero, a message with no placeholder in it (D-248).
 
 Parameters by kind: `{"clearance_mm": 100}`; `{"attribute": "fits_frames", "device_field":
 "frame_size"}` — the list the accessory carries in `components.attributes`, and which of five
@@ -688,7 +698,7 @@ allowed fields of the main device it must name; `{"max_ratio": 4, "incomer_secti
 | `v_panel_warnings` | The same for every panel the caller may read, with `costing_id` and `panel_name`. Security invoker. |
 | `component_field(component, field)` | The five fields a rule may name — an allowlist, so a rule that is data never reaches a column by name. |
 | `fill_message(template, vars)` | Puts the findings into the rule's own sentence. |
-| `costing_facts` | Re-derived from 0102 by insertion: gains `compatibility_blockers` and `compatibility_warnings`, so an approval rule (0108) can refuse a costing that does not fit. Nothing else acts on a blocker (D-243). |
+| `costing_facts` | Re-derived from 0102 by insertion: gains `compatibility_blockers` and `compatibility_warnings`, so an approval rule (0108) can refuse a costing that does not fit. Nothing else acts on a blocker (D-249). |
 
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
