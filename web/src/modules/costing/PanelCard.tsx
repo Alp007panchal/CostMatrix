@@ -80,7 +80,7 @@ export function PanelCard({
   const kvar = kvarTotal(assemblies, kits)
   const listId = `panel-sections-${panel.id}`
 
-  const field = (key: keyof CostingPanel, value: string | number | null) =>
+  const field = (key: keyof CostingPanel, value: string | number | boolean | null) =>
     handlers.onPanelChange(panel.id, { [key]: value })
 
   return (
@@ -133,6 +133,15 @@ export function PanelCard({
           <div className="muted" style={{ fontSize: '.8125rem' }}>
             × {panel.quantity} = {money(price?.line_total ?? 0, label)}
           </div>
+          {/* Roadmap 2.7: say plainly why a priced panel is not in the total. */}
+          {panel.is_option && (
+            <div className="badge" style={{ marginTop: '.3rem' }}>Optional extra — not in the total</div>
+          )}
+          {!panel.is_option && price && !price.in_chosen_offer && (
+            <div className="badge" style={{ marginTop: '.3rem' }}>
+              {panel.option_label} — not the chosen option
+            </div>
+          )}
           {editable && (
             <button className="danger" style={{ marginTop: '.5rem' }} onClick={() => handlers.onPanelRemove(panel.id)}>
               Remove panel
@@ -147,6 +156,21 @@ export function PanelCard({
           <Detail label="Option" hint="e.g. Option 1" value={panel.option_label} editable={editable} onCommit={(v) => field('option_label', v)} />
           <Detail label="Unit" value={panel.uom} editable={editable} onCommit={(v) => field('uom', v || 'PC')} />
           <Detail label="Enclosure" hint="e.g. 2100(H)×800(W)×800(D)" value={panel.enclosure_dimensions} editable={editable} onCommit={(v) => field('enclosure_dimensions', v)} />
+          <label className="row" style={{ gap: '.4rem', alignItems: 'flex-start' }}>
+            <input
+              type="checkbox"
+              checked={panel.is_option}
+              disabled={!editable}
+              style={{ width: 'auto', marginTop: '.15rem' }}
+              onChange={(e) => field('is_option', e.target.checked)}
+            />
+            <span style={{ fontSize: '.8125rem' }}>
+              Optional extra
+              <em className="hint" style={{ display: 'block' }}>
+                priced and printed on the quotation, left out of the total
+              </em>
+            </span>
+          </label>
           <div style={{ gridColumn: '1 / -1' }}>
             <div className="spread">
               <span className="muted" style={{ fontSize: '.8125rem' }}>Technical description (printed on the quotation; left blank, it is written from the kits at release)</span>

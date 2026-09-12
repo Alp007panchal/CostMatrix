@@ -489,6 +489,8 @@ export interface Costing {
   price_rounding_step: number
   tax_pct: number
   enclosure_uplift_pct: number
+  /** Which option the costing's own total means. Null: no choice, and it adds every panel. */
+  chosen_option_label: string | null
   submitted_at: string | null
   approved_at: string | null
   returned_at: string | null
@@ -506,6 +508,8 @@ export interface CostingPanel {
   option_label: string | null
   uom: string
   quantity: number
+  /** An extra the customer may take or leave: priced and printed, left out of the total. */
+  is_option: boolean
   technical_description: string | null
   enclosure_dimensions: string | null
   sort_order: number
@@ -600,6 +604,11 @@ export interface PanelPrice {
   labour_sell: number
   unit_price: number
   line_total: number
+  is_option: boolean
+  /** Part of the offer the total means: the chosen option, or every panel while none is chosen. */
+  in_chosen_offer: boolean
+  /** Adds to the total. An optional extra never does. */
+  counts_in_total: boolean
 }
 
 /** v_costing_totals */
@@ -611,6 +620,12 @@ export interface CostingTotals {
   subtotal: number
   tax: number
   grand_total: number
+  /** What this offer's optional extras would add if the customer took them all. */
+  optional_subtotal: number
+  optional_tax: number
+  optional_total: number
+  chosen_option_label: string | null
+  option_count: number
 }
 
 /** v_costing_option_totals */
@@ -619,6 +634,11 @@ export interface OptionTotals {
   subtotal: number
   tax: number
   grand_total: number
+  optional_subtotal: number
+  optional_tax: number
+  optional_total: number
+  /** The option the costing's total means. */
+  is_chosen: boolean
 }
 
 export interface CostingHistoryRow {
@@ -723,6 +743,10 @@ export interface BomItem {
   option_label: string | null
   quantity: number
   line_total: number
+  /** Only bought if the customer takes that extra. */
+  is_option: boolean
+  /** Belongs to the option being offered as the job. */
+  in_chosen_offer: boolean
 }
 
 // --- crm -------------------------------------------------------------------
