@@ -14,6 +14,10 @@
 \set bob    '00000000-0000-0000-0000-0000000000a3'
 \set master '00000000-0000-0000-0000-0000000000a1'
 
+-- The rules engine is behind a switch since 0116, off for every company. This
+-- file is what tests it, so it switches it on for Alpha and off again at the end.
+select test.feature(:'alpha'::uuid, 'approval_rules', true);
+
 -- === F4. Every line says where it came from ================================
 begin;
 set local role authenticated;
@@ -293,4 +297,5 @@ select test.refuses(
 rollback;
 
 -- Leave things as found.
+select test.feature(:'alpha'::uuid, 'approval_rules', false);
 delete from public.assistant_conversations where id = :'conv'::uuid;

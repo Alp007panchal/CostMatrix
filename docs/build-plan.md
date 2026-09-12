@@ -208,6 +208,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
     preference is per person in their own browser.
 
+26. **A switch per advanced feature** (advanced track, the road to production) — every feature
+    built since the foundations sits behind a per-company switch that is off by default and only
+    the master administrator can flip, which is condition 2 of the two-track rule and what makes
+    a merge to `main` possible at all. Most switches hide a screen; three gate real behaviour
+    (migration 0117).
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing

@@ -14,6 +14,11 @@
 \set carol  '00000000-0000-0000-0000-0000000000a4'
 \set bob    '00000000-0000-0000-0000-0000000000a3'
 
+-- Options and optional extras are behind a switch since 0116, off for every
+-- company, because switching it on changes the headline figure of a job that
+-- uses it. This file is what tests it, so it switches it on for Alpha.
+select test.feature(:'alpha'::uuid, 'options_and_extras', true);
+
 select id as part_id from public.components
  where company_id is null and pricing_mode = 'fixed' and purchase_price is not null
    and not is_placeholder order by code limit 1 \gset
@@ -269,3 +274,6 @@ select test.eq((select count(*)::int from public.v_costing_option_choice where c
 select test.eq((select count(*)::int from public.v_costing_totals where costing_id = :'job'::uuid), 0,
   'nor its totals');
 rollback;
+
+-- Leave things as found.
+select test.feature(:'alpha'::uuid, 'options_and_extras', false);

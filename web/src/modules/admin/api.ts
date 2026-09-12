@@ -2,6 +2,7 @@ import { supabase } from '../../lib/supabase'
 import { functionErrorMessage } from '../../lib/errors'
 import type {
   ApprovalRule,
+  CompanyFeature,
   CompatibilityRule,
   Company,
   CompanySettings,
@@ -260,6 +261,30 @@ export async function removeFooterLogo(id: string): Promise<void> {
  * The compatibility checks in force for this company: the master rules everybody
  * gets, and any the company has written for itself (roadmap 3.4).
  */
+/**
+ * Every advanced feature and whether it is on for the caller's company
+ * (v_company_features). One query for the navigation, the costing screen and the
+ * Features page — the database is the only thing that decides.
+ */
+export async function listFeatures(): Promise<CompanyFeature[]> {
+  const { data, error } = await supabase.from('v_company_features').select('*').order('sort_order')
+  fail('Could not read which features are switched on', error)
+  return (data ?? []) as CompanyFeature[]
+}
+
+/**
+ * Switch one on or off for a company. Only the master administrator may: a
+ * trigger refuses anybody else, so this is about showing the right control, not
+ * about safety.
+ */
+export async function setFeature(companyId: string, optionKey: string, on: boolean): Promise<void> {
+  const { error } = await supabase
+    .from('company_options')
+    .upsert({ company_id: companyId, key: optionKey, value: on, value_type: 'boolean' },
+            { onConflict: 'company_id,key' })
+  fail('Could not change the switch', error)
+}
+
 export async function listCompatibilityRules(): Promise<CompatibilityRule[]> {
   const { data, error } = await supabase
     .from('compatibility_rules')

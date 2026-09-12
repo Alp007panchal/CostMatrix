@@ -809,6 +809,25 @@ company setting, so it can be changed without a new version of the app. Ask and 
 A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
 under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.
 
+### Switch a feature on (the road to production)
+**Features** in the top bar. Everything built since the foundations arrives **switched off**, for
+every company, and stays off until you switch it on here. Only you, as the master administrator,
+can: a company administrator sees the list and its state but no buttons, and the database refuses
+the change rather than the screen hiding it.
+
+Three of them are marked in red because **switching them on changes what an existing costing
+does**, and those are the ones to try on the staging app first — open a real job, write down its
+total, switch the feature on, and read the total again:
+
+| Feature | What changes |
+|---|---|
+| Approval rules in force | What happens when a costing is submitted. Off, every costing needs an approver, as it does today. |
+| Validity and the nightly sweep | A quotation that has run out is marked overnight and a chase is raised. This is the only thing in the app that writes while nobody is watching. |
+| Chosen option and optional extras | The headline figure of a job with two options or an optional extra. |
+
+The rest only add a screen: switching one on shows a menu item, and nothing already costed moves.
+Switching a feature off again hides it; nothing that was entered while it was on is deleted.
+
 ### Read the compatibility checks on a panel (roadmap 3.4)
 A panel shows a short list under its name when a check finds something: a device deeper than the
 usable depth of the cubicle bought for it, a part listed for other devices than the one in its kit,
