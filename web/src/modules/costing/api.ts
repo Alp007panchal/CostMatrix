@@ -1,6 +1,8 @@
 import { supabase } from '../../lib/supabase'
 import type {
   AssemblyTotals,
+  BoardLine,
+  BoardProposal,
   BomItem,
   Kit,
   Costing,
@@ -406,4 +408,30 @@ export async function applyApfcSteps(panelId: string, steps: ApfcStep[]): Promis
     steps,
   })
   fail('Could not add the bank', error)
+}
+
+// --- the guided board configurator (roadmap 3.1) -----------------------------
+
+/** What the answers come to, as kits at quantities. Writes nothing. */
+export async function proposeBoard(panelId: string, answers: unknown): Promise<BoardProposal> {
+  const { data, error } = await supabase.rpc('propose_board', {
+    target_panel: panelId,
+    answers,
+  })
+  fail('Could not work the board out', error)
+  return data as BoardProposal
+}
+
+/** Adds what the engineer settled on, and keeps the answers on the panel. */
+export async function applyBoard(
+  panelId: string,
+  lines: BoardLine[],
+  parameters: Record<string, unknown>,
+): Promise<void> {
+  const { error } = await supabase.rpc('apply_board', {
+    target_panel: panelId,
+    lines,
+    parameters,
+  })
+  fail('Could not configure the board', error)
 }

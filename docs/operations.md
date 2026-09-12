@@ -623,6 +623,33 @@ matters — new costings use the new figure, and existing costings keep the hour
 group can only be changed by the master administrator; your own company's groups, by your company
 administrator.
 
+### Configure a standard board from the questions (phase 3.1)
+
+On a panel, **Configure this board**. Answer what the board is, in the order a customer describes it:
+
+1. **Fed from** — grid, generator, solar. Two or more supplies let you choose a changeover.
+2. **Incomer** — the rating in amps, and whether it is an ACB, an MCCB or a switch disconnector.
+3. **Changeover** — automatic (ATS), manual, a changeover switch, or synchronised in parallel.
+4. **Outgoing ways** — a line per rating: amps × how many, MCCB or MCB. *+ another rating* adds a line.
+5. **Correction and metering** — kVAr of power-factor correction, and whether the board is metered.
+6. **Enclosure** — form, IP, access, cable entry. These are **recorded on the panel and printed with
+   it**; the cubicles are still costed as catalogue cubicles plus your uplift, as they always were.
+
+Then **Work the board out**. You get the kits it proposes, grouped into the panel's sections, each
+with the answer that put it there — *12 ways at 100 A* — and a quantity you can change. Two things
+it tells you rather than hiding:
+
+- a kit **bigger than what you asked for**, when the library has nothing nearer, marked on the line;
+- anything it **could not answer** — a kind of kit you do not stock, or one whose every version holds
+  a part with no price — named with the reason.
+
+Nothing is added until you press **Add … to this panel**. What is added is what is on the screen, and
+each kit is priced and frozen exactly as if you had picked it from the kit picker yourself. A panel
+that already has kits is added to, never cleared.
+
+A non-standard board is still built kit by kit, as before. The correction is worked out by the same
+APFC grader as the *Work out an APFC bank* button, so both give the same answer.
+
 ### Read a costing as a grid (phase 2.9)
 
 At the top of a costing, two buttons: **Panel by panel** and **Grid**. The grid shows the whole

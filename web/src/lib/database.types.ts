@@ -568,6 +568,74 @@ export interface ApfcProposal {
   steps: ApfcStep[]
 }
 
+// --- the guided board configurator (roadmap 3.1) ---------------------------
+
+/** One feeder way the customer asked for. */
+export interface FeederAnswer {
+  rating_a: number
+  quantity: number
+  /** mccb or mcb; blank lets the library decide. */
+  type: string
+}
+
+/** The questions the configurator asks about a board. */
+export interface BoardAnswers {
+  sources: string[]
+  incomer_rating_a: number | null
+  incomer_type: string
+  changeover: string
+  feeders: FeederAnswer[]
+  apfc_kvar: number | null
+  metering: boolean
+  form: string
+  ip: string
+  access: string
+  cable_entry: string
+}
+
+/** One kit the configurator proposes, and which answer put it there. */
+export interface BoardLine {
+  assembly_id: string
+  code: string
+  name: string
+  rating: number | null
+  group_name: string | null
+  role: string
+  section: string
+  quantity: number
+  why: string
+  /** False when the library had nothing that big; `note` says so. */
+  exact: boolean
+  note?: string
+}
+
+/** Something the answers asked for that this library cannot provide. */
+export interface BoardGap {
+  what: string
+  why: string
+}
+
+export interface BoardProposal {
+  panel_id: string
+  panel: string
+  lines: BoardLine[]
+  missing: BoardGap[]
+  /** The answers, shaped for costing_panels.parameters. */
+  parameters: Record<string, unknown>
+}
+
+/** A kit as the configurator sees it (v_board_kits). */
+export interface BoardKit {
+  id: string
+  code: string
+  name: string
+  rating: number | null
+  group_name: string | null
+  role: string
+  flavour: string | null
+  has_unpriced_part: boolean
+}
+
 /** A kit as the costing picker sees it (v_kits). */
 export interface Kit {
   id: string
