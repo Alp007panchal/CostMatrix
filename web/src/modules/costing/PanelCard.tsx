@@ -17,6 +17,7 @@ import { PanelLines } from './PanelLines'
 import { CopyPanel } from './CopyPanel'
 import { ApfcCard } from './ApfcCard'
 import { BoardCard } from './BoardCard'
+import { BusbarCard } from './BusbarCard'
 import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
@@ -265,6 +266,8 @@ export function PanelCard({
             />
           )}
           {on('apfc_configurator') && <ApfcCard panelId={panel.id} onApplied={handlers.onPanelCopied} />}
+          {/* Roadmap 4.1: the CU-OPT1 sheet, with the metres carried into the costing. */}
+          {on('busbar_runs') && <BusbarCard panelId={panel.id} onApplied={handlers.onPanelCopied} />}
           <CopyPanel panel={panel} costing={costing} drafts={drafts} onCopied={handlers.onPanelCopied} />
         </>
       )}

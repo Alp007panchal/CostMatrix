@@ -820,6 +820,23 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
+### Busbar runs (roadmap 4.1, migration 0118)
+No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
+each entry `{label, bar_code, phases, runs_per_phase, length_m, sets, metres}` — so a revision and a
+copy carry it with the column they already copy.
+
+- `v_busbar_bars` — the copper bar sizes (`pricing_mode = 'weight_rate'`, `material_rate_code =
+  'copper_busbar'`), with width, thickness and area read off the part number, kilograms per metre
+  from the catalogue and price per metre at the company's copper rate.
+- `v_busbar_bar_by_rating` — which bar the library's own kits use at each device rating.
+- `v_panel_busbar_runs` — the saved schedule, a run a row.
+- `v_panel_busbar_check` — per panel and bar size: metres scheduled, metres costed, the difference.
+- `app.bar_for_rating(amps)`, `app.busbar_run_totals(runs)`, `app.starting_busbar_runs(panel)`,
+  `app.save_busbar_runs(panel, runs)`, `app.apply_busbar_runs(panel, section, replace_existing)`.
+  Only the last writes a costing line, and it does so through `add_component_to_costing`.
+- `company_options.busbar_run_lengths` — the company's usual run lengths, seeded from the owner's
+  own NPP-192 sheet.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).

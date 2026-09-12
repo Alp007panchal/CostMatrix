@@ -805,6 +805,36 @@ Components screen waiting for you.
 The grading — how much of the target goes into the biggest step, how much into the next — is a
 company setting, so it can be changed without a new version of the app. Ask and I will change it.
 
+### Work out the busbar runs (phase 4.1)
+This is your `CU-OPT1` sheet, on the panel. In a draft costing, on the panel: **Work out the
+busbar runs**.
+
+**Start from this board** lists the runs a board like this one needs — incoming tails for each
+supply, changeover and ATS tails where it has them, horizontal and vertical busbar, a row of
+outgoing tails for each rating in the feeder schedule, the correction's tails sized from its kVAr,
+and an earth bar. The bar sizes come from your own library: the bar your 800 A kits carry is the
+bar an 800 A run gets. **The lengths are your company's usual figures, not a measurement of the
+board in front of you** — that is the column to correct against the drawing. (A board nobody has
+configured has no ratings to work from, so the button says so; add the runs by hand instead.)
+
+Each row is the sheet's own sum: phases × runs per phase × length × sets, and the metres appear as
+you type. Underneath, the totals per bar size in metres, kilograms and money at today's copper
+rate.
+
+**Save the schedule** keeps it with the panel and **moves no price at all** — it is a calculation,
+not a line. It comes back when you open the card again, and a revision or a copy of the costing
+carries it.
+
+**Add these as busbar lines** puts one line per bar size, at those metres, into a *Busbar* section
+— ordinary component lines, priced and frozen exactly like hand-typed ones. Press it twice and it
+refuses rather than doubling the metres; if you have changed the schedule and want the new figures
+in place of the old lines, use **Replace the busbar lines already there**.
+
+The one thing worth looking at even if you never apply it: when the panel already carries busbar,
+the card says how far the schedule and the costing are apart. On NPP-192 that gap was real — the
+sheet worked out 70.4 m of 50×10 and the estimate carried 30 — because nothing carried one into
+the other. Now something does.
+
 ### Read the APFC bank size (session 3)
 A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
 under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.

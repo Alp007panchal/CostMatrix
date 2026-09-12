@@ -222,7 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 4.1 busbar run calculator (advanced) | `claude/advanced-p41-busbar-run` | 2026-09-12 16:00 |
+| (nothing in hand) | | |
 
 26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
@@ -234,6 +234,12 @@ the work begins, removed when the pull request opens.
     by customer, value band, month and product group, why jobs were lost in the words they were
     heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
     with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
+
+29. **The busbar run calculator** (advanced track, roadmap 4.1) — the owner's `CU-OPT1` sheet in the
+    app: a run a row at `phases × runs per phase × length × sets`, totals per bar size in metres,
+    kilograms and money, bar sizes read from his own kits, a starting schedule built from the
+    board's parameters, and the schedule set beside the metres the panel is actually costed at
+    (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
