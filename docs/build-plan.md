@@ -218,6 +218,12 @@ the work begins, removed when the pull request opens.
 |---|---|---|
 | (nothing in hand) | | |
 
+26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
+    actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
+    correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
+    then applied through the ordinary kit function with the answers frozen on the panel
+    (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
