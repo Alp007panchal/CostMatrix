@@ -104,6 +104,11 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   off the track you are on, **one pull request per feature, never stacked**, targeting that
   track. Advanced migrations are numbered from **0100**, basic ones from 0018 (D-170).
   Migrations reach production on merge to `main`, and staging on merge to `advanced`.
+- **Check, then claim, before building.** More than one session works on this repository. Before
+  starting a roadmap item: `git fetch`, look at the open pull requests and the remote branches,
+  and if nothing has it, put one line in `docs/build-plan.md` under *In hand right now* and push
+  that first. Two sessions built roadmap 2.8 on the same morning and one of them was thrown away
+  (D-240); a line in a file is what stops it happening again.
 - Verify before claiming: `supabase/tests/run-local.sh` (it imports the real `data/seed`
   files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
   Never edit `data/seed/*` by hand: it is the owner's data. Say plainly what could not be

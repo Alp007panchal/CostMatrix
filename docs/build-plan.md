@@ -180,6 +180,16 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
+## In hand right now
+
+One line per roadmap item a session has started, so two sessions cannot build the same thing
+twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
+the work begins, removed when the pull request opens.
+
+| Item | Session | Since |
+|---|---|---|
+| 3.3 Parameterised kits (migration 0112) | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
