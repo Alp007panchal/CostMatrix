@@ -668,6 +668,27 @@ the pricing engine: a costing keeps the hours it froze (D-235).
 | `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
 | `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
 
+### Added by migration 0113 — the APFC configurator (advanced track)
+
+Roadmap 3.2, and decision 4's "a configurator later".
+
+- **company_options.apfc_step_pattern** — the shares of a target that go to each size, largest
+  first, seeded `50,25,18.75,6.25`: the grading of the owner's own NPP-192 bank (50×4, 25×4,
+  12.5×6, 5×5 for 400 kVAr). A setting rather than an opinion in code, so it changes without a
+  deploy and another company can grade differently.
+- **v_apfc_kits** — the kVAr-rated active kits the caller can see, with the
+  **family** read off the kit name (`APFC-FUSE`, `APFC-BREAKER`, else `OTHER`). A bank is built
+  from one family, never a mixture.
+- **app.propose_apfc(panel, target_kvar, family, pattern)** — writes nothing. The family defaults
+  to the one already on the panel, else the one with the most priced sizes. The shares are floored
+  to whole kits and the remainder topped up with the largest size that still fits; what the sizes
+  cannot reach is returned as **shortfall_kvar** rather than papered over. A family whose kits all
+  hold an unpriced part — true of every breaker step kit in the owner's library today — is refused
+  with that reason and the other family suggested.
+- **app.apply_apfc_steps(panel, steps)** — one transaction, through the ordinary
+  `add_assembly_to_costing`, into the panel's `APFC bank` section, with `apfc.applied` in the
+  activity log. What is applied is what the engineer had on screen, not what the proposal said.
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

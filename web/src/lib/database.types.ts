@@ -530,6 +530,27 @@ export interface CostingAssembly {
   sort_order: number
 }
 
+/** One size of step kit in a proposed APFC bank (app.propose_apfc). */
+export interface ApfcStep {
+  assembly_id: string
+  code: string
+  name: string
+  rating: number
+  quantity: number
+  kvar: number
+}
+
+/** What the configurator proposes for a target; it writes nothing until applied. */
+export interface ApfcProposal {
+  panel_id: string
+  family: string
+  target_kvar: number
+  total_kvar: number
+  /** What the sizes in the library could not reach. Zero when the target is met. */
+  shortfall_kvar: number
+  steps: ApfcStep[]
+}
+
 /** A kit as the costing picker sees it (v_kits). */
 export interface Kit {
   id: string

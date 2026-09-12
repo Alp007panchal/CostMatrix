@@ -188,7 +188,12 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.2 APFC configurator (migration 0113) | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+| 3.4 Compatibility checks | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+
+21. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
+    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
+    family of step kit; the engineer edits the quantities and applies, and the steps land as
+    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
