@@ -185,18 +185,22 @@ straight to `main`, reviewed and merged by the owner the same day.
     to, so the kit-group report reached none of them and they left no trace. They are now named
     beside the report, with what usually causes it (migration 0111).
 
-<<<<<<< HEAD
-23. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
-    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
-    family of step kit; the engineer edits the quantities and applies, and the steps land as
-    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
-=======
 22. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
     and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
     its steps, works its line quantities out from the answers, refuses a formula that is anything
     but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
     unchanged (migration 0112). What 3.2 and 3.1 stand on.
->>>>>>> origin/advanced
+
+23. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
+    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
+    family of step kit; the engineer edits the quantities and applies, and the steps land as
+    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
+
+25. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
+    across and kits and components down, with in-place quantity editing through the same functions as
+    the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts
+    and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
+    preference is per person in their own browser.
 
 ## In hand right now
 

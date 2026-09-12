@@ -6,12 +6,14 @@ import { Async } from '../../ui/Async'
 import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
-  addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, listCostings, listPanelSections, reissueCosting, removeCostingAssembly,
-  removeItem, removePanel, returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity,
-  setLabourHours, submitCosting, updateCosting, updatePanel,
+  addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, copyPanel,
+  createRevision, getCostingDetail, listBomItems, listCostings, listPanelSections, panelFit,
+  reissueCosting, removeCostingAssembly, removeItem, removePanel, returnCosting, setAssemblySection,
+  setCostingAssemblyQuantity, setItemQuantity, setLabourHours, submitCosting, updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
+import { CostingGrid } from './CostingGrid'
+import { readCostingView, writeCostingView, type CostingView } from './costing-view'
 import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
@@ -55,6 +57,22 @@ export function CostingEditor() {
 
   const [returnComment, setReturnComment] = useState('')
   const [returning, setReturning] = useState(false)
+  // Panel by panel, or the whole costing as one grid (roadmap 2.9). Remembered
+  // per person in their own browser — it is a preference, not company data.
+  const [view, setView] = useState<CostingView>(readCostingView)
+  const chooseView = (next: CostingView) => { setView(next); writeCostingView(next) }
+
+  // The space check for every panel, for the grid's column headings. Only asked
+  // for when the grid is open, and silent when nothing has been measured (F12).
+  const panelIds = (detail.data?.panels ?? []).map((p) => p.id)
+  const fits = useQuery({
+    queryKey: ['panel-fits', id, panelIds.join(',')],
+    queryFn: async () => {
+      const pairs = await Promise.all(panelIds.map(async (pid) => [pid, await panelFit(pid)] as const))
+      return Object.fromEntries(pairs)
+    },
+    enabled: view === 'grid' && panelIds.length > 0,
+  })
 
   if (!company) return null
 
@@ -154,6 +172,26 @@ export function CostingEditor() {
               </>
             )}
 
+            {/* Two ways of reading the same costing: panel by panel, or the whole
+                thing as a grid (roadmap 2.9). The grid edits through the same
+                functions, so neither view is the privileged one. */}
+            <div className="row" style={{ marginTop: '.75rem', gap: '.4rem' }}>
+              <button
+                className={view === 'panels' ? 'primary' : undefined}
+                aria-pressed={view === 'panels'}
+                onClick={() => chooseView('panels')}
+              >
+                Panel by panel
+              </button>
+              <button
+                className={view === 'grid' ? 'primary' : undefined}
+                aria-pressed={view === 'grid'}
+                onClick={() => chooseView('grid')}
+              >
+                Grid
+              </button>
+            </div>
+
             {/* One column, read top to bottom: what it costs, how it is built, what
                 to export, what happened. */}
             {/* Roadmap 2.5: what the company's rules make of this costing. */}
@@ -169,7 +207,35 @@ export function CostingEditor() {
               onChooseOption={(chosen) => run(() => updateCosting(costing.id, { chosen_option_label: chosen }))}
             />
 
-            {panels.map((panel) => (
+            {view === 'grid' && (
+              <CostingGrid
+                costing={costing}
+                panels={panels}
+                assemblies={assemblies}
+                items={items}
+                panelPrices={panelPrices}
+                totals={totals}
+                kits={kits}
+                components={components.data ?? []}
+                categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))}
+                fits={fits.data ?? {}}
+                editable={editable}
+                handlers={{
+                  onAddKit: async (pid, kid, qty) => { await addAssemblyToPanel(pid, kid, qty, null); await refresh() },
+                  onAddComponent: async (pid, cid, qty) => { await addComponentToPanel(pid, cid, qty, null); await refresh() },
+                  onKitQuantity: (lid, qty) => run(() => setCostingAssemblyQuantity(lid, qty)),
+                  onItemQuantity: (iid, qty) => run(() => setItemQuantity(iid, qty)),
+                  onRemoveKit: (lid) => run(() => removeCostingAssembly(lid)),
+                  onRemoveItem: (iid) => run(() => removeItem(iid)),
+                  onAddPanel: () => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length)),
+                  onCopyPanel: (pid) => run(() => copyPanel(
+                    pid, costing.id, `${panels.find((p) => p.id === pid)?.name ?? 'Panel'} (copy)`,
+                  )),
+                }}
+              />
+            )}
+
+            {view === 'panels' && panels.map((panel) => (
               <PanelCard
                 key={panel.id}
                 panel={panel}
@@ -206,7 +272,7 @@ export function CostingEditor() {
               />
             ))}
 
-            {editable && (
+            {view === 'panels' && editable && (
               <button onClick={() => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length))}>
                 + Add a panel
               </button>

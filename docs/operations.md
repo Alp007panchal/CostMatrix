@@ -623,6 +623,31 @@ matters — new costings use the new figure, and existing costings keep the hour
 group can only be changed by the master administrator; your own company's groups, by your company
 administrator.
 
+### Read a costing as a grid (phase 2.9)
+
+At the top of a costing, two buttons: **Panel by panel** and **Grid**. The grid shows the whole
+costing as one table — every panel a column, every kit and loose component any of them uses a row —
+and it remembers which one you last used, on your own computer.
+
+- **Type in a cell** to change a quantity. A blank cell means that panel does not use the row; type a
+  figure into it and the kit is added to that panel. Clear a cell and the line is removed. Prices
+  freeze and the history records it exactly as on a panel card — it is the same edit, made in a
+  different place.
+- **Two cells the grid will not guess at**, and says so instead: a row the panel holds on more than
+  one line (two sections, for instance), and a typed-in lump sum on a panel that does not have it.
+  Both are done on the panel card.
+- **Compare** two columns with the two pickers: the rows that differ — including a blank against a
+  figure — are marked in amber and counted.
+- **+** at the bottom of a column opens the usual kit picker for that panel; **Copy panel…** makes a
+  near-identical column, re-priced as a copy always is; **Add panel** adds an empty one.
+- **Red marks** mean something to look at: a row whose part the library no longer prices, and a panel
+  whose space check (F12) says it is tight or will not fit. Hover for the reason.
+- **Excel** downloads what is on screen — the sections, the columns and the totals — with a second
+  sheet of what each panel costs and sells for.
+
+The grid is read-only once the costing is submitted or approved, exactly as the panel cards are.
+Prices, margins and panel parameters are not edited here; that stays on the panel card.
+
 ### Offer one job two ways, and quote an extra separately (phase 2.7)
 
 Two different things, and the app keeps them apart.

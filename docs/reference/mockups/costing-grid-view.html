@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CostMatrix — costing grid view (mockup)</title>
+</head>
+<body>
+
+
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2937; background: #f9fafb; }
+    a { color: #1d4ed8; } a:hover { color: #1e40af; }
+    table { border-collapse: collapse; }
+    th, td { font-size: 14px; }
+  </style>
+
+<div style="width: 1440px; min-height: 1040px; background: #f9fafb; display: flex; flex-direction: column;">
+
+  <!-- App top bar, as on the existing screens -->
+  <div style="background: #ffffff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 72px;">
+    <div style="display: flex; align-items: center; gap: 28px;">
+      <div style="font-weight: 700; font-size: 18px; color: #111827;">CostMatrix</div>
+      <div style="display: flex; gap: 20px; font-size: 15px; color: #374151;">
+        <span>Home</span><span>Enquiries</span><span style="color: #111827; border-bottom: 2px solid #1d4ed8; padding-bottom: 4px;">Costings</span><span>Quotations</span><span>Follow-ups</span><span>Customers</span><span>Components</span><span>Kits</span><span>Rates</span><span>Import</span><span>People</span><span>Company</span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="text-align: right; font-size: 13px; color: #6b7280; line-height: 1.35;">Master Administrator<br>Staging Company</div>
+      <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 14px; font-size: 14px; color: #111827; background: #ffffff;">Sign out</div>
+    </div>
+  </div>
+
+  <div style="padding: 28px 32px 40px 32px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- Costing header -->
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 13px; color: #6b7280;">Costing NPP-201 · Draft · Triclover Limited · Factory extension, phase 2</div>
+        <div style="font-size: 28px; font-weight: 700; color: #111827;">Panels at a glance</div>
+        <div style="font-size: 14px; color: #4b5563; max-width: 760px;">Every panel in this costing is a column; every kit and loose component any of them uses is a row. Type a quantity in a cell to change it; prices stay frozen and the change is recorded exactly as in the panel editor.</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+        <div style="display: flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; font-size: 14px;">
+          <div style="padding: 8px 14px; background: #ffffff; color: #374151;">Panel by panel</div>
+          <div style="padding: 8px 14px; background: #1d4ed8; color: #ffffff; font-weight: 600;">Grid</div>
+        </div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 14px; font-size: 14px; background: #ffffff; color: #111827;">Excel</div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 14px; font-size: 14px; background: #ffffff; color: #111827;">Copy panel…</div>
+        <div style="border-radius: 6px; padding: 8px 14px; font-size: 14px; background: #1d4ed8; color: #ffffff; font-weight: 600;">Add panel</div>
+      </div>
+    </div>
+
+    <!-- Compare strip -->
+    <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #4b5563;">
+      <span>Comparing</span>
+      <span style="border: 1px solid #d1d5db; border-radius: 999px; padding: 4px 12px; background: #ffffff; color: #111827;">DB-2 First floor</span>
+      <span>with</span>
+      <span style="border: 1px solid #d1d5db; border-radius: 999px; padding: 4px 12px; background: #ffffff; color: #111827;">DB-3 Second floor</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;"><span style="display: inline-block; width: 14px; height: 14px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 3px;"></span>cells that differ</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="display: inline-block; width: 14px; height: 14px; background: #fee2e2; border: 1px solid #ef4444; border-radius: 3px;"></span>needs attention (unpriced part, space)</span>
+    </div>
+
+    <!-- Grid card -->
+    <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+      <table style="width: 100%;">
+        <thead>
+          <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+            <th style="text-align: left; padding: 14px 16px; font-weight: 600; color: #374151; width: 440px;">Kit / component</th>
+            <th style="text-align: left; padding: 14px 12px; font-weight: 600; color: #374151; width: 120px;">Group</th>
+            <th style="text-align: center; padding: 10px 12px; font-weight: 600; color: #111827; width: 150px; border-left: 1px solid #e5e7eb;">MDB<div style="font-size: 12px; color: #6b7280; font-weight: 400;">1600 A main board · qty 1</div></th>
+            <th style="text-align: center; padding: 10px 12px; font-weight: 600; color: #111827; width: 150px; border-left: 1px solid #e5e7eb;">DB-1<div style="font-size: 12px; color: #6b7280; font-weight: 400;">Ground floor · qty 1</div></th>
+            <th style="text-align: center; padding: 10px 12px; font-weight: 600; color: #111827; width: 150px; border-left: 2px solid #f59e0b; background: #fffbeb;">DB-2<div style="font-size: 12px; color: #6b7280; font-weight: 400;">First floor · qty 1</div></th>
+            <th style="text-align: center; padding: 10px 12px; font-weight: 600; color: #111827; width: 150px; border-left: 1px solid #f59e0b; border-right: 2px solid #f59e0b; background: #fffbeb;">DB-3<div style="font-size: 12px; color: #6b7280; font-weight: 400;">Second floor · qty 2</div></th>
+            <th style="text-align: right; padding: 10px 16px; font-weight: 600; color: #111827; width: 160px; border-left: 1px solid #e5e7eb; background: #f3f4f6;">All panels<div style="font-size: 12px; color: #6b7280; font-weight: 400;">× panel qty</div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Incomer -->
+          <tr style="background: #f3f4f6;"><td colspan="7" style="padding: 8px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Incomer</td></tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">1600A 4P WITHDRAWABLE MOTORIZED ACB with changeover accessories-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">ACB frame 1</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">1</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">250A,TP,MCCB, Adjustable, 25KA-INCOMER-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">MCCB</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">4</td>
+          </tr>
+
+          <!-- Outgoers -->
+          <tr style="background: #f3f4f6;"><td colspan="7" style="padding: 8px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Outgoers</td></tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">630A,TP,MCCB, Adjustable, 36kA-OUTGOER-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">MCCB</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">1</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">400A,TP,MCCB, Adjustable, 36kA-OUTGOER-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">MCCB</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">3</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">3</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">100A,TP,MCCB, Adjustable, 25KA-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">MCCB</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">4</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">6</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">6</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">22</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">63A TP MCB C-CURVE-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">MCB</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">8</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; background: #fef3c7;"><div style="display: inline-block; min-width: 56px; border: 1px solid #f59e0b; border-radius: 6px; padding: 6px 8px; background: #ffffff; font-weight: 600;">12</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; background: #fef3c7;"><div style="display: inline-block; min-width: 56px; border: 1px solid #f59e0b; border-radius: 6px; padding: 6px 8px; background: #ffffff; font-weight: 600;">10</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">40</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">32A TP MCB C-CURVE-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">MCB</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">6</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">6</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">6</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">24</td>
+          </tr>
+
+          <!-- Accessories -->
+          <tr style="background: #f3f4f6;"><td colspan="7" style="padding: 8px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Accessories &amp; metering</td></tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">INDICATOR KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">Accessories</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">5</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">9</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">SPD TYPE 1+2-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">Accessories</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">1</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">SPD TYPE 2-KIT</td>
+            <td style="padding: 12px 12px; color: #6b7280;">Accessories</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">4</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">LM1340 <span style="color: #6b7280;">· multifunction meter</span> <span style="font-size: 11px; color: #6b7280; border: 1px solid #d1d5db; border-radius: 999px; padding: 1px 7px; margin-left: 6px;">component</span></td>
+            <td style="padding: 12px 12px; color: #6b7280;">Metering</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">3</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; background: #fef3c7;"><div style="display: inline-block; min-width: 56px; border: 1px solid #f59e0b; border-radius: 6px; padding: 6px 8px; background: #ffffff; font-weight: 600;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; background: #fef3c7; color: #b45309; font-weight: 600;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">5</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">800A/5 <span style="color: #6b7280;">· current transformer</span> <span style="font-size: 11px; color: #6b7280; border: 1px solid #d1d5db; border-radius: 999px; padding: 1px 7px; margin-left: 6px;">component</span></td>
+            <td style="padding: 12px 12px; color: #6b7280;">Metering</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">14</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">14</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">CONTROLS &amp; WIRING <span style="font-size: 11px; color: #6b7280; border: 1px solid #d1d5db; border-radius: 999px; padding: 1px 7px; margin-left: 6px;">lump sum</span></td>
+            <td style="padding: 12px 12px; color: #6b7280;">Controls</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">1</td>
+          </tr>
+
+          <!-- Enclosure -->
+          <tr style="background: #f3f4f6;"><td colspan="7" style="padding: 8px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Enclosure</td></tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">800(W)X800(D)X2100(H)-2B <span style="color: #6b7280;">· free-standing cubicle</span></td>
+            <td style="padding: 12px 12px; color: #6b7280;">Enclosure</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">5</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a; color: #d1d5db;">–</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">5</td>
+          </tr>
+          <tr style="border-top: 1px solid #f3f4f6;">
+            <td style="padding: 12px 16px;">600(W)X800(H)X250(D) <span style="color: #6b7280;">· wall-mounted box</span></td>
+            <td style="padding: 12px 12px; color: #6b7280;">Enclosure</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6; color: #d1d5db;">–</td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #f3f4f6;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 2px solid #fde68a; background: #fee2e2;"><div style="display: inline-block; min-width: 56px; border: 1px solid #ef4444; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div><div style="font-size: 11px; color: #b91c1c; margin-top: 4px;">space 92 % · check</div></td>
+            <td style="text-align: center; padding: 8px 12px; border-left: 1px solid #fde68a; border-right: 2px solid #fde68a;"><div style="display: inline-block; min-width: 56px; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 8px; background: #ffffff;">1</div></td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #f3f4f6; background: #f9fafb; color: #374151;">4</td>
+          </tr>
+
+          <!-- Totals -->
+          <tr style="background: #f9fafb; border-top: 2px solid #e5e7eb;">
+            <td colspan="2" style="padding: 12px 16px; font-weight: 600; color: #374151;">Material, KES</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #e5e7eb; color: #111827;">3,622,782</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #e5e7eb; color: #111827;">412,300</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 2px solid #f59e0b; color: #111827;">468,900</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #f59e0b; border-right: 2px solid #f59e0b; color: #111827;">452,100</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #e5e7eb; background: #f3f4f6; color: #111827;">5,408,182</td>
+          </tr>
+          <tr style="background: #f9fafb;">
+            <td colspan="2" style="padding: 12px 16px; font-weight: 600; color: #374151;">Labour, KES <span style="font-weight: 400; color: #6b7280;">(hours × rate)</span></td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #e5e7eb; color: #111827;">186,400</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #e5e7eb; color: #111827;">28,800</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 2px solid #f59e0b; color: #111827;">31,200</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #f59e0b; border-right: 2px solid #f59e0b; color: #111827;">30,400</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #e5e7eb; background: #f3f4f6; color: #111827;">307,200</td>
+          </tr>
+          <tr style="background: #f9fafb;">
+            <td colspan="2" style="padding: 12px 16px; font-weight: 600; color: #374151;">Selling price ex-VAT <span style="font-weight: 400; color: #6b7280;">(10 % profit of price)</span></td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #e5e7eb; color: #111827;">4,232,424</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #e5e7eb; color: #111827;">490,111</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 2px solid #f59e0b; color: #111827;">555,667</td>
+            <td style="text-align: right; padding: 12px 12px; border-left: 1px solid #f59e0b; border-right: 2px solid #f59e0b; color: #111827;">536,111</td>
+            <td style="text-align: right; padding: 12px 16px; border-left: 1px solid #e5e7eb; background: #f3f4f6; color: #111827;">6,350,424</td>
+          </tr>
+          <tr style="background: #ffffff; border-top: 1px solid #e5e7eb;">
+            <td colspan="2" style="padding: 14px 16px; font-weight: 700; color: #111827;">Panel price, rounded up to KES 100</td>
+            <td style="text-align: right; padding: 14px 12px; border-left: 1px solid #e5e7eb; color: #111827; font-weight: 700;">4,232,500</td>
+            <td style="text-align: right; padding: 14px 12px; border-left: 1px solid #e5e7eb; color: #111827; font-weight: 700;">490,200</td>
+            <td style="text-align: right; padding: 14px 12px; border-left: 2px solid #f59e0b; color: #111827; font-weight: 700;">555,700</td>
+            <td style="text-align: right; padding: 14px 12px; border-left: 1px solid #f59e0b; border-right: 2px solid #f59e0b; color: #111827; font-weight: 700;">536,200 <span style="font-weight: 400; color: #6b7280;">× 2</span></td>
+            <td style="text-align: right; padding: 14px 16px; border-left: 1px solid #e5e7eb; background: #f3f4f6; color: #111827; font-weight: 700;">6,350,800</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size: 13px; color: #6b7280;">Blank cell = the panel does not use that kit. Rows appear once any panel uses the kit; add a kit to a column with the kit picker as today, and it becomes a row for all panels. Quantities are multiplied through kit quantity and panel quantity in the right-hand column and in the BOMs.</div>
+  </div>
+</div>
+
+</body>
+</html>
