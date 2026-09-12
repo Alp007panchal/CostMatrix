@@ -468,6 +468,10 @@ export interface Assembly {
   footprint_w_mm: number | null
   footprint_h_mm: number | null
   footprint_d_mm: number | null
+  /** Roadmap 3.8: which mounting design this kit belongs to, and what it takes on the stack. */
+  mounting_design: MountingDesign | null
+  module_height_mm: number | null
+  positions_per_plate: number | null
 }
 
 export interface AssemblyComponentRow {
@@ -1264,6 +1268,15 @@ export interface AssistantUsage {
   proposals: Partial<Record<ProposalStatus, number>>
   allowance: AssistantAllowance
 }
+
+/** The six mounting designs of panel-layout-spec.md §3. */
+export type MountingDesign =
+  | 'busbar_fed'
+  | 'mccb_plates'
+  | 'side_by_side_plates'
+  | 'compensation'
+  | 'meter_board_plate'
+  | 'inline_3nj6'
 
 export interface CompanyOption {
   id: string

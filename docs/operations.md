@@ -805,6 +805,30 @@ Components screen waiting for you.
 The grading — how much of the target goes into the biggest step, how much into the next — is a
 company setting, so it can be changed without a new version of the app. Ask and I will change it.
 
+### Fill in what the panel layout will need (phase 3.8, fields only)
+The layout pop-up itself is not built yet — the specification and the mockups are in
+`docs/reference/panel-layout-spec.md` — but the library can be filled in now, so that when it is
+built there is something to draw.
+
+Two places, whichever suits you:
+
+- **On a kit** (Kits → open one): under the footprint, three new boxes — **Mounting design** (how the
+  kit is built into a board: busbar-fed, MCCB plates, side-by-side plates, compensation, meter board
+  plate, in-line 3NJ6), **Module height** in millimetres (the S4 cover height it takes on the stack,
+  in 50 mm steps), and **Positions per plate** (only where it is not simply the plate width divided
+  by the device). Blank is fine: the layout will call such a kit unsized rather than guess.
+- **In bulk**: `python3 scripts/build_kit_layout_template.py` writes
+  `data/seed/kit-layout-template.csv`, one row per kit with its group, name and main device already
+  filled in. Fill what you know, then **Import → step 5, Kit sizes and mounting**. It previews first,
+  a blank cell is left alone so the file can be filled a group at a time, and re-running the script
+  keeps what you have typed. A module height that is not a whole 50 mm, or a design that is not one
+  of the six, is refused by name rather than quietly ignored.
+
+The widths and depths a board can be built in live in a table of their own, seeded with **SIVACON
+S4** from the Application Manual. **S8, the meter board and our own double-front frame are named and
+empty** — those figures are yours, and a made-up width would be worse than a blank one. Tell me the
+lists and I will put them in.
+
 ### Work out the busbar runs (phase 4.1)
 This is your `CU-OPT1` sheet, on the panel. In a draft costing, on the panel: **Work out the
 busbar runs**.

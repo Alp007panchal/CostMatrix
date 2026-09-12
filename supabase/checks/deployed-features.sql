@@ -62,7 +62,11 @@ with wanted(feature, kind, name) as (values
   ('4.1 busbar runs',         'view',     'public.v_panel_busbar_check'),
   ('4.1 busbar runs',         'function', 'app.busbar_run_totals'),
   ('4.1 busbar runs',         'function', 'app.starting_busbar_runs'),
-  ('4.1 busbar runs',         'function', 'app.apply_busbar_runs')
+  ('4.1 busbar runs',         'function', 'app.apply_busbar_runs'),
+  ('3.8 layout fields',       'table',    'public.layout_constructions'),
+  ('3.8 layout fields',       'function', 'app.import_kit_layout'),
+  ('3.8 layout fields',       'column',   'public.assemblies.mounting_design'),
+  ('3.8 layout fields',       'column',   'public.panel_layouts.sections')
 )
 select
   w.feature,

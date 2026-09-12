@@ -196,10 +196,11 @@ select test.eq(:'fit_strict'::jsonb ->> 'verdict', 'no_fit',
 begin;
 set local role authenticated;
 select test.sign_in(:'carol');
-insert into public.panel_layouts (company_id, panel_id, version, cubicles, note)
+insert into public.panel_layouts (company_id, panel_id, version, sections, note)
 values (:'alpha'::uuid, :'panel_id'::uuid, 1,
         jsonb_build_array(jsonb_build_object(
-          'name', 'Cubicle 1', 'component_id', :'cubicle_id', 'w_mm', 800, 'h_mm', 2100, 'd_mm', 800,
+          'name', 'Section 1', 'component_id', :'cubicle_id', 'width_mm', 800, 'h_mm', 2100, 'depth_mm', 800,
+          'access', 'single_front',
           'placements', jsonb_build_array(jsonb_build_object(
             'costing_assembly_id', (select id from public.costing_assemblies where panel_id = :'panel_id'::uuid and kind = 'kit' limit 1),
             'x_mm', 40, 'y_mm', 120, 'w_mm', 600, 'h_mm', 800, 'rotation', 0)))),
@@ -207,9 +208,9 @@ values (:'alpha'::uuid, :'panel_id'::uuid, 1,
 returning id as layout_id \gset
 commit;
 
-select test.eq((select jsonb_array_length(cubicles) from public.panel_layouts where id = :'layout_id'::uuid), 1,
-  'a layout keeps its cubicles and the placements inside them');
-select test.eq((select cubicles -> 0 -> 'placements' -> 0 ->> 'x_mm' from public.panel_layouts where id = :'layout_id'::uuid), '40',
+select test.eq((select jsonb_array_length(sections) from public.panel_layouts where id = :'layout_id'::uuid), 1,
+  'a layout keeps its sections and the placements inside them');
+select test.eq((select sections -> 0 -> 'placements' -> 0 ->> 'x_mm' from public.panel_layouts where id = :'layout_id'::uuid), '40',
   'in millimetres from the top left');
 
 begin;
@@ -218,7 +219,7 @@ select test.sign_in(:'bob');
 select test.eq((select count(*)::int from public.panel_layouts), 0,
   'another company sees no layout of Alpha''s');
 select test.refuses(
-  format($$insert into public.panel_layouts (company_id, panel_id, cubicles) values (%L, %L, '[]'::jsonb)$$,
+  format($$insert into public.panel_layouts (company_id, panel_id, sections) values (%L, %L, '[]'::jsonb)$$,
          :'beta', :'panel_id'),
   'and cannot lay out its panel', 'policy');
 rollback;
@@ -227,7 +228,7 @@ begin;
 set local role authenticated;
 select test.sign_in(:'carol');
 select test.refuses(
-  format($$insert into public.panel_layouts (company_id, panel_id, version, cubicles) values (%L, %L, 1, '[]'::jsonb)$$,
+  format($$insert into public.panel_layouts (company_id, panel_id, version, sections) values (%L, %L, 1, '[]'::jsonb)$$,
          :'alpha', :'panel_id'),
   'one version of a panel''s layout is one row', 'panel_layouts_panel_id_version_key');
 rollback;

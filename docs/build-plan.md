@@ -222,7 +222,6 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.8 panel layout: the spec and the kit fields (no canvas) | `claude/advanced-p38-layout-fields` | 2026-09-12 17:40 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
@@ -255,6 +254,14 @@ or into go-live.
     migrations to a database already at 0017 and already full of rows, refusing any figure that
     moves (in CI on every pull request), a go-live section in the runbook, and then the release
     itself: one pull request from `advanced` into `main`, every feature off.
+
+32. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
+    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
+    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
+    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
+    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
+    faces for a double-front board; and a kit template plus importer so the library can be filled
+    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

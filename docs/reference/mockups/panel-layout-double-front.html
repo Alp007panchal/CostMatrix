@@ -1,0 +1,716 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2937; background: #4b5563; }
+    a { color: #1d4ed8; } a:hover { color: #1e40af; }
+  </style>
+</helmet>
+<div style="width: 1680px; height: 1040px; background: rgba(17, 24, 39, 0.55); display: flex; align-items: center; justify-content: center;">
+  <div style="width: 1640px; height: 1004px; background: #ffffff; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); display: flex; flex-direction: column; overflow: hidden;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 18px; font-weight: 700; color: #111827;">Panel layout — KPLC meter board, 40 flats · double-front · Faces A + B</div>
+        <div style="font-size: 12px; color: #6b7280;">Costing NPP-203 · 1 200 × 2 000 (+100 base) × 600 · busbar bottom · access: double-front (face A front, face B rear)</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; font-size: 13px;"><div style="padding: 7px 12px; background: #ffffff; color: #374151; font-weight: 400;">Front A</div><div style="padding: 7px 12px; background: #1d4ed8; color: #ffffff; font-weight: 600;">Rear B</div><div style="padding: 7px 12px; background: #ffffff; color: #374151; font-weight: 400;">Side</div><div style="padding: 7px 12px; background: #ffffff; color: #374151; font-weight: 400;">Door</div><div style="padding: 7px 12px; background: #ffffff; color: #374151; font-weight: 400;">3D</div></div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 12px; font-size: 13px; background: #ffffff; color: #111827;">Auto-arrange</div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 12px; font-size: 13px; background: #ffffff; color: #111827;">GA sketch</div>
+        <div style="border-radius: 6px; padding: 7px 12px; font-size: 13px; background: #1d4ed8; color: #ffffff; font-weight: 600;">Save layout</div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 10px; font-size: 13px; background: #ffffff; color: #6b7280;">Close</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 20px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; font-size: 11px; color: #374151;">
+      <span style="font-weight: 600;">Layers</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#ffffff; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#d1d5db;"></span>Doors</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Covers</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Busbars</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Cables</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Tags</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Dimensions</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Rulers</span><span style="display:inline-flex; align-items:center; gap:4px; border:1px solid #d1d5db; border-radius:999px; padding:2px 8px; font-size:11px; background:#dbeafe; color:#1f2937;"><span style="width:8px;height:8px;border-radius:999px;background:#2563eb;"></span>Grid 50 mm</span>
+      <span style="margin-left: auto; display: inline-flex; gap: 6px; align-items: center;"><span style="border:1px solid #d1d5db; border-radius:4px; padding:1px 6px;">−</span><span>100 %</span><span style="border:1px solid #d1d5db; border-radius:4px; padding:1px 6px;">+</span><span style="margin-left:8px;">Snap 50 mm</span><span style="margin-left:8px;">Cursor 2 640, 1 125 mm</span></span>
+    </div>
+    <div style="display: flex; flex-grow: 1; min-height: 0;">
+      
+      <div style="width: 232px; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; background: #f9fafb; overflow: hidden;">
+        <div style="padding: 12px 14px 4px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Kits in this panel</div>
+        <div style="padding: 0 12px 8px 12px; font-size: 11px; color: #6b7280;">Drag onto face A or face B. Both faces are editable on a double-front board.</div>
+        <div style="display: flex; flex-direction: column; gap: 5px; padding: 0 10px;">
+          <div style="font-size: 10px; font-weight: 700; color: #6b7280;">FACE A · FRONT</div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; background: #ffffff;"><svg width="22" height="26" viewBox="0 0 54 90"><use href="#mcb" width="18" height="90"/><use href="#mcb" x="18" width="18" height="90"/><use href="#mcb" x="36" width="18" height="90"/></svg><div style="font-size: 12px; color: #111827;">63 A DP MCB ×40<div style="font-size: 10px; color: #16a34a;">MCB plates S1, S2 · placed</div></div></div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; background: #ffffff;"><svg width="20" height="26" viewBox="0 0 130 170"><use href="#kmeter" width="130" height="170"/></svg><div style="font-size: 12px; color: #111827;">KPLC 1-ph meter ×40<div style="font-size: 10px; color: #16a34a;">meter plates · 40 of 40</div></div></div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; background: #ffffff;"><svg width="22" height="14" viewBox="0 0 60 30"><rect x="2" y="4" width="10" height="22" fill="#e2e8f0" stroke="#718096"/><rect x="16" y="4" width="10" height="22" fill="#e2e8f0" stroke="#718096"/><rect x="30" y="4" width="10" height="22" fill="#dbeafe" stroke="#1d4ed8"/><rect x="44" y="4" width="10" height="22" fill="#dbeafe" stroke="#1d4ed8"/></svg><div style="font-size: 12px; color: #111827;">Consumer terminals 16 mm² ×80<div style="font-size: 10px; color: #16a34a;">terminal plates · placed</div></div></div>
+          <div style="font-size: 10px; font-weight: 700; color: #6b7280; margin-top: 6px;">FACE B · REAR</div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #2563eb; border-radius: 6px; padding: 6px 8px; background: #eff6ff;"><svg width="24" height="24" viewBox="0 0 300 300"><use href="#cho" width="300" height="300"/></svg><div style="font-size: 12px; color: #111827;">On-load changeover 400 A + isolator<div style="font-size: 10px; color: #1d4ed8;">changeover plate S1 · selected</div></div></div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; background: #ffffff;"><svg width="20" height="26" viewBox="0 0 180 230"><use href="#kmeter3" width="180" height="230"/></svg><div style="font-size: 12px; color: #111827;">KPLC 3-ph CT meter + MFM<div style="font-size: 10px; color: #16a34a;">meter plate S2 · placed</div></div></div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; background: #ffffff;"><svg width="22" height="22" viewBox="0 0 60 60"><use href="#ct" width="60" height="60"/></svg><div style="font-size: 12px; color: #111827;">CT 400/5 ×3 + risers<div style="font-size: 10px; color: #16a34a;">CT chamber S2 · placed</div></div></div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #f59e0b; border-radius: 6px; padding: 6px 8px; background: #fffbeb;"><svg width="22" height="14" viewBox="0 0 60 30"><rect x="2" y="4" width="10" height="22" fill="#e2e8f0" stroke="#718096"/><rect x="16" y="4" width="10" height="22" fill="#e2e8f0" stroke="#718096"/></svg><div style="font-size: 12px; color: #111827;">SPD T2 + surge MCB<div style="font-size: 10px; color: #b45309;">to place · fits face B S2</div></div></div>
+          <div style="font-size: 10px; font-weight: 700; color: #6b7280; margin-top: 6px;">SHARED</div>
+          <div style="display:flex; gap:8px; align-items:center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; background: #ffffff;"><svg width="22" height="12" viewBox="0 0 60 30"><rect x="2" y="4" width="56" height="6" fill="#b8692a"/><rect x="2" y="14" width="56" height="6" fill="#b8692a"/></svg><div style="font-size: 12px; color: #111827;">Busbar 4 × 50×10 · 400 A<div style="font-size: 10px; color: #16a34a;">bottom chamber · 1.2 m</div></div></div>
+        </div>
+      </div>
+      <div style="flex-grow: 1; background: #ffffff; background-image: url(#grid50); overflow: hidden; display: flex; align-items: flex-start; justify-content: center; padding: 8px 6px;">
+        <svg width="1147.2" height="762.0" viewBox="-30 -60 956.0 635.0" style="display:block;">
+          
+<defs>
+  <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9dbde"/><stop offset="0.5" stop-color="#eceef0"/><stop offset="1" stop-color="#cfd2d6"/></linearGradient>
+  <linearGradient id="steelV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ebed"/><stop offset="1" stop-color="#c9cdd2"/></linearGradient>
+  <linearGradient id="cover" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f5f6"/><stop offset="1" stop-color="#dcdfe3"/></linearGradient>
+  <linearGradient id="copper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0a066"/><stop offset="0.5" stop-color="#b8692a"/><stop offset="1" stop-color="#8a4a18"/></linearGradient>
+  <linearGradient id="copperH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e0a066"/><stop offset="0.5" stop-color="#b8692a"/><stop offset="1" stop-color="#8a4a18"/></linearGradient>
+  <linearGradient id="dev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b6470"/><stop offset="1" stop-color="#2f3640"/></linearGradient>
+  <linearGradient id="devL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa3ad"/><stop offset="1" stop-color="#6b7480"/></linearGradient>
+  <linearGradient id="base" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d3e50"/><stop offset="1" stop-color="#1b2632"/></linearGradient>
+  <pattern id="vent" width="6" height="3" patternUnits="userSpaceOnUse"><rect width="6" height="3" fill="#d7dadf"/><rect x="1" y="1" width="4" height="1" fill="#9aa0a8"/></pattern>
+  <pattern id="grid50" width="12.5" height="12.5" patternUnits="userSpaceOnUse"><path d="M12.5 0 L0 0 0 12.5" fill="none" stroke="#e5e7eb" stroke-width="0.5"/></pattern>
+  <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="1.2" stdDeviation="1.2" flood-color="#000" flood-opacity="0.25"/></filter>
+
+  <!-- 3WA air circuit breaker front, 100 x 110 units -->
+  <symbol id="acb" viewBox="0 0 100 110">
+    <rect x="0" y="0" width="100" height="110" rx="3" fill="url(#dev)" stroke="#1f242b" stroke-width="1"/>
+    <rect x="6" y="6" width="88" height="20" rx="2" fill="#3a424d" stroke="#1f242b" stroke-width="0.6"/>
+    <rect x="10" y="10" width="40" height="12" fill="#1a1e24"/><text x="30" y="19" font-size="7" fill="#9ae6b4" text-anchor="middle" font-family="monospace">ETU 1600A</text>
+    <circle cx="66" cy="16" r="4" fill="#e53e3e"/><circle cx="78" cy="16" r="4" fill="#48bb78"/><circle cx="90" cy="16" r="3" fill="#ecc94b"/>
+    <rect x="8" y="32" width="84" height="54" rx="2" fill="#4a535e" stroke="#1f242b" stroke-width="0.6"/>
+    <rect x="14" y="38" width="30" height="42" rx="2" fill="#2b323b"/><rect x="18" y="44" width="22" height="8" fill="#c53030"/><text x="29" y="50.5" font-size="5.5" fill="#fff" text-anchor="middle" font-family="sans-serif">OFF</text>
+    <rect x="18" y="56" width="22" height="8" fill="#2f855a"/><text x="29" y="62.5" font-size="5.5" fill="#fff" text-anchor="middle" font-family="sans-serif">ON</text>
+    <rect x="50" y="40" width="34" height="34" rx="17" fill="#3a424d" stroke="#1f242b" stroke-width="0.6"/><rect x="64" y="42" width="6" height="30" rx="2" fill="#a0aec0"/>
+    <rect x="8" y="90" width="84" height="12" rx="1.5" fill="#2b323b"/><text x="50" y="98.5" font-size="6.5" fill="#e2e8f0" text-anchor="middle" font-family="sans-serif">SIEMENS 3WA</text>
+    <rect x="0" y="104" width="100" height="6" fill="#8a94a0"/>
+  </symbol>
+  <!-- 3VA MCCB body, 40 x 60 units -->
+  <symbol id="mccb" viewBox="0 0 40 60">
+    <rect x="0" y="0" width="40" height="60" rx="2" fill="url(#dev)" stroke="#1f242b" stroke-width="0.8"/>
+    <g fill="#b8692a"><rect x="4" y="1" width="8" height="6"/><rect x="16" y="1" width="8" height="6"/><rect x="28" y="1" width="8" height="6"/><rect x="4" y="53" width="8" height="6"/><rect x="16" y="53" width="8" height="6"/><rect x="28" y="53" width="8" height="6"/></g>
+    <rect x="6" y="12" width="28" height="36" rx="2" fill="#3a424d"/>
+    <rect x="15" y="16" width="10" height="28" rx="2" fill="#1f242b"/><rect x="16.5" y="18" width="7" height="12" rx="1.5" fill="#cbd5e0"/>
+    <rect x="8" y="37" width="24" height="7" fill="#2b323b"/><text x="20" y="42.5" font-size="4.6" fill="#e2e8f0" text-anchor="middle" font-family="sans-serif">3VA</text>
+  </symbol>
+  <!-- MCB on DIN rail, 18 x 90 units per module -->
+  <symbol id="mcb" viewBox="0 0 18 90">
+    <rect x="0.5" y="0" width="17" height="90" rx="1.5" fill="#e6e8eb" stroke="#8a94a0" stroke-width="0.8"/>
+    <rect x="4" y="30" width="10" height="30" rx="1.5" fill="#2d3748"/><rect x="5.5" y="33" width="7" height="12" rx="1" fill="#a0aec0"/>
+    <rect x="3" y="8" width="12" height="10" fill="#cbd5e0"/><rect x="3" y="72" width="12" height="10" fill="#cbd5e0"/>
+  </symbol>
+  <!-- multifunction meter 96x96 -->
+  <symbol id="mfm" viewBox="0 0 96 96">
+    <rect x="0" y="0" width="96" height="96" rx="4" fill="#1a202c" stroke="#000" stroke-width="1"/>
+    <rect x="10" y="12" width="76" height="46" rx="2" fill="#0b3d2e"/><text x="48" y="32" font-size="14" fill="#9ae6b4" text-anchor="middle" font-family="monospace">415 V</text><text x="48" y="50" font-size="12" fill="#9ae6b4" text-anchor="middle" font-family="monospace">1 248 A</text>
+    <g fill="#4a5568"><rect x="12" y="68" width="14" height="14" rx="2"/><rect x="34" y="68" width="14" height="14" rx="2"/><rect x="56" y="68" width="14" height="14" rx="2"/></g>
+  </symbol>
+  <!-- contactor 45 x 80 -->
+  <symbol id="contactor" viewBox="0 0 45 80">
+    <rect x="0" y="0" width="45" height="80" rx="2" fill="#4a5568" stroke="#1f242b" stroke-width="0.8"/>
+    <g fill="#b8692a"><rect x="5" y="2" width="8" height="8"/><rect x="18.5" y="2" width="8" height="8"/><rect x="32" y="2" width="8" height="8"/><rect x="5" y="70" width="8" height="8"/><rect x="18.5" y="70" width="8" height="8"/><rect x="32" y="70" width="8" height="8"/></g>
+    <rect x="8" y="18" width="29" height="44" rx="2" fill="#2d3748"/><rect x="17" y="30" width="11" height="8" fill="#a0aec0"/>
+  </symbol>
+  <!-- capacitor 75 x 150 -->
+  <symbol id="cap" viewBox="0 0 75 150">
+    <rect x="0" y="0" width="75" height="150" rx="10" fill="url(#devL)" stroke="#4a5568" stroke-width="1"/>
+    <rect x="12" y="20" width="51" height="28" rx="2" fill="#e2e8f0"/><text x="37.5" y="38" font-size="12" fill="#2d3748" text-anchor="middle" font-family="sans-serif">50 kvar</text>
+    <g fill="#b8692a"><rect x="12" y="2" width="12" height="8"/><rect x="31" y="2" width="12" height="8"/><rect x="50" y="2" width="12" height="8"/></g>
+  </symbol>
+  <!-- pilot lamp 22 mm -->
+  <symbol id="lamp" viewBox="0 0 22 22"><circle cx="11" cy="11" r="10" fill="#2d3748"/><circle cx="11" cy="11" r="6.5" fill="#f56565"/><circle cx="9" cy="9" r="2" fill="#fed7d7" opacity="0.8"/></symbol>
+</defs>
+
+<symbol id="kmeter" viewBox="0 0 130 170">
+  <rect x="2" y="2" width="126" height="166" rx="6" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+  <rect x="14" y="16" width="102" height="34" rx="2" fill="#1f2937"/>
+  <rect x="20" y="22" width="90" height="22" fill="#a7f3d0" opacity="0.9"/>
+  <text x="65" y="38" font-size="13" font-family="monospace" fill="#064e3b" text-anchor="middle">012345.6 kWh</text>
+  <circle cx="30" cy="66" r="4" fill="#ef4444"/><text x="40" y="70" font-size="8" fill="#374151" font-family="sans-serif">1000 imp/kWh</text>
+  <rect x="14" y="80" width="102" height="46" rx="2" fill="#e5e7eb" stroke="#9ca3af"/>
+  <text x="65" y="100" font-size="9" fill="#374151" text-anchor="middle" font-family="sans-serif">SINGLE PHASE</text>
+  <text x="65" y="114" font-size="9" fill="#374151" text-anchor="middle" font-family="sans-serif">240 V · 10(80) A</text>
+  <rect x="10" y="136" width="110" height="26" rx="2" fill="#374151"/>
+  <rect x="18" y="142" width="10" height="14" fill="#9ca3af"/><rect x="38" y="142" width="10" height="14" fill="#9ca3af"/><rect x="58" y="142" width="10" height="14" fill="#9ca3af"/><rect x="78" y="142" width="10" height="14" fill="#9ca3af"/><rect x="98" y="142" width="10" height="14" fill="#9ca3af"/>
+</symbol>
+<symbol id="kmeter3" viewBox="0 0 180 230">
+  <rect x="2" y="2" width="176" height="226" rx="6" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+  <rect x="16" y="18" width="148" height="44" rx="2" fill="#1f2937"/>
+  <rect x="22" y="24" width="136" height="32" fill="#a7f3d0" opacity="0.9"/>
+  <text x="90" y="46" font-size="15" font-family="monospace" fill="#064e3b" text-anchor="middle">1234567.8 kWh</text>
+  <text x="90" y="92" font-size="11" fill="#374151" text-anchor="middle" font-family="sans-serif">THREE PHASE · CT OPERATED</text>
+  <text x="90" y="108" font-size="11" fill="#374151" text-anchor="middle" font-family="sans-serif">3×240/415 V · 5 A · CT 400/5</text>
+  <rect x="16" y="130" width="148" height="50" rx="2" fill="#e5e7eb" stroke="#9ca3af"/>
+  <rect x="12" y="192" width="156" height="28" rx="2" fill="#374151"/>
+</symbol>
+<symbol id="cho" viewBox="0 0 300 300">
+  <rect x="2" y="2" width="296" height="296" rx="8" fill="url(#devL)" stroke="#1f242b" stroke-width="3"/>
+  <rect x="20" y="20" width="260" height="60" rx="4" fill="#2f3640"/>
+  <text x="150" y="58" font-size="19" fill="#e5e7eb" text-anchor="middle" font-family="sans-serif" font-weight="700">ON-LOAD CHANGEOVER 400 A</text>
+  <circle cx="150" cy="185" r="70" fill="#1f2937" stroke="#0f172a" stroke-width="3"/>
+  <rect x="140" y="125" width="20" height="120" rx="6" fill="#dc2626"/>
+  <text x="60" y="195" font-size="30" fill="#fef3c7" text-anchor="middle" font-family="sans-serif" font-weight="700">I</text>
+  <text x="150" y="105" font-size="26" fill="#fef3c7" text-anchor="middle" font-family="sans-serif" font-weight="700">0</text>
+  <text x="240" y="195" font-size="30" fill="#fef3c7" text-anchor="middle" font-family="sans-serif" font-weight="700">II</text>
+  <text x="60" y="270" font-size="18" fill="#e5e7eb" text-anchor="middle" font-family="sans-serif">KPLC</text>
+  <text x="240" y="270" font-size="18" fill="#e5e7eb" text-anchor="middle" font-family="sans-serif">GEN</text>
+</symbol>
+<symbol id="iso" viewBox="0 0 120 150">
+  <rect x="2" y="2" width="116" height="146" rx="4" fill="#4b5563" stroke="#1f242b" stroke-width="2"/>
+  <rect x="14" y="14" width="92" height="30" fill="#2f3640"/>
+  <circle cx="60" cy="90" r="30" fill="#1f2937"/><rect x="54" y="62" width="12" height="56" rx="4" fill="#dc2626"/>
+  <text x="60" y="140" font-size="12" fill="#e5e7eb" text-anchor="middle" font-family="sans-serif">ISOLATOR 400 A</text>
+</symbol>
+<symbol id="ct" viewBox="0 0 60 60">
+  <rect x="4" y="4" width="52" height="52" rx="4" fill="#1e3a8a" stroke="#0f172a"/>
+  <circle cx="30" cy="30" r="14" fill="#f3f4f6"/><text x="30" y="52" font-size="9" fill="#e5e7eb" text-anchor="middle" font-family="sans-serif">400/5</text>
+</symbol>
+
+          <rect x="-30" y="-60" width="956.0" height="635.0" fill="url(#grid50)"/>
+          <rect x="0.0" y="0" width="150.0" height="500.0" fill="url(#steel)" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="4.0" y="4" width="142.0" height="492.0" fill="#f2f3f5" stroke="#9ca3af" stroke-width="0.6"/>
+<rect x="12.0" y="8" width="126.0" height="8" fill="url(#vent)"/>
+<rect x="0.0" y="500.0" width="150.0" height="25.0" fill="url(#base)" stroke="#111827" stroke-width="0.8"/>
+<text x="75.0" y="-14" font-size="7" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="700">S1</text>
+<rect x="150.0" y="0" width="150.0" height="500.0" fill="url(#steel)" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="154.0" y="4" width="142.0" height="492.0" fill="#f2f3f5" stroke="#9ca3af" stroke-width="0.6"/>
+<rect x="162.0" y="8" width="126.0" height="8" fill="url(#vent)"/>
+<rect x="150.0" y="500.0" width="150.0" height="25.0" fill="url(#base)" stroke="#111827" stroke-width="0.8"/>
+<text x="225.0" y="-14" font-size="7" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="700">S2</text>
+<rect x="0.0" y="-6" width="300.0" height="6" fill="url(#steelV)" stroke="#6b7280" stroke-width="0.8"/>
+<rect x="6.0" y="425.0" width="288.0" height="67.0" fill="#e5e7eb" stroke="#9ca3af" stroke-width="0.6"/>
+<rect x="10.0" y="437.5" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="286.0" y="439.5" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">L1 50×10</text>
+<rect x="10.0" y="451.25" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="286.0" y="453.25" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">L2 50×10</text>
+<rect x="10.0" y="465.0" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="286.0" y="467.0" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">L3 50×10</text>
+<rect x="10.0" y="478.75" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="286.0" y="480.75" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">N 50×10</text>
+<rect x="34.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<rect x="109.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<rect x="184.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<rect x="259.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<text x="150.0" y="434.0" font-size="5.5" fill="#374151" text-anchor="middle" font-family="sans-serif">BUSBAR CHAMBER · bottom · 4 × 50×10 Cu · 400 A · shared by both faces</text>
+<line x1="6.0" y1="425.0" x2="294.0" y2="425.0" stroke="#111827" stroke-width="2"/>
+<rect x="0.0" y="-40" width="300.0" height="16" rx="3" fill="#1d4ed8"/>
+<text x="150.0" y="-29" font-size="8" fill="#ffffff" text-anchor="middle" font-family="sans-serif" font-weight="700">FACE A · FRONT · 40 consumer meters</text>
+<rect x="10.0" y="20.0" width="130.0" height="72.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="14.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="136.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="14.0" cy="88.0" r="1.3" fill="#9ca3af"/>
+<circle cx="136.0" cy="88.0" r="1.3" fill="#9ca3af"/>
+<text x="134.0" y="87.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">MCB plate 300</text>
+<rect x="18.0" y="45.0" width="114.0" height="2.0" fill="#a0aec0" stroke="#4a5568" stroke-width="0.5"/>
+<use href="#mcb" x="22.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="26.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="34.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="39.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="47.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="51.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="59.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="64.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="72.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="76.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="84.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="89.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="97.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="101.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="109.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="114.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="122.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="126.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="134.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="139.0" y="35.0" width="4.5" height="22.5"/>
+<rect x="18.0" y="77.5" width="114.0" height="2.0" fill="#a0aec0" stroke="#4a5568" stroke-width="0.5"/>
+<use href="#mcb" x="22.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="26.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="34.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="39.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="47.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="51.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="59.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="64.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="72.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="76.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="84.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="89.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="97.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="101.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="109.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="114.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="122.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="126.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="134.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="139.0" y="67.5" width="4.5" height="22.5"/>
+<text x="16.0" y="29.0" font-size="5" fill="#374151" font-family="sans-serif">MCB plate 300 · 20 × 63 A DP · 40/48 modules</text>
+<rect x="13.0" y="34.0" width="22" height="9" rx="2" fill="#ffffff" stroke="#111827" stroke-width="0.6"/><text x="24.0" y="40.8" font-size="5.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">F1–F20</text>
+<rect x="10.0" y="95.0" width="130.0" height="247.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="14.0" cy="99.0" r="1.3" fill="#9ca3af"/>
+<circle cx="136.0" cy="99.0" r="1.3" fill="#9ca3af"/>
+<circle cx="14.0" cy="338.0" r="1.3" fill="#9ca3af"/>
+<circle cx="136.0" cy="338.0" r="1.3" fill="#9ca3af"/>
+<text x="134.0" y="337.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">meter plate 1000</text>
+<use href="#kmeter" x="24.0" y="102.5" width="32.5" height="42.5"/>
+<text x="40.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M1 · Flat 01</text>
+<use href="#kmeter" x="59.0" y="102.5" width="32.5" height="42.5"/>
+<text x="75.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M2 · Flat 02</text>
+<use href="#kmeter" x="94.0" y="102.5" width="32.5" height="42.5"/>
+<text x="110.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M3 · Flat 03</text>
+<use href="#kmeter" x="129.0" y="102.5" width="32.5" height="42.5"/>
+<text x="145.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M4 · Flat 04</text>
+<use href="#kmeter" x="24.0" y="150.0" width="32.5" height="42.5"/>
+<text x="40.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M5 · Flat 05</text>
+<use href="#kmeter" x="59.0" y="150.0" width="32.5" height="42.5"/>
+<text x="75.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M6 · Flat 06</text>
+<use href="#kmeter" x="94.0" y="150.0" width="32.5" height="42.5"/>
+<text x="110.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M7 · Flat 07</text>
+<use href="#kmeter" x="129.0" y="150.0" width="32.5" height="42.5"/>
+<text x="145.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M8 · Flat 08</text>
+<use href="#kmeter" x="24.0" y="197.5" width="32.5" height="42.5"/>
+<text x="40.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M9 · Flat 09</text>
+<use href="#kmeter" x="59.0" y="197.5" width="32.5" height="42.5"/>
+<text x="75.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M10 · Flat 10</text>
+<use href="#kmeter" x="94.0" y="197.5" width="32.5" height="42.5"/>
+<text x="110.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M11 · Flat 11</text>
+<use href="#kmeter" x="129.0" y="197.5" width="32.5" height="42.5"/>
+<text x="145.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M12 · Flat 12</text>
+<use href="#kmeter" x="24.0" y="245.0" width="32.5" height="42.5"/>
+<text x="40.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M13 · Flat 13</text>
+<use href="#kmeter" x="59.0" y="245.0" width="32.5" height="42.5"/>
+<text x="75.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M14 · Flat 14</text>
+<use href="#kmeter" x="94.0" y="245.0" width="32.5" height="42.5"/>
+<text x="110.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M15 · Flat 15</text>
+<use href="#kmeter" x="129.0" y="245.0" width="32.5" height="42.5"/>
+<text x="145.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M16 · Flat 16</text>
+<use href="#kmeter" x="24.0" y="292.5" width="32.5" height="42.5"/>
+<text x="40.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M17 · Flat 17</text>
+<use href="#kmeter" x="59.0" y="292.5" width="32.5" height="42.5"/>
+<text x="75.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M18 · Flat 18</text>
+<use href="#kmeter" x="94.0" y="292.5" width="32.5" height="42.5"/>
+<text x="110.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M19 · Flat 19</text>
+<use href="#kmeter" x="129.0" y="292.5" width="32.5" height="42.5"/>
+<text x="145.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M20 · Flat 20</text>
+<text x="16.0" y="104.0" font-size="5" fill="#374151" font-family="sans-serif">meter plate 1000 · 20 KPLC meters 130×170 · 4 × 5</text>
+<rect x="10.0" y="345.0" width="130.0" height="77.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="14.0" cy="349.0" r="1.3" fill="#9ca3af"/>
+<circle cx="136.0" cy="349.0" r="1.3" fill="#9ca3af"/>
+<circle cx="14.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<circle cx="136.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<text x="134.0" y="417.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">terminal plate</text>
+<rect x="18.0" y="358.75" width="114.0" height="2.0" fill="#a0aec0"/>
+<rect x="20.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="22.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="25.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="28.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="31.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="33.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="36.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="39.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="42.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="44.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="47.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="50.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="53.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="55.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="58.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="61.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="64.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="66.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="69.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="72.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="75.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="77.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="80.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="83.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="86.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="88.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="91.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="94.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="97.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="99.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="102.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="105.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="108.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="110.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="113.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="116.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="119.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="121.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="124.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="127.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="18.0" y="377.5" width="114.0" height="2.0" fill="#a0aec0"/>
+<rect x="20.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="22.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="25.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="28.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="31.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="33.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="36.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="39.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="42.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="44.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="47.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="50.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="53.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="55.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="58.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="61.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="64.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="66.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="69.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="72.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="75.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="77.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="80.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="83.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="86.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="88.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="91.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="94.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="97.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="99.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="102.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="105.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="108.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="110.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="113.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="116.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="119.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="121.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="124.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="127.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<text x="16.0" y="354.0" font-size="5" fill="#374151" font-family="sans-serif">terminals · 40 L + 40 N · 16 mm²</text>
+<rect x="160.0" y="20.0" width="130.0" height="72.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="164.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="286.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="164.0" cy="88.0" r="1.3" fill="#9ca3af"/>
+<circle cx="286.0" cy="88.0" r="1.3" fill="#9ca3af"/>
+<text x="284.0" y="87.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">MCB plate 300</text>
+<rect x="168.0" y="45.0" width="114.0" height="2.0" fill="#a0aec0" stroke="#4a5568" stroke-width="0.5"/>
+<use href="#mcb" x="172.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="176.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="184.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="189.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="197.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="201.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="209.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="214.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="222.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="226.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="234.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="239.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="247.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="251.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="259.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="264.0" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="272.0" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="276.5" y="35.0" width="4.5" height="22.5"/>
+<use href="#mcb" x="284.5" y="35.0" width="4.5" height="22.5"/><use href="#mcb" x="289.0" y="35.0" width="4.5" height="22.5"/>
+<rect x="168.0" y="77.5" width="114.0" height="2.0" fill="#a0aec0" stroke="#4a5568" stroke-width="0.5"/>
+<use href="#mcb" x="172.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="176.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="184.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="189.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="197.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="201.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="209.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="214.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="222.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="226.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="234.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="239.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="247.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="251.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="259.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="264.0" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="272.0" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="276.5" y="67.5" width="4.5" height="22.5"/>
+<use href="#mcb" x="284.5" y="67.5" width="4.5" height="22.5"/><use href="#mcb" x="289.0" y="67.5" width="4.5" height="22.5"/>
+<text x="166.0" y="29.0" font-size="5" fill="#374151" font-family="sans-serif">MCB plate 300 · 20 × 63 A DP · 40/48 modules</text>
+<rect x="163.0" y="34.0" width="22" height="9" rx="2" fill="#ffffff" stroke="#111827" stroke-width="0.6"/><text x="174.0" y="40.8" font-size="5.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">F21–F40</text>
+<rect x="160.0" y="95.0" width="130.0" height="247.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="164.0" cy="99.0" r="1.3" fill="#9ca3af"/>
+<circle cx="286.0" cy="99.0" r="1.3" fill="#9ca3af"/>
+<circle cx="164.0" cy="338.0" r="1.3" fill="#9ca3af"/>
+<circle cx="286.0" cy="338.0" r="1.3" fill="#9ca3af"/>
+<text x="284.0" y="337.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">meter plate 1000</text>
+<use href="#kmeter" x="174.0" y="102.5" width="32.5" height="42.5"/>
+<text x="190.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M21 · Flat 21</text>
+<use href="#kmeter" x="209.0" y="102.5" width="32.5" height="42.5"/>
+<text x="225.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M22 · Flat 22</text>
+<use href="#kmeter" x="244.0" y="102.5" width="32.5" height="42.5"/>
+<text x="260.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M23 · Flat 23</text>
+<use href="#kmeter" x="279.0" y="102.5" width="32.5" height="42.5"/>
+<text x="295.25" y="151.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M24 · Flat 24</text>
+<use href="#kmeter" x="174.0" y="150.0" width="32.5" height="42.5"/>
+<text x="190.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M25 · Flat 25</text>
+<use href="#kmeter" x="209.0" y="150.0" width="32.5" height="42.5"/>
+<text x="225.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M26 · Flat 26</text>
+<use href="#kmeter" x="244.0" y="150.0" width="32.5" height="42.5"/>
+<text x="260.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M27 · Flat 27</text>
+<use href="#kmeter" x="279.0" y="150.0" width="32.5" height="42.5"/>
+<text x="295.25" y="198.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M28 · Flat 28</text>
+<use href="#kmeter" x="174.0" y="197.5" width="32.5" height="42.5"/>
+<text x="190.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M29 · Flat 29</text>
+<use href="#kmeter" x="209.0" y="197.5" width="32.5" height="42.5"/>
+<text x="225.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M30 · Flat 30</text>
+<use href="#kmeter" x="244.0" y="197.5" width="32.5" height="42.5"/>
+<text x="260.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M31 · Flat 31</text>
+<use href="#kmeter" x="279.0" y="197.5" width="32.5" height="42.5"/>
+<text x="295.25" y="246.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M32 · Flat 32</text>
+<use href="#kmeter" x="174.0" y="245.0" width="32.5" height="42.5"/>
+<text x="190.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M33 · Flat 33</text>
+<use href="#kmeter" x="209.0" y="245.0" width="32.5" height="42.5"/>
+<text x="225.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M34 · Flat 34</text>
+<use href="#kmeter" x="244.0" y="245.0" width="32.5" height="42.5"/>
+<text x="260.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M35 · Flat 35</text>
+<use href="#kmeter" x="279.0" y="245.0" width="32.5" height="42.5"/>
+<text x="295.25" y="293.5" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M36 · Flat 36</text>
+<use href="#kmeter" x="174.0" y="292.5" width="32.5" height="42.5"/>
+<text x="190.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M37 · Flat 37</text>
+<use href="#kmeter" x="209.0" y="292.5" width="32.5" height="42.5"/>
+<text x="225.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M38 · Flat 38</text>
+<use href="#kmeter" x="244.0" y="292.5" width="32.5" height="42.5"/>
+<text x="260.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M39 · Flat 39</text>
+<use href="#kmeter" x="279.0" y="292.5" width="32.5" height="42.5"/>
+<text x="295.25" y="341.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">M40 · Flat 40</text>
+<text x="166.0" y="104.0" font-size="5" fill="#374151" font-family="sans-serif">meter plate 1000 · 20 KPLC meters 130×170 · 4 × 5</text>
+<rect x="160.0" y="345.0" width="130.0" height="77.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="164.0" cy="349.0" r="1.3" fill="#9ca3af"/>
+<circle cx="286.0" cy="349.0" r="1.3" fill="#9ca3af"/>
+<circle cx="164.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<circle cx="286.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<text x="284.0" y="417.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">terminal plate</text>
+<rect x="168.0" y="358.75" width="114.0" height="2.0" fill="#a0aec0"/>
+<rect x="170.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="172.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="175.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="178.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="181.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="183.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="186.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="189.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="192.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="194.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="197.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="200.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="203.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="205.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="208.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="211.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="214.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="216.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="219.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="222.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="225.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="227.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="230.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="233.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="236.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="238.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="241.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="244.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="247.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="249.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="252.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="255.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="258.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="260.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="263.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="266.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="269.0" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="271.75" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="274.5" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="277.25" y="355.0" width="1.95" height="10.0" fill="#e2e8f0" stroke="#718096" stroke-width="0.4"/>
+<rect x="168.0" y="377.5" width="114.0" height="2.0" fill="#a0aec0"/>
+<rect x="170.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="172.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="175.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="178.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="181.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="183.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="186.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="189.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="192.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="194.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="197.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="200.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="203.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="205.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="208.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="211.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="214.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="216.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="219.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="222.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="225.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="227.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="230.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="233.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="236.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="238.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="241.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="244.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="247.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="249.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="252.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="255.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="258.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="260.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="263.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="266.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="269.0" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="271.75" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="274.5" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<rect x="277.25" y="373.75" width="1.95" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+<text x="166.0" y="354.0" font-size="5" fill="#374151" font-family="sans-serif">terminals · 40 L + 40 N · 16 mm²</text>
+<rect x="340.0" y="0" width="150.0" height="500.0" fill="url(#steel)" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="344.0" y="4" width="142.0" height="492.0" fill="#f2f3f5" stroke="#9ca3af" stroke-width="0.6"/>
+<rect x="352.0" y="8" width="126.0" height="8" fill="url(#vent)"/>
+<rect x="340.0" y="500.0" width="150.0" height="25.0" fill="url(#base)" stroke="#111827" stroke-width="0.8"/>
+<text x="415.0" y="-14" font-size="7" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="700">S1</text>
+<rect x="490.0" y="0" width="150.0" height="500.0" fill="url(#steel)" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="494.0" y="4" width="142.0" height="492.0" fill="#f2f3f5" stroke="#9ca3af" stroke-width="0.6"/>
+<rect x="502.0" y="8" width="126.0" height="8" fill="url(#vent)"/>
+<rect x="490.0" y="500.0" width="150.0" height="25.0" fill="url(#base)" stroke="#111827" stroke-width="0.8"/>
+<text x="565.0" y="-14" font-size="7" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="700">S2</text>
+<rect x="340.0" y="-6" width="300.0" height="6" fill="url(#steelV)" stroke="#6b7280" stroke-width="0.8"/>
+<rect x="346.0" y="425.0" width="288.0" height="67.0" fill="#e5e7eb" stroke="#9ca3af" stroke-width="0.6"/>
+<rect x="350.0" y="437.5" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="626.0" y="439.5" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">L1 50×10</text>
+<rect x="350.0" y="451.25" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="626.0" y="453.25" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">L2 50×10</text>
+<rect x="350.0" y="465.0" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="626.0" y="467.0" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">L3 50×10</text>
+<rect x="350.0" y="478.75" width="280.0" height="2.0" fill="url(#copper)" stroke="#6b3d12" stroke-width="0.4"/>
+<text x="626.0" y="480.75" font-size="4.5" fill="#fde68a" text-anchor="end" font-family="sans-serif">N 50×10</text>
+<rect x="374.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<rect x="449.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<rect x="524.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<rect x="599.5" y="433.75" width="6" height="50.0" fill="#c7d2fe" stroke="#6366f1" stroke-width="0.5"/>
+<text x="490.0" y="434.0" font-size="5.5" fill="#374151" text-anchor="middle" font-family="sans-serif">BUSBAR CHAMBER · bottom · 4 × 50×10 Cu · 400 A · shared by both faces</text>
+<line x1="346.0" y1="425.0" x2="634.0" y2="425.0" stroke="#111827" stroke-width="2"/>
+<rect x="340.0" y="-40" width="300.0" height="16" rx="3" fill="#1d4ed8"/>
+<text x="490.0" y="-29" font-size="8" fill="#ffffff" text-anchor="middle" font-family="sans-serif" font-weight="700">FACE B · REAR · changeover, main meter, CTs</text>
+<rect x="350.0" y="20.0" width="130.0" height="172.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="354.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="476.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="354.0" cy="188.0" r="1.3" fill="#9ca3af"/>
+<circle cx="476.0" cy="188.0" r="1.3" fill="#9ca3af"/>
+<text x="474.0" y="187.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">changeover plate 700</text>
+<rect x="348.0" y="18.0" width="134.0" height="176.0" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="4 2"/>
+<rect x="345.5" y="15.5" width="5" height="5" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
+<rect x="479.5" y="15.5" width="5" height="5" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
+<rect x="345.5" y="191.5" width="5" height="5" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
+<rect x="479.5" y="191.5" width="5" height="5" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
+<use href="#cho" x="362.5" y="35.0" width="75.0" height="75.0"/>
+<use href="#iso" x="450.0" y="47.5" width="30.0" height="37.5"/>
+<rect x="432.75" y="34.0" width="22" height="9" rx="2" fill="#ffffff" stroke="#111827" stroke-width="0.6"/><text x="443.75" y="40.8" font-size="5.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">Q1</text>
+<rect x="474.0" y="38.5" width="22" height="9" rx="2" fill="#ffffff" stroke="#111827" stroke-width="0.6"/><text x="485.0" y="45.3" font-size="5.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">Q2</text>
+<text x="356.0" y="29.0" font-size="5" fill="#374151" font-family="sans-serif">changeover plate · 400 A changeover + isolator</text>
+<rect x="380.0" y="110.0" width="3.0" height="315.0" fill="url(#copperH)" opacity="0.9"/>
+<rect x="395.0" y="110.0" width="3.0" height="315.0" fill="url(#copperH)" opacity="0.9"/>
+<rect x="410.0" y="110.0" width="3.0" height="315.0" fill="url(#copperH)" opacity="0.9"/>
+<text x="400.0" y="160.0" font-size="4.6" fill="#6b7280" text-anchor="middle" font-family="sans-serif">flexible busbar 3 × 40×5 down to bottom chamber</text>
+<path d="M372.5 31.0 C 372.5 33.25, 372.5 33.25, 372.5 35.5" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M412.5 31.0 C 412.5 33.25, 412.5 33.25, 412.5 35.5" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M382.5 31.0 C 382.5 33.25, 382.5 33.25, 382.5 35.5" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M422.5 31.0 C 422.5 33.25, 422.5 33.25, 422.5 35.5" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M392.5 31.0 C 392.5 33.25, 392.5 33.25, 392.5 35.5" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M432.5 31.0 C 432.5 33.25, 432.5 33.25, 432.5 35.5" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"/>
+<text x="385.0" y="115.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">KPLC in (top)</text>
+<text x="425.0" y="115.0" font-size="4.2" fill="#374151" text-anchor="middle" font-family="sans-serif">GEN in (top)</text>
+<rect x="350.0" y="195.0" width="130.0" height="227.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="354.0" cy="199.0" r="1.3" fill="#9ca3af"/>
+<circle cx="476.0" cy="199.0" r="1.3" fill="#9ca3af"/>
+<circle cx="354.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<circle cx="476.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<text x="474.0" y="417.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">terminal plate</text>
+<rect x="358.0" y="215.0" width="114.0" height="2.0" fill="#a0aec0"/>
+<rect x="362.0" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="373.25" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="384.5" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="395.75" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="407.0" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="418.25" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="429.5" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="440.75" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="452.0" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="463.25" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="474.5" y="207.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<text x="356.0" y="204.0" font-size="5" fill="#374151" font-family="sans-serif">terminals · 95 mm² · KPLC / GEN / PE</text>
+<rect x="500.0" y="20.0" width="130.0" height="147.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="504.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="626.0" cy="24.0" r="1.3" fill="#9ca3af"/>
+<circle cx="504.0" cy="163.0" r="1.3" fill="#9ca3af"/>
+<circle cx="626.0" cy="163.0" r="1.3" fill="#9ca3af"/>
+<text x="624.0" y="162.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">meter plate 600</text>
+<use href="#kmeter3" x="515.0" y="35.0" width="45.0" height="57.5"/>
+<use href="#mfm" x="582.5" y="40.0" width="24.0" height="24.0"/>
+<rect x="582.5" y="75.0" width="45.0" height="15.0" rx="2" fill="#e2e8f0" stroke="#4a5568" stroke-width="0.6"/><text x="605.0" y="83.75" font-size="4.6" fill="#2d3748" text-anchor="middle" font-family="sans-serif">test terminal block</text>
+<rect x="564.0" y="26.0" width="22" height="9" rx="2" fill="#ffffff" stroke="#111827" stroke-width="0.6"/><text x="575.0" y="32.8" font-size="5.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">P1</text>
+<text x="506.0" y="29.0" font-size="5" fill="#374151" font-family="sans-serif">meter plate · KPLC CT meter + MFM · sealable</text>
+<rect x="500.0" y="170.0" width="130.0" height="97.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="504.0" cy="174.0" r="1.3" fill="#9ca3af"/>
+<circle cx="626.0" cy="174.0" r="1.3" fill="#9ca3af"/>
+<circle cx="504.0" cy="263.0" r="1.3" fill="#9ca3af"/>
+<circle cx="626.0" cy="263.0" r="1.3" fill="#9ca3af"/>
+<text x="624.0" y="262.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">CT chamber 400</text>
+<use href="#ct" x="520.0" y="200.0" width="15.0" height="15.0"/>
+<rect x="526.25" y="180.0" width="2.5" height="80.0" fill="url(#copperH)" opacity="0.9"/>
+<use href="#ct" x="557.5" y="200.0" width="15.0" height="15.0"/>
+<rect x="563.75" y="180.0" width="2.5" height="80.0" fill="url(#copperH)" opacity="0.9"/>
+<use href="#ct" x="595.0" y="200.0" width="15.0" height="15.0"/>
+<rect x="601.25" y="180.0" width="2.5" height="80.0" fill="url(#copperH)" opacity="0.9"/>
+<text x="506.0" y="179.0" font-size="5" fill="#374151" font-family="sans-serif">CT chamber · 3 × CT 400/5 on risers · sealable</text>
+<rect x="500.0" y="270.0" width="130.0" height="152.0" fill="url(#cover)" stroke="#9ca3af" stroke-width="0.7" filter="url(#sh)"/>
+<circle cx="504.0" cy="274.0" r="1.3" fill="#9ca3af"/>
+<circle cx="626.0" cy="274.0" r="1.3" fill="#9ca3af"/>
+<circle cx="504.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<circle cx="626.0" cy="418.0" r="1.3" fill="#9ca3af"/>
+<text x="624.0" y="417.0" font-size="4.5" fill="#6b7280" text-anchor="end" font-family="sans-serif">terminal plate</text>
+<rect x="508.0" y="290.0" width="114.0" height="2.0" fill="#a0aec0"/>
+<rect x="512.0" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="523.25" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="534.5" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="545.75" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="557.0" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="568.25" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="579.5" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="590.75" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="602.0" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="613.25" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<rect x="624.5" y="282.5" width="8.75" height="17.5" fill="#e2e8f0" stroke="#718096" stroke-width="0.5"/>
+<text x="506.0" y="279.0" font-size="5" fill="#374151" font-family="sans-serif">terminals · risers to face A · 4 × 70 mm²</text>
+<line x1="0.0" y1="543.0" x2="300.0" y2="543.0" stroke="#374151" stroke-width="0.8"/>
+<line x1="0.0" y1="538.0" x2="0.0" y2="548.0" stroke="#374151" stroke-width="0.8"/>
+<line x1="150.0" y1="538.0" x2="150.0" y2="548.0" stroke="#374151" stroke-width="0.8"/>
+<line x1="300.0" y1="538.0" x2="300.0" y2="548.0" stroke="#374151" stroke-width="0.8"/>
+<text x="75.0" y="555.0" font-size="6" fill="#374151" text-anchor="middle" font-family="sans-serif">600</text>
+<text x="225.0" y="555.0" font-size="6" fill="#374151" text-anchor="middle" font-family="sans-serif">600</text>
+<text x="150.0" y="567.0" font-size="6.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">face A · 1 200 × 2 000 (+100 base)</text>
+<line x1="340.0" y1="543.0" x2="640.0" y2="543.0" stroke="#374151" stroke-width="0.8"/>
+<line x1="340.0" y1="538.0" x2="340.0" y2="548.0" stroke="#374151" stroke-width="0.8"/>
+<line x1="490.0" y1="538.0" x2="490.0" y2="548.0" stroke="#374151" stroke-width="0.8"/>
+<line x1="640.0" y1="538.0" x2="640.0" y2="548.0" stroke="#374151" stroke-width="0.8"/>
+<text x="415.0" y="555.0" font-size="6" fill="#374151" text-anchor="middle" font-family="sans-serif">600</text>
+<text x="565.0" y="555.0" font-size="6" fill="#374151" text-anchor="middle" font-family="sans-serif">600</text>
+<text x="490.0" y="567.0" font-size="6.5" fill="#111827" text-anchor="middle" font-family="sans-serif" font-weight="600">face B · same frame, seen from the back</text>
+<line x1="-14" y1="0.0" x2="-8" y2="0.0" stroke="#6b7280" stroke-width="0.6"/><text x="-17" y="2.0" font-size="5" fill="#6b7280" text-anchor="end" font-family="sans-serif">0</text>
+<line x1="-14" y1="125.0" x2="-8" y2="125.0" stroke="#6b7280" stroke-width="0.6"/><text x="-17" y="127.0" font-size="5" fill="#6b7280" text-anchor="end" font-family="sans-serif">500</text>
+<line x1="-14" y1="250.0" x2="-8" y2="250.0" stroke="#6b7280" stroke-width="0.6"/><text x="-17" y="252.0" font-size="5" fill="#6b7280" text-anchor="end" font-family="sans-serif">1000</text>
+<line x1="-14" y1="375.0" x2="-8" y2="375.0" stroke="#6b7280" stroke-width="0.6"/><text x="-17" y="377.0" font-size="5" fill="#6b7280" text-anchor="end" font-family="sans-serif">1500</text>
+<line x1="-14" y1="500.0" x2="-8" y2="500.0" stroke="#6b7280" stroke-width="0.6"/><text x="-17" y="502.0" font-size="5" fill="#6b7280" text-anchor="end" font-family="sans-serif">2000</text>
+<g transform="translate(690.0 40) scale(0.72)">
+<text x="0" y="-8" font-size="9" fill="#111827" font-family="sans-serif" font-weight="700">PLAN · 1 200 × 600 deep · double-front</text>
+<rect x="0" y="0" width="300.0" height="150.0" fill="#f2f3f5" stroke="#6b7280" stroke-width="1.2"/>
+<line x1="150.0" y1="0" x2="150.0" y2="150.0" stroke="#9ca3af" stroke-width="0.8"/>
+<rect x="6" y="100.0" width="288.0" height="45.0" fill="#fde68a" stroke="#b45309" stroke-width="0.6"/>
+<text x="150.0" y="125.0" font-size="7" fill="#78350f" text-anchor="middle" font-family="sans-serif">FACE A (front) · plates 180 deep · MCB / meters / terminals</text>
+<rect x="6" y="5.0" width="288.0" height="45.0" fill="#fde68a" stroke="#b45309" stroke-width="0.6"/>
+<text x="150.0" y="28.75" font-size="7" fill="#78350f" text-anchor="middle" font-family="sans-serif">FACE B (rear) · plates 180 deep · changeover / main meter / CTs</text>
+<rect x="6" y="50.0" width="288.0" height="50.0" fill="#e5e7eb" stroke="#9ca3af" stroke-width="0.5"/>
+<text x="150.0" y="72.5" font-size="7" fill="#374151" text-anchor="middle" font-family="sans-serif">between faces · 200 mm · risers face B → face A · busbar chamber below (bottom 300)</text>
+<text x="150.0" y="80.0" font-size="6" fill="#6b7280" text-anchor="middle" font-family="sans-serif">both doors open · access from both sides · frame S4-style, own fabrication</text>
+<line x1="314.0" y1="0" x2="314.0" y2="150.0" stroke="#374151" stroke-width="0.8"/><text x="322.0" y="75.0" font-size="6" fill="#374151" text-anchor="middle" font-family="sans-serif" transform="rotate(90 322.0 75.0)">600</text>
+</g>
+<text x="320.0" y="225.0" font-size="6" fill="#6b7280" text-anchor="middle" font-family="sans-serif" transform="rotate(-90 320.0 225.0)">← back to back · 600 deep · busbar at bottom shared →</text>
+        </svg>
+      </div>
+      
+      <div style="width: 300px; border-left: 1px solid #e5e7eb; background: #f9fafb; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; overflow: hidden; font-size: 12px; color: #111827;">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Selected · Q1 · changeover plate · face B</div>
+        <div style="display: grid; grid-template-columns: 96px 1fr; row-gap: 5px; column-gap: 8px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px;">
+          <span style="color:#6b7280;">Kit</span><span>400A-ONLOAD-CHANGEOVER-KIT</span>
+          <span style="color:#6b7280;">Devices</span><span>Changeover 400 A 4P · isolator 400 A</span>
+          <span style="color:#6b7280;">Mounting</span><span>side-by-side plate · face B</span>
+          <span style="color:#6b7280;">Plate height</span><span>700 mm (kit library)</span>
+          <span style="color:#6b7280;">Section</span><span>S1 · face B · plate 1 of 2</span>
+          <span style="color:#6b7280;">Feed</span><span>KPLC + GEN in from top · flexible busbar to bottom chamber</span>
+        </div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Does it fit? · per face</div>
+        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-weight: 700; color: #166534;">Fits — both faces</div>
+          <div style="color: #166534; font-size: 11px;">Face A: 2 × (300 + 1 000 + 340) = 1 640 of 1 640 usable. Face B: S1 700 + 940 · S2 600 + 400 + 640. SPD kit still to place — room on face B S2 meter plate.</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr auto; row-gap: 3px; font-size: 11px;">
+          <span>A · S1 MCB plate</span><span style="text-align:right;">40 / 48 modules</span>
+          <span>A · S1 meter plate</span><span style="text-align:right;">20 / 20 meters</span>
+          <span>A · S2 MCB plate</span><span style="text-align:right;">40 / 48 modules</span>
+          <span>A · S2 meter plate</span><span style="text-align:right;">20 / 20 meters</span>
+          <span>B · S1 changeover plate</span><span style="text-align:right;">700 / 700</span>
+          <span>B · S2 meter + CT</span><span style="text-align:right;">1 000 / 1 640</span>
+          <span>Busbar 400 A</span><span style="text-align:right;">load 348 A · ok</span>
+        </div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Enclosure line in the costing</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; row-gap: 4px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px; font-size: 11px;">
+          <span style="color:#6b7280;">Now in costing</span><span style="text-align:right;">1 × meter board 1200×2000×600</span>
+          <span style="color:#6b7280; font-weight: 700;">From this layout</span><span style="text-align:right; font-weight: 700;">double-front 2 × 600 × 2000 × 600 · fabricated · 2 doors front + 2 rear</span>
+          <span style="color:#6b7280;">Plates</span><span style="text-align:right;">A: 6 · B: 5 · sealable ×2</span>
+        </div>
+        <div style="margin-top: auto; border-radius: 6px; padding: 9px 12px; background: #1d4ed8; color: #ffffff; font-weight: 600; text-align: center;">Apply to enclosure line</div>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; padding: 5px 20px; border-top: 1px solid #e5e7eb; background: #f9fafb; font-size: 11px; color: #6b7280;"><span>Double-front board · face A and face B both editable · 11 of 12 kits placed</span><span>Scale 1 : 4 · 1 px = 4 mm · construction: own fabrication, S4-style frame</span></div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
