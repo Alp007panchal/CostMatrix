@@ -13,6 +13,10 @@
 \set bob    '00000000-0000-0000-0000-0000000000a3'
 \set master '00000000-0000-0000-0000-0000000000a1'
 
+-- The blocker block below writes an approval rule and expects it to refuse a
+-- submission, so it needs the rules engine, which 0116 put behind a switch.
+select test.feature(:'alpha'::uuid, 'approval_rules', true);
+
 -- === The three checks arrive as rows anybody can read =======================
 select test.eq((select count(*)::int from public.compatibility_rules where company_id is null), 3,
   'the three checks the roadmap asks for arrive as three master rows');
@@ -318,4 +322,5 @@ select test.eq((select material_cost from public.v_costing_panel_costs c
                3622781.80, 'and NPP-192 is where it has always been: 3,622,781.80');
 
 -- Leave things as found.
+select test.feature(:'alpha'::uuid, 'approval_rules', false);
 delete from public.costings where id = :'costing_id'::uuid;

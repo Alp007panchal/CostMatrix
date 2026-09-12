@@ -13,6 +13,13 @@
 \set bob    '00000000-0000-0000-0000-0000000000a3'
 \set master '00000000-0000-0000-0000-0000000000a1'
 
+-- Both halves of 0108 are behind switches since 0116, off for every company.
+-- This file is what tests them, so it switches them on and off again at the end.
+select test.feature(:'alpha'::uuid, 'approval_rules', true);
+select test.feature(:'alpha'::uuid, 'quotation_validity', true);
+select test.feature(:'beta'::uuid,  'approval_rules', true);
+select test.feature(:'beta'::uuid,  'quotation_validity', true);
+
 select id as part_id from public.components
  where company_id is null and pricing_mode = 'fixed' and purchase_price is not null
    and not is_placeholder order by code limit 1 \gset
@@ -286,3 +293,7 @@ update public.components set purchase_price = :old_price::numeric where id = :'p
 delete from public.quotation_followups where quotation_id = :'q_sent'::uuid;
 delete from public.quotations where id = :'q_sent'::uuid;
 delete from public.costings where family_id = (select family_id from public.costings where id = :'plain_id'::uuid);
+select test.feature(:'alpha'::uuid, 'approval_rules', false);
+select test.feature(:'alpha'::uuid, 'quotation_validity', false);
+select test.feature(:'beta'::uuid,  'approval_rules', false);
+select test.feature(:'beta'::uuid,  'quotation_validity', false);

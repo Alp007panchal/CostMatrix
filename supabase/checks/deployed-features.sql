@@ -49,7 +49,14 @@ with wanted(feature, kind, name) as (values
   ('F12 dimensions',          'function', 'app.panel_fit'),
   ('2.7 options and extras',  'column',   'public.costings.chosen_option_label'),
   ('2.7 options and extras',  'column',   'public.costing_panels.is_option'),
-  ('3.1 board configurator',  'column',   'public.costing_panels.parameters')
+  ('3.1 board configurator',  'column',   'public.costing_panels.parameters'),
+  ('3.3 parameterised kits',  'table',    'public.kit_parameters'),
+  ('3.3 parameterised kits',  'function', 'app.eval_qty_expression'),
+  ('3.4 compatibility',       'table',    'public.compatibility_rules'),
+  ('3.4 compatibility',       'view',     'public.v_panel_warnings'),
+  ('Feature switches',        'table',    'public.features'),
+  ('Feature switches',        'view',     'public.v_company_features'),
+  ('Feature switches',        'function', 'app.feature_on')
 )
 select
   w.feature,

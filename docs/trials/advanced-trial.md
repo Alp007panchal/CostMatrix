@@ -1,15 +1,15 @@
 # Staging trial — the advanced app, end to end
 
-**Why this exists.** Eleven features went onto the staging app on 12 Sep 2026 and not one of
-them has been driven by a person. Tests prove the arithmetic; they cannot tell you whether a
-screen makes sense, whether a word is wrong, or whether the proposal a configurator makes is
+**Why this exists.** Fifteen features went onto the staging app on 12 Sep 2026, each now behind a
+switch of its own, and not one of them has been driven by a person. Tests prove the arithmetic;
+they cannot tell you whether a screen makes sense, whether a word is wrong, or whether the proposal a configurator makes is
 the board you would have built. That is this hour's job.
 
 `docs/acceptance-test.md` is the other script: the **basic app on production**, which is
 unchanged. This one is only for **staging** (the CostMatrix Staging project, the `advanced`
 branch's preview URL).
 
-**Before you start.** Sign in to the staging app as yourself (master administrator). Have
+**Before you start.** Sign in to the staging app as yourself (master administrator) — §0 needs that role to switch the features on. Have
 `docs/reference/costing-NPP-192-REV1.xlsm` open — several steps compare against it.
 
 **How to note a finding.** Every row in the table at the bottom. Small things count: a word
@@ -18,18 +18,29 @@ between steps; finish the pass, then send the lot.
 
 ---
 
-## 0. Is staging actually carrying all of it? — 3 minutes
+## 0. Is staging carrying all of it, and is any of it switched on? — 6 minutes
 
-Two checks before any clicking, so a missing migration is not mistaken for a broken screen.
+Three things before any clicking, so a missing migration is not mistaken for a broken screen —
+and so an empty menu is not mistaken for a missing feature.
 
 - [ ] Open the staging project's **SQL editor** in Supabase. Open
       `supabase/checks/deployed-features.sql` from the repository, copy the whole file in, run it.
-      **Expect:** about 38 rows, every one `present = true`. A `false` row is a feature whose
+      **Expect:** about 45 rows, every one `present = true`. A `false` row is a feature whose
       migration has not landed — write down which and stop; the rest of this script will fail in
       confusing ways.
-- [ ] Look at the menu across the top. **Expect** these to be there, beside the ones you know:
-      **Sales**, and under the administrator's half: **Price lists**, **Approval rules**,
-      **Compatibility**, **Labour variance**, **Assistant**.
+- [ ] **Every advanced feature now arrives off.** That is deliberate (D-266, and condition 2 of
+      the two-track rule): the app has to be able to reach production looking exactly as it does
+      today. So the menu is short until you say otherwise, and a short menu at this point is the
+      switches working, not a feature missing.
+- [ ] Open **Features** in the top bar. **Expect:** fifteen rows, each with what it does in plain
+      words, every one **off**, and a switch beside each because you are the master administrator.
+      Switch **all fifteen on** — this pass is meant to exercise the lot. Three of them are marked
+      in red as changing what an existing costing does (**Approval rules in force**, **Validity and
+      the nightly sweep**, **Chosen option and optional extras**); switch those on here and note
+      that nothing you have already costed moves.
+- [ ] Look at the menu across the top again. **Expect** these to have appeared: **Sales**, and
+      under the administrator's half: **Price lists**, **Approval rules**, **Compatibility**,
+      **Labour variance**, **Assistant**.
 
 ## 1. A supplier price list — 8 minutes *(roadmap 2.2)*
 

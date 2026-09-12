@@ -208,6 +208,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
     preference is per person in their own browser.
 
+26. **A switch per advanced feature** (advanced track, the road to production) — every feature
+    built since the foundations sits behind a per-company switch that is off by default and only
+    the master administrator can flip, which is condition 2 of the two-track rule and what makes
+    a merge to `main` possible at all. Most switches hide a screen; three gate real behaviour
+    (migration 0117).
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing
@@ -216,7 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| (nothing in hand) | | |
+| 3.1 Guided board configurator (PR 41, migration 0115) | another session | 2026-09-12 |
 
 26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
@@ -230,7 +236,7 @@ the work begins, removed when the pull request opens.
     with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
 
 28. **The staging trial** (advanced track) — `docs/trials/advanced-trial.md`, a click-through for
-    the eleven features now on staging, in the order a real job flows, each step saying what to
+    the fifteen features now on staging, in the order a real job flows, each step saying what to
     expect; and `supabase/checks/deployed-features.sql`, one query the owner pastes into the
     Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 41 so the list
     cannot drift. No application change.
