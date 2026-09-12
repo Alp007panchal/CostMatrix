@@ -180,7 +180,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
-21. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
+21. **The hours that belong to nobody** (advanced track, a gap in 2.8) — where a panel was costed
+    at none of a kind of work there is no estimate to share its recorded hours out in proportion
+    to, so the kit-group report reached none of them and they left no trace. They are now named
+    beside the report, with what usually causes it (migration 0111).
+
+22. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
     and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
     its steps, works its line quantities out from the answers, refuses a formula that is anything
     but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
@@ -194,7 +199,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.2 APFC configurator, then 3.4 compatibility checks | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+| (nothing in hand) | | |
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
