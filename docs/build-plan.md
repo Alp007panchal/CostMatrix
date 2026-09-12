@@ -216,7 +216,8 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| (nothing in hand) | | |
+| A switch per advanced feature, off by default (the road to production) | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+| 3.1 Guided board configurator (PR 41, migration 0115) | another session | 2026-09-12 |
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
