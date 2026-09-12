@@ -623,6 +623,34 @@ matters — new costings use the new figure, and existing costings keep the hour
 group can only be changed by the master administrator; your own company's groups, by your company
 administrator.
 
+### Read the sales reports (phase 3.6)
+
+**Sales**, in the main menu. Everything on it comes from decisions already recorded on enquiries —
+nothing on this screen changes anything, and values are always ex-VAT.
+
+It leads with the **hit rate**: jobs won as a share of jobs *decided*. Jobs still open are not
+counted as losses, and the figure always says what it rests on — *1 of 2 decided* — because a
+100 % hit rate on one job is not a fact about the business. Beside it: what was won and lost in
+money, the **share by value** (one large job outweighs three small ones), and the average days a
+customer takes to decide.
+
+- **Still out there** — every open and quoted enquiry with its value, how long it has been waiting,
+  the offer it is waiting on and how many days that offer has left. An offer past its date says
+  *ran out*.
+- **By customer, by value, by month** — the same hit rate cut three ways, busiest first.
+- **By product group** — by kit group, so you can see which families you win, with the material and
+  hours at stake in each.
+- **Why jobs were lost** — the reasons as they were typed when the enquiry was marked lost,
+  commonest first. This is the one report that is only as good as what gets typed: a reason left
+  blank shows as *no reason recorded*.
+- **Margin quoted, margin achieved** — the same sum with the hours the shop recorded in place of the
+  estimate. A job appears here **only once hours have been recorded against it** (under *Hours
+  actually worked* on the costing), and **Measured** says how much of its labour is fact rather than
+  estimate. Read a row with one eye on that column.
+
+To change the value bands, a company administrator edits `analytics_value_bands` in the company
+options — the default is 500 K / 2 M / 10 M.
+
 ### Configure a standard board from the questions (phase 3.1)
 
 On a panel, **Configure this board**. Answer what the board is, in the order a customer describes it:
