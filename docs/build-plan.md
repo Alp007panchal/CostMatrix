@@ -191,6 +191,11 @@ straight to `main`, reviewed and merged by the owner the same day.
     but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
     unchanged (migration 0112). What 3.2 and 3.1 stand on.
 
+23. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
+    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
+    family of step kit; the engineer edits the quantities and applies, and the steps land as
+    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
+
 25. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
     across and kits and components down, with in-place quantity editing through the same functions as
     the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts

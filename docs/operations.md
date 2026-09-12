@@ -735,6 +735,21 @@ company's own figure; the master admin ticks *master* to change the default for 
 add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
 be saved. New costings use the new figure; existing ones keep what they froze.
 
+### Work out an APFC bank from a target (phase 3.2)
+In a draft costing, on the panel: **Work out an APFC bank**. Type the target in kVAr, choose
+fuse-protected or breaker-protected steps (or leave it to pick), and press *Work it out*. You get
+the steps it proposes — for 400 kVAr, the bank you built on NPP-192: 50×4, 25×4, 12.5×6, 5×5 —
+with the quantities editable. Change any of them; the total follows. **Add** puts them on the
+panel as ordinary kit lines in an *APFC bank* section, priced and frozen like any other kit.
+
+If the sizes in your library cannot reach the target exactly, the card says how far short it is
+rather than quietly rounding. And if you ask for breaker-protected steps today it will tell you
+that every one of those kits still holds a part with no price — those are the eight parts on the
+Components screen waiting for you.
+
+The grading — how much of the target goes into the biggest step, how much into the next — is a
+company setting, so it can be changed without a new version of the app. Ask and I will change it.
+
 ### Read the APFC bank size (session 3)
 A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
 under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.

@@ -18,6 +18,8 @@ import type {
   KeptLine,
   PanelFit,
   PanelSection,
+  ApfcProposal,
+  ApfcStep,
 } from '../../lib/database.types'
 
 /**
@@ -375,4 +377,33 @@ export async function listBomItems(costingId: string): Promise<BomItem[]> {
     .order('code')
   fail('Could not load the bill of materials', error)
   return (data ?? []) as BomItem[]
+}
+
+// --- the APFC bank (roadmap 3.2) ---------------------------------------------
+
+/**
+ * How many of each step kit reach a target kVAr. Reads only: the bank is added
+ * when somebody presses Apply, with whatever quantities are on the screen then.
+ */
+export async function proposeApfc(
+  panelId: string,
+  targetKvar: number,
+  family: string | null,
+): Promise<ApfcProposal> {
+  const { data, error } = await supabase.rpc('propose_apfc', {
+    target_panel: panelId,
+    target_kvar: targetKvar,
+    family,
+  })
+  fail('Could not work out the bank', error)
+  return data as ApfcProposal
+}
+
+/** Adds the steps as ordinary kit lines, in one go, into the APFC bank section. */
+export async function applyApfcSteps(panelId: string, steps: ApfcStep[]): Promise<void> {
+  const { error } = await supabase.rpc('apply_apfc_steps', {
+    target_panel: panelId,
+    steps,
+  })
+  fail('Could not add the bank', error)
 }
