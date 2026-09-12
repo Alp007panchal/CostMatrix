@@ -166,7 +166,7 @@ comes next rather than in its numbered place.
 
 | # | Feature | Borrowed from |
 |---|---|---|
-| 4.1 | Busbar run calculator (the `CU-OPT1` logic, reference §1.4) as an optional way to fill busbar kit parameters | Current workbook |
+| 4.1 ✅ | **Busbar run calculator** (built 2026-09-12, migration 0118): the `CU-OPT1` logic of reference §1.4 — a run a row, metres and kilograms by bar size, bar sizes read from the library's own kits, a starting schedule from the board's parameters, and the schedule compared with the metres actually costed. Applied as busbar lines rather than into a kit parameter: no kit in the library asks for its metres yet (decision 12), and the same figure is what such a parameter would be answered with | Current workbook |
 | 4.2 | ~~Enclosure fill/space check from component dimensions in `attributes`~~ — **brought forward**: the dimensions are F12 and the check is 3.8 | Rittal RiPanel |
 | 4.3 | Technical offer export to Word/EPLAN-compatible parts list; import of EPLAN project metadata (project name, drawing numbers) onto the costing | EPLAN |
 | 4.4 | Email sending from the app, e-signature on quotations, customer portal for external buyers to view and accept | CPQ |

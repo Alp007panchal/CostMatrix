@@ -1272,3 +1272,80 @@ export interface CompanyOption {
   value: unknown
   value_type: 'boolean' | 'number' | 'text' | 'json'
 }
+
+// --- the busbar run calculator (roadmap 4.1) -------------------------------
+
+/** One copper bar size, as v_busbar_bars sees it. */
+export interface BusbarBar {
+  id: string
+  code: string
+  width_mm: number | null
+  thickness_mm: number | null
+  area_mm2: number | null
+  kg_per_metre: number | null
+  price_per_metre: number | null
+  is_priced: boolean
+}
+
+/** One bar run: the workbook's CU-OPT1 row. */
+export interface BusbarRun {
+  label: string
+  bar_code: string
+  phases: number
+  runs_per_phase: number
+  length_m: number
+  sets: number
+  /** What the formula gives. Filled in by the database; absent on a row being typed. */
+  metres?: number
+}
+
+/** The metres, kilograms and value of one bar size across a schedule. */
+export interface BusbarBarTotal {
+  bar_code: string
+  kg_per_metre: number | null
+  price_per_metre: number | null
+  metres: number
+  kg: number | null
+  value: number | null
+  is_priced: boolean
+}
+
+/** What app.busbar_run_totals answers. */
+export interface BusbarTotals {
+  runs: BusbarRun[]
+  bars: BusbarBarTotal[]
+  total_metres: number
+  total_kg: number
+  total_value: number
+  /** Named bars with no price behind them, or null when every bar is priced. */
+  unpriced_bars: string | null
+}
+
+/** What app.starting_busbar_runs answers: a schedule to correct, not a measurement. */
+export interface BusbarStart {
+  panel_id: string
+  panel: string
+  runs: BusbarRun[]
+  totals: BusbarTotals
+  note: string
+}
+
+/** A row of v_panel_busbar_check: asked for against costed. */
+export interface BusbarCheckRow {
+  panel_id: string
+  bar_code: string
+  scheduled_m: number
+  costed_m: number
+  difference_m: number
+  kg_per_metre: number | null
+  scheduled_kg: number | null
+}
+
+/** What app.apply_busbar_runs answers. */
+export interface BusbarApplied {
+  panel_id: string
+  section: string
+  sizes: number
+  metres: number
+  replaced: number
+}

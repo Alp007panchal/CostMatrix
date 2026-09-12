@@ -56,7 +56,13 @@ with wanted(feature, kind, name) as (values
   ('3.4 compatibility',       'view',     'public.v_panel_warnings'),
   ('Feature switches',        'table',    'public.features'),
   ('Feature switches',        'view',     'public.v_company_features'),
-  ('Feature switches',        'function', 'app.feature_on')
+  ('Feature switches',        'function', 'app.feature_on'),
+  ('4.1 busbar runs',         'view',     'public.v_busbar_bars'),
+  ('4.1 busbar runs',         'view',     'public.v_panel_busbar_runs'),
+  ('4.1 busbar runs',         'view',     'public.v_panel_busbar_check'),
+  ('4.1 busbar runs',         'function', 'app.busbar_run_totals'),
+  ('4.1 busbar runs',         'function', 'app.starting_busbar_runs'),
+  ('4.1 busbar runs',         'function', 'app.apply_busbar_runs')
 )
 select
   w.feature,

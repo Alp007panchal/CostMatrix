@@ -241,10 +241,16 @@ the work begins, removed when the pull request opens.
     Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 41 so the list
     cannot drift. No application change.
 
+30. **The busbar run calculator** (advanced track, roadmap 4.1) — the owner's `CU-OPT1` sheet in the
+    app: a run a row at `phases × runs per phase × length × sets`, totals per bar size in metres,
+    kilograms and money, bar sizes read from his own kits, a starting schedule built from the
+    board's parameters, and the schedule set beside the metres the panel is actually costed at
+    (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
-30. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
     migrations to a database already at 0017 and already full of rows, refusing any figure that
     moves (in CI on every pull request), a go-live section in the runbook, and then the release
     itself: one pull request from `advanced` into `main`, every feature off.

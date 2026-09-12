@@ -1,6 +1,6 @@
 # Staging trial — the advanced app, end to end
 
-**Why this exists.** Fifteen features went onto the staging app on 12 Sep 2026, each now behind a
+**Why this exists.** Sixteen features went onto the staging app on 12 Sep 2026, each behind a
 switch of its own, and not one of them has been driven by a person. Tests prove the arithmetic;
 they cannot tell you whether a screen makes sense, whether a word is wrong, or whether the proposal a configurator makes is
 the board you would have built. That is this hour's job.
@@ -25,16 +25,16 @@ and so an empty menu is not mistaken for a missing feature.
 
 - [ ] Open the staging project's **SQL editor** in Supabase. Open
       `supabase/checks/deployed-features.sql` from the repository, copy the whole file in, run it.
-      **Expect:** about 45 rows, every one `present = true`. A `false` row is a feature whose
+      **Expect:** about 50 rows, every one `present = true`. A `false` row is a feature whose
       migration has not landed — write down which and stop; the rest of this script will fail in
       confusing ways.
 - [ ] **Every advanced feature now arrives off.** That is deliberate (D-266, and condition 2 of
       the two-track rule): the app has to be able to reach production looking exactly as it does
       today. So the menu is short until you say otherwise, and a short menu at this point is the
       switches working, not a feature missing.
-- [ ] Open **Features** in the top bar. **Expect:** fifteen rows, each with what it does in plain
+- [ ] Open **Features** in the top bar. **Expect:** sixteen rows, each with what it does in plain
       words, every one **off**, and a switch beside each because you are the master administrator.
-      Switch **all fifteen on** — this pass is meant to exercise the lot. Three of them are marked
+      Switch **all sixteen on** — this pass is meant to exercise the lot. Three of them are marked
       in red as changing what an existing costing does (**Approval rules in force**, **Validity and
       the nightly sweep**, **Chosen option and optional extras**); switch those on here and note
       that nothing you have already costed moves.
@@ -67,7 +67,7 @@ The space check stays silent until things have been measured, so measure enough 
 - [ ] `data/seed/dimensions-template.csv` in the repository is the bulk way in, with every part
       number already listed — for later, not now.
 
-## 3. One job, configured from the questions — 15 minutes *(roadmap 3.1, 3.2, 3.3, 3.4)*
+## 3. One job, configured from the questions — 20 minutes *(roadmap 3.1, 3.2, 3.3, 3.4, 4.1)*
 
 - [ ] **Enquiries → New**: the customer, the job title. Then **New costing** against it.
 - [ ] Add a panel. In the panel, **Configure this board**. Answer it as you would describe the
@@ -92,6 +92,19 @@ The space check stays silent until things have been measured, so measure enough 
       ask for it and to show the line quantities it works out from your answer.
 - [ ] **Expect** a space line on the panel now that you have measured a cubicle: *fits*, *tight* or
       *will not fit*, with the percentage. It changes no price — it is advice.
+- [ ] **Work out the busbar runs** on the same panel *(roadmap 4.1)* — this is your `CU-OPT1` sheet.
+      Press **Start from this board**. **Expect:** the runs a board like this needs, named, with the
+      bar sizes your own kits use at those ratings, and a line saying the lengths are your usual
+      figures rather than a measurement. Correct two lengths against a real drawing and watch the
+      metres and kilograms follow as you type.
+- [ ] **Save the schedule.** **Expect the costing's total not to move by one shilling** — a schedule
+      is a calculation, not a line. Then **Add these as busbar lines**: now the copper is in the
+      price, in a *Busbar* section. Press it a second time and **expect a refusal**, not doubled
+      metres.
+- [ ] Compare the totals with the `CU-OPT1` sheet of your own workbook if the board is similar:
+      70.4 m of 50×10 and 95.3 m of 20×10 were what it worked out for NPP-192, against the 30 and 77
+      the estimate carried. The card names that gap when the panel already holds busbar — tell me if
+      the sentence reads wrongly.
 
 ## 4. The same costing as a grid — 8 minutes *(roadmap 2.9)*
 
