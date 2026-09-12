@@ -5,7 +5,7 @@
 -- migration has not reached this project, whatever the deploy log said — the app
 -- will show the screen and the screen will fail when it calls the missing piece.
 --
--- It is also `supabase/tests/40_deployed_features.sql`, so CI fails if a migration
+-- It is also `supabase/tests/41_deployed_features.sql`, so CI fails if a migration
 -- ever stops providing one of these. One list, two uses.
 
 -- A temporary view, so the same file can both print the answer for a person and be
