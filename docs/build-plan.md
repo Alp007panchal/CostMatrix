@@ -196,6 +196,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     family of step kit; the engineer edits the quantities and applies, and the steps land as
     ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
 
+24. **Compatibility checks** (advanced track, roadmap 3.4) — three questions asked of every panel
+    as rows anybody can read: will that device go into that cubicle, does that part belong to that
+    device, do the outgoing ways add up against the incomer. Warnings under the panel name, a
+    screen to change or silence each check, and a blocker an approval rule can act on
+    (migration 0114). Advisory: no price, hour or total moves.
+
 25. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
     across and kits and components down, with in-place quantity editing through the same functions as
     the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts
@@ -216,7 +222,7 @@ the work begins, removed when the pull request opens.
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
     correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
     then applied through the ordinary kit function with the answers frozen on the panel
-    (migration 0114). Standard boards in minutes; non-standard ones still kit by kit.
+    (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

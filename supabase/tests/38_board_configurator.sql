@@ -1,4 +1,4 @@
--- The guided board configurator (migration 0114, roadmap 3.1). Runs after 14, so
+-- The guided board configurator (migration 0115, roadmap 3.1). Runs after 14, so
 -- the kits are the owner's own 296 and the choices are made from a real library.
 --
 -- The answers under test are a board the owner would recognise: 1250 A ACB

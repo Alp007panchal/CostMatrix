@@ -2,6 +2,7 @@ import { supabase } from '../../lib/supabase'
 import { functionErrorMessage } from '../../lib/errors'
 import type {
   ApprovalRule,
+  CompatibilityRule,
   Company,
   CompanySettings,
   PersonWithRoles,
@@ -255,6 +256,32 @@ export async function removeFooterLogo(id: string): Promise<void> {
  * by a company administrator; read by everybody, because the costing screen
  * explains itself with them.
  */
+/**
+ * The compatibility checks in force for this company: the master rules everybody
+ * gets, and any the company has written for itself (roadmap 3.4).
+ */
+export async function listCompatibilityRules(): Promise<CompatibilityRule[]> {
+  const { data, error } = await supabase
+    .from('compatibility_rules')
+    .select('*')
+    .order('sort_order')
+    .order('name')
+  fail('Could not load the compatibility checks', error)
+  return (data ?? []) as CompatibilityRule[]
+}
+
+/**
+ * Change one rule. Who may is the database's decision, not this screen's: a
+ * master rule is the master administrator's, a company's own is its admin's.
+ */
+export async function saveCompatibilityRule(
+  id: string,
+  changes: Partial<Pick<CompatibilityRule, 'params' | 'severity' | 'is_active' | 'message' | 'sort_order'>>,
+): Promise<void> {
+  const { error } = await supabase.from('compatibility_rules').update(changes).eq('id', id)
+  fail('Could not save the check', error)
+}
+
 export async function listApprovalRules(companyId: string): Promise<ApprovalRule[]> {
   const { data, error } = await supabase
     .from('approval_rules')
