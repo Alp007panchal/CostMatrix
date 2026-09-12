@@ -235,6 +235,12 @@ the work begins, removed when the pull request opens.
     heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
     with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
 
+28. **The staging trial** (advanced track) — `docs/trials/advanced-trial.md`, a click-through for
+    the fifteen features now on staging, in the order a real job flows, each step saying what to
+    expect; and `supabase/checks/deployed-features.sql`, one query the owner pastes into the
+    Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 41 so the list
+    cannot drift. No application change.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
