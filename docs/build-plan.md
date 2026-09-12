@@ -216,7 +216,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| The staging trial script for the advanced app, and the deployed-features check | session_01V2JYoFAXHLt58eBvbV8woQ | 2026-09-12 15:45 UTC |
+| (nothing in hand) | | |
 
 26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
@@ -228,6 +228,12 @@ the work begins, removed when the pull request opens.
     by customer, value band, month and product group, why jobs were lost in the words they were
     heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
     with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
+
+28. **The staging trial** (advanced track) — `docs/trials/advanced-trial.md`, a click-through for
+    the eleven features now on staging, in the order a real job flows, each step saying what to
+    expect; and `supabase/checks/deployed-features.sql`, one query the owner pastes into the
+    Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 40 so the list
+    cannot drift. No application change.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
