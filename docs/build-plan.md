@@ -222,6 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
+| 3.8 panel layout: the spec and the kit fields (no canvas) | `claude/advanced-p38-layout-fields` | 2026-09-12 17:40 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
