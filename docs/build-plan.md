@@ -216,7 +216,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| (nothing in hand) | | |
+| 4.1 busbar run calculator (advanced) | `claude/advanced-p41-busbar-run` | 2026-09-12 16:00 |
 
 26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
