@@ -180,6 +180,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
+21. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
+    across and kits and components down, with in-place quantity editing through the same functions as
+    the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts
+    and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
+    preference is per person in their own browser.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
