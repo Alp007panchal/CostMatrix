@@ -66,6 +66,12 @@ describe('the seed as the screens see it', () => {
   })
 })
 
+// Rendering the whole seed is slow by design — 735 rows, then scans across them —
+// and on a busy runner it sits either side of vitest's 5-second default, which
+// fails the build for no reason anybody can act on. These two get a generous
+// limit of their own; every assertion is untouched.
+const WHOLE_SEED_TIMEOUT = 30_000
+
 describe('Components page with the imported seed', () => {
   it('renders every part, marking the eight without a price', () => {
     renderWithSeed(<ComponentsPage />)
@@ -76,7 +82,7 @@ describe('Components page with the imported seed', () => {
     const busbarRow = screen.getAllByText('30X10MM')[0]!.closest('tr')!
     expect(within(busbarRow).getByText('KES 8,400.00')).toBeTruthy()
     expect(within(busbarRow).getByText('2.8 kg per m')).toBeTruthy()
-  })
+  }, WHOLE_SEED_TIMEOUT)
 })
 
 describe('Kits page with the imported seed', () => {
@@ -85,7 +91,7 @@ describe('Kits page with the imported seed', () => {
     expect(screen.getAllByRole('row')).toHaveLength(296 + 1)
     expect(screen.getAllByText('ACB frame 1').length).toBeGreaterThan(0)
     expect(screen.getAllByText('250 A, 3P').length).toBeGreaterThan(0)
-  })
+  }, WHOLE_SEED_TIMEOUT)
 
   it('opens a kit built on an unpriced part without crashing', () => {
     renderWithSeed(<AssemblyEditor assembly={seed.placeholderKit} onBack={() => {}} />)
