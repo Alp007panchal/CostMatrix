@@ -180,6 +180,11 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
+21. **The hours that belong to nobody** (advanced track, a gap in 2.8) — where a panel was costed
+    at none of a kind of work there is no estimate to share its recorded hours out in proportion
+    to, so the kit-group report reached none of them and they left no trace. They are now named
+    beside the report, with what usually causes it (migration 0111).
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
