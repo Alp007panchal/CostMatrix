@@ -216,7 +216,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| (nothing in hand) | | |
+| The staging trial script for the advanced app, and the deployed-features check | session_01V2JYoFAXHLt58eBvbV8woQ | 2026-09-12 15:45 UTC |
 
 26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
