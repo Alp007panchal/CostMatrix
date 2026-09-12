@@ -9,6 +9,7 @@ import { ComponentPicker } from './ComponentPicker'
 import { KitDetailsForm } from './KitDetailsForm'
 import { setLineFormula, setMainDevice } from './kits-api'
 import { KitParametersCard } from './KitParametersCard'
+import { useFeatures } from '../admin/use-features'
 import { addAssemblyComponent, clearCompanyAssemblyHours, listAssemblyComponents, listAssemblyHours, listComponentPrices, removeAssemblyComponent, setAssemblyComponentQuantity, setAssemblyHours, setCompanyAssemblyHours } from './api'
 import { listLabourRates } from './rates-api'
 
@@ -28,6 +29,7 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
   const isMaster = assembly.company_id === null
   const isCompanyAdmin = hasRole('company_admin')
   const canEditContents = isMaster ? isMasterAdmin : isCompanyAdmin && assembly.company_id === company?.id
+  const { on } = useFeatures()
   const canOverrideHours = isMaster && isCompanyAdmin && !isMasterAdmin
 
   const lines = useQuery({
@@ -268,7 +270,7 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
         )}
       </div>
 
-      <KitParametersCard assemblyId={assembly.id} canEdit={canEditContents} />
+      {on('kit_parameters') && <KitParametersCard assemblyId={assembly.id} canEdit={canEditContents} />}
 
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Labour, in hours</h2>

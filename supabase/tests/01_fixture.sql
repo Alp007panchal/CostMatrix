@@ -81,6 +81,24 @@ insert into public.profiles (id, company_id, full_name, email, is_master_admin, 
   ('00000000-0000-0000-0000-0000000000a4', '00000000-0000-0000-0000-0000000000c2', 'Carol Costing', 'carol@alpha.test',       false, true),
   ('00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000c2', 'Dan Departed',  'dan@alpha.test',         false, false);
 
+-- Switch an advanced feature on or off for a company (0117). Called from a test
+-- as the database owner, outside any signed-in block: the trigger that reserves
+-- a feature switch for the master administrator lets a migration or a fixture
+-- through, and this is a fixture. A test that exercises a gated feature switches
+-- it on at the top of the file and off again at the end, the way 28 leaves the
+-- measurements it made.
+create or replace function test.feature(company uuid, feature_code text, is_on boolean default true)
+returns void language plpgsql as $$
+declare k text;
+begin
+  select f.option_key into k from public.features f where f.code = feature_code;
+  if k is null then raise exception 'no such feature: %', feature_code; end if;
+  insert into public.company_options (company_id, key, value, value_type)
+  values (company, k, to_jsonb(is_on), 'boolean')
+  on conflict (company_id, key) do update set value = to_jsonb(is_on);
+end;
+$$;
+
 insert into public.user_roles (user_id, company_id, role) values
   ('00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-0000000000c2', 'company_admin'),
   ('00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-0000000000c2', 'approver'),
