@@ -111,6 +111,24 @@ export function seedFixtures(): SeedFixtures {
       unit: isBusbar || isCable ? 'm' : (r['unit'] ?? '') || 'pcs',
       manufacturer: (r['brand'] ?? '') || null,
       part_number: null,
+      // added by migration 0100 (foundations F1): every one optional, and the
+      // owner's seed fills none of them.
+      supplier: null,
+      attributes: {},
+      replaced_by: null,
+      datasheet_url: null,
+      lead_time_days: null,
+      price_valid_from: null,
+      price_source: null,
+      // Foundations F12: nothing in the seed is measured yet.
+      width_mm: null,
+      height_mm: null,
+      depth_mm: null,
+      mounting_type: null,
+      clearances: {},
+      weight_kg: null,
+      enclosure_layout: {},
+      status: price == null && !isBusbar ? 'placeholder' : 'active',
       pricing_mode: isBusbar ? 'weight_rate' : 'fixed',
       purchase_currency: isBusbar ? 'KES' : (r['purchaseCurrency'] ?? '') || 'EUR',
       weight_per_unit: weight,
@@ -168,6 +186,17 @@ export function seedFixtures(): SeedFixtures {
         description: null,
         kit_group_id: groupIdFor(tpl?.group ?? row['kitGroup'] ?? 'Other'),
         is_active: true,
+        // added by migration 0100 (foundations F2)
+        version: 1,
+        customer_wording: null,
+        tags: [],
+        compatibility_rules: {},
+        status: 'active',
+        // added by migration 0106 (foundations F12): no kit overrides its
+        // footprint until somebody measures one.
+        footprint_w_mm: null,
+        footprint_h_mm: null,
+        footprint_d_mm: null,
         ...parseKitName(name),
       }
       assemblies.push(kit)
@@ -181,6 +210,7 @@ export function seedFixtures(): SeedFixtures {
       id: `${kit.id}-l${lines.length + 1}`,
       assembly_id: kit.id,
       component_id: part.id,
+      qty_expression: null,
       quantity: Number(row['quantity'] ?? '1'),
       is_main_device: (template.get(name)?.main ?? '').toUpperCase() === part.code.toUpperCase(),
       sort_order: lines.length + 1,

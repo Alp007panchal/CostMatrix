@@ -235,6 +235,62 @@ Three things it says, rather than failing silently:
 If somebody reports "No such page" after following a link, the deployment they landed on is older
 than September 2026 — the page did not exist before then, and the link pointed at nothing.
 
+### B9d. Files on an enquiry or a costing, and their text
+
+Both the enquiry page and the costing page have a **Files** card. Anything attached there is kept
+in the app's private storage, visible only to your company, and opened through a link that lasts
+a few minutes.
+
+Each file also has its **text read**, so the assistant can use it later without being handed the
+PDF: the **Text** column says *waiting*, *read*, *not readable* (only PDF, Word, Excel and plain
+text are read) or *could not read*, with a **retry** button. Nothing in the app depends on the
+text having been read; it is for the assistant.
+
+Reading happens on Supabase, in the `extract-document` function. Like the other two functions it
+deploys to production automatically when it changes on `main`. On staging, re-run **Create
+staging project**, which deploys every function.
+
+### B9e. The assistant (advanced app only)
+
+On the advanced app — the `advanced` preview, not production — the enquiry page and the costing
+page have an **Assistant** card under the Files card. It is closed until you press **Open**.
+
+What you can ask it, from the buttons above the box:
+
+| Button | What it does |
+|---|---|
+| **Draft this costing from the attached documents** | Reads every attached file, works out the boards and their parameters, and proposes panel lines from your own kits. Greyed out until something is attached. |
+| **Review before submission** | Checks the costing against the documents and your company's policy and writes findings, most serious first. |
+| **What kits match a 630 A outgoer?** | An ordinary question about this costing and your library. |
+
+It **proposes; it never changes anything.** A proposal appears as a card under the conversation:
+
+- Every line shows the kit it proposes, the quantity, the sentence from the document it came from,
+  and how sure it is. **High** and **Medium** start accepted; **Low** starts rejected, because a
+  Low line is its nearest guess.
+- **Accept**, **Change** (choose another kit) or **Reject** each line, and edit any quantity.
+- The button says how many lines it will apply. Pressing it adds them exactly as if you had picked
+  them yourself: same prices, same freeze, same totals. Each one is marked as having come from the
+  assistant, and the costing's history says who applied it.
+- Items it could not match are listed underneath, with a link to create a placeholder part.
+- A review's findings each offer **Apply this fix** where a one-click fix is possible.
+
+If it cannot answer, the card says why and what to do. The four you are most likely to see:
+
+| What it says | What to do |
+|---|---|
+| The Anthropic account has no credit left | Top it up at console.anthropic.com → Billing. Nothing in CostMatrix needs changing. |
+| Anthropic refused the key | Check `ANTHROPIC_API_KEY` in the Supabase project's Edge Function secrets. |
+| The model it is set to use does not exist | Check `AI_MODEL` and `AI_MODEL_FAST` on the function. |
+| The assistant is switched off for your company | The master administrator switches it on (below). |
+
+**Assistant** in the top navigation (company administrators) holds the switch, the monthly token
+budget, the two thresholds a review uses, and the usage: tokens by month, who used it this month,
+and what it has cost. Only the master administrator can switch it on or off; the thresholds and the
+budget are the company administrator's. A rough guide: drafting from a ten-page specification costs
+about 30,000 to 60,000 tokens, a review 10,000 to 20,000 — cents, not pounds — and the assistant
+warns at 80 % of the budget and stops at 100 %.
+
 ### B9b. Turn on two-factor authentication
 
 Not required to finish setup, so skip the prompts if they interrupt you — but do it before real
@@ -390,7 +446,34 @@ reset from Supabase → Authentication → Users.
 Existing costings do not change: their prices were frozen when they were built. Only new
 costings pick up the new discount. This is deliberate.
 
-### Update prices from a supplier (slice 1)
+### Update prices from a supplier's price list (phase 2.2)
+
+The way to re-price from a list the supplier sent you, in their format. **Price lists** in the
+menu (administrators only).
+
+1. **Price lists** → choose the file. CSV, Excel and PDF all work; a PDF is uploaded, its text is
+   read, and the rows it found are shown — check for rows it missed, since a PDF is read line by
+   line.
+2. If you are the master administrator, tick **Price the master catalogue** for the shared
+   catalogue, or leave it clear to price your own company's private parts.
+3. Say which column is the **part number** and which is the **price**. The app guesses from the
+   column names; correct it if the guess is wrong. Currency, make and description are optional.
+4. Press **See what … rows would change**. Nothing has been saved at this point, and nothing will
+   be until step 6.
+5. Read the review:
+   - **Price changes** — the part, how it was matched, the price it has now, the price the
+     supplier asks, and the percentage. A part that had no price at all is marked *was unpriced*.
+   - **Needs a person** — a reference the library does not have ("add the part first"), a
+     reference two parts answer to, a busbar size (priced by weight, so change the copper rate
+     instead), a cell that is not a price, or a currency with no landed factor.
+   - A line saying how many rows already match the price you have.
+6. Tick the rows you believe and **Accept … ticked**, or **Accept all**. Each accepted price is
+   dated from the list, records the supplier as its source, and appears in that part's price
+   history. **Discard this upload** throws the whole thing away and changes nothing.
+
+Old costings never move: every price on a costing was frozen when the line was added.
+
+### Update prices from a spreadsheet of our own (slice 1)
 Prices are entered as the supplier charges them, in the supplier's currency (the *Purchase*
 column); the app lands them in KES with the currency factors and shows *Your price*.
 1. Library → Components → **Download Excel**.
@@ -400,6 +483,67 @@ column); the app lands them in KES with the currency factors and shows *Your pri
 5. Confirm. Every price change is recorded with your name and the time.
 
 Uploads never delete anything. To remove a component, deactivate it on its own screen.
+
+### Measure the parts, so the app can warn about space (F12)
+
+Optional, and useful once you have a cubicle drawing to hand. Nothing breaks while parts are
+unmeasured; the space line on a costing panel simply stays quiet.
+
+**One part at a time:** Components → open a part → **Size and mounting…** → width, height and
+depth in millimetres, what it mounts on, what it weighs, and the clearances the maker asks for
+around it. For an enclosure cubicle the same panel also asks for the **usable area inside it**, the
+busbar and cable chamber sizes, and the form it is built to.
+
+**Many parts at once:** ask me to regenerate `data/seed/dimensions-template.csv` (it already lists
+all 735 part numbers with their descriptions), fill in the columns you know in Excel, save as CSV,
+then Import → **step 4, Dimensions**. It changes nothing but the measurements — never a price or a
+category — blank rows count as "not done yet", and re-generating the file keeps what you typed.
+
+**A kit's footprint:** Kits → open a kit → the three footprint boxes. Leave them blank unless the
+kit takes more room than its main device and clearances, for instance accessories mounted beside it.
+
+**What it buys you:** once the kits on a panel and the cubicles costed for it are both measured, the
+panel shows one line — how full the board is, or that it will not fit with a suggestion to add a
+cubicle. The figure includes a safety factor of 1.3 for wiring and access, which a company
+administrator can change. It is a warning only: it changes no price, and the real arrangement comes
+with the layout canvas later.
+
+### Decide when a costing needs an approver (phase 2.5)
+
+**Approval rules** in the menu (administrators only). Rules are read top to bottom and the first
+one whose conditions **all** hold decides what happens when a costing is submitted.
+
+Every company starts with one rule, *Always require an approver*, which is what the app did before
+rules existed. Leave it alone and nothing changes.
+
+A rule can test the job total, either margin, the profit margin, whether anything on it has no
+price, how many such parts there are, how old the prices are, and the revision number. It can then:
+
+| Outcome | What happens |
+|---|---|
+| Approve it automatically | Submitting approves it; nobody is asked. The history records which rule did it, and no name goes in the approver's place, because no person approved it. |
+| An approver must approve it | What happens today. |
+| Only the master administrator may approve it | For the largest jobs. Note this means a master administrator **of your own company**; for another company's costing nobody can satisfy it, because the master administrator's access there is read-only. |
+| It cannot be submitted at all | The engineer is told which rule stopped it, and fixes the costing. |
+
+Put the narrow rules first: a rule that blocks unpriced parts is useless below one that approves
+everything small. Each costing shows an **Approval** card saying which rule decided and, when you
+have written rules of your own, every rule with the figures it looked at.
+
+### When a quotation runs out (phase 2.6)
+
+Each quotation carries a validity date, set when it was released from your company's validity days.
+The app checks every night: one whose date has passed while it was still released or sent is marked
+as run out, and if it had actually been **sent** to the customer a follow-up is raised for somebody
+to chase it. The status does not change — an expired quotation can still be won.
+
+- The **Quotations** screen shows *Valid for 20 more days*, *Runs out today* or *Ran out 3 days ago*
+  under each one, and has a **Check what has run out** button for anybody who does not want to wait
+  for the night.
+- To quote the same job again at current prices: open the approved costing and press **Re-issue at
+  today's prices**. That makes a new revision with every line priced again — what could not be
+  re-priced is named — and leaves the approved revision exactly as it was agreed. Check it, submit,
+  approve and release as usual.
 
 ### Change your own company's margins, VAT or currency
 **Company** → change the fields → Save. The screen shows the markup each margin implies, since
@@ -445,11 +589,175 @@ the same costing (a second, near-identical board) or into another of your open d
 A copy is not a revision. A revision is another version of the *same* job, keeps the number and
 supersedes the one before it; a copy is a *different* job that happens to start from this one.
 
+### Record the hours a job actually took, and fix the standards (phase 2.8)
+
+**On the costing, under “Hours actually worked”.** Press *Show*. The table compares what the costing
+was priced on, panel by panel and process by process, with what the shop floor took. To file hours:
+choose the panel, choose the process, type the hours, add a note such as *week 32* if you like, and
+press *Record these hours*. Hours can be filed a week at a time — they are added up — and a wrong
+entry is corrected by pressing *Remove* beside it in the list underneath.
+
+This works on an approved costing, which is the point: the boards are built after the quotation goes
+out. **Recording hours changes no price, no total and no quotation.** A costing keeps the hours it
+was priced on, for ever.
+
+**Then, once a few jobs have hours against them: Labour variance** (administrators' menu). One row
+per kit group and process type: the standard in force, what the jobs actually took per kit, whether
+that is longer or quicker, and how much it rests on — *1 job, 6 kits — too little to change a
+standard on*, up to *6 jobs, 40 kits — enough to take seriously*. The rows with the most hours at
+stake come first, not the biggest percentages.
+
+Read the sample size before you act. A board's hours are shared across its kits in proportion to what
+they were costed at, because the shop records hours per board rather than per kit, so one unusual job
+can move a figure.
+
+**Hours the report cannot place.** Under the table a card may appear, *Hours no kit group can be
+blamed for*. Those hours were worked on a board the costing gave no hours of that kind — usually a
+board of loose parts, or one built from a kit whose group still has blank standard hours. They are
+in none of the figures above, which is exactly why they are listed rather than dropped: fill the
+group's hours in under *Set kit group hours* and they join the report.
+
+**Nothing changes a standard until you press *Apply*.** That sets the kit group's hours for that
+process to the suggested figure; you are asked to confirm, and the confirmation says the part that
+matters — new costings use the new figure, and existing costings keep the hours they froze. A master
+group can only be changed by the master administrator; your own company's groups, by your company
+administrator.
+
+### Read the sales reports (phase 3.6)
+
+**Sales**, in the main menu. Everything on it comes from decisions already recorded on enquiries —
+nothing on this screen changes anything, and values are always ex-VAT.
+
+It leads with the **hit rate**: jobs won as a share of jobs *decided*. Jobs still open are not
+counted as losses, and the figure always says what it rests on — *1 of 2 decided* — because a
+100 % hit rate on one job is not a fact about the business. Beside it: what was won and lost in
+money, the **share by value** (one large job outweighs three small ones), and the average days a
+customer takes to decide.
+
+- **Still out there** — every open and quoted enquiry with its value, how long it has been waiting,
+  the offer it is waiting on and how many days that offer has left. An offer past its date says
+  *ran out*.
+- **By customer, by value, by month** — the same hit rate cut three ways, busiest first.
+- **By product group** — by kit group, so you can see which families you win, with the material and
+  hours at stake in each.
+- **Why jobs were lost** — the reasons as they were typed when the enquiry was marked lost,
+  commonest first. This is the one report that is only as good as what gets typed: a reason left
+  blank shows as *no reason recorded*.
+- **Margin quoted, margin achieved** — the same sum with the hours the shop recorded in place of the
+  estimate. A job appears here **only once hours have been recorded against it** (under *Hours
+  actually worked* on the costing), and **Measured** says how much of its labour is fact rather than
+  estimate. Read a row with one eye on that column.
+
+To change the value bands, a company administrator edits `analytics_value_bands` in the company
+options — the default is 500 K / 2 M / 10 M.
+
+### Configure a standard board from the questions (phase 3.1)
+
+On a panel, **Configure this board**. Answer what the board is, in the order a customer describes it:
+
+1. **Fed from** — grid, generator, solar. Two or more supplies let you choose a changeover.
+2. **Incomer** — the rating in amps, and whether it is an ACB, an MCCB or a switch disconnector.
+3. **Changeover** — automatic (ATS), manual, a changeover switch, or synchronised in parallel.
+4. **Outgoing ways** — a line per rating: amps × how many, MCCB or MCB. *+ another rating* adds a line.
+5. **Correction and metering** — kVAr of power-factor correction, and whether the board is metered.
+6. **Enclosure** — form, IP, access, cable entry. These are **recorded on the panel and printed with
+   it**; the cubicles are still costed as catalogue cubicles plus your uplift, as they always were.
+
+Then **Work the board out**. You get the kits it proposes, grouped into the panel's sections, each
+with the answer that put it there — *12 ways at 100 A* — and a quantity you can change. Two things
+it tells you rather than hiding:
+
+- a kit **bigger than what you asked for**, when the library has nothing nearer, marked on the line;
+- anything it **could not answer** — a kind of kit you do not stock, or one whose every version holds
+  a part with no price — named with the reason.
+
+Nothing is added until you press **Add … to this panel**. What is added is what is on the screen, and
+each kit is priced and frozen exactly as if you had picked it from the kit picker yourself. A panel
+that already has kits is added to, never cleared.
+
+A non-standard board is still built kit by kit, as before. The correction is worked out by the same
+APFC grader as the *Work out an APFC bank* button, so both give the same answer.
+
+### Read a costing as a grid (phase 2.9)
+
+At the top of a costing, two buttons: **Panel by panel** and **Grid**. The grid shows the whole
+costing as one table — every panel a column, every kit and loose component any of them uses a row —
+and it remembers which one you last used, on your own computer.
+
+- **Type in a cell** to change a quantity. A blank cell means that panel does not use the row; type a
+  figure into it and the kit is added to that panel. Clear a cell and the line is removed. Prices
+  freeze and the history records it exactly as on a panel card — it is the same edit, made in a
+  different place.
+- **Two cells the grid will not guess at**, and says so instead: a row the panel holds on more than
+  one line (two sections, for instance), and a typed-in lump sum on a panel that does not have it.
+  Both are done on the panel card.
+- **Compare** two columns with the two pickers: the rows that differ — including a blank against a
+  figure — are marked in amber and counted.
+- **+** at the bottom of a column opens the usual kit picker for that panel; **Copy panel…** makes a
+  near-identical column, re-priced as a copy always is; **Add panel** adds an empty one.
+- **Red marks** mean something to look at: a row whose part the library no longer prices, and a panel
+  whose space check (F12) says it is tight or will not fit. Hover for the reason.
+- **Excel** downloads what is on screen — the sections, the columns and the totals — with a second
+  sheet of what each panel costs and sells for.
+
+The grid is read-only once the costing is submitted or approved, exactly as the panel cards are.
+Prices, margins and panel parameters are not edited here; that stays on the panel card.
+
+### Offer one job two ways, and quote an extra separately (phase 2.7)
+
+Two different things, and the app keeps them apart.
+
+**Two alternatives the customer picks one of** — the ACB board or the MCCB board, Option 1 or
+Option 2 in the old workbook. In each panel → *Details* → **Option**, type the same label on every
+panel belonging to that option, e.g. `Option 1`. A panel you leave blank is common to both, and is
+counted whichever option is taken. The **Totals** card then shows a *Per option* table, and the
+quotation prints a price schedule per option exactly as the NPP-192 quotation did.
+
+Then, under that table, **Offered as**: choose the option the job's own total should mean. Until you
+choose, the grand total is the two offers added together — which is not the price of anything — and
+the card says so. Choosing Option 2 makes the total the common panels plus Option 2; Option 1's
+panels stay on the quotation, stay priced, and are marked *not the chosen option* on the screen.
+The BOM total follows the same choice, so what it says to buy is the board you are building.
+
+**An extra the customer may take or leave** — a spare feeder, a second set of keys. Tick
+**Optional extra** in that panel's *Details*. It is priced like any other panel and printed on the
+quotation, but it is left out of the total; the Totals card shows it as *Optional extras, if the
+customer takes them*, and the quotation prints it in its own table under the schedule it belongs
+to, headed "not included in the total above". On the bill of materials it keeps its row, with an
+**Optional** column marking it and a separate OPTIONAL EXTRAS line under the total, so the buyer
+can see what is only bought if the customer says yes.
+
+Both travel: a revision and a copy keep the option labels, the extras and which option the job is
+offered as.
+
 ### Write the technical offer from the kits (session 4)
 In a panel → *Details* → **Draft from the kits**: the technical description is written from
 the panel's kits under their section headings (a kit in no section falls back to its kit group),
 each with its lines, then the loose components and the enclosure. Edit it freely; the quotation prints what you leave. A panel whose description is
 left blank gets the same draft at release, so Annexure IV is never empty for a costed panel.
+
+### Start a costing from somebody else's parts list (phase 2.3)
+
+When a consultant sends a schedule, a customer attaches their own list, or you have an EPLAN
+export: **Costings** → open a draft costing → **Import a parts list** → *Import a file…*
+
+1. Choose the CSV or Excel file. Say which column holds the **part number**; the app guesses from
+   the column names. A missing quantity column means one of each.
+2. **Match … rows.** Nothing is added to the costing yet.
+3. Read the review. Each row offers a choice, already set to what the app thinks:
+   - **Kit** — the row named a device that is a kit's main device, so the kit is offered first.
+     That is usually what you want: the kit carries the busbar, cable, accessories and labour that
+     the bare device does not.
+   - **Part on its own** — for a part no kit is built around, or when you want just the device.
+   - **Placeholder** — for a part number nobody has. It is added to your company's library with no
+     price; it does **not** go on the costing, because an unpriced part cannot be costed. Price it
+     on the Components screen, then add it. Only an administrator can do this.
+   - **Leave this row out.**
+4. Set the quantities if the file's are wrong, name the new panel, and **Bring in …**.
+
+What comes in lands on a panel of its own, priced by the engine exactly as hand-added lines are,
+and every line records that it came from that file. Rows the app could not read at all — no part
+number, a quantity like "as required" — are listed with the reason and brought in by nobody.
 
 ### Add a part that is not in the catalogue (session 3)
 In the panel, *Outside a kit → typed in with a price*: name, category, price each in your
@@ -482,9 +790,95 @@ company's own figure; the master admin ticks *master* to change the default for 
 add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
 be saved. New costings use the new figure; existing ones keep what they froze.
 
+### Work out an APFC bank from a target (phase 3.2)
+In a draft costing, on the panel: **Work out an APFC bank**. Type the target in kVAr, choose
+fuse-protected or breaker-protected steps (or leave it to pick), and press *Work it out*. You get
+the steps it proposes — for 400 kVAr, the bank you built on NPP-192: 50×4, 25×4, 12.5×6, 5×5 —
+with the quantities editable. Change any of them; the total follows. **Add** puts them on the
+panel as ordinary kit lines in an *APFC bank* section, priced and frozen like any other kit.
+
+If the sizes in your library cannot reach the target exactly, the card says how far short it is
+rather than quietly rounding. And if you ask for breaker-protected steps today it will tell you
+that every one of those kits still holds a part with no price — those are the eight parts on the
+Components screen waiting for you.
+
+The grading — how much of the target goes into the biggest step, how much into the next — is a
+company setting, so it can be changed without a new version of the app. Ask and I will change it.
+
+### Work out the busbar runs (phase 4.1)
+This is your `CU-OPT1` sheet, on the panel. In a draft costing, on the panel: **Work out the
+busbar runs**.
+
+**Start from this board** lists the runs a board like this one needs — incoming tails for each
+supply, changeover and ATS tails where it has them, horizontal and vertical busbar, a row of
+outgoing tails for each rating in the feeder schedule, the correction's tails sized from its kVAr,
+and an earth bar. The bar sizes come from your own library: the bar your 800 A kits carry is the
+bar an 800 A run gets. **The lengths are your company's usual figures, not a measurement of the
+board in front of you** — that is the column to correct against the drawing. (A board nobody has
+configured has no ratings to work from, so the button says so; add the runs by hand instead.)
+
+Each row is the sheet's own sum: phases × runs per phase × length × sets, and the metres appear as
+you type. Underneath, the totals per bar size in metres, kilograms and money at today's copper
+rate.
+
+**Save the schedule** keeps it with the panel and **moves no price at all** — it is a calculation,
+not a line. It comes back when you open the card again, and a revision or a copy of the costing
+carries it.
+
+**Add these as busbar lines** puts one line per bar size, at those metres, into a *Busbar* section
+— ordinary component lines, priced and frozen exactly like hand-typed ones. Press it twice and it
+refuses rather than doubling the metres; if you have changed the schedule and want the new figures
+in place of the old lines, use **Replace the busbar lines already there**.
+
+The one thing worth looking at even if you never apply it: when the panel already carries busbar,
+the card says how far the schedule and the costing are apart. On NPP-192 that gap was real — the
+sheet worked out 70.4 m of 50×10 and the estimate carried 30 — because nothing carried one into
+the other. Now something does.
+
 ### Read the APFC bank size (session 3)
 A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
 under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.
+
+### Switch a feature on (the road to production)
+**Features** in the top bar. Everything built since the foundations arrives **switched off**, for
+every company, and stays off until you switch it on here. Only you, as the master administrator,
+can: a company administrator sees the list and its state but no buttons, and the database refuses
+the change rather than the screen hiding it.
+
+Three of them are marked in red because **switching them on changes what an existing costing
+does**, and those are the ones to try on the staging app first — open a real job, write down its
+total, switch the feature on, and read the total again:
+
+| Feature | What changes |
+|---|---|
+| Approval rules in force | What happens when a costing is submitted. Off, every costing needs an approver, as it does today. |
+| Validity and the nightly sweep | A quotation that has run out is marked overnight and a chase is raised. This is the only thing in the app that writes while nobody is watching. |
+| Chosen option and optional extras | The headline figure of a job with two options or an optional extra. |
+
+The rest only add a screen: switching one on shows a menu item, and nothing already costed moves.
+Switching a feature off again hides it; nothing that was entered while it was on is deleted.
+
+### Read the compatibility checks on a panel (roadmap 3.4)
+A panel shows a short list under its name when a check finds something: a device deeper than the
+usable depth of the cubicle bought for it, a part listed for other devices than the one in its kit,
+or outgoing ways adding up to far more than the incomer. The costing screen carries one line above
+the panels saying how many there are altogether. **They change nothing** — no price, no hour, no
+total — and a check says nothing at all until the library holds what it reads. So an untouched
+catalogue shows no notes, which is the honest answer, not a fault.
+
+What each check reads, and where you fill it in on the Components screen: the depth of a device
+(*Depth mm*), the usable depth inside a cubicle (*Usable depth*), and the frame a part is listed
+for. The outgoing-ways check reads the kits' ratings, which the library already holds, and the
+section each kit sits in on the panel — so put the incomer in **Incomer** and the ways in
+**Outgoers** and it reads correctly.
+
+### Change or switch off a compatibility check (roadmap 3.4)
+Compatibility → the three checks, each with the one figure it uses: the room to leave behind a
+device (100 mm), and how many times the incomer the outgoing ways may come to (4 ×). Type a new
+figure and press **Save**; **Switch off** silences a check for everybody. *How loud* has two
+settings: *a note on the panel*, which is what they all ship as, and *a blocker an approval rule
+can act on* — which still changes nothing by itself. To make a blocker stop a costing being
+submitted, go to Approval rules and write one on *Compatibility findings marked as blockers*.
 
 ### Set the enclosure uplift (session 1)
 Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure
@@ -571,6 +965,61 @@ Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump f
 backup job stores it.
 
 ---
+
+## Part C2 — Taking the advanced app to production
+
+The advanced track has been built on the staging project since 10 September. This is how it
+reaches the app you quote from. It happens **once**; afterwards the two tracks are one again and
+new work arrives the ordinary way.
+
+### What the merge actually does
+
+Merging `advanced` into `main` runs two workflows against **production**:
+
+- **Deploy database** applies migrations 0100 onward to your real catalogue, kits, costings and
+  quotations. This is the largest single change since the app went live.
+- **Deploy functions** puts the Edge Functions there, and Vercel rebuilds the site.
+
+**Nothing you can see changes.** Every advanced feature arrives switched off, so the app looks as
+it does now, plus a **Features** item in the top bar. What you switch on afterwards, and when, is
+yours.
+
+### Before you merge
+
+1. **Take a backup.** Supabase → your production project → Database → Backups, and take one now
+   rather than relying on last night's. Part E explains what each tier gives you.
+2. Check the pull request is green — both CI jobs, including *Rehearse the upgrade on a database
+   that already holds rows*. That job builds a database at 0017, fills it with the real seed and
+   a released quotation, applies every advanced migration on top, and **refuses any figure that
+   moves**. It is the closest thing to a dress rehearsal that does not touch your data.
+3. Pick a quiet hour. Nobody should be part-way through costing a job.
+
+### After you merge, in the first five minutes
+
+1. GitHub → **Actions** → *Deploy database* → the run on `main` has a green tick. If it is red,
+   stop and send me the log; **do not** merge anything else.
+2. Open the live app. Sign in. It should look exactly as it did.
+3. Open one costing you know and check its total is the figure you remember. This is the one that
+   matters; everything else can be fixed at leisure.
+4. Components still shows 735 parts. Kits still shows 296.
+5. A new **Features** item appears in the top bar. Open it: everything says *Off*.
+
+### Then, one at a time
+
+Switch on the ones that only add a screen first — price lists, the BOM import, files, sizes, the
+costing grid, the configurators, the compatibility checks, sales analytics. Each shows a menu item
+and changes nothing already costed.
+
+Leave the three marked in red until last, and for each of those: open a real costing, write its
+total down, switch the feature on, and read the total again. They are the ones that change what an
+existing costing does, and they are described on the Features screen itself.
+
+### If something is wrong
+
+The backup from step 1 is the answer, and Part E is how to use it. Nothing in this merge deletes
+data: the migrations add tables and columns and rewrite functions. A feature switched on can
+always be switched off again, and switching it off hides it without deleting what was entered
+while it was on.
 
 ## Part D — When something goes wrong
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { ImportCard } from './ImportCard'
-import { importComponents, importKitGroupHours, importKits } from './import-api'
+import { importComponents, importDimensions, importKitGroupHours, importKits } from './import-api'
 
 /**
  * The seed importer: the three CSV files under data/seed, in order. The
@@ -63,6 +63,14 @@ export function SeedImportPage() {
         blurb="kit-group-labour-template.csv with the hours filled in — one row per labour group with three columns: panel assembly, wiring, busbar fabrication. Blank cells are skipped, so you can fill the file a group at a time. The Kit groups screen edits the same figures."
         required={['labourGroup', 'hoursPanelAssembly', 'hoursWiring', 'hoursBusbarFabrication']}
         run={(rows, _second, apply) => importKitGroupHours(rows, target, apply)}
+        onApplied={refresh}
+      />
+      <ImportCard
+        step={4}
+        title="Dimensions (optional)"
+        blurb="dimensions-template.csv — one row per part, its number and description already filled in, for you to add width, height, depth, what it mounts on, clearances and weight; for an enclosure cubicle, the usable area inside it and its chambers. Nothing here changes a price or a category, blank rows are counted as not done yet, and the only thing that uses the figures is the space check on a costing panel. Regenerate the file with scripts/build_dimensions_template.py; it keeps what you have already typed."
+        required={['partNumber']}
+        run={(rows, _second, apply) => importDimensions(rows, target, apply)}
         onApplied={refresh}
       />
     </>

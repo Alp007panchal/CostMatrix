@@ -12,15 +12,23 @@ export function TotalsPanel({
   optionTotals,
   bom,
   categoryNames,
+  editable,
+  onChooseOption,
 }: {
   costing: Costing
   totals: CostingTotals | null
   optionTotals: OptionTotals[]
   bom: BomItem[]
   categoryNames: Record<string, string>
+  editable: boolean
+  /** Roadmap 2.7: which option the total below means. Null adds them all up. */
+  onChooseOption: (label: string | null) => void
 }) {
   const label = costing.currency_label
-  const hasOptions = optionTotals.some((o) => o.option_label !== '')
+  const options = optionTotals.filter((o) => o.option_label !== '')
+  const hasOptions = options.length > 0
+  const chosen = totals?.chosen_option_label ?? null
+  const optionalTotal = Number(totals?.optional_total ?? 0)
   // Material by category, as the old costing sheets subtotalled it. From the
   // BOM view: quantities already multiplied through kit and panel quantities.
   const byCategory = groupBom(bom, categoryNames).filter((g) => g.rows.length > 0)
@@ -48,13 +56,36 @@ export function TotalsPanel({
               {optionTotals.map((o) => (
                 <Row
                   key={o.option_label}
-                  label={o.option_label || 'Base offer'}
+                  label={`${o.option_label || 'Common to every option'}${o.is_chosen ? ' — the offer' : ''}`}
                   value={money(o.grand_total, label)}
-                  hint={`${money(o.subtotal, label)} + VAT ${money(o.tax, label)}`}
+                  hint={[
+                    `${money(o.subtotal, label)} + VAT ${money(o.tax, label)}`,
+                    Number(o.optional_total) > 0 ? `extras ${money(o.optional_total, label)}` : null,
+                  ].filter(Boolean).join(' · ')}
+                  strong={o.is_chosen}
                 />
               ))}
             </tbody>
           </table>
+          <label className="field" style={{ marginTop: '.6rem' }}>
+            <span>Offered as <em className="hint">— which option the total below means</em></span>
+            <select
+              value={chosen ?? ''}
+              disabled={!editable}
+              onChange={(e) => onChooseOption(e.target.value === '' ? null : e.target.value)}
+            >
+              <option value="">No choice yet — the total adds every option together</option>
+              {options.map((o) => (
+                <option key={o.option_label} value={o.option_label}>{o.option_label}</option>
+              ))}
+            </select>
+          </label>
+          {chosen === null && (
+            <p className="muted" style={{ fontSize: '.8125rem', margin: '.3rem 0 0' }}>
+              The customer will buy one of these, so until one is chosen the grand total
+              below is the sum of {options.length} offers rather than the price of the job.
+            </p>
+          )}
         </>
       )}
 
@@ -63,6 +94,14 @@ export function TotalsPanel({
           <Row label="Subtotal" value={money(totals?.subtotal ?? 0, label)} />
           <Row label={`VAT ${percent(costing.tax_pct)}`} value={money(totals?.tax ?? 0, label)} />
           <Row label="Grand total" value={money(totals?.grand_total ?? 0, label)} strong />
+          {optionalTotal > 0 && (
+            <Row
+              label="Optional extras, if the customer takes them"
+              value={`+ ${money(optionalTotal, label)}`}
+              hint={`${money(totals?.optional_subtotal ?? 0, label)} + VAT ${money(totals?.optional_tax ?? 0, label)} — printed on the quotation, not in the total above`}
+              muted
+            />
+          )}
         </tbody>
       </table>
 

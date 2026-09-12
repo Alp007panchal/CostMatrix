@@ -29,7 +29,17 @@ Time estimates assume one developer working with you part-time and are rough.
 | — | **People: correcting a mistake (2026-09-10).** Migration 0012 and the remove-user function: the master administrator may move or remove somebody who has no records at all; everyone else is deactivated as before. Function errors now show their real message, and a new company reaches the People screen without a reload. | 2026-09-10 |
 | — | **The owner's notebook: nine changes in five pull requests. All merged and live** (migrations 0013–0017, `main` at the PR 18 merge). PR 14 costing screen in one column and the operator's name in the history; PR 15 sections inside a panel; PR 16 copy a costing or a panel; PR 17 one enquiry, one decision (and no busbar in Annexure IV); PR 18 files kept with an enquiry, on an enquiry page of its own. Next: the owner runs `docs/acceptance-test.md` on what is live; nothing is waiting on a review. | 2026-09-10 |
 | — | **Two tracks, and the advanced roadmap (2026-09-10).** The owner's roadmap (`docs/reference/roadmap-from-market-leaders.md`, foundations F1–F11) and AI-assistant spec arrived. `main` is now the basic app on production; a long-lived `advanced` branch holds all foundations and assistant work against a separate **CostMatrix Staging** project (D-169). Step 0 built the arrangement by code: `create-staging.yml` creates, wakes and seeds staging; "Deploy database" chooses its target by branch; advanced migrations start at 0100. | 2026-09-10 |
-| F1–F11 — Foundations | **Planned, not built.** The gap list against migrations 0001–0017 is in `docs/reference/two-track-setup.md`'s companion plan and decisions D-174 to D-179. Two PRs to come: A = master data (F1–F3, migration 0100), B = costing, documents, audit, settings and assistant tables (F4–F11, migrations 0101–0102). The kit-composition freeze turned out to be already built (D-177). | — |
+| F1–F3 — Foundations PR A | **Merged into `advanced`, on staging.** Migration 0100: component supplier, attributes, obsolescence, datasheet, lead time and price provenance; kit version, customer wording, labels, parameters and `qty_expression`; the kit version recorded on every costing line; a productivity factor per panel; actual hours; labour rate history. The kit-composition freeze was already built (D-177), so F2 needed no back-fill. | 2026-09-11 |
+| F4–F11 — Foundations PR B | **Built** (PR 26). Migration 0101: panel `parameters`, `origin` and `origin_ref` on every costing line, one `documents` table replacing `enquiry_attachments`, `activity_log`. Migration 0102: `approval_rules` with one default rule per company and a read-only engine, `valid_until` and `price_snapshot_at`, `import_jobs`/`import_rows` filled from the batches, `company_options` with the assistant switched off everywhere, the three assistant tables. The `extract-document` Edge Function reads PDF, Word, Excel and text. Files strip on the costing screen. 483 database assertions, test 15 unmodified. | 2026-09-11 |
+| F4–F11 — Foundations PR B | **Merged into `advanced`, on staging** (PR 26); "Deploy functions" made branch-aware by PR 27 so `extract-document` reached staging, where the owner verified the NPP-192 PDF reads. | 2026-09-11 |
+| AI assistant PR A — core | **Merged into `advanced`, on staging** (PR 28). Migration 0103: nine read-only query functions behind the tools, `price_preview` to the cent against the engine, `assistant_allowance` and `assistant_record_usage`. `supabase/functions/_shared/ai/`: the provider seam, the Anthropic adapter, a fake provider, the nine tools, proposal validation, the budget decision, the context builder, the loop with limits. The `assistant` Edge Function streams server-sent events, logs every turn, refuses before any provider call when off, rate-limited or over budget. Spec tests 3, 5 and 6: 60 database assertions (543 in all) and 42 vitest tests (129 in all), no API key needed. Not yet run against Anthropic: the owner adds the key on staging. | 2026-09-11 |
+| AI assistant PR B — UI | **Built, PR open into `advanced`.** The Assistant panel on the enquiry and costing screens with suggested actions and a streamed reply; the Proposal card (evidence, confidence, Accept / Change / Reject per line, unresolved items) and the Review card (most serious first, one-click fixes); migration 0104 applies what was accepted through the ordinary engine functions and stamps `origin = ai_proposal`, with `proposal.applied` and `proposal.rejected` in the activity log; the Assistant admin screen with the switch, the budget, the thresholds and six months of usage. A failed live call shows the reason and the remedy, no credit included. 596 database assertions, 178 web tests, spec tests 1, 2 and 4. | 2026-09-11 |
+| Phase 2.2 — Supplier price lists | **Merged into `advanced`, on staging** (PR 30). Migration 0105: four-attempt matching, a preview that writes only `import_jobs`/`import_rows`, accept per row or all, discard, and the price history recording its source. The Price lists screen reads CSV, Excel or a PDF (through `extract-document`), guesses the columns, and shows old → new with the percentage; rows that need a person are listed with the reason. Master admin for the master catalogue, company admin for private parts. 658 database assertions, 205 web tests, NPP-192 unchanged. | 2026-09-11 |
+| F12 — Physical dimensions | **Built, PR open into `advanced`.** Migration 0106: sizes, mounting type, clearances and weight on components; the usable internal area, chambers and form on an enclosure cubicle; optional footprint overrides on kits; the empty `panel_layouts` table for the layout canvas; `app.panel_fit`, an advisory area check with a 1.3 safety factor per company. `dimensions-template.csv` generated with all 735 part numbers for the owner to fill in, and its own importer that touches no price. Size and mounting boxes on the component form, footprint boxes on the kit form, one space line on the costing panel. 646 database assertions, 193 web tests, NPP-192 unchanged. Groundwork only: the layout canvas itself is roadmap 3.8. | 2026-09-11 |
+| Phase 2.3 — BOM import | **Built, PR open into `advanced`.** Migration 0107: `match_catalogue_row` over everything the caller can see, the kit proposed where the row named its main device, `start_bom_import` previewing without touching the costing, and `apply_bom_import` bringing the chosen rows onto a panel of their own with `origin = import`. A placeholder fills the library but makes no line, because an unpriced part cannot be costed. The Import a parts list card on the costing screen reads CSV or Excel, guesses the columns and offers one choice per row. 757 database assertions, 244 web tests, NPP-192 unchanged. | 2026-09-11 |
+| Phase 2.5 / 2.6 — Approval rules and validity | **Built, PR open into `advanced`.** Migration 0108: the rules engine wired into submit and approve with the default rule keeping today's behaviour, `approval_review` behind a "why this needs approval" panel, and a rules editor for company administrators. Quotations gain `expired_at` and `v_quotation_validity`; `expire_quotations` runs nightly under pg_cron where it exists, raises a follow-up on the ones that had been sent, and there is a by-hand button beside it; `reissue_costing` makes a new revision priced today. 805 database assertions, 266 web tests, NPP-192 unchanged. | 2026-09-11 |
+| Phase 2 — what is left | **Not scheduled.** 2.7 options and alternatives on one quotation; 2.8 estimate against actual labour. | — |
+| AI assistant — phase 2 | **Not scheduled.** Questions across all costings and the CRM, external companies, a per-document confidential flag, the APFC configurator. | — |
 
 ## Slice 0 — Foundation (about one week)
 
@@ -159,8 +169,91 @@ straight to `main`, reviewed and merged by the owner the same day.
 18. **Attachments on an enquiry** — drawings, specifications and emails kept with the job, on a
     new enquiry page that also lists its costings and quotations (migration 0017).
 
+19. **Options, alternatives and optional extras** (advanced track, roadmap 2.7) — a costing names
+    which option it is offered as, so its total is the price of the job rather than the sum of two
+    offers; a panel can be an optional extra, priced and printed but out of the total; the
+    quotation prints each option's extras under its schedule and the BOM marks them (migration
+    0109).
+
+20. **Estimate against actual labour** (advanced track, roadmap 2.8) — hours actually worked
+    recorded against a panel and process type, an estimate-against-actual table on the costing, and
+    a labour variance report by kit group with a suggested new standard that only a person applies
+    (migration 0110). Completes roadmap phase 2.
+
+21. **The hours that belong to nobody** (advanced track, a gap in 2.8) — where a panel was costed
+    at none of a kind of work there is no estimate to share its recorded hours out in proportion
+    to, so the kit-group report reached none of them and they left no trace. They are now named
+    beside the report, with what usually causes it (migration 0111).
+
+22. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
+    and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
+    its steps, works its line quantities out from the answers, refuses a formula that is anything
+    but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
+    unchanged (migration 0112). What 3.2 and 3.1 stand on.
+
+23. **The APFC configurator** (advanced track, roadmap 3.2) — a target in kVAr proposes how many
+    of each step kit reach it, graded the way the owner's own NPP-192 bank was built, from one
+    family of step kit; the engineer edits the quantities and applies, and the steps land as
+    ordinary kit lines in an *APFC bank* section (migration 0113). Decision 4's "later phase".
+
+24. **Compatibility checks** (advanced track, roadmap 3.4) — three questions asked of every panel
+    as rows anybody can read: will that device go into that cubicle, does that part belong to that
+    device, do the outgoing ways add up against the incomer. Warnings under the panel name, a
+    screen to change or silence each check, and a blocker an approval rule can act on
+    (migration 0114). Advisory: no price, hour or total moves.
+
+25. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
+    across and kits and components down, with in-place quantity editing through the same functions as
+    the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts
+    and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
+    preference is per person in their own browser.
+
+26. **A switch per advanced feature** (advanced track, the road to production) — every feature
+    built since the foundations sits behind a per-company switch that is off by default and only
+    the master administrator can flip, which is condition 2 of the two-track rule and what makes
+    a merge to `main` possible at all. Most switches hide a screen; three gate real behaviour
+    (migration 0117).
+
+## In hand right now
+
+One line per roadmap item a session has started, so two sessions cannot build the same thing
+twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
+the work begins, removed when the pull request opens.
+
+| Item | Session | Since |
+|---|---|---|
+| Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+
+27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
+    actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
+    correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
+    then applied through the ordinary kit function with the answers frozen on the panel
+    (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
+
+28. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
+    by customer, value band, month and product group, why jobs were lost in the words they were
+    heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
+    with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
+
+29. **The staging trial** (advanced track) — `docs/trials/advanced-trial.md`, a click-through for
+    the fifteen features now on staging, in the order a real job flows, each step saying what to
+    expect; and `supabase/checks/deployed-features.sql`, one query the owner pastes into the
+    Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 41 so the list
+    cannot drift. No application change.
+
+30. **The busbar run calculator** (advanced track, roadmap 4.1) — the owner's `CU-OPT1` sheet in the
+    app: a run a row at `phases × runs per phase × length × sets`, totals per bar size in metres,
+    kilograms and money, bar sizes read from his own kits, a starting schedule built from the
+    board's parameters, and the schedule set beside the metres the panel is actually costed at
+    (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
+
+31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+    migrations to a database already at 0017 and already full of rows, refusing any figure that
+    moves (in CI on every pull request), a go-live section in the runbook, and then the release
+    itself: one pull request from `advanced` into `main`, every feature off.
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

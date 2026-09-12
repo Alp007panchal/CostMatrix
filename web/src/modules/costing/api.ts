@@ -1,6 +1,8 @@
 import { supabase } from '../../lib/supabase'
 import type {
   AssemblyTotals,
+  BoardLine,
+  BoardProposal,
   BomItem,
   Kit,
   Costing,
@@ -14,7 +16,13 @@ import type {
   OptionTotals,
   PanelCopyReport,
   PanelPrice,
+  ApprovalReview,
+  KeptLine,
+  PanelFit,
+  PanelWarning,
   PanelSection,
+  ApfcProposal,
+  ApfcStep,
 } from '../../lib/database.types'
 
 /**
@@ -119,7 +127,7 @@ export async function listHistory(costingId: string): Promise<CostingHistoryRow[
 
 export async function updateCosting(
   id: string,
-  changes: Partial<Pick<Costing, 'title' | 'notes' | 'negotiation_margin_pct'>>,
+  changes: Partial<Pick<Costing, 'title' | 'notes' | 'negotiation_margin_pct' | 'chosen_option_label'>>,
 ): Promise<void> {
   const { error } = await supabase.from('costings').update(changes).eq('id', id)
   fail('Could not save the costing', error)
@@ -142,7 +150,7 @@ export async function updatePanel(
   changes: Partial<
     Pick<
       CostingPanel,
-      'name' | 'tag' | 'option_label' | 'uom' | 'quantity' | 'technical_description' | 'enclosure_dimensions'
+      'name' | 'tag' | 'option_label' | 'is_option' | 'uom' | 'quantity' | 'technical_description' | 'enclosure_dimensions'
     >
   >,
 ): Promise<void> {
@@ -161,12 +169,15 @@ export async function addAssemblyToPanel(
   assemblyId: string,
   quantity: number,
   section: string | null = null,
+  /** What a parameterised kit was answered with; null for a kit that asks nothing. */
+  params: Record<string, string> | null = null,
 ): Promise<void> {
   const { error } = await supabase.rpc('add_assembly_to_costing', {
     target_panel_id: panelId,
     source_assembly: assemblyId,
     qty: quantity,
     section,
+    params,
   })
   fail('Could not add the kit', error)
 }
@@ -327,6 +338,53 @@ export async function copyPanel(
 // --- bill of materials -------------------------------------------------------
 
 /** Every distinct component in a costing with its total quantity, for the exports. */
+/**
+ * Does what is on this panel fit the cubicles bought for it (app.panel_fit)?
+ * Advisory, read-only, and "unknown" until the parts have been measured.
+ */
+export async function panelFit(panelId: string): Promise<PanelFit> {
+  const { data, error } = await supabase.rpc('panel_fit', { target: panelId })
+  fail('Could not check the space', error)
+  return data as PanelFit
+}
+
+/**
+ * What the compatibility rules make of every panel in one costing
+ * (v_panel_warnings, roadmap 3.4). Advisory: nothing here changes a figure, and
+ * a panel whose parts nobody has measured or described returns no rows at all.
+ */
+export async function listPanelWarnings(costingId: string): Promise<PanelWarning[]> {
+  const { data, error } = await supabase
+    .from('v_panel_warnings')
+    .select('*')
+    .eq('costing_id', costingId)
+  fail('Could not run the compatibility checks', error)
+  return (data ?? []) as PanelWarning[]
+}
+
+/** Why this costing needs an approver, or does not (app.approval_review). */
+export async function approvalReview(costingId: string): Promise<ApprovalReview> {
+  const { data, error } = await supabase.rpc('approval_review', { target: costingId })
+  fail('Could not read the approval rules', error)
+  return data as ApprovalReview
+}
+
+/**
+ * A new revision of an approved costing with every line priced today
+ * (app.reissue_costing). The approved revision is untouched.
+ */
+export async function reissueCosting(costingId: string): Promise<{
+  costing_id: string
+  costing_no: string
+  revision_no: number
+  repriced: number
+  kept: KeptLine[]
+}> {
+  const { data, error } = await supabase.rpc('reissue_costing', { source: costingId })
+  fail('Could not re-issue the costing', error)
+  return data as { costing_id: string; costing_no: string; revision_no: number; repriced: number; kept: KeptLine[] }
+}
+
 export async function listBomItems(costingId: string): Promise<BomItem[]> {
   const { data, error } = await supabase
     .from('v_costing_items_by_category')
@@ -336,4 +394,59 @@ export async function listBomItems(costingId: string): Promise<BomItem[]> {
     .order('code')
   fail('Could not load the bill of materials', error)
   return (data ?? []) as BomItem[]
+}
+
+// --- the APFC bank (roadmap 3.2) ---------------------------------------------
+
+/**
+ * How many of each step kit reach a target kVAr. Reads only: the bank is added
+ * when somebody presses Apply, with whatever quantities are on the screen then.
+ */
+export async function proposeApfc(
+  panelId: string,
+  targetKvar: number,
+  family: string | null,
+): Promise<ApfcProposal> {
+  const { data, error } = await supabase.rpc('propose_apfc', {
+    target_panel: panelId,
+    target_kvar: targetKvar,
+    family,
+  })
+  fail('Could not work out the bank', error)
+  return data as ApfcProposal
+}
+
+/** Adds the steps as ordinary kit lines, in one go, into the APFC bank section. */
+export async function applyApfcSteps(panelId: string, steps: ApfcStep[]): Promise<void> {
+  const { error } = await supabase.rpc('apply_apfc_steps', {
+    target_panel: panelId,
+    steps,
+  })
+  fail('Could not add the bank', error)
+}
+
+// --- the guided board configurator (roadmap 3.1) -----------------------------
+
+/** What the answers come to, as kits at quantities. Writes nothing. */
+export async function proposeBoard(panelId: string, answers: unknown): Promise<BoardProposal> {
+  const { data, error } = await supabase.rpc('propose_board', {
+    target_panel: panelId,
+    answers,
+  })
+  fail('Could not work the board out', error)
+  return data as BoardProposal
+}
+
+/** Adds what the engineer settled on, and keeps the answers on the panel. */
+export async function applyBoard(
+  panelId: string,
+  lines: BoardLine[],
+  parameters: Record<string, unknown>,
+): Promise<void> {
+  const { error } = await supabase.rpc('apply_board', {
+    target_panel: panelId,
+    lines,
+    parameters,
+  })
+  fail('Could not configure the board', error)
 }

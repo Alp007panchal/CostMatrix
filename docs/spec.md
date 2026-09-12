@@ -120,7 +120,10 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 A panel is built from three kinds of line (session 3):
 
 - **Kits**, chosen by kit group and rating, times a quantity. Each brings its lines and its
-  hours (§6) frozen at today's prices and this costing's rates.
+  hours (§6) frozen at today's prices and this costing's rates. A kit may **ask for parameters** —
+  busbar metres, steps, a feeder count — and work its line quantities out from the answers
+  (`qty_expression`, roadmap 3.3); the answers are frozen on the line beside the prices. A kit
+  with no parameters takes the fixed quantities in the library, which is every kit today.
 - **Components on their own**, from the catalogue, in the *components and enclosure* line of
   their section (quantity always 1, no labour; one such line per section). An enclosure cubicle
   added this way is uplifted like one inside a kit. Adding the same component to the same
@@ -136,6 +139,14 @@ material and labour subtotal for each, and Annexure IV takes its headings from t
 back to the kit group for a line with no section. A line in no section sorts last and reads
 exactly as it did before sections existed. Sections are a way of reading a panel: they change
 no price, and the bills of materials stay grouped by category (decision 12).
+
+An **APFC bank** may be worked out from a target rather than counted by hand (roadmap 3.2): the
+app proposes how many of each step kit reach the target, graded by the company's
+`apfc_step_pattern` (seeded at 50 / 25 / 18.75 / 6.25 per cent of the target across the largest
+sizes, which is how the owner's own 400 kVAr bank was built), all from one family — fuse-protected
+or breaker-protected, never a mixture. It proposes; a person edits the quantities and applies, and
+the steps are added as ordinary kit lines in an *APFC bank* section. What the sizes cannot reach
+exactly is reported as a shortfall.
 
 A part without a price (a placeholder) is refused with its code named, whether inside a kit or
 on its own.

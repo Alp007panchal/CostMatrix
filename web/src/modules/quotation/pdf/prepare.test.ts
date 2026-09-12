@@ -9,7 +9,8 @@ function detail(over: Partial<CostingDetail> = {}): CostingDetail {
       previous_revision_id: null, is_current: true, title: 'MCC', notes: null, status: 'approved',
       currency_code: 'KES', currency_label: 'KSH', exchange_rate: 1, discount_pct: 0,
       material_margin_pct: 10, labour_margin_pct: 20, negotiation_margin_pct: 0,
-      price_rounding_step: 100, tax_pct: 16, enclosure_uplift_pct: 0, submitted_at: null, approved_at: null,
+      price_rounding_step: 100, tax_pct: 16, enclosure_uplift_pct: 0, chosen_option_label: null,
+      submitted_at: null, approved_at: null,
       returned_at: null, return_comment: null, created_at: '', updated_at: '',
     },
     panels: [], assemblies: [], items: [], labour: [], assemblyTotals: [],
@@ -18,13 +19,22 @@ function detail(over: Partial<CostingDetail> = {}): CostingDetail {
   }
 }
 
-const panel = (id: string, name: string, qty: number, option: string | null = null) => ({
+const panel = (id: string, name: string, qty: number, option: string | null = null, isOption = false) => ({
   id, costing_id: 'c', company_id: 'co', name, tag: null, option_label: option, uom: 'PC',
-  quantity: qty, technical_description: null, enclosure_dimensions: null, sort_order: 0,
+  quantity: qty, is_option: isOption, technical_description: null, enclosure_dimensions: null, sort_order: 0,
 })
-const price = (panel_id: string, unit: number, qty: number) => ({
+const price = (panel_id: string, unit: number, qty: number, isOption = false) => ({
   panel_id, material_cost: 0, labour_cost: 0, hours: 0, material_sell: 0, labour_sell: 0,
   unit_price: unit, line_total: unit * qty,
+  is_option: isOption, in_chosen_offer: true, counts_in_total: !isOption,
+})
+const optionTotals = (
+  option_label: string, subtotal: number, tax: number, grand_total: number,
+  extras: { subtotal: number; tax: number; total: number } = { subtotal: 0, tax: 0, total: 0 },
+) => ({
+  option_label, subtotal, tax, grand_total,
+  optional_subtotal: extras.subtotal, optional_tax: extras.tax, optional_total: extras.total,
+  is_chosen: false,
 })
 
 describe('buildSchedules', () => {
@@ -32,7 +42,7 @@ describe('buildSchedules', () => {
     const d = detail({
       panels: [panel('p1', '1600A Main LV Board', 1)],
       panelPrices: [price('p1', 5784800, 1)],
-      optionTotals: [{ option_label: '', subtotal: 5784800, tax: 925568, grand_total: 6710368 }],
+      optionTotals: [optionTotals('', 5784800, 925568, 6710368)],
     })
     const [sch] = buildSchedules(d, 'KSH')
     expect(buildSchedules(d, 'KSH')).toHaveLength(1)
@@ -48,13 +58,36 @@ describe('buildSchedules', () => {
       panels: [panel('p1', 'Board', 1, 'Option 1'), panel('p2', 'Board', 1, 'Option 2')],
       panelPrices: [price('p1', 5784800, 1), price('p2', 7684700, 1)],
       optionTotals: [
-        { option_label: 'Option 1', subtotal: 5784800, tax: 925568, grand_total: 6710368 },
-        { option_label: 'Option 2', subtotal: 7684700, tax: 1229552, grand_total: 8914252 },
+        optionTotals('Option 1', 5784800, 925568, 6710368),
+        optionTotals('Option 2', 7684700, 1229552, 8914252),
       ],
     })
     const schedules = buildSchedules(d, 'KSH')
     expect(schedules.map((s) => s.heading)).toEqual(['OPTION 1 — PRICE SCHEDULE', 'OPTION 2 — PRICE SCHEDULE'])
     expect(schedules[1]?.total).toBe('8,914,252.00')
+  })
+
+  it('leaves an optional extra out of the schedule and quotes it underneath', () => {
+    const d = detail({
+      panels: [panel('p1', 'Main board', 1), panel('p2', 'Spare feeder', 2, null, true)],
+      panelPrices: [price('p1', 1000000, 1), price('p2', 50000, 2, true)],
+      optionTotals: [optionTotals('', 1000000, 160000, 1160000, { subtotal: 100000, tax: 16000, total: 116000 })],
+    })
+    const [sch] = buildSchedules(d, 'KSH')
+    expect(sch?.rows.map((r) => r.description)).toEqual(['MAIN BOARD'])
+    expect(sch?.total).toBe('1,160,000.00')
+    expect(sch?.optionalRows.map((r) => r.description)).toEqual(['SPARE FEEDER'])
+    expect(sch?.optionalRows[0]).toMatchObject({ itemNo: 1, qty: '2', total: '100,000.00' })
+    expect(sch?.optionalTotal).toBe('116,000.00')
+  })
+
+  it('has no extras table on an ordinary job', () => {
+    const d = detail({
+      panels: [panel('p1', 'Main board', 1)],
+      panelPrices: [price('p1', 1000, 1)],
+      optionTotals: [optionTotals('', 1000, 160, 1160)],
+    })
+    expect(buildSchedules(d, 'KSH')[0]?.optionalRows).toEqual([])
   })
 
   it('numbers items from 1 within each option', () => {
@@ -65,6 +98,13 @@ describe('buildSchedules', () => {
     const [one, two] = buildSchedules(d, 'KSH')
     expect(one?.rows.map((r) => r.itemNo)).toEqual([1, 2])
     expect(two?.rows.map((r) => r.itemNo)).toEqual([1])
+  })
+})
+
+describe('buildTechnical and optional extras', () => {
+  it('says in the technical annexure which line is an extra', () => {
+    const d = detail({ panels: [panel('p1', 'Spare feeder', 1, 'Option 1', true)] })
+    expect(buildTechnical(d)[0]?.particular).toBe('SPARE FEEDER - OPTION 1 - OPTIONAL EXTRA')
   })
 })
 
@@ -101,7 +141,7 @@ describe('buildTechnical from the kits', () => {
   it('writes the description from the kits when the engineer has not', () => {
     const d = detail({
       panels: [panel('p1', 'MAIN LV BOARD', 1, 'Option 1')],
-      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: '250A MCCB KIT', quantity: 2, sort_order: 0 }],
+      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: '250A MCCB KIT', quantity: 2, parameters: {}, sort_order: 0 }],
       items: [],
     })
     expect(buildTechnical(d)[0]?.description).toBe('KITS\n2 No. 250A MCCB KIT')
@@ -109,7 +149,7 @@ describe('buildTechnical from the kits', () => {
   it('keeps the engineer\'s own text when there is one', () => {
     const d = detail({
       panels: [{ ...panel('p1', 'MAIN LV BOARD', 1), technical_description: 'As specified.', enclosure_dimensions: '2100(H) x 800(W)' }],
-      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: 'KIT', quantity: 1, sort_order: 0 }],
+      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: 'KIT', quantity: 1, parameters: {}, sort_order: 0 }],
     })
     expect(buildTechnical(d)[0]?.description).toBe('As specified.\n\nProposed Enclosure: 2100(H) x 800(W)')
   })

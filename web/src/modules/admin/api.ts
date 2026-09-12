@@ -1,6 +1,9 @@
 import { supabase } from '../../lib/supabase'
 import { functionErrorMessage } from '../../lib/errors'
 import type {
+  ApprovalRule,
+  CompanyFeature,
+  CompatibilityRule,
   Company,
   CompanySettings,
   PersonWithRoles,
@@ -245,4 +248,89 @@ export async function addFooterLogo(companyId: string, imagePath: string, captio
 export async function removeFooterLogo(id: string): Promise<void> {
   const { error } = await supabase.from('company_footer_logos').delete().eq('id', id)
   fail('Could not remove the footer logo', error)
+}
+
+// --- approval rules (roadmap 2.5) -------------------------------------------
+
+/**
+ * The rules that decide whether a costing needs a second pair of eyes. Written
+ * by a company administrator; read by everybody, because the costing screen
+ * explains itself with them.
+ */
+/**
+ * The compatibility checks in force for this company: the master rules everybody
+ * gets, and any the company has written for itself (roadmap 3.4).
+ */
+/**
+ * Every advanced feature and whether it is on for the caller's company
+ * (v_company_features). One query for the navigation, the costing screen and the
+ * Features page — the database is the only thing that decides.
+ */
+export async function listFeatures(): Promise<CompanyFeature[]> {
+  const { data, error } = await supabase.from('v_company_features').select('*').order('sort_order')
+  fail('Could not read which features are switched on', error)
+  return (data ?? []) as CompanyFeature[]
+}
+
+/**
+ * Switch one on or off for a company. Only the master administrator may: a
+ * trigger refuses anybody else, so this is about showing the right control, not
+ * about safety.
+ */
+export async function setFeature(companyId: string, optionKey: string, on: boolean): Promise<void> {
+  const { error } = await supabase
+    .from('company_options')
+    .upsert({ company_id: companyId, key: optionKey, value: on, value_type: 'boolean' },
+            { onConflict: 'company_id,key' })
+  fail('Could not change the switch', error)
+}
+
+export async function listCompatibilityRules(): Promise<CompatibilityRule[]> {
+  const { data, error } = await supabase
+    .from('compatibility_rules')
+    .select('*')
+    .order('sort_order')
+    .order('name')
+  fail('Could not load the compatibility checks', error)
+  return (data ?? []) as CompatibilityRule[]
+}
+
+/**
+ * Change one rule. Who may is the database's decision, not this screen's: a
+ * master rule is the master administrator's, a company's own is its admin's.
+ */
+export async function saveCompatibilityRule(
+  id: string,
+  changes: Partial<Pick<CompatibilityRule, 'params' | 'severity' | 'is_active' | 'message' | 'sort_order'>>,
+): Promise<void> {
+  const { error } = await supabase.from('compatibility_rules').update(changes).eq('id', id)
+  fail('Could not save the check', error)
+}
+
+export async function listApprovalRules(companyId: string): Promise<ApprovalRule[]> {
+  const { data, error } = await supabase
+    .from('approval_rules')
+    .select('*')
+    .eq('company_id', companyId)
+    .order('sort_order')
+  fail('Could not load the approval rules', error)
+  return (data ?? []) as ApprovalRule[]
+}
+
+export async function saveApprovalRule(
+  rule: Pick<ApprovalRule, 'name' | 'condition' | 'outcome' | 'sort_order' | 'is_active'> & {
+    id?: string
+    company_id: string
+  },
+): Promise<void> {
+  const { id, ...values } = rule
+  const { error } = id
+    ? await supabase.from('approval_rules').update(values).eq('id', id)
+    : await supabase.from('approval_rules').insert(values)
+  fail('Could not save the rule', error)
+}
+
+export async function removeApprovalRule(id: string): Promise<void> {
+  const { error } = await supabase.from('approval_rules').delete().eq('id', id)
+  fail('Could not remove the rule', error)
 }

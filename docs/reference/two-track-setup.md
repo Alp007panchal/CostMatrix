@@ -44,6 +44,17 @@ An advanced feature is merged into `main` only when all three are true:
 2. It is behind a per-company switch that is **off by default**.
 3. You have tried it on the preview URL and approve it.
 
+**Condition 2 is built** (migration 0117, D-266). Every advanced feature has a row on the
+**Features** screen and arrives switched off for every company; only the master administrator can
+switch one on. Three of them change what an existing costing does and are marked as such — the
+rules engine, the nightly expiry sweep, and which panels count towards the total — and each is
+gated so that *off* behaves exactly as the app did before that feature was written.
+
+So the merge to `main` is now an ordinary one: `main` gets the whole of `advanced`, every feature
+off, and the live app behaves as it does today until you switch something on. What is left is
+condition 3, which is yours: try each feature on the staging preview and say which ones you want
+to be able to switch on for real work.
+
 And `main` is merged **into** `advanced` after every change to `main`, so the two never drift.
 
 ---
@@ -130,6 +141,79 @@ Open the `advanced` preview URL, click **Forgot password**, and enter your email
 password is separate from your production one, and nobody else knows it — the workflow creates
 the login with a random password that it masks and throws away.
 
+### 6. The assistant's key — Edge Function secrets on the staging project
+
+The assistant's server side is an Edge Function on the staging project (D-180), and its API key
+lives there: never in GitHub, never in Vercel, never in the browser. Enter it once, by hand, in
+the Supabase dashboard of the **second** account:
+
+1. Sign in at **https://supabase.com/dashboard** with the staging account and open the
+   **CostMatrix Staging** project.
+2. In the left-hand menu click **Edge Functions**, then the **Secrets** tab (in some layouts it is
+   **Project Settings** → **Edge Functions**). You should see a table headed *Secrets* listing the
+   ones Supabase injects itself (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, …).
+3. Click **Add new secret**. Name `ANTHROPIC_API_KEY`, value: the key from
+   console.anthropic.com → **API keys** → **Create key** (copy it once; the console never shows it
+   again). Click **Save**.
+4. Add four more the same way, each optional, each with its default if left out:
+
+   | Name | Value | If missing |
+   |---|---|---|
+   | `AI_PROVIDER` | `anthropic` | `anthropic`. `fake` makes a dry run that calls nobody. |
+   | `AI_MODEL` | `claude-opus-5` | `claude-opus-5` — drafts and reviews |
+   | `AI_MODEL_FAST` | `claude-haiku-4-5` | `claude-haiku-4-5` — plain questions |
+   | `AI_FALLBACKS` | leave out | on; `off` disables server-side refusal fallbacks |
+
+5. Secrets take effect on the function's next cold start; nothing to redeploy. The table shows
+   names only — a saved value is never displayed again, which is the point.
+
+### 7. Switching the assistant on for the staging company
+
+The assistant is **off for every company** until the master administrator turns it on (D-193),
+and it refuses with "switched off" until then. Phase 1 has no screen for the switch yet (the admin
+settings screen is assistant PR B), so on staging it is one query, run as the master administrator
+from the staging project's **SQL Editor** (the switch is guarded by a trigger: anyone but the master
+administrator is refused):
+
+```sql
+-- who has it on, and what budget (0 = none set, so the assistant refuses)
+select c.name, o.key, o.value
+from public.company_options o join public.companies c on c.id = o.company_id
+where o.key in ('ai_enabled', 'ai_monthly_token_budget') order by c.name, o.key;
+```
+
+The SQL Editor runs as the database owner, not as a signed-in person, so the trigger stands
+aside (D-193) and this flips it for the company named:
+
+```sql
+update public.company_options set value = 'true'::jsonb
+ where key = 'ai_enabled' and company_id = (select id from public.companies where kind = 'in_house');
+```
+
+(Staging has one in-house company, yours; a budget of `2000000` tokens is already seeded.) You can
+tell it is on in three ways:
+the first query shows `true`; **Check staging** will show it once that workflow is extended; and
+the function itself answers a turn instead of *"The assistant is switched off for your company"*.
+
+### 8. Trying the assistant on staging
+
+With §6 and §7 done, on the `advanced` preview:
+
+1. Open an enquiry, attach the NPP-192 PDF (or any specification) and wait for the Files card to
+   say **read**.
+2. Press **Open** on the **Assistant** card, then **Draft this costing from the attached
+   documents**. The reply appears as it is written; short grey lines say what it is doing.
+3. A **Proposed costing** card follows. Check a few lines against the document, accept or reject,
+   then **Apply**. You land on a new draft costing whose lines are marked as the assistant's, priced
+   by the ordinary engine.
+4. On that costing, **Review before submission** gives findings, with a one-click fix where one is
+   possible.
+5. **Assistant** in the top navigation shows what the two actions cost in tokens.
+
+Until the Anthropic account has credit, step 2 ends with *"the Anthropic account has no credit
+left"* and the remedy, which is the intended behaviour rather than a fault: everything up to the
+model call is working.
+
 ---
 
 ## If Supabase refuses to create the project
@@ -193,6 +277,7 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | `SUPABASE_STAGING_DB_PASSWORD` | secret, new | staging deploys | The staging database password. Never read by a `main` run. |
 | `SUPABASE_STAGING_PROJECT_REF` | variable, new | staging deploys | The staging project. A variable rather than a secret because a project ref is not sensitive and it helps to be able to read it back. |
 | `ADVANCED_PREVIEW_URL` | variable, optional | staging setup | If set, invitation emails sent from staging point at the preview URL instead of localhost. |
+| `ANTHROPIC_API_KEY` | Edge Function secret on the **staging project**, not GitHub | the `assistant` function | The assistant's key (D-180). Entered once in the Supabase dashboard (§6). Production has none until the assistant reaches `main`. |
 
 ## How the workflows divide up
 

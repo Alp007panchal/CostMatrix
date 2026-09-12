@@ -1,5 +1,7 @@
 import { supabase } from '../../lib/supabase'
-import type { Quotation, QuotationRow, QuotationStatus, ReleaseTexts } from '../../lib/database.types'
+import type {
+  Quotation, QuotationRow, QuotationStatus, QuotationValidity, ReleaseTexts,
+} from '../../lib/database.types'
 
 /**
  * Quotations. Releasing goes through a database function that checks the
@@ -94,4 +96,22 @@ export async function logoAsDataUrl(path: string | null): Promise<string | null>
     reader.onerror = () => resolve(null)
     reader.readAsDataURL(data)
   })
+}
+
+/** How long each quotation has left (v_quotation_validity, roadmap 2.6). */
+export async function listValidity(): Promise<QuotationValidity[]> {
+  const { data, error } = await supabase.from('v_quotation_validity').select('*')
+  fail('Could not read the quotation dates', error)
+  return (data ?? []) as QuotationValidity[]
+}
+
+/**
+ * Marks this company's quotations that have run out and raises a follow-up on
+ * the ones that were sent. The nightly job does the same for everybody; this is
+ * the button for somebody who does not want to wait for it.
+ */
+export async function checkMyQuotationExpiry(): Promise<{ expired: number; followups: number }> {
+  const { data, error } = await supabase.rpc('check_my_quotation_expiry')
+  fail('Could not check the quotation dates', error)
+  return data as { expired: number; followups: number }
 }

@@ -6,16 +6,26 @@ import { Async } from '../../ui/Async'
 import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
-  addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, listCostings, listPanelSections, removeCostingAssembly, removeItem, removePanel,
-  returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity, setLabourHours,
-  submitCosting, updateCosting, updatePanel,
+  addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, copyPanel,
+  createRevision, getCostingDetail, listBomItems, listCostings, listPanelSections, listPanelWarnings,
+  panelFit, reissueCosting, removeCostingAssembly, removeItem, removePanel, returnCosting,
+  setAssemblySection, setCostingAssemblyQuantity, setItemQuantity, setLabourHours, submitCosting,
+  updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
+import { CostingGrid } from './CostingGrid'
+import { costingWarningSummary, warningsByPanel } from './warnings'
+import { useFeatures } from '../admin/use-features'
+import { readCostingView, writeCostingView, type CostingView } from './costing-view'
 import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
+import { DocumentFiles } from '../documents/DocumentFiles'
+import { BomImportCard } from './BomImportCard'
+import { ApprovalPanel } from './ApprovalPanel'
+import { ActualHoursCard } from './ActualHoursCard'
+import { AssistantPanel } from '../assistant/AssistantPanel'
 
 /**
  * One costing. Editable while it is a current draft and the person may build
@@ -27,6 +37,9 @@ export function CostingEditor() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { company, hasRole } = useSession()
+  // Which advanced features this company has switched on (the road to
+  // production). One query for every card below, not one each.
+  const { on } = useFeatures()
 
   const detail = useQuery({ queryKey: ['costing', id], queryFn: () => getCostingDetail(id), enabled: Boolean(id) })
   const components = useQuery({ queryKey: ['components'], queryFn: listComponentPrices })
@@ -35,12 +48,20 @@ export function CostingEditor() {
   const bom = useQuery({ queryKey: ['bom', id], queryFn: () => listBomItems(id), enabled: Boolean(id) })
   const sections = useQuery({ queryKey: ['panel-sections'], queryFn: listPanelSections })
   const costings = useQuery({ queryKey: ['costings'], queryFn: listCostings })
+  // Roadmap 3.4: what the compatibility rules make of each panel. Advisory,
+  // so a failure to load it must never stop the costing being shown.
+  const warnings = useQuery({
+    queryKey: ['panel-warnings', id],
+    queryFn: () => listPanelWarnings(id),
+    enabled: Boolean(id) && on('compatibility_checks'),
+  })
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['costing', id] })
     await queryClient.invalidateQueries({ queryKey: ['bom', id] })
     await queryClient.invalidateQueries({ queryKey: ['costing-history', id] })
     await queryClient.invalidateQueries({ queryKey: ['costings'] })
+    await queryClient.invalidateQueries({ queryKey: ['panel-warnings', id] })
   }
 
   // Every edit is the same shape: do it, then reload the costing so the totals
@@ -50,6 +71,22 @@ export function CostingEditor() {
 
   const [returnComment, setReturnComment] = useState('')
   const [returning, setReturning] = useState(false)
+  // Panel by panel, or the whole costing as one grid (roadmap 2.9). Remembered
+  // per person in their own browser — it is a preference, not company data.
+  const [view, setView] = useState<CostingView>(readCostingView)
+  const chooseView = (next: CostingView) => { setView(next); writeCostingView(next) }
+
+  // The space check for every panel, for the grid's column headings. Only asked
+  // for when the grid is open, and silent when nothing has been measured (F12).
+  const panelIds = (detail.data?.panels ?? []).map((p) => p.id)
+  const fits = useQuery({
+    queryKey: ['panel-fits', id, panelIds.join(',')],
+    queryFn: async () => {
+      const pairs = await Promise.all(panelIds.map(async (pid) => [pid, await panelFit(pid)] as const))
+      return Object.fromEntries(pairs)
+    },
+    enabled: view === 'grid' && panelIds.length > 0,
+  })
 
   if (!company) return null
 
@@ -61,6 +98,7 @@ export function CostingEditor() {
         const editable = costing.status === 'draft' && costing.is_current && canBuild
         const label = costing.currency_label
         const processNames = Object.fromEntries((processTypes.data ?? []).map((p) => [p.code, p.name]))
+        const panelWarnings = warningsByPanel(warnings.data ?? [])
 
         return (
           <>
@@ -101,12 +139,25 @@ export function CostingEditor() {
                   </>
                 )}
                 {costing.status === 'approved' && costing.is_current && canBuild && (
-                  <button className="primary" onClick={() => act.mutate(async () => {
-                    const rev = await createRevision(costing.id)
-                    navigate(`/costings/${rev.id}`)
-                  })}>
-                    New revision
-                  </button>
+                  <>
+                    {/* Roadmap 2.6: the same job at today's prices, for a quotation
+                        that has run out. A revision, so the approved one stands. */}
+                    <button
+                      title="A new revision with every line priced at today's prices"
+                      onClick={() => act.mutate(async () => {
+                        const out = await reissueCosting(costing.id)
+                        navigate(`/costings/${out.costing_id}`)
+                      })}
+                    >
+                      Re-issue at today's prices
+                    </button>
+                    <button className="primary" onClick={() => act.mutate(async () => {
+                      const rev = await createRevision(costing.id)
+                      navigate(`/costings/${rev.id}`)
+                    })}>
+                      New revision
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -136,11 +187,81 @@ export function CostingEditor() {
               </>
             )}
 
+            {/* Two ways of reading the same costing: panel by panel, or the whole
+                thing as a grid (roadmap 2.9). The grid edits through the same
+                functions, so neither view is the privileged one. */}
+            {on('costing_grid') && (
+            <div className="row" style={{ marginTop: '.75rem', gap: '.4rem' }}>
+              <button
+                className={view === 'panels' ? 'primary' : undefined}
+                aria-pressed={view === 'panels'}
+                onClick={() => chooseView('panels')}
+              >
+                Panel by panel
+              </button>
+              <button
+                className={view === 'grid' ? 'primary' : undefined}
+                aria-pressed={view === 'grid'}
+                onClick={() => chooseView('grid')}
+              >
+                Grid
+              </button>
+            </div>
+            )}
+
             {/* One column, read top to bottom: what it costs, how it is built, what
                 to export, what happened. */}
-            <TotalsPanel costing={costing} totals={totals} optionTotals={optionTotals} bom={bom.data ?? []} categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))} />
+            {/* Roadmap 2.5: what the company's rules make of this costing. */}
+            {on('approval_rules') && <ApprovalPanel costingId={costing.id} status={costing.status} />}
 
-            {panels.map((panel) => (
+            <TotalsPanel
+              costing={costing}
+              totals={totals}
+              optionTotals={optionTotals}
+              bom={bom.data ?? []}
+              categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))}
+              editable={editable}
+              onChooseOption={(chosen) => run(() => updateCosting(costing.id, { chosen_option_label: chosen }))}
+            />
+
+            {/* Roadmap 3.4: one line so nobody has to scroll every panel to find
+                out whether the checks found anything. */}
+            {on('compatibility_checks') && costingWarningSummary(warnings.data ?? []) && (
+              <p className="muted" style={{ margin: '.4rem 0 0' }}>
+                Compatibility checks: {costingWarningSummary(warnings.data ?? [])}. They are shown on the panels
+                themselves, and change no figure.
+              </p>
+            )}
+
+            {on('costing_grid') && view === 'grid' && (
+              <CostingGrid
+                costing={costing}
+                panels={panels}
+                assemblies={assemblies}
+                items={items}
+                panelPrices={panelPrices}
+                totals={totals}
+                kits={kits}
+                components={components.data ?? []}
+                categoryNames={Object.fromEntries((categories.data ?? []).map((c) => [c.code, c.name]))}
+                fits={fits.data ?? {}}
+                editable={editable}
+                handlers={{
+                  onAddKit: async (pid, kid, qty) => { await addAssemblyToPanel(pid, kid, qty, null); await refresh() },
+                  onAddComponent: async (pid, cid, qty) => { await addComponentToPanel(pid, cid, qty, null); await refresh() },
+                  onKitQuantity: (lid, qty) => run(() => setCostingAssemblyQuantity(lid, qty)),
+                  onItemQuantity: (iid, qty) => run(() => setItemQuantity(iid, qty)),
+                  onRemoveKit: (lid) => run(() => removeCostingAssembly(lid)),
+                  onRemoveItem: (iid) => run(() => removeItem(iid)),
+                  onAddPanel: () => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length)),
+                  onCopyPanel: (pid) => run(() => copyPanel(
+                    pid, costing.id, `${panels.find((p) => p.id === pid)?.name ?? 'Panel'} (copy)`,
+                  )),
+                }}
+              />
+            )}
+
+            {(view === 'panels' || !on('costing_grid')) && panels.map((panel) => (
               <PanelCard
                 key={panel.id}
                 panel={panel}
@@ -157,13 +278,14 @@ export function CostingEditor() {
                 components={components.data ?? []}
                 categories={categories.data ?? []}
                 sections={(sections.data ?? []).map((s) => s.name)}
+                warnings={panelWarnings.get(panel.id) ?? []}
                 label={label}
                 editable={editable}
                 processNames={processNames}
                 handlers={{
                   onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
                   onPanelRemove: (pid) => run(() => removePanel(pid)),
-                  onAddAssembly: async (pid, aid, qty, section) => { await addAssemblyToPanel(pid, aid, qty, section); await refresh() },
+                  onAddAssembly: async (pid, aid, qty, section, params) => { await addAssemblyToPanel(pid, aid, qty, section, params); await refresh() },
                   onAddComponent: async (pid, cid, qty, section) => { await addComponentToPanel(pid, cid, qty, section); await refresh() },
                   onAddManual: async (pid, input, section) => { await addManualItem(pid, input, section); await refresh() },
                   onAssemblyQuantity: (aid, q) => run(() => setCostingAssemblyQuantity(aid, q)),
@@ -177,7 +299,7 @@ export function CostingEditor() {
               />
             ))}
 
-            {editable && (
+            {(view === 'panels' || !on('costing_grid')) && editable && (
               <button onClick={() => run(() => addPanel(costing.id, company.id, `Panel ${panels.length + 1}`, panels.length))}>
                 + Add a panel
               </button>
@@ -200,6 +322,38 @@ export function CostingEditor() {
                 </p>
               </div>
             )}
+
+            {/* Somebody else's parts list, matched to kits and parts (roadmap 2.3). */}
+            {on('bom_import') && <BomImportCard costingId={costing.id} editable={editable} />}
+
+            {/* What the boards actually took (roadmap 2.8). Available whatever the
+                costing's status, because the work happens after approval, and it
+                changes nothing this costing was priced on. */}
+            {on('labour_actuals') && (
+              <ActualHoursCard
+                costingId={costing.id}
+                panels={panels}
+                processTypes={processTypes.data ?? []}
+                currencyLabel={label}
+                canRecord={canBuild}
+              />
+            )}
+
+            {/* The spec, the tender schedule, the drawing this costing answers.
+                Kept with it, and read so the assistant can use them later. */}
+            {on('documents') && (
+              <DocumentFiles entityType="costing" entityId={costing.id} companyId={costing.company_id} canEdit={editable} />
+            )}
+
+            {/* Reads this costing and those documents, and proposes; a person
+                applies. Nothing it does reaches the costing on its own. */}
+            <AssistantPanel
+              entityType="costing"
+              entityId={costing.id}
+              panels={panels}
+              canApply={editable}
+              onApplied={() => void refresh()}
+            />
 
             <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
             <HistoryPanel costingId={costing.id} />

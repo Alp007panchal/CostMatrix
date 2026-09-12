@@ -4,7 +4,8 @@ import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import { longDate, money } from '../../lib/format'
 import { getEnquiry, listCustomers } from './api'
-import { EnquiryFiles } from './EnquiryFiles'
+import { DocumentFiles } from '../documents/DocumentFiles'
+import { AssistantPanel } from '../assistant/AssistantPanel'
 import { listCostings } from '../costing/api'
 import { listQuotations } from '../quotation/api'
 
@@ -48,7 +49,15 @@ export function EnquiryDetail() {
               </div>
             </div>
 
-            <EnquiryFiles enquiryId={e.id} companyId={e.company_id} canEdit={canEdit} />
+            <DocumentFiles entityType="enquiry" entityId={e.id} companyId={e.company_id} canEdit={canEdit} />
+
+            {/* Drafts a costing from the attached documents, as a proposal. */}
+            <AssistantPanel
+              entityType="enquiry"
+              entityId={e.id}
+              canApply={canEdit}
+              onApplied={(result) => navigate(`/costings/${result.costing_id}`)}
+            />
 
             <div className="card">
               <h2 style={{ marginTop: 0 }}>Costings</h2>

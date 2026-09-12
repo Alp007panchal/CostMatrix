@@ -18,7 +18,13 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@anthropic-ai/sdk": ["./node_modules/@anthropic-ai/sdk"],
+      "@supabase/supabase-js": ["./node_modules/@supabase/supabase-js"],
+      "vitest": ["./node_modules/vitest"]
+    }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "vite.config.ts", "vitest.config.ts", "../supabase/functions/_shared/ai"]
 }

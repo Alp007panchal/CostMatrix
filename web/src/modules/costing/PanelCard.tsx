@@ -11,20 +11,27 @@ import type {
   CostingPanel,
   Kit,
   PanelPrice,
+  PanelWarning,
 } from '../../lib/database.types'
 import { PanelLines } from './PanelLines'
 import { CopyPanel } from './CopyPanel'
+import { ApfcCard } from './ApfcCard'
+import { BoardCard } from './BoardCard'
+import { BusbarCard } from './BusbarCard'
 import { KitPicker } from './KitPicker'
 import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
 import { Detail } from './PanelDetails'
+import { PanelFitLine } from './PanelFitLine'
+import { PanelWarnings } from './PanelWarnings'
+import { useFeatures } from '../admin/use-features'
 import { describePanel } from './technical'
 import type { ManualItemInput } from './api'
 
 interface Handlers {
   onPanelChange: (id: string, changes: Partial<CostingPanel>) => void
   onPanelRemove: (id: string) => void
-  onAddAssembly: (panelId: string, assemblyId: string, quantity: number, section: string | null) => Promise<void>
+  onAddAssembly: (panelId: string, assemblyId: string, quantity: number, section: string | null, params: Record<string, string> | null) => Promise<void>
   onAddComponent: (panelId: string, componentId: string, quantity: number, section: string | null) => Promise<void>
   onAddManual: (panelId: string, input: ManualItemInput, section: string | null) => Promise<void>
   onAssemblyQuantity: (id: string, quantity: number) => void
@@ -50,6 +57,7 @@ export function PanelCard({
   components,
   categories,
   sections,
+  warnings,
   label,
   editable,
   processNames,
@@ -69,17 +77,20 @@ export function PanelCard({
   categories: ComponentCategory[]
   /** The section names on offer; a section typed here is kept as it is. */
   sections: string[]
+  /** What the compatibility rules found here (roadmap 3.4). Advisory. */
+  warnings: PanelWarning[]
   label: string
   editable: boolean
   processNames: Record<string, string>
   handlers: Handlers
 }) {
   const [showDetails, setShowDetails] = useState(false)
+  const { on } = useFeatures()
   const [section, setSection] = useState('')
   const kvar = kvarTotal(assemblies, kits)
   const listId = `panel-sections-${panel.id}`
 
-  const field = (key: keyof CostingPanel, value: string | number | null) =>
+  const field = (key: keyof CostingPanel, value: string | number | boolean | null) =>
     handlers.onPanelChange(panel.id, { [key]: value })
 
   return (
@@ -119,6 +130,12 @@ export function PanelCard({
           >
             {showDetails ? 'Hide details' : 'Details: tag, option, description'}
           </button>
+          {/* Foundations F12: will this fit the cubicles bought for it? Silent
+              until the kits and the cubicle have been measured. */}
+          {on('dimensions') && <PanelFitLine panelId={panel.id} />}
+          {/* Roadmap 3.4: what the compatibility rules found here. Advisory, and
+              silent about parts nobody has measured or described. */}
+          {on('compatibility_checks') && <PanelWarnings warnings={warnings} />}
         </div>
 
         <div style={{ textAlign: 'right', minWidth: '11rem' }}>
@@ -129,6 +146,15 @@ export function PanelCard({
           <div className="muted" style={{ fontSize: '.8125rem' }}>
             × {panel.quantity} = {money(price?.line_total ?? 0, label)}
           </div>
+          {/* Roadmap 2.7: say plainly why a priced panel is not in the total. */}
+          {panel.is_option && (
+            <div className="badge" style={{ marginTop: '.3rem' }}>Optional extra — not in the total</div>
+          )}
+          {!panel.is_option && price && !price.in_chosen_offer && (
+            <div className="badge" style={{ marginTop: '.3rem' }}>
+              {panel.option_label} — not the chosen option
+            </div>
+          )}
           {editable && (
             <button className="danger" style={{ marginTop: '.5rem' }} onClick={() => handlers.onPanelRemove(panel.id)}>
               Remove panel
@@ -143,6 +169,21 @@ export function PanelCard({
           <Detail label="Option" hint="e.g. Option 1" value={panel.option_label} editable={editable} onCommit={(v) => field('option_label', v)} />
           <Detail label="Unit" value={panel.uom} editable={editable} onCommit={(v) => field('uom', v || 'PC')} />
           <Detail label="Enclosure" hint="e.g. 2100(H)×800(W)×800(D)" value={panel.enclosure_dimensions} editable={editable} onCommit={(v) => field('enclosure_dimensions', v)} />
+          <label className="row" style={{ gap: '.4rem', alignItems: 'flex-start' }}>
+            <input
+              type="checkbox"
+              checked={panel.is_option}
+              disabled={!editable}
+              style={{ width: 'auto', marginTop: '.15rem' }}
+              onChange={(e) => field('is_option', e.target.checked)}
+            />
+            <span style={{ fontSize: '.8125rem' }}>
+              Optional extra
+              <em className="hint" style={{ display: 'block' }}>
+                priced and printed on the quotation, left out of the total
+              </em>
+            </span>
+          </label>
           <div style={{ gridColumn: '1 / -1' }}>
             <div className="spread">
               <span className="muted" style={{ fontSize: '.8125rem' }}>Technical description (printed on the quotation; left blank, it is written from the kits at release)</span>
@@ -207,7 +248,7 @@ export function PanelCard({
               — choose one or type your own; everything added below goes there.
             </span>
           </div>
-          <KitPicker kits={kits} onAdd={(id, qty) => handlers.onAddAssembly(panel.id, id, qty, clean(section))} />
+          <KitPicker kits={kits} onAdd={(id, qty, params) => handlers.onAddAssembly(panel.id, id, qty, clean(section), params)} />
           <AddFreeLine
             components={components}
             categories={categories}
@@ -215,6 +256,18 @@ export function PanelCard({
             onAddComponent={(cid, qty) => handlers.onAddComponent(panel.id, cid, qty, clean(section))}
             onAddManual={(input) => handlers.onAddManual(panel.id, input, clean(section))}
           />
+          {/* A bank worked out from a target, rather than counted by hand. */}
+          {/* Roadmap 3.1: answer what the board is and the kits come back. */}
+          {on('board_configurator') && (
+            <BoardCard
+              panelId={panel.id}
+              hasLines={assemblies.some((a) => a.kind === 'kit')}
+              onApplied={handlers.onPanelCopied}
+            />
+          )}
+          {on('apfc_configurator') && <ApfcCard panelId={panel.id} onApplied={handlers.onPanelCopied} />}
+          {/* Roadmap 4.1: the CU-OPT1 sheet, with the metres carried into the costing. */}
+          {on('busbar_runs') && <BusbarCard panelId={panel.id} onApplied={handlers.onPanelCopied} />}
           <CopyPanel panel={panel} costing={costing} drafts={drafts} onCopied={handlers.onPanelCopied} />
         </>
       )}

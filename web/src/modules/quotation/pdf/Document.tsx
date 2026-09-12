@@ -98,6 +98,36 @@ export function QuotationDocument({ data }: { data: QuotationPdfData }) {
                 <Text style={s.totalsValue}>{sch.total}</Text>
               </View>
             </View>
+            {/* Roadmap 2.7: extras the customer may take or leave. Priced here, and
+                not in the total above — which is why they have a table of their own. */}
+            {sch.optionalRows.length > 0 && (
+              <View style={s.table} wrap={false}>
+                <View style={s.tr}>
+                  <Cell header style={s.cNo} align="center">ITEM NO</Cell>
+                  <Cell header style={s.cDesc}>OPTIONAL ITEMS — NOT INCLUDED IN THE TOTAL ABOVE</Cell>
+                  <Cell header style={s.cUom} align="center">UOM</Cell>
+                  <Cell header style={s.cQty} align="center">QTY</Cell>
+                  <Cell header style={s.cUnit} align="right">UNIT PRICE (IN {data.currencyLabel}.)</Cell>
+                  <Cell header style={s.cTot} align="right" last>TOTAL (IN {data.currencyLabel}.)</Cell>
+                </View>
+                {sch.optionalRows.map((r) => (
+                  <View key={r.itemNo} style={s.tr}>
+                    <Cell style={s.cNo} align="center">{r.itemNo}</Cell>
+                    <Cell style={s.cDesc}>{r.description}</Cell>
+                    <Cell style={s.cUom} align="center">{r.uom}</Cell>
+                    <Cell style={s.cQty} align="center">{r.qty}</Cell>
+                    <Cell style={s.cUnit} align="right">{r.unitPrice}</Cell>
+                    <Cell style={s.cTot} align="right" last>{r.total}</Cell>
+                  </View>
+                ))}
+                <View style={s.trLast}>
+                  <Text style={s.totalsLabel}>
+                    If all the optional items above are taken, in {data.currencyLabel} (Inclusive of VAT)
+                  </Text>
+                  <Text style={s.totalsValue}>{sch.optionalTotal}</Text>
+                </View>
+              </View>
+            )}
           </View>
         ))}
       </Page>

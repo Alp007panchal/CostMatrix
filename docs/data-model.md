@@ -193,7 +193,8 @@ View **v_currency_factors** — per master currency: the company's own figures w
 
 **costing_panels**
 - `costing_id`, `company_id`, `name`, `tag`, `quantity`, `uom` default `PC`, `sort_order`
-- `option_label` text nullable — panels sharing a label form one priced option
+- `option_label` text nullable — panels sharing a label form one priced option; the costing names
+  which one it means in `chosen_option_label` (0109)
 - `technical_description` text — printed in Annexure IV; drafted by the app, edited by the engineer
 - `enclosure_dimensions` text, e.g. `2100(H) x 3500(W) x 800(D) mm`
 
@@ -391,11 +392,456 @@ Role checks per area:
 - The screen uploads the file first and writes the row second, taking the file back out if the
   row is refused, so the two never disagree.
 
+### Added by migration 0100 — foundations F1 to F3 (advanced track)
+
+The first advanced-track migration, numbered from 0100 so it can never collide with a
+basic-track number on `main` (D-170). Nothing in it changes a price.
+
+**components** (F1) — `supplier` (who invoices, as against `manufacturer`, which is the brand the
+quotation prints); `attributes` jsonb typed by category; `replaced_by → components` with a check
+that a part cannot replace itself; `datasheet_url`; `lead_time_days`; `price_valid_from` and
+`price_source`. **`status`** is a **generated** column — `placeholder` when `is_placeholder`,
+`obsolete` when not `is_active`, else `active` — because `is_placeholder` is load-bearing today
+(the `components_pricing_fields` constraint allows a null price only for a placeholder, and
+`app.freeze_component` refuses an unpriced non-placeholder). Writing it raises *"column status can
+only be updated to DEFAULT"*, which is the point: a silent revert would be worse (D-175).
+**component_price_history** gained `source`.
+
+**assemblies** (= kits, F2) — `version` (default 1), `customer_wording`, `compatibility_rules`
+jsonb, `tags text[]` with a GIN index, and a generated `status` of `active`/`retired` from
+`is_active`. **assembly_components** — `qty_expression` (null everywhere today; the engine rule is
+null means use `quantity`) and `customer_wording`.
+
+**kit_parameters** — `assembly_id`, `name`, `value_type`, `unit`, `default_value`, `min_value`,
+`max_value`, `sort_order`; unique per kit and name; `kit_parameters_min_not_above_max` named so the
+message says what is wrong. Empty in phase 1. Parent-derived RLS, like `assembly_components`.
+
+**costing_assemblies.source_version** — the kit version a line was copied from. The composition
+freeze itself already existed: `add_assembly_to_costing` snapshots the kit's code and name and
+copies every line into `costing_items` with its price frozen, and `source_assembly_id` is
+`on delete set null` provenance only, so editing or deleting a master kit cannot reach an existing
+costing (D-177). Test 23 proves it: a kit is renamed, a line's quantity changed, a line removed, a
+line added, the version bumped and the kit retired, and the costing's lines stay identical.
+
+**costing_panels.productivity_factor** (F3) — `numeric(6,3) not null default 1.0`, `> 0`. The one
+change that touches the pricing views: `v_costing_panel_costs.labour_cost` and `.hours` are
+multiplied by it, so every view above — panel prices, totals, the price schedule — picks it up
+unchanged. `labour_cost_standard` and `hours_standard` are appended beside them so the adjustment
+can always be explained, the same rule the frozen price columns follow. At 1.0 the arithmetic is
+identical, which is why test 15 is unmodified. There is deliberately no costing-wide factor
+(D-186).
+
+**labour_actuals** — `company_id`, `costing_id`, `panel_id`, `process_type`, `hours`, `source`
+(`manual`/`timesheet`), `note`, `recorded_at`, with the same composite foreign keys the costing
+tables use. Never read by the pricing engine. Tenant-owned RLS.
+
+**labour_rate_history** — `labour_rate_id`, `old_hourly_rate`, `new_hourly_rate`, `changed_by`,
+`changed_at`, filled by a SECURITY DEFINER trigger. `labour_rates` was the only rate table with no
+history; `components`, `material_rates` and `currency_factors` all keep a current value plus a
+history table, and effective dating exists nowhere in this schema, so this matches the pattern
+rather than the roadmap's `valid_from` wording (D-176).
+
+**v_component_prices** gained the new component columns (appended, so everything selecting by name
+is unaffected), which is how the component form shows and edits them without a second query.
+
+`app.add_assembly_to_costing` records `source_version`; `app.create_costing_revision` and
+`app.copy_panel` carry `source_version` and `productivity_factor`. Those three column lists are
+written by hand, and a column added later and forgotten in them is dropped silently — the bug
+migration 0011 had to fix once already.
+
+### Added by migration 0101 — foundations F4 to F6 (advanced track)
+
+**costing_panels** — `parameters` jsonb (the board's defining answers: incomer rating, sources,
+form, IP, access, cable entry, APFC kVAr, enclosure dimensions; empty today) and `is_option`
+(priced and printed but left out of the total; `option_label` stays the grouping, D-179).
+
+**costing_assemblies** and **costing_items** — `origin` (`manual` / `kit` / `configurator` /
+`import` / `ai_proposal`, checked) and `origin_ref`, a bare uuid naming an assistant proposal or an
+import job (D-189). Back-filled: `kit` where the holder is a kit, `manual` otherwise.
+`app.freeze_component` gained `line_origin` and `line_origin_ref` as trailing parameters with
+defaults; `add_assembly_to_costing` passes `kit`; the apply step of an assistant proposal will pass
+`ai_proposal` and the proposal id. `create_costing_revision` and `copy_panel` carry all four
+columns; test 24 proves it through a revision and a copy.
+
+**documents** — replaces `enquiry_attachments` (D-190). `company_id`, `entity_type` (`enquiry` /
+`costing` / `quotation` / `component` / `supplier_price_list`), `entity_id` (nullable for a price
+list that belongs to nothing yet), `file_name`, `path` (unique), `mime_type`, `size_bytes`, `note`,
+`extracted_text`, `extraction_status` (`pending` / `done` / `failed` / `unsupported`),
+`extraction_error`, `extracted_at`. Two triggers replace the composite foreign key:
+`documents_check_entity` refuses an enquiry, costing or quotation that is not the company's, and
+`documents_follow_entity` on those three tables deletes the rows when the record goes. Rows from
+`enquiry_attachments` were copied with their paths unchanged, so nothing in storage moved. Read for
+the company and the master admin; write for whoever may edit costings. The `attachments` bucket is
+unchanged.
+
+**activity_log** — `company_id`, `actor_user_id` (null for the assistant or a job), `actor_kind`
+(`user` / `assistant` / `system`), `entity_type`, `entity_id`, `action`, `before`, `after`, `note`,
+`created_at`. Append-only: only `app.write_activity(...)` (SECURITY DEFINER, company from the
+caller) may insert, and nobody may update or delete. `costing_history` is untouched (D-178).
+
+### Added by migration 0102 — foundations F7 to F11 (advanced track)
+
+**approval_rules** — per company, ordered: `name`, `condition` (a jsonb list of
+`{field, op, value}`, all of which must hold; `[]` always holds), `outcome` (`auto_approve` /
+`require_approver` / `require_master_admin` / `block`), `is_active`. One rule per company is
+seeded, "Always require an approver", and a new company gets it at birth.
+`app.costing_facts(costing)` returns what a rule can test (`total_ex_vat`, the margins,
+`profit_margin_pct` = the lower of material and labour, `uses_placeholder_part`,
+`price_age_days`, `status`); `app.evaluate_approval_rules(costing)` returns the first holding rule
+with the facts, or `require_approver` when none holds. **The lifecycle does not call it** (D-192).
+
+**quotations.valid_until** — set by `release_quotation` to today plus `validity_days`.
+**costings.price_snapshot_at** — set by `create_costing`, carried by a revision, fresh on a copy;
+back-filled to `created_at` (D-194).
+
+**import_jobs** (`company_id` null = master library, `user_id`, `type` = `catalogue` / `kits` /
+`kit_group_hours` / `bom` / `price_list` / `labour_hours`, `document_id → documents`, `file_name`,
+`status` = `preview` / `applied` / `failed` / `discarded`, `column_mapping`, `summary`,
+`rows_total`, `legacy_batch_id → import_batches` unique, `started_at`, `finished_at`) and
+**import_rows** (`job_id`, `row_number`, `raw`, `matched_entity_id`, `match_method`, `status`,
+`message`). Filled by the `import_batches_mirror` trigger on insert and update of
+`import_batches`, so the three importers of 0010 are untouched; batches from before 0102 got a job
+row each (D-191).
+
+**company_options** — `company_id`, `key`, `value` jsonb, `value_type`; unique per company and
+key. `app.company_option(key, fallback)` reads the caller's own. Seeded for every company, and
+for a new one at birth, with `ai_enabled` false, `ai_monthly_token_budget`,
+`ai_price_age_warning_days` 90 and `ai_min_margin_pct`. A company admin writes; only the master
+administrator may change `ai_enabled` (trigger `company_options_protect_master`, D-193).
+`company_settings`, the older wide table, is unchanged.
+
+**assistant_conversations** (`company_id`, `user_id`, `entity_type` enquiry / costing,
+`entity_id`, `title`, `tokens_in`, `tokens_out`, `cost_usd`), **assistant_messages**
+(`conversation_id`, `role` user / assistant / tool, `content`, `tool_calls`, `tool_results`
+trimmed, `model`, tokens, `latency_ms`) and **assistant_proposals** (`conversation_id`,
+`message_id`, `company_id`, `entity_type`, `entity_id`, `type` draft_costing / review /
+line_change, `status` open / partially_applied / applied / rejected / expired, `payload`,
+`applied_by`, `applied_at`, `result`) — AI spec §6, empty, tenant-owned RLS, no screen yet. A line
+created by applying a proposal carries `origin = ai_proposal` and `origin_ref` = the proposal id.
+
+### Added by migration 0103 — what the assistant may ask (advanced track)
+
+No tables and no columns: read-only `security invoker` functions, each with a `public.` wrapper
+granted to `authenticated`, so row-level security answers as it does for the screen (D-198).
+
+| Function | Returns |
+|---|---|
+| `costing_snapshot(costing)` | The costing as one JSON document: header, frozen settings, panels with `parameters`, every line with its items, labour, `origin`, `origin_ref` and `source_version`, the totals from `v_costing_totals`, attached documents. Null when the caller may not see it. |
+| `enquiry_snapshot(enquiry)` | Customer, contact, project, the enquiry's costings and documents. |
+| `document_text(document, max_chars = 200000)` | `extracted_text` cut to the ceiling, with `truncated` and the extraction status. |
+| `search_kits(q, filters, lim = 20)` | Up to 50 active kits by full-text search over name, code, customer wording and labels (plus `ilike`), filtered by `rating_a`, `poles`, `category` (group name), `tag`, `brand`, `frame`; each with today's price (`v_component_prices` × quantity) and hours (`v_assembly_hours`). |
+| `search_components(q, filters, lim = 20)` | Up to 50 active components by name, code, part number, description; filters `category`, `bom_category`, `brand`, `rating_a`, `poles`, `unit`; price in the caller's currency, `status`. |
+| `kit_detail(kit)` | One kit with lines, prices, parameters, wording, rules, hours. |
+| `company_policy()` | The caller's company: margins, rounding, VAT, terms, the four assistant options, approval rules, kit groups, categories. Never a purchase price (spec §8). |
+| `price_preview(lines)` | Indicative material, labour and selling price for `[{kit_id \| component_id, qty}]` by the same divisor-and-ceil arithmetic as `v_costing_panel_prices`, nothing written; unpriced parts named under `unpriced`. |
+| `assistant_allowance()` | `enabled`, `monthly_token_budget`, `used_this_month` (summed from this month's `assistant_messages`), `recent_requests` (this user's, last 60 s), `rate_limit_per_minute` 20. |
+| `assistant_record_usage(conversation, in, out, cost)` | Adds to the conversation's token and cost totals. The one writer, and it writes only its own row. |
+
+### Added by migration 0104 — applying what the assistant proposed (advanced track)
+
+No tables and no columns. Functions, `security invoker`, wrapped in `public.` and granted to
+`authenticated` (D-205):
+
+| Function | What it does |
+|---|---|
+| `apply_proposal(proposal, decisions)` | Applies the lines a person accepted. `decisions` is `{lines: [{panel, line, kind, ref_id, qty, section}], title?}` for a draft, `{finding, panel_id?}` for a review, `{panel_id?}` for a line change. A draft on an enquiry creates a draft costing through `create_costing`; lines go in through `add_assembly_to_costing` / `add_component_to_costing` and are stamped `origin = ai_proposal`, `origin_ref` = the proposal. Sets the proposal to `applied` or `partially_applied`, records `result` (the costing, the lines, the findings applied) and writes `proposal.applied` to the activity log — `actor_kind = user`, because the assistant proposed and a person applied. |
+| `apply_line_change(proposal, costing, change, panel)` | One `add` / `change_qty` / `remove` / `set_parameter`: a review's inline fix, or a `line_change` proposal. |
+| `apply_proposal_line(proposal, panel, kind, ref, qty, section)` | One line through the engine, with its provenance stamped. Reports `merged` when the engine added to a line that was already there, rather than claiming it. |
+| `reject_proposal(proposal, reason)` | Status `rejected` with the reason, and `proposal.rejected` in the activity log. What was already applied stays applied. |
+| `assistant_usage()` | For the Assistant admin screen: six months of tokens and answers, this month by person, the month's cost, the proposal counts, and the allowance. |
+
+Refused, as for any other edit: a costing that is not an open draft, a proposal of another company
+(to them it is not there), a person without `app.can_edit_costings()`, an empty set of accepted
+lines, the same proposal or the same finding twice.
+
+### Added by migration 0105 — supplier price lists (advanced track)
+
+No tables: the F9 framework (0102) already had them. Functions, all SECURITY INVOKER, so
+`app.assert_may_import` and the library policies decide who may re-price what.
+
+| Function | What it does |
+|---|---|
+| `app.normalise_part_key(text)` | A reference with every non-alphanumeric character stripped, upper case. The basis of the loose match. |
+| `app.match_price_list_row(to_company, key, maker)` | Four attempts, most trustworthy first: `code`, `part_number`, `manufacturer_part_number`, `part_number_loose`. Returns the part, the method, and how many answered — more than one is a warning, never a guess. |
+| `start_price_list(to_company, file_name, rows, mapping, document)` | One `import_jobs` row of type `price_list` plus one `import_rows` row per line, each with its match, old → new, `change_pct` and a status (`changed` / `unchanged` / `new` / `warning` / `rejected`). **Writes nothing else.** |
+| `accept_price_rows(job, row_ids)` | Applies the rows a person accepted (all the `changed` ones when `row_ids` is null): sets `purchase_price`, `purchase_currency`, `price_valid_from`, `price_source`, clears `is_placeholder`, marks the row `accepted`, recounts the job and writes `price_list.accepted` to the activity log. |
+| `discard_import_job(job, reason)` | A `preview` job nobody wants becomes `discarded`, with the reason kept. |
+
+`app.record_component_price_change` (0008) is re-derived to write `component_price_history.source`
+from the component's own `price_source`, so every price change says where it came from (D-212).
+### Added by migration 0107 — importing somebody else's parts list (advanced track)
+
+No tables: the F9 framework again, with `import_jobs.type = 'bom'` and the costing it is for kept
+in `summary.costing_id`.
+
+| Function | What it does |
+|---|---|
+| `match_catalogue_row(key, maker)` | The four attempts of 0105 over every component the caller can see — master and own. |
+| `kits_with_main_device(component)` | The active kits that part is the main device of, with their group, line count and whether any line is unpriced. |
+| `start_bom_import(costing, file_name, rows, mapping, document)` | One job and one row per line: matched part, the kit proposed where exactly one kit uses it as its main device, quantity (blank means one), and a status — `new`, `warning` (nothing matched, or several parts answer to the reference) or `rejected`. Writes nothing to the costing. |
+| `add_line_with_origin(panel, kind, ref, qty, section, origin, origin_ref)` | 0104's `apply_proposal_line` with the origin as an argument, merge rule included. |
+| `apply_bom_import(job, decisions)` | Brings the chosen rows onto a new panel: each row a kit, a part, a new placeholder (library only, no line) or nothing. Writes `bom.imported` to the activity log. |
+
+The two import policies of 0102 are re-derived with one extra clause each: a `bom` job of this
+company may be written by anybody who may edit costings, not only a company administrator (D-222).
+
+### Added by migration 0106 — foundations F12, physical dimensions (advanced track)
+
+Groundwork for the panel layout canvas (roadmap 3.8). Everything nullable; nothing in the engine
+reads it.
+
+**components** — `width_mm`, `height_mm`, `depth_mm` (each > 0 or null), `mounting_type`
+(`din_rail` / `plate` / `withdrawable` / `door` / `busbar_chamber` / `other`), `clearances` jsonb
+(`{top, bottom, left, right}` in mm), `weight_kg`, and `enclosure_layout` jsonb — the latter
+allowed only on a row marked `is_enclosure_cubicle` (constraint `components_layout_is_enclosure`),
+holding `usable_w_mm` / `usable_h_mm` / `usable_d_mm`, `busbar_chamber`, `cable_chamber` and `form`.
+Appended to `v_component_prices`, which was re-derived from the 0100 text by insertion.
+
+**assemblies** — `footprint_w_mm`, `footprint_h_mm`, `footprint_d_mm`: optional overrides. Null
+means "derive it from the main device and its clearances".
+
+**panel_layouts** — `company_id`, `panel_id`, `version` (unique per panel), `cubicles` jsonb
+(each cubicle with its size and a `placements` array of kit lines at `x_mm`, `y_mm`, `w_mm`,
+`h_mm`, `rotation`), `note`. Tenant-owned RLS, written by nobody yet.
+
+| Function | Returns |
+|---|---|
+| `component_footprint(component)` | The space it takes: its size plus its clearances, with `area_mm2`, or `known: false`. |
+| `kit_footprint(kit)` | The kit's own footprint if set, else the main device's, else `known: false` naming what is unmeasured. |
+| `panel_fit(panel)` | Footprints on the panel × quantity against the usable area of its cubicles × `company_options.layout_safety_factor` (1.3): verdict `fits` / `tight` / `no_fit` / `unknown`, the areas, `used_pct`, and which kits are unmeasured. Advisory and read-only. |
+| `import_dimensions(rows, to_company, apply)` | Reads `dimensions-template.csv`. Touches only the F12 columns; a blank row counts as not filled in yet. |
+
+### Added by migration 0108 — approval rules in force, and validity (advanced track)
+
+**quotations.expired_at** — when the sweep noticed `valid_until` had passed. A fact beside the
+status, not a status (D-227). **v_quotation_validity** derives `days_left` and `has_run_out`.
+
+| Function | What it does |
+|---|---|
+| `approval_review(costing)` | The verdict, and every active rule with each condition, whether it holds and the figure it looked at. Read-only; behind the "why this needs approval" panel. |
+| `submit_costing` / `approve_costing` | Re-derived from 0004 by insertion: the verdict is asked for, `block` refuses naming the rule, `auto_approve` approves on the spot with `approved_by = null` and a "approved by rule" history line, `require_master_admin` refuses an ordinary approver, and the deciding rule is written into the history. With only the default rule, behaviour is unchanged. |
+| `expire_quotations()` | The nightly sweep: marks every quotation whose validity passed while still released or sent, logs it as `actor_kind = system`, and raises a follow-up on the ones that had been sent. Scheduled by pg_cron where it exists; **revoked from `authenticated`**. |
+| `check_my_quotation_expiry()` | The same work for the caller's own company, from a button. |
+| `reissue_costing(costing)` | A new revision of an approved costing with every line priced today: `create_costing_revision` for the numbering and history, then `copy_panel` per panel for the re-pricing, and a fresh `price_snapshot_at`. |
+
+### Added by migration 0109 — options, alternatives and optional extras (advanced track)
+
+**costings.chosen_option_label** — which of the job's options the costing's own total means,
+matching `costing_panels.option_label`. Null means no choice has been made, and the totals add
+every option together exactly as they did before, which is why nothing about an existing costing
+changes (D-231). Panels with no option label are common to every option and always count. Carried
+by `create_costing_revision` (its hand-written column list) and by `copy_costing` (which starts
+from `create_costing`, so the label is set afterwards).
+
+**costing_panels.is_option** — read at last: an optional extra, priced and printed but out of the
+total (D-230).
+
+**v_costing_option_choice** — one row per costing: the option its total means (null when none is
+chosen, **or when the label matches no panel**, so a stale label falls back to counting everything
+rather than silently dropping panels), the label as typed, and how many options the job is on offer
+as.
+
+The four costing views were re-derived by insertion, appending columns only:
+
+| View | Appended | Meaning |
+|---|---|---|
+| `v_costing_panel_costs` | `is_option` | An extra is costed like anything else. |
+| `v_costing_panel_prices` | `is_option`, `in_chosen_offer`, `counts_in_total` | `counts_in_total` is the **one place** that decides what a total counts (D-232); the views above it sum on it. |
+| `v_costing_totals` | `optional_subtotal`, `optional_tax`, `optional_total`, `chosen_option_label`, `option_count` | The first ten columns keep their names and now count the offer: the chosen option, without extras. |
+| `v_costing_option_totals` | `optional_subtotal`, `optional_tax`, `optional_total`, `is_chosen` | Every option's own figures, whichever is chosen — the comparison table. Labels are trimmed. |
+| `v_costing_items_by_category` | `is_option`, `in_chosen_offer` | The BOM keeps every row and marks it (D-233). |
+
+### Added by migration 0110 — estimate against actual labour (advanced track)
+
+`labour_actuals` (0100, foundation F3) is written and read at last. Nothing here is reachable from
+the pricing engine: a costing keeps the hours it froze (D-235).
+
+| View | What it gives |
+|---|---|
+| `v_panel_labour_estimate` | Per panel and process type, the hours this costing froze for the whole batch: kit hours × kit quantity × panel quantity × productivity factor — the same arithmetic `v_costing_panel_costs` prices, so the two cannot drift. |
+| `v_panel_labour_variance` | Estimate against actual per panel and process: hours each way, the difference in hours and at the frozen rate, the percentage, and how many entries the actual is made of. A process appears when **either** side has something to say. |
+| `v_kit_group_labour_variance` | The same by kit group, over every panel with actuals. A panel's hours are **apportioned across its kit lines in proportion to the estimate** (D-236); each row carries jobs, panels and kit units, the hours per kit each way, `suggested_hours` (actual per kit unit) and `standard_hours` (what the group says today). |
+
+| Function | What it does |
+|---|---|
+| `record_actual_hours(panel, process, worked, note, source, worked_at)` | Appends an entry against that panel and process type, writes the activity log, touches no costing. Refuses negative hours and an unknown process type. |
+| `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
+| `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
+
+### Added by migration 0111 — hours that belong to no kit group (advanced track)
+
+**v_panel_labour_unattributed** — hours recorded against a panel costed at **none** of that kind
+of work. 0110 shares a panel's hours across its kit lines in proportion to the estimate and
+divides by the panel's estimated hours for that process, so where that figure is zero — a board
+of loose parts, a kit group whose standard hours are still blank, a line added by hand — the
+hours reach no kit group and, until this view, left no trace. They are named beside the report
+instead: every hour recorded is either shared out or listed here, which test 33 asserts by adding
+the two together.
+
+### Added by migration 0112 — kits that work out their own quantities (advanced track)
+
+Roadmap 3.3. `assembly_components.qty_expression` and `kit_parameters` came with F2 in 0100 and
+said in their own comments that nothing read them yet. This is the engine reading them.
+
+- **app.eval_qty_expression(expression, params)** — the parameters are substituted first
+  (longest name first, so `steps` cannot eat `steps_spare`), and what remains must be digits,
+  `+ - * / ( ) . ,` and `ceil`/`floor`/`round`/`greatest`/`least`. A surviving name is refused
+  **by name** ("the formula uses gremlins, which is not one of this kit's parameters"), which is
+  both the error message an engineer needs and the reason a formula cannot be anything but
+  arithmetic. A result that is null, not-a-number or negative is refused too.
+- **app.kit_parameter_values(assembly, given)** — the answers over the kit's defaults, checked
+  against its ranges, with a name the kit does not have refused rather than ignored.
+- **costing_assemblies.parameters** — what the line was worked out from, frozen like every other
+  figure. Carried by `create_costing_revision` and `copy_panel`, whose hand-written column lists
+  are the trap 0011 and 0014 each fixed once.
+- **app.add_assembly_to_costing(panel, kit, qty, section, params)** — the fifth argument defaults
+  to null, so the assistant (0104) and the BOM import (0107) call it unchanged. Each line's
+  quantity is its formula worked out against the answers, or the fixed quantity where there is no
+  formula, which is every line in the owner's library. **A line whose formula comes to zero is not
+  written**: a bank of four steps has four lines, not four and an empty fifth.
+
+Nothing about a kit with no parameters changes, which is what the existing suite passing
+unaltered — NPP-192 included — is there to prove.
+
+### Added by migration 0113 — the APFC configurator (advanced track)
+
+Roadmap 3.2, and decision 4's "a configurator later".
+
+- **company_options.apfc_step_pattern** — the shares of a target that go to each size, largest
+  first, seeded `50,25,18.75,6.25`: the grading of the owner's own NPP-192 bank (50×4, 25×4,
+  12.5×6, 5×5 for 400 kVAr). A setting rather than an opinion in code, so it changes without a
+  deploy and another company can grade differently.
+- **v_apfc_kits** — the kVAr-rated active kits the caller can see, with the
+  **family** read off the kit name (`APFC-FUSE`, `APFC-BREAKER`, else `OTHER`). A bank is built
+  from one family, never a mixture.
+- **app.propose_apfc(panel, target_kvar, family, pattern)** — writes nothing. The family defaults
+  to the one already on the panel, else the one with the most priced sizes. The shares are floored
+  to whole kits and the remainder topped up with the largest size that still fits; what the sizes
+  cannot reach is returned as **shortfall_kvar** rather than papered over. A family whose kits all
+  hold an unpriced part — true of every breaker step kit in the owner's library today — is refused
+  with that reason and the other family suggested.
+- **app.apply_apfc_steps(panel, steps)** — one transaction, through the ordinary
+  `add_assembly_to_costing`, into the panel's `APFC bank` section, with `apfc.applied` in the
+  activity log. What is applied is what the engineer had on screen, not what the proposal said.
+
+### Added by migration 0114 — compatibility checks (advanced track)
+
+**compatibility_rules** — `company_id` (null = a master rule for everybody), `rule_kind`
+(`device_depth_vs_cubicle` | `accessory_fits_device` | `feeders_vs_incomer`), `name`, `params`
+jsonb, `severity` (`warning` | `blocker`), `message` (the sentence, with `{placeholders}`),
+`is_active`, `sort_order`. Library RLS: everybody reads master rows and their own; the master
+admin writes master rows, a company admin its own. A trigger refuses a rule that could never fire
+— an unknown device field, a ratio of zero, a message with no placeholder in it (D-248).
+
+Parameters by kind: `{"clearance_mm": 100}`; `{"attribute": "fits_frames", "device_field":
+"frame_size"}` — the list the accessory carries in `components.attributes`, and which of five
+allowed fields of the main device it must name; `{"max_ratio": 4, "incomer_sections": [...],
+"feeder_sections": [...], "incomer_tags": [...], "feeder_tags": [...]}`.
+
+| Function or view | What it gives |
+|---|---|
+| `panel_warnings(panel)` | One row per finding: rule, severity, the subject (a kit, or the panel where the finding belongs to no one kit), the filled-in sentence and the figures behind it. Reads `components.depth_mm` and `enclosure_layout.usable_d_mm` (F12, 0106), `components.attributes` and `frame_size` (F1, 0100), the kits' ratings and `assemblies.tags`, and the costing line's `section`. Silent about anything unmeasured or undescribed. |
+| `v_panel_warnings` | The same for every panel the caller may read, with `costing_id` and `panel_name`. Security invoker. |
+| `component_field(component, field)` | The five fields a rule may name — an allowlist, so a rule that is data never reaches a column by name. |
+| `fill_message(template, vars)` | Puts the findings into the rule's own sentence. |
+| `costing_facts` | Re-derived from 0102 by insertion: gains `compatibility_blockers` and `compatibility_warnings`, so an approval rule (0108) can refuse a costing that does not fit. Nothing else acts on a blocker (D-249). |
+### Added by migration 0115 — the guided board configurator (advanced track)
+
+No new table: the answers live in `costing_panels.parameters` (foundation F4) and the kits are
+ordinary costing lines.
+
+| View / function | What it is |
+|---|---|
+| `v_board_kits` | Every active kit with the part it can play in a board — incomer, outgoer, changeover, sync, metering, apfc, accessory — read off its kit group, plus the kind of device (`flavour`: acb / mccb / mcb / switch / manual / ats) where the answer names one (D-256). Role `other` is never proposed. |
+| `pick_board_kit(role, rating, flavour)` | The next size up: the smallest kit of that role and kind whose rating reaches what was asked; else the largest there is with a note saying so; else a reason nothing could be chosen (D-257). The one place that rule is written. |
+| `propose_board(panel, answers)` | The answers → lines (`role`, `section`, `quantity`, `why`, `exact`), `missing` (what this library cannot answer, each with a reason), and `parameters` to freeze. **Writes nothing.** The kVAr answer is handed to `propose_apfc` (D-258). |
+| `apply_board(panel, lines, parameters)` | Adds what the engineer settled on through `add_assembly_to_costing`, each into its section, and merges the answers onto the panel's `parameters` — merged, so an engineer's own note there survives (D-259). Writes one `activity_log` row, `board.configured`. |
+
+The answers as the screen asks them: `sources[]`, `incomer_rating_a`, `incomer_type`, `changeover`
+(ats / manual / switch / sync), `feeders[{rating_a, quantity, type}]`, `apfc_kvar`, `metering`,
+`form`, `ip`, `access`, `cable_entry`. The last four are recorded, not priced (decision 1).
+
+### Added by migration 0116 — sales analytics (advanced track)
+
+**No table and no write** (D-260). Four views over what the app already records, plus one setting.
+
+| View | What it gives |
+|---|---|
+| `v_sales_outcomes` | One row per enquiry: its decision, why it was lost, days to decide, offers released, and the job's **ex-VAT value** from the offer that won, else the latest released, else the current costing (D-261), with its value band. Grouping by customer, band and month is done in the web layer from these rows. |
+| `v_sales_group_outcomes` | The same outcome against each kit group the job used, with that group's material, labour and hours — so win and loss by product group sit beside the money at stake. |
+| `v_margin_achieved` | Margin quoted against margin achieved: the same arithmetic with recorded hours in place of the estimate, panel by panel, plus `labour_measured_pct` (D-263). |
+| `v_sales_pipeline` | Open and quoted enquiries with value, age, the latest offer's state and how long it has left. |
+
+| Function | What it does |
+|---|---|
+| `app.value_band(value)` | Which band a job falls in, from `company_options.analytics_value_bands` (default `500000,2000000,10000000`). |
+| `app.money_words(value)` | "500 K", "2 M" — short enough for a column heading. |
+| `app.seed_company_options` | Re-derived to seed `analytics_value_bands` **and `apfc_step_pattern`**, which 0113 never added, so a company created since has had no row for it (D-264). |
+
+### Added by migration 0117 — a switch per advanced feature (advanced track)
+
+**features** — master rows, one per advanced feature (fourteen, the guided board configurator of 0115 included): `code`, `name`, `blurb` (what it does in
+the owner's own words, printed on the Features screen), `changes_costings` (does switching it on
+change what an existing costing does? three do), `option_key`, `sort_order`. Everybody reads it;
+the master administrator writes it.
+
+The per-company answer is a `company_options` row under `feature.<code>`, **absent or false
+meaning off**, which is how every company starts. The assistant's row names its own older
+`ai_enabled` key, so one thing has one switch. `app.protect_master_options` (0102) is widened
+from `ai_enabled` to every `feature.%` key: **only the master administrator may flip one**
+(D-266), which is what makes "off by default" worth anything for an external company.
+
+| Function or view | What it gives |
+|---|---|
+| `feature_on(code, company)` | Whether one feature is on for a company — the caller's own unless another is named. SECURITY DEFINER, because the nightly sweep runs with no signed-in user and the pricing view is read by a master administrator looking at somebody else's costing; what it discloses is one boolean the Features screen shows anyway. |
+| `v_company_features` | The register with the caller's own answer beside each row. One query for the navigation, the costing screen and the Features page. |
+| `seed_feature_options(company)` | Every feature off for one company; called for every company that exists and by the company-creation trigger for every new one. |
+
+**The three gates.** Everything else is inert until somebody uses it, so its switch only decides
+whether the way in is shown. These three change what an existing costing does, and each is
+written so that *off* reproduces the older text exactly (D-267):
+
+| Gate | Off |
+|---|---|
+| `evaluate_approval_rules` | No rule is read; an approver is required, as before 0108. `submit_costing` and `approve_costing` are untouched — one gate, in the function that decides. |
+| `expire_quotations` | The nightly sweep passes that company by, and reports `skipped` beside `expired`. The only thing in the app that writes with nobody watching. |
+| `v_costing_panel_prices.counts_in_total` | Every panel counts and an optional extra is simply a panel, as before 0109. |
+
+### Edge Functions
+- **invite-user**, **remove-user** — as before.
+- **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain
+  text; the row's `extraction_status` says what happened. Called by the browser after an upload.
+- **assistant** (0103) — one POST per user turn, streamed back as server-sent events. Acts as the
+  caller (no service role): asks `assistant_allowance` before building any provider, stores the
+  user's message and an empty assistant row, builds the system prompt from `company_policy` and the
+  record's snapshot, runs the loop in `supabase/functions/_shared/ai/` (at most 12 rounds), then
+  fills the assistant row with text, tool calls, trimmed results, model, tokens and latency,
+  records usage on the conversation and writes an `activity_log` row (`actor_kind = assistant`)
+  per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
+  `AI_FALLBACKS`.
+
+### Busbar runs (roadmap 4.1, migration 0118)
+No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
+each entry `{label, bar_code, phases, runs_per_phase, length_m, sets, metres}` — so a revision and a
+copy carry it with the column they already copy.
+
+- `v_busbar_bars` — the copper bar sizes (`pricing_mode = 'weight_rate'`, `material_rate_code =
+  'copper_busbar'`), with width, thickness and area read off the part number, kilograms per metre
+  from the catalogue and price per metre at the company's copper rate.
+- `v_busbar_bar_by_rating` — which bar the library's own kits use at each device rating.
+- `v_panel_busbar_runs` — the saved schedule, a run a row.
+- `v_panel_busbar_check` — per panel and bar size: metres scheduled, metres costed, the difference.
+- `app.bar_for_rating(amps)`, `app.busbar_run_totals(runs)`, `app.starting_busbar_runs(panel)`,
+  `app.save_busbar_runs(panel, runs)`, `app.apply_busbar_runs(panel, section, replace_existing)`.
+  Only the last writes a costing line, and it does so through `add_component_to_costing`.
+- `company_options.busbar_run_lengths` — the company's usual run lengths, seeded from the owner's
+  own NPP-192 sheet.
+
 ### Storage
 - Bucket `quotations`, private. Object path `{company_id}/{quotation_id}.pdf`.
 - Policy: first path segment equals `app.current_company_id()::text` (read and write), or master admin (read).
 - Bucket `logos`, private, same pattern. Holds the header logo and the footer strip images.
-- Bucket `attachments`, private, same pattern. Holds the files kept with an enquiry.
+- Bucket `attachments`, private, same pattern. Holds every `documents` row's file: enquiry and costing attachments today.
 
 ### Tests
 `supabase/tests/` holds pgTAP tests run in CI on every migration change:
