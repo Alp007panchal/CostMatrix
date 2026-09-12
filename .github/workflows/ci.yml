@@ -17,6 +17,12 @@ jobs:
           sudo apt-get install -y postgresql postgresql-client
       - name: Apply migrations and run the tests
         run: ./supabase/tests/run-local.sh
+      # The suite above applies every migration to an EMPTY database. This one
+      # applies the advanced migrations to a database that is already at 0017
+      # and already full of rows, which is what the merge to `main` does to
+      # production, and refuses any figure that moves.
+      - name: Rehearse the upgrade on a database that already holds rows
+        run: ./supabase/tests/upgrade-rehearsal.sh
 
   web:
     name: Web app
