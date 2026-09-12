@@ -133,8 +133,9 @@ library stays valid while it is unmeasured.
 
 Ordered by dependency and value. Each is one Claude Code session and one PR, as per the working agreement.
 
-**Built on `advanced`:** the whole of phase 2 — 2.1 (migrations 0100–0102), 2.2 (0105), 2.3 (0107),
-2.4 (0103–0104), 2.5 and 2.6 (0108), 2.7 (0109), 2.8 (0110).
+**Built on `advanced`:** 2.1 (migrations 0100–0102), 2.2 (0105), 2.3 (0107), 2.4 (0103–0104),
+2.5 and 2.6 (0108), 2.7 (0109), 2.8 (0110). Left: **2.9**, added after the rest was built, so it
+comes next rather than in its numbered place.
 
 | # | Feature | Borrowed from | Depends on |
 |---|---|---|---|
@@ -146,6 +147,7 @@ Ordered by dependency and value. Each is one Claude Code session and one PR, as 
 | 2.6 | **Quotation validity and follow-up**: `valid_until`, expiry job, follow-up reminders, "re-issue with current prices" action that creates a new revision from a refreshed price snapshot | CPQ | F8 |
 | 2.7 | **Options and alternatives** on one quotation (Option 1 / Option 2 price blocks, optional line items shown but excluded from the total) | CPQ, current workbook | F4 |
 | 2.8 | **Estimate vs actual labour**: manual entry of actual hours per panel line item and process type; variance report by kit group; "suggested new standard" column (no automatic change to standards) | Accubid / ProEst | F3 |
+| 2.9 | **Costing grid view**: the whole costing as one grid — panels across the columns, kits and components down the rows — for costing a board of many near-identical panels the way the old workbook did. Added 12 Sep 2026 from the owner's confirmed spec, `costing-grid-view.md`, with the mockup at `mockups/costing-grid-view.html`. No engine or pricing change: every edit goes through the same functions as the panel editor | Current workbook, Accubid takeoff grids | F4 |
 
 ## 4. Phase 3 — configurator and learning (3–6 months)
 

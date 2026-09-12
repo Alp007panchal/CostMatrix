@@ -202,6 +202,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     screen to change or silence each check, and a blocker an approval rule can act on
     (migration 0114). Advisory: no price, hour or total moves.
 
+25. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
+    across and kits and components down, with in-place quantity editing through the same functions as
+    the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts
+    and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
+    preference is per person in their own browser.
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing
