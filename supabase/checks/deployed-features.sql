@@ -66,7 +66,12 @@ with wanted(feature, kind, name) as (values
   ('3.8 layout fields',       'table',    'public.layout_constructions'),
   ('3.8 layout fields',       'function', 'app.import_kit_layout'),
   ('3.8 layout fields',       'column',   'public.assemblies.mounting_design'),
-  ('3.8 layout fields',       'column',   'public.panel_layouts.sections')
+  ('3.8 layout fields',       'column',   'public.panel_layouts.sections'),
+  ('3.8 layout, stage one',   'view',     'public.v_panel_layout_kits'),
+  ('3.8 layout, stage one',   'function', 'app.arrange_panel'),
+  ('3.8 layout, stage one',   'function', 'app.layout_fit'),
+  ('3.8 layout, stage one',   'function', 'app.save_panel_layout'),
+  ('3.8 layout, stage one',   'function', 'app.apply_layout_enclosure')
 )
 select
   w.feature,

@@ -222,7 +222,6 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.8 panel layout canvas, stage 1 (front view, fit, apply) | `claude/advanced-p38-canvas` | 2026-09-12 23:00 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
@@ -247,6 +246,13 @@ the work begins, removed when the pull request opens.
     kilograms and money, bar sizes read from his own kits, a starting schedule built from the
     board's parameters, and the schedule set beside the metres the panel is actually costed at
     (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
+
+33. **The panel layout, stage one** (advanced track, roadmap 3.8) — the front view: the sections a
+    board needs arranged by the rules of each mounting design, the kits drawn at true scale on the
+    covers and plates they belong to with the owner's own device faces, a verdict per section in
+    the unit that design counts in, and the enclosure line the drawing asks for, applied only when
+    a person presses the button (migration 0120). The rear, side, door and 3D views and the GA
+    sketch are stage two.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
