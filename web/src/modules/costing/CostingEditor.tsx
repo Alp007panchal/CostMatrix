@@ -7,11 +7,12 @@ import { percent } from '../../lib/format'
 import { listCategories, listComponentPrices, listProcessTypes } from '../library/api'
 import {
   addAssemblyToPanel, addComponentToPanel, addManualItem, addPanel, approveCosting, createRevision,
-  getCostingDetail, listBomItems, listCostings, listPanelSections, reissueCosting, removeCostingAssembly,
-  removeItem, removePanel, returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity,
+  getCostingDetail, listBomItems, listCostings, listPanelSections, listPanelWarnings, reissueCosting,
+  removeCostingAssembly, removeItem, removePanel, returnCosting, setAssemblySection, setCostingAssemblyQuantity, setItemQuantity,
   setLabourHours, submitCosting, updateCosting, updatePanel,
 } from './api'
 import { PanelCard } from './PanelCard'
+import { costingWarningSummary, warningsByPanel } from './warnings'
 import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
@@ -40,12 +41,20 @@ export function CostingEditor() {
   const bom = useQuery({ queryKey: ['bom', id], queryFn: () => listBomItems(id), enabled: Boolean(id) })
   const sections = useQuery({ queryKey: ['panel-sections'], queryFn: listPanelSections })
   const costings = useQuery({ queryKey: ['costings'], queryFn: listCostings })
+  // Roadmap 3.4: what the compatibility rules make of each panel. Advisory,
+  // so a failure to load it must never stop the costing being shown.
+  const warnings = useQuery({
+    queryKey: ['panel-warnings', id],
+    queryFn: () => listPanelWarnings(id),
+    enabled: Boolean(id),
+  })
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['costing', id] })
     await queryClient.invalidateQueries({ queryKey: ['bom', id] })
     await queryClient.invalidateQueries({ queryKey: ['costing-history', id] })
     await queryClient.invalidateQueries({ queryKey: ['costings'] })
+    await queryClient.invalidateQueries({ queryKey: ['panel-warnings', id] })
   }
 
   // Every edit is the same shape: do it, then reload the costing so the totals
@@ -66,6 +75,7 @@ export function CostingEditor() {
         const editable = costing.status === 'draft' && costing.is_current && canBuild
         const label = costing.currency_label
         const processNames = Object.fromEntries((processTypes.data ?? []).map((p) => [p.code, p.name]))
+        const panelWarnings = warningsByPanel(warnings.data ?? [])
 
         return (
           <>
@@ -169,6 +179,15 @@ export function CostingEditor() {
               onChooseOption={(chosen) => run(() => updateCosting(costing.id, { chosen_option_label: chosen }))}
             />
 
+            {/* Roadmap 3.4: one line so nobody has to scroll every panel to find
+                out whether the checks found anything. */}
+            {costingWarningSummary(warnings.data ?? []) && (
+              <p className="muted" style={{ margin: '.4rem 0 0' }}>
+                Compatibility checks: {costingWarningSummary(warnings.data ?? [])}. They are shown on the panels
+                themselves, and change no figure.
+              </p>
+            )}
+
             {panels.map((panel) => (
               <PanelCard
                 key={panel.id}
@@ -186,6 +205,7 @@ export function CostingEditor() {
                 components={components.data ?? []}
                 categories={categories.data ?? []}
                 sections={(sections.data ?? []).map((s) => s.name)}
+                warnings={panelWarnings.get(panel.id) ?? []}
                 label={label}
                 editable={editable}
                 processNames={processNames}

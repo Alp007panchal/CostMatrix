@@ -708,6 +708,28 @@ be saved. New costings use the new figure; existing ones keep what they froze.
 A panel built from kVAr step kits (the APFC group, chosen by rating × quantity) shows a line
 under its kit table: "APFC bank: 400 kVAr in steps". Change the quantities and it follows.
 
+### Read the compatibility checks on a panel (roadmap 3.4)
+A panel shows a short list under its name when a check finds something: a device deeper than the
+usable depth of the cubicle bought for it, a part listed for other devices than the one in its kit,
+or outgoing ways adding up to far more than the incomer. The costing screen carries one line above
+the panels saying how many there are altogether. **They change nothing** — no price, no hour, no
+total — and a check says nothing at all until the library holds what it reads. So an untouched
+catalogue shows no notes, which is the honest answer, not a fault.
+
+What each check reads, and where you fill it in on the Components screen: the depth of a device
+(*Depth mm*), the usable depth inside a cubicle (*Usable depth*), and the frame a part is listed
+for. The outgoing-ways check reads the kits' ratings, which the library already holds, and the
+section each kit sits in on the panel — so put the incomer in **Incomer** and the ways in
+**Outgoers** and it reads correctly.
+
+### Change or switch off a compatibility check (roadmap 3.4)
+Compatibility → the three checks, each with the one figure it uses: the room to leave behind a
+device (100 mm), and how many times the incomer the outgoing ways may come to (4 ×). Type a new
+figure and press **Save**; **Switch off** silences a check for everybody. *How loud* has two
+settings: *a note on the panel*, which is what they all ship as, and *a blocker an approval rule
+can act on* — which still changes nothing by itself. To make a blocker stop a costing being
+submitted, go to Approval rules and write one on *Compatibility findings marked as blockers*.
+
 ### Set the enclosure uplift (session 1)
 Company → Enclosure uplift %. Added to catalogue cubicle prices (components ticked *enclosure
 cubicle*) when they enter a costing, and frozen there.

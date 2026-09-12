@@ -206,6 +206,41 @@ export interface PanelFit {
   reason?: string
 }
 
+/** One finding of one compatibility rule against one panel (v_panel_warnings). */
+export interface PanelWarning {
+  company_id: string
+  costing_id: string
+  panel_id: string
+  panel_name: string
+  rule_id: string
+  rule_kind: CompatibilityKind
+  rule_name: string
+  severity: 'warning' | 'blocker'
+  /** The kit, or the panel where the finding belongs to no one kit. */
+  subject: string
+  message: string
+  detail: Record<string, string>
+}
+
+export type CompatibilityKind =
+  | 'device_depth_vs_cubicle'
+  | 'accessory_fits_device'
+  | 'feeders_vs_incomer'
+
+/** A compatibility check as a row somebody can read and edit (0114). */
+export interface CompatibilityRule {
+  id: string
+  /** Null = a master rule, in force for every company. */
+  company_id: string | null
+  rule_kind: CompatibilityKind
+  name: string
+  params: Record<string, unknown>
+  severity: 'warning' | 'blocker'
+  message: string
+  is_active: boolean
+  sort_order: number
+}
+
 /** What an import function reports, with or without having written anything. */
 export interface ImportReport {
   new: number

@@ -180,6 +180,12 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
+22. **Compatibility checks** (advanced track, roadmap 3.4) — three questions asked of every panel
+    as rows anybody can read: will that device go into that cubicle, does that part belong to that
+    device, do the outgoing ways add up against the incomer. Warnings under the panel name, a
+    screen to change or silence each check, and a blocker an approval rule can act on
+    (migration 0114). Advisory: no price, hour or total moves.
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing

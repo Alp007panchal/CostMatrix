@@ -668,6 +668,28 @@ the pricing engine: a costing keeps the hours it froze (D-235).
 | `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
 | `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
 
+### Added by migration 0114 — compatibility checks (advanced track)
+
+**compatibility_rules** — `company_id` (null = a master rule for everybody), `rule_kind`
+(`device_depth_vs_cubicle` | `accessory_fits_device` | `feeders_vs_incomer`), `name`, `params`
+jsonb, `severity` (`warning` | `blocker`), `message` (the sentence, with `{placeholders}`),
+`is_active`, `sort_order`. Library RLS: everybody reads master rows and their own; the master
+admin writes master rows, a company admin its own. A trigger refuses a rule that could never fire
+— an unknown device field, a ratio of zero, a message with no placeholder in it (D-242).
+
+Parameters by kind: `{"clearance_mm": 100}`; `{"attribute": "fits_frames", "device_field":
+"frame_size"}` — the list the accessory carries in `components.attributes`, and which of five
+allowed fields of the main device it must name; `{"max_ratio": 4, "incomer_sections": [...],
+"feeder_sections": [...], "incomer_tags": [...], "feeder_tags": [...]}`.
+
+| Function or view | What it gives |
+|---|---|
+| `panel_warnings(panel)` | One row per finding: rule, severity, the subject (a kit, or the panel where the finding belongs to no one kit), the filled-in sentence and the figures behind it. Reads `components.depth_mm` and `enclosure_layout.usable_d_mm` (F12, 0106), `components.attributes` and `frame_size` (F1, 0100), the kits' ratings and `assemblies.tags`, and the costing line's `section`. Silent about anything unmeasured or undescribed. |
+| `v_panel_warnings` | The same for every panel the caller may read, with `costing_id` and `panel_name`. Security invoker. |
+| `component_field(component, field)` | The five fields a rule may name — an allowlist, so a rule that is data never reaches a column by name. |
+| `fill_message(template, vars)` | Puts the findings into the rule's own sentence. |
+| `costing_facts` | Re-derived from 0102 by insertion: gains `compatibility_blockers` and `compatibility_warnings`, so an approval rule (0108) can refuse a costing that does not fit. Nothing else acts on a blocker (D-243). |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

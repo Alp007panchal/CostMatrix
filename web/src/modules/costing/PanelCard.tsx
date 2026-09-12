@@ -11,6 +11,7 @@ import type {
   CostingPanel,
   Kit,
   PanelPrice,
+  PanelWarning,
 } from '../../lib/database.types'
 import { PanelLines } from './PanelLines'
 import { CopyPanel } from './CopyPanel'
@@ -19,6 +20,7 @@ import { kvarTotal } from './kvar'
 import { AddFreeLine } from './AddFreeLine'
 import { Detail } from './PanelDetails'
 import { PanelFitLine } from './PanelFitLine'
+import { PanelWarnings } from './PanelWarnings'
 import { describePanel } from './technical'
 import type { ManualItemInput } from './api'
 
@@ -51,6 +53,7 @@ export function PanelCard({
   components,
   categories,
   sections,
+  warnings,
   label,
   editable,
   processNames,
@@ -70,6 +73,8 @@ export function PanelCard({
   categories: ComponentCategory[]
   /** The section names on offer; a section typed here is kept as it is. */
   sections: string[]
+  /** What the compatibility rules found here (roadmap 3.4). Advisory. */
+  warnings: PanelWarning[]
   label: string
   editable: boolean
   processNames: Record<string, string>
@@ -123,6 +128,9 @@ export function PanelCard({
           {/* Foundations F12: will this fit the cubicles bought for it? Silent
               until the kits and the cubicle have been measured. */}
           <PanelFitLine panelId={panel.id} />
+          {/* Roadmap 3.4: what the compatibility rules found here. Advisory, and
+              silent about parts nobody has measured or described. */}
+          <PanelWarnings warnings={warnings} />
         </div>
 
         <div style={{ textAlign: 'right', minWidth: '11rem' }}>

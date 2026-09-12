@@ -17,6 +17,7 @@ import type {
   ApprovalReview,
   KeptLine,
   PanelFit,
+  PanelWarning,
   PanelSection,
 } from '../../lib/database.types'
 
@@ -338,6 +339,20 @@ export async function panelFit(panelId: string): Promise<PanelFit> {
   const { data, error } = await supabase.rpc('panel_fit', { target: panelId })
   fail('Could not check the space', error)
   return data as PanelFit
+}
+
+/**
+ * What the compatibility rules make of every panel in one costing
+ * (v_panel_warnings, roadmap 3.4). Advisory: nothing here changes a figure, and
+ * a panel whose parts nobody has measured or described returns no rows at all.
+ */
+export async function listPanelWarnings(costingId: string): Promise<PanelWarning[]> {
+  const { data, error } = await supabase
+    .from('v_panel_warnings')
+    .select('*')
+    .eq('costing_id', costingId)
+  fail('Could not run the compatibility checks', error)
+  return (data ?? []) as PanelWarning[]
 }
 
 /** Why this costing needs an approver, or does not (app.approval_review). */
