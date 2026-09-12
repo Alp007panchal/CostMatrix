@@ -917,6 +917,61 @@ backup job stores it.
 
 ---
 
+## Part C2 — Taking the advanced app to production
+
+The advanced track has been built on the staging project since 10 September. This is how it
+reaches the app you quote from. It happens **once**; afterwards the two tracks are one again and
+new work arrives the ordinary way.
+
+### What the merge actually does
+
+Merging `advanced` into `main` runs two workflows against **production**:
+
+- **Deploy database** applies migrations 0100 onward to your real catalogue, kits, costings and
+  quotations. This is the largest single change since the app went live.
+- **Deploy functions** puts the Edge Functions there, and Vercel rebuilds the site.
+
+**Nothing you can see changes.** Every advanced feature arrives switched off, so the app looks as
+it does now, plus a **Features** item in the top bar. What you switch on afterwards, and when, is
+yours.
+
+### Before you merge
+
+1. **Take a backup.** Supabase → your production project → Database → Backups, and take one now
+   rather than relying on last night's. Part E explains what each tier gives you.
+2. Check the pull request is green — both CI jobs, including *Rehearse the upgrade on a database
+   that already holds rows*. That job builds a database at 0017, fills it with the real seed and
+   a released quotation, applies every advanced migration on top, and **refuses any figure that
+   moves**. It is the closest thing to a dress rehearsal that does not touch your data.
+3. Pick a quiet hour. Nobody should be part-way through costing a job.
+
+### After you merge, in the first five minutes
+
+1. GitHub → **Actions** → *Deploy database* → the run on `main` has a green tick. If it is red,
+   stop and send me the log; **do not** merge anything else.
+2. Open the live app. Sign in. It should look exactly as it did.
+3. Open one costing you know and check its total is the figure you remember. This is the one that
+   matters; everything else can be fixed at leisure.
+4. Components still shows 735 parts. Kits still shows 296.
+5. A new **Features** item appears in the top bar. Open it: everything says *Off*.
+
+### Then, one at a time
+
+Switch on the ones that only add a screen first — price lists, the BOM import, files, sizes, the
+costing grid, the configurators, the compatibility checks, sales analytics. Each shows a menu item
+and changes nothing already costed.
+
+Leave the three marked in red until last, and for each of those: open a real costing, write its
+total down, switch the feature on, and read the total again. They are the ones that change what an
+existing costing does, and they are described on the Features screen itself.
+
+### If something is wrong
+
+The backup from step 1 is the answer, and Part E is how to use it. Nothing in this merge deletes
+data: the migrations add tables and columns and rewrite functions. A feature switched on can
+always be switched off again, and switching it off hides it without deleting what was entered
+while it was on.
+
 ## Part D — When something goes wrong
 
 ### The page is blank or shows an error

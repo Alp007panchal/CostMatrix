@@ -208,6 +208,11 @@ straight to `main`, reviewed and merged by the owner the same day.
     and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
     preference is per person in their own browser.
 
+27. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+    migrations to a database already at 0017 and already full of rows, refusing any figure that
+    moves (in CI on every pull request), a go-live section in the runbook, and then the release
+    itself: one pull request from `advanced` into `main`, every feature off.
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing
