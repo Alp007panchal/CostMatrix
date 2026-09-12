@@ -23,7 +23,7 @@ on every push.
 `run-local.sh` applies every migration to an **empty** database. That proves the migrations are
 self-consistent; it cannot prove they can be applied to a database that is already at 0017 **and
 already holds rows** — which is what production is, and what merging `advanced` into `main` does
-to it (D-270).
+to it (D-272).
 
 So this script builds production's shape (migrations `00xx`, then every test written before the
 advanced track, which imports the real `data/seed` files and builds NPP-192, plus a released

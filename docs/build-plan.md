@@ -208,10 +208,11 @@ straight to `main`, reviewed and merged by the owner the same day.
     and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
     preference is per person in their own browser.
 
-27. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
-    migrations to a database already at 0017 and already full of rows, refusing any figure that
-    moves (in CI on every pull request), a go-live section in the runbook, and then the release
-    itself: one pull request from `advanced` into `main`, every feature off.
+26. **A switch per advanced feature** (advanced track, the road to production) — every feature
+    built since the foundations sits behind a per-company switch that is off by default and only
+    the master administrator can flip, which is condition 2 of the two-track rule and what makes
+    a merge to `main` possible at all. Most switches hide a screen; three gate real behaviour
+    (migration 0117).
 
 ## In hand right now
 
@@ -223,19 +224,30 @@ the work begins, removed when the pull request opens.
 |---|---|---|
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
-26. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
+27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
     correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
     then applied through the ordinary kit function with the answers frozen on the panel
     (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
 
-27. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
+28. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
     by customer, value band, month and product group, why jobs were lost in the words they were
     heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
     with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
 
+29. **The staging trial** (advanced track) — `docs/trials/advanced-trial.md`, a click-through for
+    the fifteen features now on staging, in the order a real job flows, each step saying what to
+    expect; and `supabase/checks/deployed-features.sql`, one query the owner pastes into the
+    Supabase SQL editor to prove a deploy actually landed, guarded in CI as test 41 so the list
+    cannot drift. No application change.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
+
+30. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+    migrations to a database already at 0017 and already full of rows, refusing any figure that
+    moves (in CI on every pull request), a go-live section in the runbook, and then the release
+    itself: one pull request from `advanced` into `main`, every feature off.
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
