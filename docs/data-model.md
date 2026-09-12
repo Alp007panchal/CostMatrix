@@ -651,6 +651,23 @@ The four costing views were re-derived by insertion, appending columns only:
 | `v_costing_option_totals` | `optional_subtotal`, `optional_tax`, `optional_total`, `is_chosen` | Every option's own figures, whichever is chosen — the comparison table. Labels are trimmed. |
 | `v_costing_items_by_category` | `is_option`, `in_chosen_offer` | The BOM keeps every row and marks it (D-233). |
 
+### Added by migration 0110 — estimate against actual labour (advanced track)
+
+`labour_actuals` (0100, foundation F3) is written and read at last. Nothing here is reachable from
+the pricing engine: a costing keeps the hours it froze (D-235).
+
+| View | What it gives |
+|---|---|
+| `v_panel_labour_estimate` | Per panel and process type, the hours this costing froze for the whole batch: kit hours × kit quantity × panel quantity × productivity factor — the same arithmetic `v_costing_panel_costs` prices, so the two cannot drift. |
+| `v_panel_labour_variance` | Estimate against actual per panel and process: hours each way, the difference in hours and at the frozen rate, the percentage, and how many entries the actual is made of. A process appears when **either** side has something to say. |
+| `v_kit_group_labour_variance` | The same by kit group, over every panel with actuals. A panel's hours are **apportioned across its kit lines in proportion to the estimate** (D-236); each row carries jobs, panels and kit units, the hours per kit each way, `suggested_hours` (actual per kit unit) and `standard_hours` (what the group says today). |
+
+| Function | What it does |
+|---|---|
+| `record_actual_hours(panel, process, worked, note, source, worked_at)` | Appends an entry against that panel and process type, writes the activity log, touches no costing. Refuses negative hours and an unknown process type. |
+| `remove_actual_hours(entry)` | Removes one entry — how a wrong figure is corrected — and logs it. |
+| `apply_labour_suggestion(kit_group, process)` | Writes the suggested hours into `kit_group_labour`. **Security invoker**, so that table's existing policy decides who may (D-237); raises when nothing has been recorded for that group and process. Called only by a button somebody presses. |
+
 ### Edge Functions
 - **invite-user**, **remove-user** — as before.
 - **extract-document** (0101) — fills `documents.extracted_text` from PDF, Word, Excel and plain

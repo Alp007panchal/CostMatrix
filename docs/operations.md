@@ -589,6 +589,34 @@ the same costing (a second, near-identical board) or into another of your open d
 A copy is not a revision. A revision is another version of the *same* job, keeps the number and
 supersedes the one before it; a copy is a *different* job that happens to start from this one.
 
+### Record the hours a job actually took, and fix the standards (phase 2.8)
+
+**On the costing, under “Hours actually worked”.** Press *Show*. The table compares what the costing
+was priced on, panel by panel and process by process, with what the shop floor took. To file hours:
+choose the panel, choose the process, type the hours, add a note such as *week 32* if you like, and
+press *Record these hours*. Hours can be filed a week at a time — they are added up — and a wrong
+entry is corrected by pressing *Remove* beside it in the list underneath.
+
+This works on an approved costing, which is the point: the boards are built after the quotation goes
+out. **Recording hours changes no price, no total and no quotation.** A costing keeps the hours it
+was priced on, for ever.
+
+**Then, once a few jobs have hours against them: Labour variance** (administrators' menu). One row
+per kit group and process type: the standard in force, what the jobs actually took per kit, whether
+that is longer or quicker, and how much it rests on — *1 job, 6 kits — too little to change a
+standard on*, up to *6 jobs, 40 kits — enough to take seriously*. The rows with the most hours at
+stake come first, not the biggest percentages.
+
+Read the sample size before you act. A board's hours are shared across its kits in proportion to what
+they were costed at, because the shop records hours per board rather than per kit, so one unusual job
+can move a figure.
+
+**Nothing changes a standard until you press *Apply*.** That sets the kit group's hours for that
+process to the suggested figure; you are asked to confirm, and the confirmation says the part that
+matters — new costings use the new figure, and existing costings keep the hours they froze. A master
+group can only be changed by the master administrator; your own company's groups, by your company
+administrator.
+
 ### Offer one job two ways, and quote an extra separately (phase 2.7)
 
 Two different things, and the app keeps them apart.

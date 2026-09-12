@@ -641,6 +641,61 @@ export interface OptionTotals {
   is_chosen: boolean
 }
 
+/** labour_actuals: hours actually worked, filed against a panel and process type. */
+export interface LabourActual {
+  id: string
+  costing_id: string
+  panel_id: string
+  process_type: string
+  hours: number
+  source: 'manual' | 'timesheet'
+  note: string | null
+  recorded_at: string
+}
+
+/** v_panel_labour_variance: what the costing said, against what the shop worked. */
+export interface PanelLabourVariance {
+  costing_id: string
+  panel_id: string
+  panel_name: string
+  panel_quantity: number
+  process_type: string
+  process_name: string
+  sort_order: number
+  estimated_hours: number
+  actual_hours: number
+  has_actuals: boolean
+  entries: number
+  last_recorded_at: string | null
+  difference_hours: number
+  /** Null when there is no estimate to compare with. */
+  variance_pct: number | null
+  hourly_rate: number
+  difference_cost: number
+}
+
+/** v_kit_group_labour_variance: the same by kit group, apportioned by the estimate. */
+export interface KitGroupLabourVariance {
+  company_id: string
+  /** Null for kit lines whose library kit has since gone, or which had no group. */
+  kit_group_id: string | null
+  kit_group_name: string | null
+  process_type: string
+  process_name: string
+  sort_order: number
+  jobs: number
+  panels: number
+  kit_units: number
+  estimated_hours: number
+  actual_hours: number
+  estimated_hours_per_kit: number
+  actual_hours_per_kit: number
+  variance_pct: number | null
+  suggested_hours: number
+  /** What the kit group says today; null if the group has no row for this process. */
+  standard_hours: number | null
+}
+
 export interface CostingHistoryRow {
   id: string
   user_id: string | null
