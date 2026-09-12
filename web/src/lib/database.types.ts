@@ -972,6 +972,78 @@ export interface BomItem {
   in_chosen_offer: boolean
 }
 
+// --- sales analytics (roadmap 3.6) ------------------------------------------
+
+/** v_sales_outcomes: one row per enquiry, what happened to it and what it was worth. */
+export interface SalesOutcome {
+  company_id: string
+  enquiry_id: string
+  enquiry_no: string
+  title: string
+  customer_id: string
+  customer_name: string
+  received_on: string
+  status: EnquiryStatus
+  decided_at: string | null
+  lost_reason: string | null
+  won_quotation_id: string | null
+  days_to_decide: number | null
+  quotations_released: number
+  costing_id: string | null
+  costing_no: string | null
+  /** The job's ex-VAT subtotal, from the offer that won or the latest one out. */
+  value_ex_vat: number | null
+  value_band: string
+}
+
+/** v_sales_group_outcomes: a job's outcome against each kit group it used. */
+export interface SalesGroupOutcome {
+  enquiry_id: string
+  status: EnquiryStatus
+  value_ex_vat: number | null
+  kit_group_name: string
+  lines: number
+  material: number
+  labour: number
+  hours: number
+}
+
+/** v_margin_achieved: the margin quoted against the margin the shop achieved. */
+export interface MarginAchieved {
+  costing_id: string
+  costing_no: string
+  revision_no: number
+  price_ex_vat: number
+  material_cost: number
+  labour_quoted: number
+  labour_achieved: number
+  hours_quoted: number
+  hours_achieved: number
+  margin_quoted_pct: number | null
+  margin_achieved_pct: number | null
+  /** How much of the labour is recorded fact rather than estimate. */
+  labour_measured_pct: number
+}
+
+/** v_sales_pipeline: the jobs still out there. */
+export interface SalesPipelineRow {
+  enquiry_id: string
+  enquiry_no: string
+  title: string
+  customer_name: string
+  status: EnquiryStatus
+  received_on: string
+  age_days: number
+  value_ex_vat: number | null
+  value_band: string
+  quotations_released: number
+  latest_quotation: string | null
+  quotation_status: QuotationStatus | null
+  sent_at: string | null
+  days_left: number | null
+  has_run_out: boolean | null
+}
+
 // --- crm -------------------------------------------------------------------
 
 export type EnquiryStatus = 'open' | 'quoted' | 'won' | 'lost' | 'closed'

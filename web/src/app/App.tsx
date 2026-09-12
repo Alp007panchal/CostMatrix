@@ -31,6 +31,7 @@ const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage'
 const FeaturesPage = lazy(() => import('../modules/admin/FeaturesPage').then((m) => ({ default: m.FeaturesPage })))
 const CompatibilityRulesPage = lazy(() => import('../modules/admin/CompatibilityRulesPage').then((m) => ({ default: m.CompatibilityRulesPage })))
 const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePage').then((m) => ({ default: m.LabourVariancePage })))
+const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
 
@@ -80,6 +81,14 @@ export function App() {
                 }
               />
               <Route path="quotations" element={<QuotationsPage />} />
+              <Route
+                path="sales"
+                element={
+                  <FeatureGate code="sales_analytics">
+                    <SalesPage />
+                  </FeatureGate>
+                }
+              />
               <Route path="crm/customers" element={<CustomersPage />} />
               <Route path="crm/customers/:id" element={<CustomersPage />} />
               <Route path="crm/enquiries" element={<EnquiriesPage />} />

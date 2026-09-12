@@ -761,7 +761,24 @@ The answers as the screen asks them: `sources[]`, `incomer_rating_a`, `incomer_t
 (ats / manual / switch / sync), `feeders[{rating_a, quantity, type}]`, `apfc_kvar`, `metering`,
 `form`, `ip`, `access`, `cable_entry`. The last four are recorded, not priced (decision 1).
 
-### Added by migration 0116 — a switch per advanced feature (advanced track)
+### Added by migration 0116 — sales analytics (advanced track)
+
+**No table and no write** (D-260). Four views over what the app already records, plus one setting.
+
+| View | What it gives |
+|---|---|
+| `v_sales_outcomes` | One row per enquiry: its decision, why it was lost, days to decide, offers released, and the job's **ex-VAT value** from the offer that won, else the latest released, else the current costing (D-261), with its value band. Grouping by customer, band and month is done in the web layer from these rows. |
+| `v_sales_group_outcomes` | The same outcome against each kit group the job used, with that group's material, labour and hours — so win and loss by product group sit beside the money at stake. |
+| `v_margin_achieved` | Margin quoted against margin achieved: the same arithmetic with recorded hours in place of the estimate, panel by panel, plus `labour_measured_pct` (D-263). |
+| `v_sales_pipeline` | Open and quoted enquiries with value, age, the latest offer's state and how long it has left. |
+
+| Function | What it does |
+|---|---|
+| `app.value_band(value)` | Which band a job falls in, from `company_options.analytics_value_bands` (default `500000,2000000,10000000`). |
+| `app.money_words(value)` | "500 K", "2 M" — short enough for a column heading. |
+| `app.seed_company_options` | Re-derived to seed `analytics_value_bands` **and `apfc_step_pattern`**, which 0113 never added, so a company created since has had no row for it (D-264). |
+
+### Added by migration 0117 — a switch per advanced feature (advanced track)
 
 **features** — master rows, one per advanced feature (fourteen, the guided board configurator of 0115 included): `code`, `name`, `blurb` (what it does in
 the owner's own words, printed on the Features screen), `changes_costings` (does switching it on
@@ -772,7 +789,7 @@ The per-company answer is a `company_options` row under `feature.<code>`, **abse
 meaning off**, which is how every company starts. The assistant's row names its own older
 `ai_enabled` key, so one thing has one switch. `app.protect_master_options` (0102) is widened
 from `ai_enabled` to every `feature.%` key: **only the master administrator may flip one**
-(D-260), which is what makes "off by default" worth anything for an external company.
+(D-266), which is what makes "off by default" worth anything for an external company.
 
 | Function or view | What it gives |
 |---|---|
@@ -782,7 +799,7 @@ from `ai_enabled` to every `feature.%` key: **only the master administrator may 
 
 **The three gates.** Everything else is inert until somebody uses it, so its switch only decides
 whether the way in is shown. These three change what an existing costing does, and each is
-written so that *off* reproduces the older text exactly (D-261):
+written so that *off* reproduces the older text exactly (D-267):
 
 | Gate | Off |
 |---|---|

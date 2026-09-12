@@ -1,4 +1,4 @@
--- 0116  A switch per advanced feature, off by default (the road to production)
+-- 0117  A switch per advanced feature, off by default (the road to production)
 --
 -- `advanced` is fifteen migrations ahead of `main` and none of that work can
 -- reach the app the owner quotes from, because their own two-track rule
@@ -107,7 +107,10 @@ insert into public.features (code, name, blurb, changes_costings, option_key, so
    false, 'feature.compatibility_checks', 130),
   ('board_configurator', 'The guided board configurator',
    'Answer what the board is — supply, incomer rating, changeover, the feeder schedule, kVAr — and the kits come back with their quantities for you to edit before anything is added.',
-   false, 'feature.board_configurator', 140)
+   false, 'feature.board_configurator', 140),
+  ('sales_analytics', 'Sales analytics',
+   'Win and loss by customer, product group, value band and reason; hit rate; the margin quoted against the margin achieved. Read-only: it writes nothing anywhere.',
+   false, 'feature.sales_analytics', 150)
 on conflict (code) do nothing;
 
 -- ===========================================================================

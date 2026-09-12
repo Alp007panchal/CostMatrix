@@ -212,7 +212,7 @@ straight to `main`, reviewed and merged by the owner the same day.
     built since the foundations sits behind a per-company switch that is off by default and only
     the master administrator can flip, which is condition 2 of the two-track rule and what makes
     a merge to `main` possible at all. Most switches hide a screen; three gate real behaviour
-    (migration 0116).
+    (migration 0117).
 
 ## In hand right now
 
@@ -229,6 +229,11 @@ the work begins, removed when the pull request opens.
     correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
     then applied through the ordinary kit function with the answers frozen on the panel
     (migration 0115). Standard boards in minutes; non-standard ones still kit by kit.
+
+27. **Sales analytics** (advanced track, roadmap 3.6) — won, lost and still out there: the hit rate
+    by customer, value band, month and product group, why jobs were lost in the words they were
+    heard in, the margin achieved against the margin quoted from recorded hours, and the pipeline
+    with what has run out (migration 0116). Read-only: views and a screen, no write anywhere.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

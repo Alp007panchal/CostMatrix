@@ -81,7 +81,7 @@ insert into public.profiles (id, company_id, full_name, email, is_master_admin, 
   ('00000000-0000-0000-0000-0000000000a4', '00000000-0000-0000-0000-0000000000c2', 'Carol Costing', 'carol@alpha.test',       false, true),
   ('00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000c2', 'Dan Departed',  'dan@alpha.test',         false, false);
 
--- Switch an advanced feature on or off for a company (0116). Called from a test
+-- Switch an advanced feature on or off for a company (0117). Called from a test
 -- as the database owner, outside any signed-in block: the trigger that reserves
 -- a feature switch for the master administrator lets a migration or a fixture
 -- through, and this is a fixture. A test that exercises a gated feature switches

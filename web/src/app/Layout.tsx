@@ -24,6 +24,7 @@ export function Layout() {
           <NavLink to="/costings">Costings</NavLink>
           <NavLink to="/quotations">Quotations</NavLink>
           <NavLink to="/crm/follow-ups">Follow-ups</NavLink>
+          {on('sales_analytics') && <NavLink to="/sales">Sales</NavLink>}
           <NavLink to="/crm/customers">Customers</NavLink>
           <NavLink to="/library/components">Components</NavLink>
           <NavLink to="/library/assemblies">Kits</NavLink>
