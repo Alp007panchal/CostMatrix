@@ -164,12 +164,15 @@ export async function addAssemblyToPanel(
   assemblyId: string,
   quantity: number,
   section: string | null = null,
+  /** What a parameterised kit was answered with; null for a kit that asks nothing. */
+  params: Record<string, string> | null = null,
 ): Promise<void> {
   const { error } = await supabase.rpc('add_assembly_to_costing', {
     target_panel_id: panelId,
     source_assembly: assemblyId,
     qty: quantity,
     section,
+    params,
   })
   fail('Could not add the kit', error)
 }

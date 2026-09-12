@@ -185,6 +185,22 @@ straight to `main`, reviewed and merged by the owner the same day.
     to, so the kit-group report reached none of them and they left no trace. They are now named
     beside the report, with what usually causes it (migration 0111).
 
+22. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
+    and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
+    its steps, works its line quantities out from the answers, refuses a formula that is anything
+    but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
+    unchanged (migration 0112). What 3.2 and 3.1 stand on.
+
+## In hand right now
+
+One line per roadmap item a session has started, so two sessions cannot build the same thing
+twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
+the work begins, removed when the pull request opens.
+
+| Item | Session | Since |
+|---|---|---|
+| (nothing in hand) | | |
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 

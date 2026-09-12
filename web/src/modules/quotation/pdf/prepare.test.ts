@@ -141,7 +141,7 @@ describe('buildTechnical from the kits', () => {
   it('writes the description from the kits when the engineer has not', () => {
     const d = detail({
       panels: [panel('p1', 'MAIN LV BOARD', 1, 'Option 1')],
-      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: '250A MCCB KIT', quantity: 2, sort_order: 0 }],
+      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: '250A MCCB KIT', quantity: 2, parameters: {}, sort_order: 0 }],
       items: [],
     })
     expect(buildTechnical(d)[0]?.description).toBe('KITS\n2 No. 250A MCCB KIT')
@@ -149,7 +149,7 @@ describe('buildTechnical from the kits', () => {
   it('keeps the engineer\'s own text when there is one', () => {
     const d = detail({
       panels: [{ ...panel('p1', 'MAIN LV BOARD', 1), technical_description: 'As specified.', enclosure_dimensions: '2100(H) x 800(W)' }],
-      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: 'KIT', quantity: 1, sort_order: 0 }],
+      assemblies: [{ id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: null, code: 'K', name: 'KIT', quantity: 1, parameters: {}, sort_order: 0 }],
     })
     expect(buildTechnical(d)[0]?.description).toBe('As specified.\n\nProposed Enclosure: 2100(H) x 800(W)')
   })

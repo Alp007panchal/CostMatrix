@@ -428,6 +428,8 @@ export interface AssemblyComponentRow {
   assembly_id: string
   component_id: string
   quantity: number
+  /** A formula over the kit's parameters; null means use `quantity` (0100, read since 0112). */
+  qty_expression: string | null
   is_main_device: boolean
   sort_order: number
 }
@@ -527,6 +529,21 @@ export interface CostingAssembly {
   code: string
   name: string
   quantity: number
+  /** The kit parameters this line was worked out from; empty for a kit that takes none. */
+  parameters: Record<string, string>
+  sort_order: number
+}
+
+/** What a parameterised kit asks for before it can be added (kit_parameters). */
+export interface KitParameter {
+  id: string
+  assembly_id: string
+  name: string
+  value_type: 'number' | 'text' | 'boolean'
+  unit: string | null
+  default_value: string | null
+  min_value: number | null
+  max_value: number | null
   sort_order: number
 }
 
