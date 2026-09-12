@@ -7,7 +7,8 @@ import type { Assembly } from '../../lib/database.types'
 import { AssemblyHoursRow } from './AssemblyHoursRow'
 import { ComponentPicker } from './ComponentPicker'
 import { KitDetailsForm } from './KitDetailsForm'
-import { setMainDevice } from './kits-api'
+import { setLineFormula, setMainDevice } from './kits-api'
+import { KitParametersCard } from './KitParametersCard'
 import { addAssemblyComponent, clearCompanyAssemblyHours, listAssemblyComponents, listAssemblyHours, listComponentPrices, removeAssemblyComponent, setAssemblyComponentQuantity, setAssemblyHours, setCompanyAssemblyHours } from './api'
 import { listLabourRates } from './rates-api'
 
@@ -58,10 +59,14 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
     return master ? master.hourly_rate / (company?.exchange_rate ?? 1) : 0
   }
 
+  // A formula line's quantity is not known until the kit is added to a costing,
+  // so it is left out of this figure rather than counted at the fixed number
+  // beside it, which would be a price nobody will ever be charged.
   const materialTotal = (lines.data ?? []).reduce(
-    (sum, l) => sum + l.quantity * (priceById.get(l.component_id)?.unit_price ?? 0),
+    (sum, l) => sum + (l.qty_expression ? 0 : l.quantity * (priceById.get(l.component_id)?.unit_price ?? 0)),
     0,
   )
+  const formulaLines = (lines.data ?? []).filter((l) => l.qty_expression).length
   const unpricedLines = (lines.data ?? []).filter((l) => priceById.get(l.component_id)?.unit_price == null).length
   const labourTotal = (hours.data ?? []).reduce(
     (sum, h) => sum + h.effective_hours * rateFor(h.process_type),
@@ -76,6 +81,12 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
   const remove = useMutation({ mutationFn: removeAssemblyComponent, onSuccess: refreshLines })
   const markMain = useMutation({
     mutationFn: (lineId: string) => setMainDevice(assembly.id, lineId),
+    onSuccess: refreshLines,
+  })
+  // A line's quantity may be a formula over the kit's parameters (roadmap 3.3);
+  // blank means the fixed quantity, which is every line in the library today.
+  const setFormula = useMutation({
+    mutationFn: (input: { id: string; formula: string }) => setLineFormula(input.id, input.formula),
     onSuccess: refreshLines,
   })
   const hasMainDevice = (lines.data ?? []).some((l) => l.is_main_device)
@@ -112,6 +123,12 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
             <span className="muted">Material</span>
             <strong>{money(materialTotal, label)}</strong>
           </div>
+          {formulaLines > 0 && (
+            <div className="muted" style={{ fontSize: '.75rem' }}>
+              {formulaLines} line{formulaLines === 1 ? '' : 's'} worked out from the kit's parameters — not in this
+              total, because the quantity is not known until the kit is added to a costing.
+            </div>
+          )}
           {unpricedLines > 0 && (
             <div className="error" style={{ fontSize: '.8rem' }}>
               {unpricedLines} line{unpricedLines === 1 ? '' : 's'} without a price — not in this total; the kit cannot be costed until priced.
@@ -146,6 +163,7 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
                     <th>Component</th>
                     <th>Make</th>
                     <th className="right">Qty</th>
+                    <th title="Worked out from this kit's parameters">Formula</th>
                     <th className="right">Each</th>
                     <th className="right">Total</th>
                     <th></th>
@@ -188,11 +206,25 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
                             l.quantity
                           )}
                         </td>
+                        <td>
+                          {canEditContents ? (
+                            <input
+                              defaultValue={l.qty_expression ?? ''}
+                              placeholder="fixed"
+                              aria-label="Quantity formula"
+                              style={{ width: '9rem' }}
+                              onBlur={(e) => e.target.value.trim() !== (l.qty_expression ?? '') &&
+                                setFormula.mutate({ id: l.id, formula: e.target.value })}
+                            />
+                          ) : (
+                            l.qty_expression ?? <span className="muted">fixed</span>
+                          )}
+                        </td>
                         <td className="right">
                           {p?.unit_price == null ? <span className="error">no price</span> : money(p.unit_price, label)}
                         </td>
                         <td className="right">
-                          {p?.unit_price == null ? '—' : money(l.quantity * p.unit_price, label)}
+                          {p?.unit_price == null || l.qty_expression ? '—' : money(l.quantity * p.unit_price, label)}
                         </td>
                         <td className="right">
                           {canEditContents && (
@@ -209,9 +241,14 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
             )}
           </Async>
         </div>
-        {(changeQty.error || remove.error || markMain.error) && (
-          <p className="error">{String(changeQty.error ?? remove.error ?? markMain.error)}</p>
+        {(changeQty.error || remove.error || markMain.error || setFormula.error) && (
+          <p className="error">{String(changeQty.error ?? remove.error ?? markMain.error ?? setFormula.error)}</p>
         )}
+        <p className="muted" style={{ fontSize: '.75rem' }}>
+          A <strong>formula</strong> works the quantity out when the kit is added — <code>busbar_metres</code>,
+          <code> steps</code>, <code>greatest(steps - 4, 0)</code> — from what this kit asks for above. Blank
+          means the fixed quantity beside it, which is how every kit in the library works today.
+        </p>
         {canEditContents && (
           <ComponentPicker
             candidates={(prices.data ?? []).filter(
@@ -230,6 +267,8 @@ export function AssemblyEditor({ assembly, onBack }: { assembly: Assembly; onBac
           />
         )}
       </div>
+
+      <KitParametersCard assemblyId={assembly.id} canEdit={canEditContents} />
 
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Labour, in hours</h2>

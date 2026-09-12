@@ -120,7 +120,10 @@ CostMatrix is a multi-company product. Each company is a separate tenant.
 A panel is built from three kinds of line (session 3):
 
 - **Kits**, chosen by kit group and rating, times a quantity. Each brings its lines and its
-  hours (§6) frozen at today's prices and this costing's rates.
+  hours (§6) frozen at today's prices and this costing's rates. A kit may **ask for parameters** —
+  busbar metres, steps, a feeder count — and work its line quantities out from the answers
+  (`qty_expression`, roadmap 3.3); the answers are frozen on the line beside the prices. A kit
+  with no parameters takes the fixed quantities in the library, which is every kit today.
 - **Components on their own**, from the catalogue, in the *components and enclosure* line of
   their section (quantity always 1, no labour; one such line per section). An enclosure cubicle
   added this way is uplifted like one inside a kit. Adding the same component to the same

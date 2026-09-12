@@ -258,7 +258,7 @@ export function CostingEditor() {
                 handlers={{
                   onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
                   onPanelRemove: (pid) => run(() => removePanel(pid)),
-                  onAddAssembly: async (pid, aid, qty, section) => { await addAssemblyToPanel(pid, aid, qty, section); await refresh() },
+                  onAddAssembly: async (pid, aid, qty, section, params) => { await addAssemblyToPanel(pid, aid, qty, section, params); await refresh() },
                   onAddComponent: async (pid, cid, qty, section) => { await addComponentToPanel(pid, cid, qty, section); await refresh() },
                   onAddManual: async (pid, input, section) => { await addManualItem(pid, input, section); await refresh() },
                   onAssemblyQuantity: (aid, q) => run(() => setCostingAssemblyQuantity(aid, q)),

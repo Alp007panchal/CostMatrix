@@ -4,7 +4,7 @@ import { describePanel } from './technical'
 
 const panel = { id: 'p1', costing_id: 'c', company_id: 'co', name: 'MAIN LV BOARD', tag: null, option_label: 'Option 1', uom: 'PC', quantity: 1, technical_description: null, enclosure_dimensions: null, sort_order: 0 } as CostingPanel
 const line = (over: Partial<CostingAssembly>): CostingAssembly => ({
-  id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: 'k1', code: 'ACB-KIT', name: '1600A 4P WITHDRAWABLE MOTORIZED ACB-KIT', quantity: 1, sort_order: 0, ...over,
+  id: 'a1', costing_id: 'c', panel_id: 'p1', kind: 'kit', section: null, source_assembly_id: 'k1', code: 'ACB-KIT', name: '1600A 4P WITHDRAWABLE MOTORIZED ACB-KIT', quantity: 1, parameters: {}, sort_order: 0, ...over,
 })
 const item = (over: Partial<CostingItem>): CostingItem => ({
   id: 'i', costing_id: 'c', costing_assembly_id: 'a1', source_component_id: 'x', code: 'X', name: 'Thing',

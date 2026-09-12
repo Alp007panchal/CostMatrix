@@ -180,11 +180,32 @@ straight to `main`, reviewed and merged by the owner the same day.
     a labour variance report by kit group with a suggested new standard that only a person applies
     (migration 0110). Completes roadmap phase 2.
 
-21. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
+21. **The hours that belong to nobody** (advanced track, a gap in 2.8) — where a panel was costed
+    at none of a kind of work there is no estimate to share its recorded hours out in proportion
+    to, so the kit-group report reached none of them and they left no trace. They are now named
+    beside the report, with what usually causes it (migration 0111).
+
+22. **Parameterised kits** (advanced track, roadmap 3.3) — the engine reads the quantity formulas
+    and kit parameters the foundations added and nothing used: a kit asks for its busbar metres or
+    its steps, works its line quantities out from the answers, refuses a formula that is anything
+    but arithmetic, and freezes the answers on the costing line. A kit with no parameters is
+    unchanged (migration 0112). What 3.2 and 3.1 stand on.
+
+25. **Costing grid view** (advanced track, roadmap 2.9) — the whole costing as one grid, panels
     across and kits and components down, with in-place quantity editing through the same functions as
     the panel editor, a compare pair, the kit picker per column, attention marks for unpriced parts
     and the F12 space check, and an Excel export of what is on screen. **No migration**; the view
     preference is per person in their own browser.
+
+## In hand right now
+
+One line per roadmap item a session has started, so two sessions cannot build the same thing
+twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
+the work begins, removed when the pull request opens.
+
+| Item | Session | Since |
+|---|---|---|
+| (nothing in hand) | | |
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

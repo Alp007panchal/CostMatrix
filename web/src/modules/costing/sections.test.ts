@@ -6,7 +6,7 @@ const offered = ['Incomer', 'AVR bypass', 'ATS', '2nd incomer', 'Outgoers', 'Acc
 
 const line = (over: Partial<CostingAssembly>): CostingAssembly => ({
   id: 'a', costing_id: 'c', panel_id: 'p', kind: 'kit', section: null, source_assembly_id: 'k',
-  code: 'KIT', name: 'A kit', quantity: 1, sort_order: 0, ...over,
+  code: 'KIT', name: 'A kit', quantity: 1, parameters: {}, sort_order: 0, ...over,
 })
 const totals = (id: string, material: number, labour: number): AssemblyTotals => ({
   costing_assembly_id: id, material_each: material, labour_each: labour,
