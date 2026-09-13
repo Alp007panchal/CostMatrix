@@ -40,6 +40,7 @@ export function Layout() {
           {canAdminister && on('assistant') && <NavLink to="/admin/assistant">Assistant</NavLink>}
           {canAdminister && <NavLink to="/admin/features">Features</NavLink>}
           {isMasterAdmin && <NavLink to="/admin/companies">Companies</NavLink>}
+          <NavLink to="/help">Help</NavLink>
         </nav>
         <div className="who">
           <div>{profile?.full_name}</div>

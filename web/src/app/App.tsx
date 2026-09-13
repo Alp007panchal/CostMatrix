@@ -34,6 +34,7 @@ const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePag
 const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
+const HelpPage = lazy(() => import('../modules/help/HelpPage').then((m) => ({ default: m.HelpPage })))
 const TermsPage = lazy(() => import('../modules/legal/TermsPage').then((m) => ({ default: m.TermsPage })))
 
 const queryClient = new QueryClient({
@@ -97,6 +98,8 @@ export function App() {
                 }
               />
               <Route path="quotations" element={<QuotationsPage />} />
+              {/* Every signed-in person, whatever roles they hold or do not. */}
+              <Route path="help" element={<HelpPage />} />
               <Route
                 path="sales"
                 element={
