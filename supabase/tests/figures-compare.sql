@@ -1,4 +1,5 @@
--- The other half: compare the two phases and refuse any difference.
+-- Compare the two phases and refuse any difference. Used by both drills, so it
+-- says "between the two" rather than naming one of them.
 do $$
 declare
   r record;
@@ -22,12 +23,12 @@ begin
   end loop;
 
   if (select count(*) from test.rehearsal where phase = 'before') = 0 then
-    raise exception 'nothing was written down before the upgrade';
+    raise exception 'nothing was written down beforehand, so there is nothing to compare';
   end if;
   if differences > 0 then
-    raise exception 'the upgrade changed % figure(s) on a database that already held rows', differences;
+    raise exception '% figure(s) changed between the two readings', differences;
   end if;
-  raise notice 'The upgrade moved nothing: % figures identical either side of it',
+  raise notice 'Nothing moved: % figures identical on both sides',
     (select count(*) from test.rehearsal where phase = 'before');
 end;
 $$;

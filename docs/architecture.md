@@ -75,9 +75,9 @@ shared with anyone: GitHub holds them write-only. The same migration files run l
 
 ### Backups and data protection
 1. Supabase daily backups and point-in-time recovery (Pro plan).
-2. A weekly GitHub Actions job runs `supabase db dump` and uploads the file, encrypted, to an off-site bucket (an S3-compatible bucket or a second Supabase project). Retention 12 weeks.
-3. Storage objects (PDFs, logos) are included in the weekly job.
-4. A written restore drill in `docs/operations.md`: restore last week's dump into a fresh project and open a costing. Run once before go-live and every quarter.
+2. A weekly GitHub Actions job (`weekly-backup.yml`) runs `supabase db dump` three times — roles, schema, data — checks the files are not empty, and keeps them as a run artifact for 90 days. That puts them off the Supabase account, which is what this layer is for; it does not put them off GitHub. Sending them on to a bucket as well is one secret away and the job is written for it.
+3. Storage objects (PDFs, logos) are **not** in the weekly dump — it is the database only. Quotation PDFs can be regenerated from the costing data, which is in it.
+4. A written restore drill in `docs/operations.md` Part E: download the latest artifact, restore roles then schema then data into a fresh project, and check a costing's total to the cent. Run once now and every quarter. `supabase/tests/restore-drill.sh` rehearses the same mechanism in CI on every pull request, which proves the schema restores but not that any particular dump does.
 5. Access: master admin read-only by database policy; company data never crosses tenants; no shared secret keys in the browser, only the public publishable key plus the user's own token.
 6. A short plain-language terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 
@@ -130,7 +130,7 @@ CostMatrix/
       test/
   .github/workflows/
     ci.yml                      lint, typecheck, migrations + pgTAP on a throwaway database
-    weekly-backup.yml
+    weekly-backup.yml            a full dump of production every Sunday, kept 90 days
 ```
 
 Rules inside `web/src/modules/<name>/`:

@@ -1,11 +1,11 @@
--- One half of the upgrade rehearsal: write down what this database says.
+-- Write down what this database says, so something can be compared against it.
 --
--- Run once against a database at migration 0017 that already holds real rows,
--- and again after the advanced migrations have been applied on top. The second
--- run compares and refuses any difference, because a costing that was priced
--- before an upgrade must say exactly the same thing after it.
---
--- Called with -v phase=before or -v phase=after by upgrade-rehearsal.sh.
+-- Used by both drills, which ask the same question of different events:
+--   upgrade-rehearsal.sh — does applying the advanced migrations to a full
+--     database move anything?
+--   restore-drill.sh     — does dumping and restoring it move anything?
+-- Either way a costing that was priced before must say exactly the same thing
+-- after. Called with -v phase=before or -v phase=after.
 
 create table if not exists test.rehearsal (
   label text not null,

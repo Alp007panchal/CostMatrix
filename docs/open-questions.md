@@ -35,6 +35,8 @@ changes a price, test 15 is unmodified, and your real data is never touched (D-1
 | **Connect your own email sender** (operations B9c) | Before inviting more than one or two people | Supabase's built-in sender allows a few messages an hour and often lands in spam. A free Gmail app password is enough; move to a `neiltd.com` sender before other companies are invited. |
 | Upload the header logo and footer marks | Before the first real quotation | **Quotation wording** → Header logo and Footer strip. PNG with transparent background prints best. |
 | Sizes and fittings for the compatibility checks (roadmap 3.4): the depth of a device, the usable depth inside a cubicle, and the devices a part is listed for | Before the checks can say anything | Until they are recorded the checks stay silent, which is correct rather than broken. The dimensions importer (`dimensions-template.csv`) takes the sizes in bulk; the rest is the Components screen. |
+| **Run the restore drill once** — Actions → Weekly backup → run it, download the artifact, restore it into a throwaway Supabase project and check a costing's total | **Now**, and quarterly after | The job and the steps exist (operations Part E); only a drill against your real dump proves your backup works. Date it in `docs/decisions.md`. |
+| Do you want the weekly dump sent somewhere beyond GitHub as well? | Whenever you like | It is kept 90 days as a GitHub artifact, which is off Supabase but not off GitHub. A bucket is one secret and half an hour. |
 | Run `docs/acceptance-test.md` on what is live | **Now** | Each finding comes back as its own pull request, as the notebook changes did. |
 
 ## Assumptions in force until you say otherwise
