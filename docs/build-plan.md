@@ -222,7 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
+| One track: retiring the two-track split from `CLAUDE.md` and `two-track-setup.md` | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-13 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
