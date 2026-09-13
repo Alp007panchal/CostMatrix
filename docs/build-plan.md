@@ -222,6 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
+| 3.8 GA sketch — the layout as Annexure IV of the quotation | `claude/advanced-p38-ga-sketch` | 2026-09-13 07:25 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
