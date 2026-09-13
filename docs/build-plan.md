@@ -280,6 +280,14 @@ the work begins, removed when the pull request opens.
     numbers, a copy does not — both added to the hand-written column list that has dropped frozen
     data twice. Nothing changes a price.
 
+37. **The exceljs/uuid advisory, and the first real test of the exports** (advanced track,
+    maintenance) — the advisory was **never reachable** (exceljs imports only `uuid.v4`, with no
+    buffer; the flaw is in `v3`/`v5`/`v6` with one), and `npm audit fix --force` would have
+    downgraded exceljs breakingly for no gain. Instead an `overrides` entry moves exceljs's uuid to
+    a patched version — **0 vulnerabilities** — with the safety proven by a new round-trip test that
+    writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
+    path (D-292, D-293).
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
