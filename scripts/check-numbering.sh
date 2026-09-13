@@ -59,10 +59,14 @@ if ! git rev-parse --verify --quiet origin/main >/dev/null; then
 else
   self="$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
 
-  # number<TAB>filename, for every migration on every remote branch but our own.
+  # number<TAB>filename, for every migration claimed by a branch that is not
+  # ours and not already merged into ours. A branch whose tip is an ancestor of
+  # HEAD has no independent claim — its migrations ARE ours, and counting them
+  # would make a legitimate run of 0119..0122 look like 0119 clashing with 0122.
   elsewhere="$(
     for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin); do
       [[ "$ref" == "origin/HEAD" || "$ref" == "$self" ]] && continue
+      git merge-base --is-ancestor "$ref" HEAD 2>/dev/null && continue
       git ls-tree --name-only "$ref" -- supabase/migrations/ 2>/dev/null \
         | sed -n 's#supabase/migrations/\(\([0-9]\{4\}\)_.*\)#\2\t\1#p'
     done | sort -u
