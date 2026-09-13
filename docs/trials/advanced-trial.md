@@ -25,7 +25,7 @@ and so an empty menu is not mistaken for a missing feature.
 
 - [ ] Open the staging project's **SQL editor** in Supabase. Open
       `supabase/checks/deployed-features.sql` from the repository, copy the whole file in, run it.
-      **Expect:** about 55 rows, every one `present = true`. A `false` row is a feature whose
+      **Expect:** about 60 rows, every one `present = true`. A `false` row is a feature whose
       migration has not landed — write down which and stop; the rest of this script will fail in
       confusing ways.
 - [ ] **Every advanced feature now arrives off.** That is deliberate (D-266, and condition 2 of
@@ -92,7 +92,7 @@ The space check stays silent until things have been measured, so measure enough 
       ask for it and to show the line quantities it works out from your answer.
 - [ ] **Expect** a space line on the panel now that you have measured a cubicle: *fits*, *tight* or
       *will not fit*, with the percentage. It changes no price — it is advice.
-- [ ] **Lay this panel out** *(roadmap 3.8, stage one)* — the pop-up. Press **Work the board out**.
+- [ ] **Lay this panel out** *(roadmap 3.8)* — the pop-up. Press **Work the board out**.
       **Expect:** the board drawn at true scale, a section per busbar-fed device, covers stacked
       down the feeder sections, and a line under each saying how full it is. Open *Why each section
       is there* and read the rules; tell me any that are wrong, because they are the whole feature.
@@ -101,6 +101,24 @@ The space check stays silent until things have been measured, so measure enough 
 - [ ] Drag a kit onto a section built for another design. **Expect a refusal in words**, not a
       silent nothing. **Save layout** — and check the costing's total has not moved. Then **Put
       these cubicles on the costing** and see the Enclosure section appear.
+- [ ] Now the other four views, along the top: **Rear**, **Plan**, **Door**, **3D**.
+      **Expect** the rear to show the sections **mirrored** — the order you see them walking round
+      the board — each saying whether its cables land on lugs at the back or on shrouded terminals at
+      the front. **Expect** *Plan* to look down on the section you last clicked, with the vertical
+      busbar, the mounting plate, the cable alley and the door's swing, dimensioned. **Expect** the
+      door to be plain unless a part of the panel carries *Mounting: door*, and to name any
+      door-mounted part it has no size for. **Expect** *3D* to be an isometric you can see from the
+      left or the right — turn the **Doors** layer off to look inside.
+      This is the view to judge against your own mockups; tell me anything that looks wrong.
+- [ ] Click a section and find the **Section** panel on the left. Change **Cable alley** to *behind
+      the plates*. **Expect** the plate to go from 450 to 650 mm on an 800 mm section — and, if the
+      section is shallower than 800 mm, **expect the verdict to turn to "will not fit" and say why in
+      millimetres**. That refusal is the point: the cables would have nowhere to go.
+- [ ] Pick **Our double-front frame** in the construction box — if its widths are still empty it will
+      tell you so, which is the honest answer until you give me the figures. Where it has them, set
+      **two faces** and press *Work the board out* again. **Expect** the covers that needed two
+      sections to fit one, with the seventh on **face B**, and the verdict reported **per face** —
+      a double-front section fits only when both faces do.
 - [ ] **Work out the busbar runs** on the same panel *(roadmap 4.1)* — this is your `CU-OPT1` sheet.
       Press **Start from this board**. **Expect:** the runs a board like this needs, named, with the
       bar sizes your own kits use at those ratings, and a line saying the lengths are your usual

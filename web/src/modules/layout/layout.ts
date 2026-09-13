@@ -108,55 +108,62 @@ export function dropRefusal(
   return null
 }
 
-/** Adds a kit to a section's front face. The caller has already asked for a refusal. */
+/**
+ * Adds a kit to a face of a section. The caller has already asked for a refusal.
+ * The side defaults to the front, which is the only face a single-front section
+ * has; the rear view passes 'rear' on a double-front board.
+ */
 export function placeKit(
   sections: LayoutSection[],
   sectionName: string,
   kit: LayoutKit,
+  side: 'front' | 'rear' = 'front',
 ): LayoutSection[] {
   return sections.map((section) => {
     if (section.name !== sectionName) return section
-    const placements = frontFace(section)
-    const face = section.faces[0]
-    if (!face) return section
+    const at = section.faces.findIndex((f) => f.side === side)
+    const face = section.faces[at]
+    if (at < 0 || !face) return section
     return {
       ...section,
-      faces: [
-        {
-          ...face,
-          placements: [
-            ...placements,
-            {
-              costing_assembly_id: kit.costing_assembly_id,
-              face: 'front',
-              name: kit.name,
-              slot: placements.length,
-              height_mm: kit.module_height_mm,
-              unsized: !kit.is_sized,
+      faces: section.faces.map((each, index) =>
+        index !== at
+          ? each
+          : {
+              ...face,
+              placements: [
+                ...face.placements,
+                {
+                  costing_assembly_id: kit.costing_assembly_id,
+                  face: side,
+                  name: kit.name,
+                  slot: face.placements.length,
+                  height_mm: kit.module_height_mm,
+                  unsized: !kit.is_sized,
+                },
+              ],
             },
-          ],
-        },
-        ...section.faces.slice(1),
-      ],
+      ),
     }
   })
 }
 
-/** Takes one placement off a section, by the slot the canvas drew it at. */
+/** Takes one placement off a face of a section, by the slot it was drawn at. */
 export function removePlacement(
   sections: LayoutSection[],
   sectionName: string,
   index: number,
+  side: 'front' | 'rear' = 'front',
 ): LayoutSection[] {
   return sections.map((section) => {
-    const face = section.faces[0]
-    if (section.name !== sectionName || !face) return section
+    const at = section.faces.findIndex((f) => f.side === side)
+    const face = section.faces[at]
+    if (section.name !== sectionName || at < 0 || !face) return section
     return {
       ...section,
-      faces: [
-        { ...face, placements: face.placements.filter((_, at) => at !== index) },
-        ...section.faces.slice(1),
-      ],
+      faces: section.faces.map((each, n) =>
+        n !== at ? each : { ...face, placements: face.placements.filter((_, p) => p !== index) },
+      ),
     }
   })
 }

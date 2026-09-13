@@ -821,6 +821,7 @@ written so that *off* reproduces the older text exactly (D-267):
   `AI_FALLBACKS`.
 
 ### Panel layout, stage one (roadmap 3.8, migration 0120)
+Stage two's changes to these are listed under it; where the two disagree, stage two wins.
 - `v_panel_layout_kits` — the kits on a panel with their mounting design, module height, positions
   per plate and footprint, and `is_sized`: whether the library says enough to place them.
 - `app.section_capacity(design, width_mm, busbar_compartment_mm, construction)` — what one section
@@ -835,6 +836,34 @@ written so that *off* reproduces the older text exactly (D-267):
 - Settings in `company_options`: `layout_device_compartment_mm` (1,500, assumed),
   `layout_vertical_busbar_mm`, `layout_cable_alley_mm`, `layout_mcb_module_mm`,
   `layout_device_clearance_mm`.
+
+### Panel layout, stage two (roadmap 3.8, migration 0121)
+The other four views, and the two rules they brought with them.
+
+- A **section** now carries `depth_mm`, `form`, `busbar_side` (left/right) and `cable_alley`
+  (beside/behind) beside the fields stage one gave it. A section saved by stage one has none of them
+  and reads as single-front, alley beside, 800 mm deep — the defaults it assumed.
+- `app.section_capacity(design, width_mm, busbar_compartment_mm, construction, cable_alley, depth_mm)`
+  — the four-argument form is **dropped**, not left beside it, so two capacity rules cannot disagree;
+  every old call resolves here. With the alley **behind** the plates the plate runs the full width
+  left of the busbar (650 mm on an 800 mm section rather than 450) and the answer carries
+  `depth_needed_mm` and `too_shallow`.
+- `app.layout_fit(sections, construction)` — a verdict **per face** in `faces[]`; the section takes
+  its worst face's verdict and figures, the board its worst section's. A section too shallow for its
+  cable alley is `no_fit` whatever height is left. The board also returns `max_depth_mm`.
+- `app.layout_worse(a, b)` — the order of badness in one place: no_fit, unknown, tight, fits, empty.
+- `app.arrange_panel(panel, construction, access, cable_alley)` — `access` is `single_front` or
+  `double_front` and is refused on a construction whose `allows_double_front` is false. A
+  double-front board fills face A then **face B of the same section** before opening another; a
+  busbar-fed device still takes a single-front section. Returns `depth_mm`, `height_mm`, `base_mm`.
+- `app.layout_depth_for(depths, needs)` — the shallowest depth on the construction's list that holds
+  what is needed, else its deepest. The depth twin of `layout_width_for`.
+- `v_panel_door_devices` — the panel's parts whose F12 `components.mounting_type` is `door`, with
+  the size the door view draws them at and the kit each came from.
+- `v_panel_layout_weight` — the panel's weight from F12 `weight_kg`, with `without_weight`: how many
+  lines carry none, so the figure reads as the estimate it is.
+- Settings added: `layout_alley_behind_min_depth_mm` (800), `layout_alley_behind_mm` (250),
+  `layout_rear_dropper_mm` (100), `layout_door_swing_mm` (100), `layout_between_faces_mm` (200).
 
 ### Panel layout fields (roadmap 3.8, migration 0119)
 The canvas is not built; these are the fields it will read, so the library can be filled in first.
