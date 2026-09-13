@@ -222,7 +222,6 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| The exceljs → uuid advisory: reachability, a real xlsx round-trip test, and a clean audit | `claude/advanced-exceljs-uuid-advisory` | 2026-09-13 09:50 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
@@ -280,6 +279,14 @@ the work begins, removed when the pull request opens.
     same device tags the panel layout draws (migration 0122). A revision carries the drawing
     numbers, a copy does not — both added to the hand-written column list that has dropped frozen
     data twice. Nothing changes a price.
+
+37. **The exceljs/uuid advisory, and the first real test of the exports** (advanced track,
+    maintenance) — the advisory was **never reachable** (exceljs imports only `uuid.v4`, with no
+    buffer; the flaw is in `v3`/`v5`/`v6` with one), and `npm audit fix --force` would have
+    downgraded exceljs breakingly for no gain. Instead an `overrides` entry moves exceljs's uuid to
+    a patched version — **0 vulnerabilities** — with the safety proven by a new round-trip test that
+    writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
+    path (D-289, D-290).
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
