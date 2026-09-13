@@ -263,6 +263,15 @@ the work begins, removed when the pull request opens.
     behind the plates widens the plate and costs depth, and a section too shallow for its own cables
     does not fit. The GA sketch in the quotation PDF is the one piece of stage two still to come.
 
+35. **The general-arrangement drawing, and 3.8 finished** (advanced track, roadmap 3.8) — the saved
+    layout printed with the quotation as **Annexure V**, one A4 landscape sheet per panel that has
+    one: black line art, the two chambers, each section with its compartment and its devices, the
+    device tags `Q1, Q2 …`, a dimension line and an overall size, and a footer taking the form and
+    access from the drawing itself. The **same tag list is appended to that panel's technical-offer
+    row**, so the drawing and the offer agree by construction rather than by care (D-285). A panel
+    nobody has drawn gets no sheet and the quotation is unchanged (D-284). No migration: this is
+    all in the browser, so nothing new reaches staging but the app.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
