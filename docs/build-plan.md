@@ -255,6 +255,14 @@ or into go-live.
     moves (in CI on every pull request), a go-live section in the runbook, and then the release
     itself: one pull request from `advanced` into `main`, every feature off.
 
+32. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
+    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
+    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
+    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
+    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
+    faces for a double-front board; and a kit template plus importer so the library can be filled
+    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
+
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
 - Private components and private assemblies per company, with company admin setting hours, including Excel upload and download of the private library.

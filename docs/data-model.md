@@ -820,6 +820,23 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
+### Panel layout fields (roadmap 3.8, migration 0119)
+The canvas is not built; these are the fields it will read, so the library can be filled in first.
+
+- `assemblies.mounting_design` (`public.mounting_design` enum: busbar_fed · mccb_plates ·
+  side_by_side_plates · compensation · meter_board_plate · inline_3nj6), `module_height_mm`
+  (50 mm grid, checked) and `positions_per_plate`. All nullable; `v_kits` carries them.
+- `layout_constructions` — master rows (company null) plus a company's own: widths, the two depth
+  lists (busbar top/bottom and busbar rear), height, base heights, forms, the module-height grid and
+  its allowed heights, kVAr per compensation section. S4 seeded from the Siemens manual; S8, the
+  meter board and `custom_double_front` named and empty. Read by anybody, written by the master
+  administrator (master rows) or a company administrator (its own).
+- `panel_layouts.cubicles` is renamed **`sections`**, and a section carries `faces[]` — a
+  double-front board is one section with a front and a rear face (spec §2.1) — plus
+  `construction_code`. Nothing writes layouts yet, which is why the rename is free.
+- `app.import_kit_layout(rows, company, apply)` fills the kit fields in bulk from
+  `data/seed/kit-layout-template.csv` (built by `scripts/build_kit_layout_template.py`).
+
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
 each entry `{label, bar_code, phases, runs_per_phase, length_m, sets, metres}` — so a revision and a

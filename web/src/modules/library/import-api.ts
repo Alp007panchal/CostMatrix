@@ -35,3 +35,8 @@ export function importKitGroupHours(rows: Rows, toCompany: string | null, apply:
 export function importDimensions(rows: Rows, toCompany: string | null, apply: boolean) {
   return call('import_dimensions', { rows, to_company: toCompany, apply }, 'Could not import the dimensions')
 }
+
+/** kit-layout-template.csv — the mounting design, module height and footprint of each kit. */
+export function importKitLayout(rows: Rows, toCompany: string | null, apply: boolean) {
+  return call('import_kit_layout', { rows, to_company: toCompany, apply }, 'Could not import the kit sizes')
+}

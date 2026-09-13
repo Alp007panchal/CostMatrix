@@ -168,6 +168,10 @@ export async function updateAssembly(
       | 'footprint_w_mm'
       | 'footprint_h_mm'
       | 'footprint_d_mm'
+      // Added by migration 0119, for the panel layout of roadmap 3.8.
+      | 'mounting_design'
+      | 'module_height_mm'
+      | 'positions_per_plate'
     >
   >,
 ): Promise<void> {
