@@ -75,7 +75,12 @@ with wanted(feature, kind, name) as (values
   ('3.8 layout, stage two',   'view',     'public.v_panel_door_devices'),
   ('3.8 layout, stage two',   'view',     'public.v_panel_layout_weight'),
   ('3.8 layout, stage two',   'function', 'app.layout_depth_for'),
-  ('3.8 layout, stage two',   'function', 'app.layout_worse')
+  ('3.8 layout, stage two',   'function', 'app.layout_worse'),
+  ('4.3 EPLAN and Word',      'view',     'public.v_eplan_parts'),
+  ('4.3 EPLAN and Word',      'function', 'app.set_eplan_metadata'),
+  ('4.3 EPLAN and Word',      'function', 'app.import_eplan_metadata'),
+  ('4.3 EPLAN and Word',      'column',   'public.costings.eplan_project'),
+  ('4.3 EPLAN and Word',      'column',   'public.costings.drawing_numbers')
 )
 select
   w.feature,

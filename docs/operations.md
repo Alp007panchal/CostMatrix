@@ -1073,6 +1073,51 @@ detail: Vercel dashboard shows deployments; Supabase dashboard shows database he
 Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the
 backup job stores it.
 
+### Hand the job to the drawing office (phase 4.3)
+On a costing, the **The drawing office** card. It changes no price — everything on it is a
+reference or a file.
+
+**The references.** Type the **EPLAN project** as the drawing office names it and the **drawing
+numbers**, one per line, then *Save project details*. They go on the costing, they appear on the
+exports, and a **revision carries them** — it is the same board on the same drawings. A **copy**
+starts with none, because a copy is a different job that will have its own.
+
+Rather than typing them, press **Paste an EPLAN project export instead** and paste the project
+properties straight out of EPLAN. It reads whatever shape they come in — `Project name: …`,
+`Drawing no = …`, a two-column export, tabs — shows you what it found, and saves nothing until you
+press the save button in that box. **Every line it could not read is listed**, so if your export
+uses a field name it does not know, you will see it rather than wonder why nothing happened. Tell
+me the name and I will add it.
+
+**The technical offer as Word.** *Technical offer as Word* writes a real `.docx` onto your machine,
+one heading per panel with the description as editable paragraphs. It is a **copy**: edit it, send
+it, nothing you type in it reaches the costing or the quotation.
+
+**The parts list.** *Parts list (CSV)* or *(Excel)* writes one row per line of the costing, with
+these columns, in this order:
+
+> Device tag · Part number · Manufacturer · Description · Quantity · Unit · Panel · Panel quantity ·
+> Section · Kit · Mounting · Width mm · Height mm · Depth mm · Weight kg · Our code · Category ·
+> Costing · EPLAN project · Drawing numbers
+
+The order is fixed on purpose: the drawing office maps it in EPLAN's parts import **once** and then
+never again. Three things to know:
+
+- **Quantity is per panel**, with the panel count in the next column — not multiplied together. A
+  board built twice shows 1 and 2, so nobody double-orders.
+- **Device tag** is the tag the panel layout draws (`Q1`, `Q2` …). Lay a panel out and its kits'
+  parts carry their tags; don't, and the column is blank — the list still imports, the devices just
+  will not match a drawing.
+- The card **warns you before you export**: how many rows have no manufacturer part number (EPLAN
+  matches on that, so those rows will not find a part) and how many kits are not placed yet.
+
+The figures are the **frozen** ones, so an old costing exports what was actually quoted rather than
+what the catalogue says today.
+
+*Not verified against a real EPLAN installation* — there is none here. The columns follow EPLAN's
+parts-import fields and are documented above; if the mapping needs a different heading, say which
+and it is a one-line change.
+
 ---
 
 ## Part C2 — Taking the advanced app to production

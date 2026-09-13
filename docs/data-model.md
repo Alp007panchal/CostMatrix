@@ -882,6 +882,22 @@ The canvas is not built; these are the fields it will read, so the library can b
 - `app.import_kit_layout(rows, company, apply)` fills the kit fields in bulk from
   `data/seed/kit-layout-template.csv` (built by `scripts/build_kit_layout_template.py`).
 
+### EPLAN and Word exports (roadmap 4.3, migration 0122)
+- `costings.eplan_project`, `costings.drawing_numbers` — the drawing office's own references, free
+  text. **Added to `create_costing_revision`'s hand-written column list**, so a revision carries
+  them; a copy goes through `create_costing` and starts with none, which is right because a copy is
+  a different job.
+- `app.set_eplan_metadata(costing, project, drawings)` — draft only, writes a `eplan_metadata`
+  history line, and only when something actually changed. Blank means null, never `''`.
+- `app.import_eplan_metadata(costing, pasted, apply)` — reads `key: value`, `key=value`, `key,value`
+  and tab-separated lines, matches the key against the names EPLAN uses, and proposes unless asked
+  to apply. Returns what it found, what it could not read, and why.
+- `v_eplan_parts` — one row per frozen `costing_items` line with its panel, kit, section, part
+  number, make, description, quantity, F12 size and weight, and the **device tag** numbered over the
+  newest `panel_layouts` row for that panel in the order the GA sheet draws it (0121). The tag is
+  null where the panel has no layout.
+- Feature `eplan_exports` (sort 180), off everywhere until the master administrator turns it on.
+
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
 each entry `{label, bar_code, phases, runs_per_phase, length_m, sets, metres}` — so a revision and a

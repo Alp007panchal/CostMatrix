@@ -272,6 +272,14 @@ the work begins, removed when the pull request opens.
     nobody has drawn gets no sheet and the quotation is unchanged (D-284). No migration: this is
     all in the browser, so nothing new reaches staging but the app.
 
+36. **The drawing office: Word and EPLAN** (advanced track, roadmap 4.3) — the EPLAN project name
+    and drawing numbers on the costing, with a paste-in importer that reads whatever shape the
+    export comes in and proposes before it writes; the technical offer as an **editable `.docx`**;
+    and a **parts list** for the drawing office to import, one row per frozen line, carrying the
+    same device tags the panel layout draws (migration 0122). A revision carries the drawing
+    numbers, a copy does not — both added to the hand-written column list that has dropped frozen
+    data twice. Nothing changes a price.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
