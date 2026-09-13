@@ -260,7 +260,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| Slice 6: the uptime check (monitoring) | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-13 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
@@ -277,7 +277,7 @@ the work begins, removed when the pull request opens.
   the owner running the drill once against the real dump and dating it in `decisions.md`.
 - ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
-- Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
+- Monitoring: ~~uptime check on the web app~~ — **built 13 Sep** (`uptime.yml`, four times a day, red tick and an email when the site or Supabase stops answering; a free external checker is the upgrade for minute-level notice and the runbook says how). Still to do: Supabase alerts, and error reporting in the browser so a screen that breaks for somebody says so without them mentioning it.
 - Custom domain and email sender for Supabase Auth invitations.
 - Terms page published and linked at sign-up.
 - One-page user guide per role.
