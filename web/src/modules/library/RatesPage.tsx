@@ -3,7 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import { listProcessTypes } from './api'
-import { listEffectiveCurrencyFactors, listEffectiveMaterialRates, listLabourRates, listMaterialRates, setLabourRate } from './rates-api'
+import { listEffectiveCurrencyFactors, listEffectiveMaterialRates, listLabourRates, listLibraryDependents, listMaterialRates, setLabourRate } from './rates-api'
+import { dependentWords, dependentsFor } from './dependents'
 import { MaterialRateRow } from './MaterialRateRow'
 import { CurrencyFactorRow, NewCurrencyRow } from './CurrencyFactorRow'
 
@@ -23,6 +24,8 @@ export function RatesPage() {
     queryFn: listEffectiveMaterialRates,
   })
   const rawRates = useQuery({ queryKey: ['material-rates'], queryFn: listMaterialRates })
+  // What rests on each rate, so a change's size is visible before it is made.
+  const dependents = useQuery({ queryKey: ['library-dependents'], queryFn: listLibraryDependents })
   const factors = useQuery({
     queryKey: ['currency-factors-effective'],
     queryFn: listEffectiveCurrencyFactors,
@@ -68,6 +71,7 @@ export function RatesPage() {
                     <th className="right">Your rate</th>
                     <th className="right">Lands at</th>
                     <th>Source</th>
+                    <th className="right">Prices</th>
                     <th className="right"></th>
                   </tr>
                 </thead>
@@ -90,6 +94,7 @@ export function RatesPage() {
                       currencyCode={company.currency_code}
                       currencyLabel={company.currency_label}
                       isMasterAdmin={isMasterAdmin}
+                      usedBy={dependentWords(dependentsFor(dependents.data ?? [], 'material_rate', row.code))}
                       masterRateId={
                         rawRates.data?.find((r) => r.company_id === null && r.code === row.code)?.id
                       }
@@ -123,6 +128,7 @@ export function RatesPage() {
                     <th>Currency</th>
                     <th className="right">KES per 1, landed</th>
                     <th>Source</th>
+                    <th className="right">Bought in it</th>
                     <th className="right"></th>
                   </tr>
                 </thead>
@@ -133,6 +139,7 @@ export function RatesPage() {
                       row={row}
                       companyId={company.id}
                       isMasterAdmin={isMasterAdmin}
+                      usedBy={dependentWords(dependentsFor(dependents.data ?? [], 'currency_factor', row.currency_code))}
                       onSaved={factorsSaved}
                     />
                   ))}

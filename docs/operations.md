@@ -803,10 +803,29 @@ admin imports the master library; a company admin imports private parts and kits
 
 ### Change a currency's landed factor (session 1)
 Rates → Currency factors. Each currency shows one figure: KES per 1 unit **landed**, with the
-exchange rate, freight, duty and handling in it (200 per EUR today). **Change** writes your
+exchange rate, freight, duty and handling in it (200 per EUR today). Beside it, **Bought in it**
+says how many parts are purchased in that currency — the size of what your change moves. The
+material rates table has the same column, **Prices**: the copper rate carries eleven parts, which
+is the whole busbar catalogue. **Change** writes your
 company's own figure; the master admin ticks *master* to change the default for everyone, and may
 add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
 be saved. New costings use the new figure; existing ones keep what they froze.
+
+### If the app refuses to remove a rate or a kit group
+Three things cannot be deleted while something still rests on them, and the message says what and
+what to do first:
+
+- a **kit group** that kits are still in — move them to another group first. Without this guard the
+  kits would simply fall out of the group and cost **zero labour**, with nothing said.
+- the **master landed factor** for a currency parts are still bought in — reprice them in another
+  currency first. Without it their price cannot be worked out at all, while the purchase price goes
+  on showing on the Components screen.
+- a **master material rate** that weight-priced parts still use — give them a fixed price first.
+  The copper rate is the one that matters: it prices the whole busbar catalogue.
+
+Your **own** currency factor or material rate can always be removed: the master row catches the
+parts, so nothing is orphaned. And a rate or group nothing depends on goes without argument — the
+guard refuses a fault, not a delete.
 
 ### Work out an APFC bank from a target (phase 3.2)
 In a draft costing, on the panel: **Work out an APFC bank**. Type the target in kVAr, choose

@@ -279,6 +279,15 @@ straight to `main`, reviewed and merged by the owner the same day.
     writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
     path (D-292, D-293).
 
+39. **Nothing the library depends on disappears quietly** (maintenance) — the app was careful at
+    the door and careless at the exit: deleting a kit group silently un-grouped its kits so they
+    cost zero labour, deleting a master currency factor made every part bought in it unpriceable
+    while its price still showed, and `components.material_rate_code` had **no foreign key at all**
+    so a material rate could be removed from under the busbar catalogue. Migration 0127 adds three
+    `before delete` guards that refuse and name what is holding the row and what to do first, plus
+    `v_library_dependents` so the Rates screen shows the count beside each rate before anybody
+    tries. A company's own factor or rate still goes freely — it falls back to the master row.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
@@ -310,7 +319,6 @@ the work begins, removed when the pull request opens.
 | Item | Session | Since |
 |---|---|---|
 | Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
-| Nothing the library depends on can be deleted quietly: kit groups, master currency factors, master material rates | `claude/no-quiet-deletes` | 2026-09-13 17:05 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

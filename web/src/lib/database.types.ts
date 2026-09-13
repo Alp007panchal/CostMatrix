@@ -1520,3 +1520,12 @@ export interface LayoutEnclosureApplied {
   missing: { width_mm: number; quantity: number; why: string }[]
   wanted: Record<string, number>
 }
+
+/** How much rests on one library row (v_library_dependents, migration 0127). */
+export interface LibraryDependents {
+  kind: 'kit_group' | 'currency_factor' | 'material_rate'
+  entity_id: string
+  label: string
+  dependents: number
+  dependents_are: string
+}
