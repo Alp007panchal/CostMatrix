@@ -968,9 +968,14 @@ backup job stores it.
 
 ## Part C2 — Taking the advanced app to production
 
-The advanced track has been built on the staging project since 10 September. This is how it
-reaches the app you quote from. It happens **once**; afterwards the two tracks are one again and
-new work arrives the ordinary way.
+The advanced track was built on the staging project from 10 September, and crossed to production
+on **12 September** — 75 commits and 19 migrations, every feature switched off, and nothing on
+the live app looked different.
+
+**It happens once more, and then never again.** The panel layout and the Word/EPLAN exports were
+merged into `advanced` after that release, so one more `advanced → main` pull request brings them
+across. From 13 September there is **one track**: work goes to `main`, each feature behind a
+switch that is off, and the section at the end of this part is the rhythm from then on.
 
 ### What the merge actually does
 
@@ -1020,6 +1025,23 @@ The backup from step 1 is the answer, and Part E is how to use it. Nothing in th
 data: the migrations add tables and columns and rewrite functions. A feature switched on can
 always be switched off again, and switching it off hides it without deleting what was entered
 while it was on.
+
+### From now on: one track
+
+There is no second track to release from any more, so there is no repeat of the day above. The
+ordinary rhythm is:
+
+1. A feature is built on a branch off `main` and merged into `main`. **Deploy database** applies
+   its migration to production. Nothing you can see changes, because the feature is switched off.
+2. When you want to try it, staging is where you do that: it runs the same code (the `advanced`
+   branch, which is now just the copy staging deploys from). `docs/trials/advanced-trial.md` is
+   the click-through.
+3. Then switch it on for real work on the **Features** screen, one at a time, writing a real
+   total down before and after for anything marked as changing an existing costing.
+
+**Keeping staging in step** is one thing nobody does automatically yet: after a change reaches
+`main`, `main` has to be merged into `advanced` for staging to pick it up. Worth automating once
+the two are level; until then, ask and it is one command.
 
 ## Part D — When something goes wrong
 

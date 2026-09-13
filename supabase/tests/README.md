@@ -50,6 +50,21 @@ ignored restores something other than what was taken.
 What it cannot prove is that the owner's real dump restores — only a drill against that dump
 does, and `docs/operations.md` Part E says how.
 
+## Checking the numbers
+
+```sh
+./scripts/check-numbering.sh
+```
+
+Not a database test — it needs nothing running — but it belongs in the same habit, and CI runs it
+as its own job on every pull request. It refuses a migration number used twice, a new migration
+numbered below one that already exists **on any branch** (which is how 0116 came to be written
+twice, and how a `0018` would now sort behind eighteen migrations already applied), and a
+duplicate decision id in `docs/decisions.md`.
+
+Two sessions work on this repository at once. The rule to check first was in `CLAUDE.md` and was
+broken three times in one week, so it is a red tick now instead.
+
 ## The files
 
 

@@ -6,6 +6,21 @@ on:
   pull_request:
 
 jobs:
+  # More than one session works on this repository at once, and three times in
+  # one week two of them took the same number: migration 0116 twice, and two
+  # sets of decision numbers. A duplicate migration number is the dangerous one
+  # — Supabase skips it silently, so the tables it creates never exist. This job
+  # refuses the clash instead of trusting everyone to remember the rule.
+  # fetch-depth: 0 so the other branches are here to compare against.
+  numbering:
+    name: Migration and decision numbers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: ./scripts/check-numbering.sh
+
   database:
     name: Migrations and isolation tests
     runs-on: ubuntu-latest

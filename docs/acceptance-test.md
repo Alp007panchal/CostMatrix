@@ -16,10 +16,11 @@
 > earlier version of this script, the new steps are §4 (files), §5 (sections, copy), §6 (who did
 > it) and §9 (won or lost on the enquiry).
 
-> **2026-09-12:** this script is the **basic app on production** (`main`), which is unchanged by
-> the advanced work. The eleven features built on `advanced` against the staging project have
-> their own click-through: `docs/trials/advanced-trial.md`. Keeping them apart means this one
-> stays a true test of what your team quotes on today.
+> **2026-09-13:** this script is what your team quotes on today, and it still is: the advanced
+> work reached production on 12 September with **every feature switched off**, so nothing here
+> behaves differently. Those features have their own click-through on staging,
+> `docs/trials/advanced-trial.md`. Run that one before switching a feature on; run this one to
+> check the app you actually use.
 
 # Acceptance test — one real job, end to end
 
