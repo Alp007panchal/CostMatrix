@@ -56,6 +56,19 @@ p  { margin: .5rem 0; }
 }
 .card.narrow { width: min(24rem, 100%); }
 
+/* A page meant to be read rather than worked in: one column, a comfortable
+   measure, and space between the sections. */
+.reading { width: min(44rem, 100%); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.prose section { margin-top: 1.75rem; }
+.prose h2 { font-size: 1.0625rem; margin: 0 0 .5rem; }
+.prose p { margin: 0 0 .75rem; line-height: 1.6; }
+.prose ul { margin: 0 0 .75rem; padding-left: 1.25rem; line-height: 1.6; }
+.prose li { margin-bottom: .375rem; }
+
+.footer { border-top: 1px solid var(--line); padding: 1rem 1.25rem; text-align: center; }
+.footer a { color: var(--ink-soft); text-decoration: none; font-size: .8125rem; }
+.footer a:hover { color: var(--ink); }
+
 .row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
 .row.end { justify-content: flex-end; }
 .spread { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }

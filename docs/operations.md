@@ -441,6 +441,24 @@ that work. The database enforces this, not just the screen.
 They click **Forgot password** on the sign-in page and get an email. If nothing arrives, send a
 reset from Supabase → Authentication → Users.
 
+### What CostMatrix stores — the terms page
+
+`/terms`, linked from **What CostMatrix stores** at the bottom of every screen and from the
+sign-in page. It is readable **without signing in**, deliberately: somebody deciding whether to
+accept an invitation has to be able to read it first, so you can send the link to a company you
+are about to invite.
+
+It says, in plain words, what is stored, that it is held in Ireland, that no company can see
+another company's data, and that a company's data is deleted on request. It also says the two
+things people mistake for faults: an old quotation shows the prices it was actually sent with,
+and somebody who leaves is deactivated rather than erased, because their name is in the history
+of costings they worked on.
+
+**The wording is yours.** It describes what the app does and is not a lawyer's document. It
+claims no retention period, because none has been decided. To change any of it, say what you
+want it to say and it is one small pull request — the text lives in one file
+(`web/src/modules/legal/terms.ts`), apart from the page that draws it.
+
 ### Change a company's discount (master admin only)
 **Companies** → click the discount on that company's row → change it → Save.
 Existing costings do not change: their prices were frozen when they were built. Only new
