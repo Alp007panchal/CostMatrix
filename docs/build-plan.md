@@ -260,7 +260,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| A costing that has no labour says so, and the feature register stops colliding | `claude/labour-missing-warning` | 2026-09-13 10:55 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
