@@ -93,7 +93,8 @@ Table with one row per panel:
 ## Annexure V — General arrangement drawings (roadmap 3.8)
 
 **Only where a panel has a saved layout.** One **landscape** page per such panel, after the
-technical offer; a quotation whose panels have no layout has no Annexure V at all and is
+technical offer — and a **second** page for a panel whose layout has a face at the back, the rear
+elevation. A quotation whose panels have no layout has no Annexure V at all and is
 byte-identical to one released before the drawing existed — including the annexure list on the
 cover letter, which stays at four.
 
@@ -103,11 +104,11 @@ was written before the built PDF was checked; D-284).
 
 Each sheet carries:
 
-- a header: `ANNEXURE V — GENERAL ARRANGEMENT (FRONT ELEVATION)`, the reference, the sheet number,
-  the scale with *not to scale on print — work to the dimensions*, and which saved version it was
-  drawn from;
+- a header: `ANNEXURE V — GENERAL ARRANGEMENT (FRONT ELEVATION)` or `(REAR ELEVATION)`, the
+  reference, the sheet number, the scale with *not to scale on print — work to the dimensions*,
+  and which saved version it was drawn from;
 - the panel name and option label, the construction, the section count, and — on a double-front
-  board — a note that face B is not shown on a front elevation;
+  board — a note that face B is on the rear elevation overleaf;
 - the drawing itself in black line art: the two chambers (horizontal busbar, cable), each section
   outlined with its distribution-busbar compartment, each device a rectangle carrying its **tag**
   (`Q1`, `Q2` …) and name, a dashed outline and "size not on record" where the library has never
@@ -122,6 +123,26 @@ Each sheet carries:
 
 The scale is not fixed: it is chosen so the board fills the drawing frame, so a 6 m board and an
 800 mm one both fill the page, and the chosen ratio is printed.
+
+### The rear elevation
+
+A panel whose saved layout has a **face at the back** gets a second sheet immediately after its
+front one. It is the same board walked round, not a second drawing:
+
+- the sections run **right to left** — section A is on the right — and the header says
+  `VIEWED FROM THE BACK: SECTIONS MIRRORED, RIGHT TO LEFT`, because a rear elevation read the wrong
+  way round is worse than none;
+- each section's **busbar chamber swaps hands** with it, so the droppers are where the fitter will
+  find them;
+- only the devices on **face B** are drawn, under the tags the front sheet already gave them —
+  numbering happens once for the whole board, so `Q7` is `Q7` on both sheets and in Annexure IV;
+- a section with nothing behind it is drawn as the steel it is, marked *no devices on this face*,
+  and its heading says what the back of it shows — *rear connection · cable lugs* or
+  *front connection · terminals shrouded* — in the same words as the rear view on screen;
+- the overall dimensions, the spec line and the footer are the front sheet's own.
+
+A board set to double-front access that nobody has put anything behind **gets one sheet**, not an
+empty second one; its spec line still reads `FRONT AND REAR ACCESS`.
 
 ## Page setup
 

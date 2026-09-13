@@ -905,8 +905,16 @@ panel that has a saved layout, and the cover letter's annexure list grows to fiv
 - The footer takes the **form** and the access from the drawing itself and adds the panel's own
   enclosure note where it has one. A board whose form nobody chose prints no form.
 
-On a **double-front** board the sheet says so and notes that face B is not shown: a front elevation
-cannot show it. A rear-elevation sheet is the next thing to add if you want one.
+On a **double-front** board — one where you have put kits on a face at the back — you get a
+**second landscape page straight after the first**: the rear elevation. It is the same board seen
+from behind, so the sections run **right to left** and each section's busbar chamber is on the
+other hand; the header says so in as many words. Only the devices on face B are drawn, under the
+tags they already carry on the front sheet, and a section with nothing behind it is drawn empty and
+marked *no devices on this face*, with its heading saying whether its back shows cable lugs or
+shrouded terminals.
+
+A board you have set to double-front access but not yet drawn anything behind gets **one** sheet,
+not a blank second one. Its footer still reads *front and rear access*.
 
 ### Fill in what the panel layout will need (phase 3.8, fields only)
 The layout pop-up itself is not built yet — the specification and the mockups are in

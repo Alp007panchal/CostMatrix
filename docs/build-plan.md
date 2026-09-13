@@ -279,6 +279,14 @@ straight to `main`, reviewed and merged by the owner the same day.
     writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
     path (D-292, D-293).
 
+39. **The rear elevation on the quotation** (roadmap 3.8) — a panel whose saved layout has a face
+    at the back now gets a **second** Annexure V sheet: the same board walked round, sections right
+    to left, each busbar chamber on the other hand, face B's devices under the tags the front sheet
+    already gave them. A section with nothing behind it is drawn as the steel it is and says what
+    its back shows, in the same words as the rear view on screen. A board set to double-front that
+    nobody has drawn behind still gets one sheet, not a blank second one. No migration: this is all
+    in the browser.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
@@ -310,7 +318,6 @@ the work begins, removed when the pull request opens.
 | Item | Session | Since |
 |---|---|---|
 | Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
-| The rear-elevation GA sheet, so a double-front board's face B is drawn rather than only mentioned | `claude/ga-rear-elevation` | 2026-09-13 11:40 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
