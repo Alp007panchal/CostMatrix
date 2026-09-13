@@ -14,9 +14,27 @@
 \set master '00000000-0000-0000-0000-0000000000a1'
 
 -- === Every company starts with everything off ===============================
--- The number moves with every feature built: 0118 added the busbar run calculator.
-select test.eq((select count(*)::int from public.features), 16,
-  'every advanced feature is on the register');
+-- These used to assert a count, with a comment saying "the number moves with
+-- every feature built". It did — and it moved on two branches at once, because
+-- every session adding a feature has to edit the same line. That is the same
+-- shape as the migration numbers and the decision ids, which broke three times in
+-- one week before `check-numbering.sh` replaced the convention with a mechanism.
+--
+-- So these assert the invariant the count was standing in for, which no session
+-- has to remember: a feature is on the register with a switch of its own, and
+-- every company has that switch, off.
+select test.ok((select count(*) from public.features) > 0,
+  'the register is not empty');
+select test.eq((select count(*)::int from public.features
+                 where option_key is null or btrim(option_key) = ''), 0,
+  'every advanced feature is on the register with a switch of its own');
+select test.eq((select count(*)::int
+                  from public.companies c
+                  cross join public.features f
+                  left join public.company_options o
+                         on o.company_id = c.id and o.key = f.option_key
+                 where o.key is null), 0,
+  'and every company has every one of those switches');
 select test.eq((select count(*)::int from public.features where changes_costings), 3,
   'three of them change what an existing costing does, and say so');
 select test.eq((select count(*)::int from public.company_options o
@@ -30,7 +48,8 @@ select test.sign_in(:'carol');
 select count(*)::int as listed, count(*) filter (where is_on)::int as on_now
   from public.v_company_features \gset
 commit;
-select test.eq(:listed, 16, 'a costing engineer can see what exists');
+select test.eq(:listed, (select count(*)::int from public.features),
+  'a costing engineer can see everything on the register, whatever is on it');
 select test.eq(:on_now, 0, 'and that none of it is on for her company');
 
 -- The assistant names the switch it has had since 0102 rather than adding a

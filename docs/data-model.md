@@ -825,6 +825,14 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
+### The missing-labour check (migration 0123)
+- `v_costing_labour_gaps` — one row per costing: `kit_lines`, `kit_lines_without_hours`,
+  `groups_to_fill` (the kit groups and how many lines each accounts for), `processes_without_rate`
+  and `labour_rows_without_rate` (hours frozen at a zero rate), `material_cost`, `labour_cost`,
+  `labour_share_pct`, and a `verdict` of `ok` · `none` · `some` · `no_rate` · `no_kits`.
+  Read-only, `security_invoker`, writes nothing and blocks nothing.
+- Feature `labour_check` (sort 190), off until the master administrator turns it on.
+
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
 each entry `{label, bar_code, phases, runs_per_phase, length_m, sets, metres}` — so a revision and a

@@ -246,6 +246,13 @@ or into go-live.
     moves (in CI on every pull request), a go-live section in the runbook, and then the release
     itself: one pull request from `advanced` into `main`, every feature off.
 
+33. **The missing-labour check** — a costing whose kits carry no hours charges nothing for
+    labour, and until now said nothing about it: the material priced correctly, the time was left
+    out, and the quotation looked finished. `v_costing_labour_gaps` (migration 0123) reports it on
+    the costing, names the kit groups whose template rows would fix it, and tells apart the quieter
+    case of hours priced at a zero rate. It blocks nothing and changes no price. The feature
+    register's hardcoded count went with it, replaced by the invariant it stood for.
+
 32. **One track** — `main` is the only place work is built, every new feature arriving behind a
     switch that is off by default, and the migrations one continuous sequence from 0123 with
     `0018` retired for good. `scripts/check-numbering.sh` refuses a re-used migration number or
@@ -260,7 +267,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| A costing that has no labour says so, and the feature register stops colliding | `claude/labour-missing-warning` | 2026-09-13 10:55 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

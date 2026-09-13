@@ -21,6 +21,7 @@ import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
+import { LabourWarning } from './LabourWarning'
 import { DocumentFiles } from '../documents/DocumentFiles'
 import { BomImportCard } from './BomImportCard'
 import { ApprovalPanel } from './ApprovalPanel'
@@ -211,6 +212,10 @@ export function CostingEditor() {
 
             {/* One column, read top to bottom: what it costs, how it is built, what
                 to export, what happened. */}
+            {/* 0123: a costing that charges nothing for labour says so, here, where
+                the total is read. It blocks nothing. */}
+            {on('labour_check') && <LabourWarning costingId={costing.id} />}
+
             {/* Roadmap 2.5: what the company's rules make of this costing. */}
             {on('approval_rules') && <ApprovalPanel costingId={costing.id} status={costing.status} />}
 

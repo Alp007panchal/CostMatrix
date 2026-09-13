@@ -960,6 +960,24 @@ edited by anyone, including you. A person removed since then leaves their entry 
 Open the Vercel URL. If the page loads and you can sign in, everything is working. For more
 detail: Vercel dashboard shows deployments; Supabase dashboard shows database health.
 
+### When a costing says it charges nothing for labour (migration 0123)
+Switch **The missing-labour check** on (master administrator → Features) and a costing that carries
+no labour tells you so, above the totals. It **blocks nothing and changes no price** — a supply-only
+job legitimately has no labour, so it reports and leaves the judgement to you.
+
+Two different faults, with two different fixes:
+
+- **"This costing charges nothing for labour."** Its kits have no hours in the library. The warning
+  names the **kit groups** responsible — those are the rows of
+  `data/seed/kit-group-labour-template.csv`, or the **Kit groups** screen. Fill them in, then make a
+  **new revision**: a costing freezes the hours it was given, so an existing one will not pick them up.
+- **"Some hours are priced at nothing."** The hours are there, but the hourly rate frozen onto that
+  costing is zero. Set it under **Rates → Labour rates** and, again, make a new revision — a rate set
+  after a costing is created does not reach it.
+
+While the labour template is empty this will fire on every costing, which is correct: every kit
+currently costs zero labour.
+
 ### Download a backup (see Part E)
 Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the
 backup job stores it.
