@@ -1,61 +1,74 @@
-# The two tracks: the basic app and the advanced app
+# Staging, and the two tracks that became one
 
-Decided 10 Sep 2026. This is the arrangement, what you have to enter by hand, and how to
-re-run the staging creation. Companion to `docs/operations.md`, which covers production.
+Two tracks were decided on 10 Sep 2026 and retired on 13 Sep 2026. **Staging was not retired**,
+and everything below the next section — the secrets, the workflow that builds the project, the
+Vercel settings, the assistant's key — is still exactly how it works. Companion to
+`docs/operations.md`, which covers production.
 
-## Why there are two
+*(The file keeps its name because `supabase/migrations/0117_feature_switches.sql` refers to it,
+and an applied migration is not a file to edit for tidiness.)*
 
-`main` is the app you use. It runs on the production Supabase project and
-cost-matrix-theta.vercel.app, and it has to stay releasable at all times, because it is the
-back-up: if advanced work goes wrong, you still have a working app.
+## What changed on 13 September 2026
 
-`advanced` is where the foundations (`roadmap-from-market-leaders.md` §2) and the AI assistant
-(`ai-assistant-spec.md`) are built. It runs against a **separate Supabase project called
-CostMatrix Staging**, which holds its own copy of the library and its own costings. Nothing done
-on `advanced` can reach your real data — not by mistake, not by a bad migration, not by a bug.
+There were two tracks because advanced work had no safe way to reach the app the owner quotes
+from. `main` was the basic app on production; `advanced` was where the foundations and the AI
+assistant were built, against a separate Supabase project, so a bad migration could not touch
+real data.
+
+**Condition 2 below is what ended it.** Migration 0117 put every advanced feature behind a
+per-company switch that is off by default, and on 12 September the whole of `advanced` — 75
+commits, 19 migrations — went into `main` in one merge that nobody using the app could see. Once
+a feature can arrive switched off, there is nothing for a second branch to protect.
+
+Leaving the split in place was not free. By the next morning `advanced` was fifteen commits ahead
+again, and a dependency fix that production needed just as much was aimed at `advanced` because
+these documents said to aim it there.
+
+**So: one track.** Branch off `main`, one pull request per feature, never stacked, into `main`.
+Every new feature arrives behind a switch that is off. Merging deploys to production.
+
+| | before | now |
+|---|---|---|
+| Where work is built | `main` for the basic app, `advanced` for everything else | **`main`, for everything** |
+| What `advanced` is | a long-lived second code line | **the copy that runs on staging**, so a feature can be tried before it is switched on |
+| Migration numbers | `0018` onwards / `0100` onwards | **one sequence** — next free is 0123, and `0018` is dead (see below) |
+| Supabase projects | production, and CostMatrix Staging on a second account | **unchanged** |
+| Access tokens | `SUPABASE_ACCESS_TOKEN` / `SUPABASE_STAGING_ACCESS_TOKEN` | **unchanged** |
 
 **Staging lives in a second Supabase account**, because the first had reached its limit of two
-free projects (D-181, D-182). That turned out to be the stronger arrangement: the access token
-the advanced track uses belongs to that second account and **cannot see the production project
-at all**. The separation is no longer a rule the code follows — it is simply out of reach.
+free projects (D-181, D-182). That turned out to be the stronger arrangement and it stands: the
+access token staging uses belongs to that second account and **cannot see the production project
+at all**. The separation of credentials is not what was retired.
 
-| | `main` | `advanced` |
-|---|---|---|
-| What goes here | Bug fixes, the NPP-192 trial findings, labour hours, prices, the enclosure uplift rule, small improvements | Foundations F1–F11, the AI assistant, anything new |
-| Supabase account | your first account | **a second account**, which holds nothing else |
-| Supabase project | production (`mssqjuzgycfpfmtjukvq`) | CostMatrix Staging |
-| Access token secret | `SUPABASE_ACCESS_TOKEN` | `SUPABASE_STAGING_ACCESS_TOKEN` |
-| Web address | cost-matrix-theta.vercel.app | the Vercel preview URL for the `advanced` branch |
-| Migration numbers | `0018` onwards | **`0100` onwards** |
+### Why there is now one migration sequence
 
-### Why the migration numbers are split
+Migrations are applied in number order, and Supabase records each one by its number. Two branches
+each adding an `0018` would have meant the second was treated as already applied and **silently
+skipped** — the tables it creates simply never existing. Reserving `0100` upwards for the advanced
+track (D-170) made that impossible, and it worked.
 
-Migrations are applied in number order, and Supabase records each one by its number. If `main`
-added `0018_price_fix.sql` while `advanced` had its own `0018_foundations.sql`, then when the two
-branches met, the second `0018` would be treated as already applied and **silently skipped** —
-the tables it creates would simply never exist. Reserving `0100` upwards for the advanced track
-makes that impossible. Basic-track work carries on at `0018`, `0019`, and so on.
+But production has now recorded `0001`–`0017` **and** `0100`–`0118`. So the half of that rule
+which outlived the split — *"basic work carries on at 0018"* — has quietly become the very trap it
+was written to prevent: a new `0018` would sort behind eighteen migrations that have already run.
 
-### How work moves from advanced to main
+**`0018` is dead. The next number is the one after the highest anywhere in the repository, which
+today is 0123.** Nothing is renamed: renaming a migration that has already been applied is how you
+get it applied twice. `scripts/check-numbering.sh` refuses a re-used or too-low number in CI, and
+refuses a duplicate decision id at the same time, because the rule on its own was broken three
+times in one week by sessions working in parallel.
 
-An advanced feature is merged into `main` only when all three are true:
+### How a feature reaches production now
 
-1. All tests and the NPP-192 acceptance test pass on staging.
-2. It is behind a per-company switch that is **off by default**.
-3. You have tried it on the preview URL and approve it.
+1. Branch off `main`, build it **behind a switch that is off by default** (add a row to the
+   `features` register; migration 0117), open one pull request into `main`.
+2. Tests and the NPP-192 acceptance test green, as always.
+3. The owner merges. Production takes the migration; the app does not change, because the switch
+   is off.
+4. The owner tries it on staging, then switches it on for real work on the **Features** screen.
 
-**Condition 2 is built** (migration 0117, D-266). Every advanced feature has a row on the
-**Features** screen and arrives switched off for every company; only the master administrator can
-switch one on. Three of them change what an existing costing does and are marked as such — the
-rules engine, the nightly expiry sweep, and which panels count towards the total — and each is
-gated so that *off* behaves exactly as the app did before that feature was written.
-
-So the merge to `main` is now an ordinary one: `main` gets the whole of `advanced`, every feature
-off, and the live app behaves as it does today until you switch something on. What is left is
-condition 3, which is yours: try each feature on the staging preview and say which ones you want
-to be able to switch on for real work.
-
-And `main` is merged **into** `advanced` after every change to `main`, so the two never drift.
+Step 4 is why staging is kept. `main` is merged **into** `advanced` after a change to `main`, so
+staging runs the same code; nothing does that automatically yet, because it could not run while
+`advanced` was still ahead.
 
 ---
 
@@ -271,9 +284,9 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | Name | Kind | Used by | What it is |
 |---|---|---|---|
 | `SUPABASE_ACCESS_TOKEN` | secret, existing | `main` deploys only | Your **first** account's personal access token. Never placed in a staging job. |
-| `SUPABASE_PROJECT_REF` | secret, existing | `main` deploys; compared on `advanced` | The production project. On the advanced track it is **only ever compared against**, never used to call anything — it is how staging proves it is not production. |
+| `SUPABASE_PROJECT_REF` | secret, existing | `main` deploys; compared on `advanced` | The production project. On an `advanced` run it is **only ever compared against**, never used to call anything — it is how staging proves it is not production. |
 | `SUPABASE_DB_PASSWORD` | secret, existing | `main` deploys | The production database password. Never read by an `advanced` run. |
-| `SUPABASE_STAGING_ACCESS_TOKEN` | secret, new | staging only | The **second** account's access token. Every Management API call and every `supabase link`, `db push` and `functions deploy` on the advanced track uses this one. It cannot see the production project. |
+| `SUPABASE_STAGING_ACCESS_TOKEN` | secret, new | staging only | The **second** account's access token. Every Management API call and every `supabase link`, `db push` and `functions deploy` from `advanced` uses this one. It cannot see the production project. |
 | `SUPABASE_STAGING_DB_PASSWORD` | secret, new | staging deploys | The staging database password. Never read by a `main` run. |
 | `SUPABASE_STAGING_PROJECT_REF` | variable, new | staging deploys | The staging project. A variable rather than a secret because a project ref is not sensitive and it helps to be able to read it back. |
 | `ADVANCED_PREVIEW_URL` | variable, optional | staging setup | If set, invitation emails sent from staging point at the preview URL instead of localhost. |
@@ -284,7 +297,7 @@ of Supabase's API is the least settled, so it is deliberately a clear stop rathe
 | Workflow | Trigger | What it touches |
 |---|---|---|
 | **CI** | every push to `main`, `advanced` or `claude/**`, and every pull request | Nothing live. Runs the migrations and all database tests on a throwaway Postgres, then the web app's typecheck, tests and build. |
-| **Deploy database** | push to `main` or `advanced` that changes `supabase/migrations/**` | Two separate jobs, each guarded by the branch: `main` → production, `advanced` → staging. Separate jobs rather than one that picks its secrets, so a run on one branch cannot reach the other's credentials whatever is added to the file later. |
+| **Deploy database** | push to `main` or `advanced` that changes `supabase/migrations/**` | Two separate jobs, each guarded by the branch: `main` → production, `advanced` → staging (which now means: whatever `main` was last merged into `advanced`). Separate jobs rather than one that picks its secrets, so a run on one branch cannot reach the other's credentials whatever is added to the file later. |
 | **Create staging project** | by hand | Creates, wakes and sets up the staging project. Never production. |
 | **Check staging** | by hand | Counts what is in the staging library and prints it as a job summary. Read-only — SELECTs and nothing else — so it is safe to run at any time. Use it to answer "did the seed land?" without opening the dashboard. |
 | **Deploy functions** | push to `main` or `advanced` that changes `supabase/functions/**` | Two separate jobs guarded by branch, exactly as "Deploy database": `main` → production, `advanced` → staging. This is how an Edge Function such as `extract-document` reaches staging on merge. |

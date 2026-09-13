@@ -5,21 +5,27 @@ overturn at any time. Answered questions live in `decisions.md`.
 
 ## Now: use it, and tell me what breaks
 
-Everything built so far is merged and live (migrations 0008–0017; `main` at the PR 18 merge on
-2026-09-10). Nothing is waiting on a review. The useful next hour is `docs/acceptance-test.md`
+Everything built so far is merged and live: production carries migrations `0001`–`0017` and
+`0100`–`0118`, and since 12 September that includes the whole of the advanced app, every feature
+switched off. The useful next hour is `docs/acceptance-test.md`
 end to end on a real job, which now covers sections inside a panel, copying a costing or a
 panel, the operator's name in the history, one decision per enquiry, and files on an enquiry.
 Send the findings in one numbered list.
 
-## The advanced track
+## Staging, and one track
 
-Staging is live in its second Supabase account (`docs/reference/two-track-setup.md`), the
-`advanced` preview is at cost-matrix-git-advanced-alp-team.vercel.app, and foundations A and B and
-the assistant's core are on it. The key is in the staging Edge Function secrets and the assistant is
-switched on for the in-house company. The assistant's screens (PR into `advanced`) are the last
-piece; **one thing is yours** before a live draft will answer: credit on the Anthropic account.
-Until then the panel says so in those words, which is the intended behaviour. Nothing in either PR
-changes a price, test 15 is unmodified, and your real data is never touched (D-169).
+**There is one code line now, `main`** (13 Sep 2026). Every new feature arrives behind a switch
+that is off by default, so it reaches production without changing anything until you switch it
+on. The `advanced` branch is no longer a second track — it is the copy that runs on staging, at
+cost-matrix-git-advanced-alp-team.vercel.app, and it is what staging is for: try a feature there,
+then switch it on for real work on the **Features** screen.
+
+Staging is still its own Supabase project on a second account
+(`docs/reference/two-track-setup.md`), and its token cannot see production. That separation has
+not changed.
+
+**One thing is yours** before a live assistant draft will answer: credit on the Anthropic account.
+Until then the panel says so in those words, which is the intended behaviour.
 
 ## Waiting on you
 

@@ -56,15 +56,20 @@ order. `seed.sql` holds categories, process types and a demo company for local w
 are applied to staging and production with `supabase db push`.
 
 ### Environments
-Two to start, three before go-live. Staging means a second paid Supabase project; until there
-is real data to protect, local development is where changes are tried, so staging is deferred
-to slice 6.
+All three exist. Staging arrived on 10 September 2026 as a free project on a **second** Supabase
+account — the first had reached its two-project limit — which turned out to be the stronger
+arrangement, because the token staging uses cannot see production at all
+(`docs/reference/two-track-setup.md`).
 
-| Name | Where | Purpose | From |
+| Name | Where | Purpose | Since |
 |---|---|---|---|
-| local | a laptop, Supabase CLI + Docker | development and tests | now |
-| production | the live Supabase project (Ireland) + the live Vercel deploy | customers | now |
-| staging | a second Supabase project + preview deploy | rehearse migrations against real-looking data | slice 6 |
+| local | a laptop, Supabase CLI + Docker | development and tests | slice 0 |
+| production | the live Supabase project (Ireland) + the live Vercel deploy | customers | slice 0 |
+| staging | CostMatrix Staging (a second account) + the `advanced` preview deploy | try a feature before switching it on in production | 2026-09-10 |
+
+There is **one code line**, `main`; the `advanced` branch is the copy staging deploys from, kept
+in step by merging `main` into it. Until 13 September 2026 it was a second track where advanced
+work was built; the per-feature switch (migration 0117) made that unnecessary.
 
 ### How database changes reach production
 Migrations are applied by a GitHub Actions workflow when a change is merged to `main`, using
