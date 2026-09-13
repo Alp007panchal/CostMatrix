@@ -1,4 +1,4 @@
--- The rehearsal needs the rows production has, and the tests before it leave no
+-- Both drills need the rows production has, and the tests before them leave no
 -- quotation behind — every one of them rolls its own back. 0108 adds columns to
 -- `quotations` and a sweep that reads them, so a quotation that exists before
 -- the upgrade is exactly the row worth having on the table when it runs.

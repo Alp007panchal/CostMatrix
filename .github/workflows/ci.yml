@@ -23,6 +23,12 @@ jobs:
       # production, and refuses any figure that moves.
       - name: Rehearse the upgrade on a database that already holds rows
         run: ./supabase/tests/upgrade-rehearsal.sh
+      # "A backup you have never restored is not a backup." This proves the
+      # mechanism — that a dump of this schema restores into an empty database
+      # and gives back the same costings. The drill against the owner's real
+      # dump is theirs to run, and Part E of the runbook says how.
+      - name: Rehearse restoring a backup
+        run: ./supabase/tests/restore-drill.sh
 
   web:
     name: Web app
