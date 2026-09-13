@@ -310,6 +310,7 @@ the work begins, removed when the pull request opens.
 | Item | Session | Since |
 |---|---|---|
 | Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
+| The rear-elevation GA sheet, so a double-front board's face B is drawn rather than only mentioned | `claude/ga-rear-elevation` | 2026-09-13 11:40 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
