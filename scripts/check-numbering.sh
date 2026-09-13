@@ -52,7 +52,7 @@ fi
 # "Anywhere" matters. Comparing against origin/main alone would happily hand out
 # a number another session has already taken on a branch that has not merged
 # yet, which is exactly how 0116 came to be written twice.
-note "→ new migrations are numbered above every number taken on any branch"
+note "→ new migrations are numbered above everything origin/main has applied, and clash with nobody"
 if ! git rev-parse --verify --quiet origin/main >/dev/null; then
   note "  – origin/main is not in this clone, so there is nothing to compare against."
   note "    (In CI the database job checks out with fetch-depth: 0 so that it is.)"
@@ -70,6 +70,23 @@ else
   on_main="$(git ls-tree --name-only origin/main -- supabase/migrations/ 2>/dev/null \
     | sed -n 's#supabase/migrations/\([0-9]\{4\}\)_.*#\1#p' | sort)"
 
+  # Two different questions, and they need two different yardsticks.
+  #
+  # ORDERING is against origin/main's highest, because that is what has actually
+  # been recorded. A migration merely sitting on another branch has not run
+  # anywhere, so it cannot put a lower number "behind" anything.
+  #
+  # Comparing the ordering against the highest number on *any* branch looked
+  # equivalent and is not: a branch that brings a contiguous block — say 0119 to
+  # 0122 arriving together — trips over its own highest member, and the advice it
+  # then gives ("use 0123 or higher") is the one thing that must never be done,
+  # because renaming a migration that has already been applied somewhere gets it
+  # applied twice.
+  #
+  # CLASHES are still checked against every branch, by filename, a few lines
+  # below. That is the check that stops two sessions both writing 0116 — and it
+  # is unaffected by this, because it compares names, not order.
+  highest_on_main="$(printf '%s\n' "$on_main" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
   highest="$(printf '%s\n' "$elsewhere" | cut -f1; printf '%s\n' "$on_main")"
   highest="$(printf '%s\n' "$highest" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
 
@@ -90,8 +107,8 @@ else
           '$1 == n && $2 != me { print $2 }' | head -n 1)"
         if [[ -n "$clash" ]]; then
           problem "$name re-uses number $n, which another branch has taken as $clash."
-        elif [[ "$((10#$n))" -lt "$((10#$highest))" ]]; then
-          problem "$name is numbered $n, below $highest which already exists."
+        elif [[ -n "$highest_on_main" && "$((10#$n))" -lt "$((10#$highest_on_main))" ]]; then
+          problem "$name is numbered $n, below $highest_on_main which origin/main has already applied."
           problem "    Migrations run in number order. Use $(printf '%04d' "$((10#$highest + 1))") or higher."
         fi
       fi
@@ -99,7 +116,7 @@ else
     if [[ "$added" -eq 0 ]]; then
       note "  ✓ this branch adds no migration; the highest taken anywhere is $highest"
     elif [[ "$fail" -eq 0 ]]; then
-      note "  ✓ $added new, all above $highest"
+      note "  ✓ $added new, all above origin/main's $highest_on_main and clashing with nothing"
     fi
   fi
 fi

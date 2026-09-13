@@ -1,7 +1,8 @@
 import type { Letterhead, QuotationTerms } from '../../../lib/database.types'
 import type { CostingDetail } from '../../costing/api'
 import { describePanel } from '../../costing/technical'
-import type { PdfSchedule, PdfScheduleRow, PdfTechnicalRow, PdfTerm, QuotationPdfData } from './types'
+import { buildGaSheets, gaTagLine, type SavedPanelLayout } from './ga'
+import type { PdfGaSheet, PdfSchedule, PdfScheduleRow, PdfTechnicalRow, PdfTerm, QuotationPdfData } from './types'
 
 /**
  * Turns a costing, the company's letterhead and the approver's wording into
@@ -26,11 +27,18 @@ export interface PrepareInput {
   terms: QuotationTerms
   signatoryName: string | null
   signatoryEmail: string | null
+  /**
+   * The layouts saved against this costing's panels (roadmap 3.8). Omitted or
+   * empty means no general-arrangement sheets and a quotation byte-identical to
+   * one released before the layout existed.
+   */
+  layouts?: SavedPanelLayout[]
 }
 
 export function prepareQuotationPdf(input: PrepareInput): QuotationPdfData {
   const { detail, letterhead } = input
   const label = detail.costing.currency_label
+  const gaSheets = buildGaSheets(detail, input.layouts ?? [])
 
   return {
     letterhead: {
@@ -58,7 +66,8 @@ export function prepareQuotationPdf(input: PrepareInput): QuotationPdfData {
     currencyLabel: label,
     schedules: buildSchedules(detail, label),
     terms: buildTerms(input.terms),
-    technical: buildTechnical(detail),
+    technical: buildTechnical(detail, gaSheets),
+    gaSheets,
   }
 }
 
@@ -125,13 +134,21 @@ export function buildTerms(terms: QuotationTerms): PdfTerm[] {
  * description written from the panel's kits and lines, so the annexure is
  * never blank for a costed panel.
  */
-export function buildTechnical(detail: CostingDetail): PdfTechnicalRow[] {
+export function buildTechnical(detail: CostingDetail, gaSheets: PdfGaSheet[] = []): PdfTechnicalRow[] {
+  const sheetByPanel = new Map(gaSheets.map((sheet) => [sheet.panelId, sheet]))
   return detail.panels.map((panel, i) => {
     const written = panel.technical_description?.trim() ?? ''
     const generated = written ? '' : describePanel({ panel, assemblies: detail.assemblies, items: detail.items, kits: detail.kits })
     const parts = [written || generated]
     if (panel.enclosure_dimensions?.trim()) {
       parts.push(`Proposed Enclosure: ${panel.enclosure_dimensions.trim()}`)
+    }
+    // The device tags come from the drawing, so the two always agree (spec §7).
+    // A panel with no drawing gains nothing, and its row reads as it always did.
+    const sheet = sheetByPanel.get(panel.id)
+    if (sheet !== undefined) {
+      const tags = gaTagLine(sheet)
+      if (tags !== '') parts.push(tags)
     }
     return {
       srNo: i + 1,

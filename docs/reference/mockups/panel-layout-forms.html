@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CostMatrix — panel-layout-forms (mockup)</title>
+</head>
+<body>
+
+
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2937; background: #ffffff; }
+    a { color: #1d4ed8; } a:hover { color: #1e40af; }
+    svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  </style>
+
+<div style="width: 1000px; height: 640px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;">
+  <div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 24px; border-bottom: 1px solid #e5e7eb;">
+    <div style="font-size: 18px; font-weight: 700; color: #111827;">Form of separation — the same MCCB section as 2B, 3B and 4B</div>
+    <div style="font-size: 13px; color: #6b7280;">The form chosen on the panel adds partitions and shrouds to the drawing and drives the enclosure uplift (decision 1)</div>
+  </div>
+
+  <div style="display: flex; gap: 24px; padding: 20px 24px; align-items: flex-start;">
+    <!-- 2B -->
+    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+      <div style="font-size: 14px; font-weight: 600; color: #111827;">Form 2B</div>
+      <svg width="220" height="420" viewBox="-6 -6 220 420">
+        <rect x="0" y="0" width="208" height="408" fill="#ffffff" stroke="#9ca3af" stroke-width="2"></rect>
+        <rect x="0" y="0" width="208" height="56" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="3"><line x1="6" y1="20" x2="202" y2="20"></line><line x1="6" y1="30" x2="202" y2="30"></line><line x1="6" y1="40" x2="202" y2="40"></line></g>
+        <rect x="0" y="56" width="40" height="300" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="2"><line x1="12" y1="60" x2="12" y2="350"></line><line x1="20" y1="60" x2="20" y2="350"></line><line x1="28" y1="60" x2="28" y2="350"></line></g>
+        <rect x="156" y="56" width="52" height="300" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g fill="#fef9c3" stroke="#ca8a04"><rect x="44" y="62" width="108" height="66"></rect><rect x="44" y="134" width="108" height="66"></rect><rect x="44" y="206" width="108" height="66"></rect><rect x="44" y="278" width="108" height="66"></rect></g>
+        <g fill="#dbeafe" stroke="#3b82f6"><rect x="70" y="72" width="56" height="34"></rect><rect x="70" y="144" width="56" height="34"></rect><rect x="70" y="216" width="56" height="34"></rect><rect x="70" y="288" width="56" height="34"></rect></g>
+        <rect x="0" y="356" width="208" height="52" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <!-- 2B: busbars separated from units by a barrier only -->
+        <line x1="0" y1="56" x2="208" y2="56" stroke="#111827" stroke-width="3"></line>
+        <text x="104" y="392" font-size="9" text-anchor="middle" fill="#374151">cable chamber</text>
+      </svg>
+      <div style="font-size: 12px; color: #6b7280; max-width: 220px; text-align: center;">Busbars separated from the functional units. Units share the space; terminals open.</div>
+      <div style="font-size: 12px; color: #111827;">Uplift: <strong>none</strong> (catalogue cubicle)</div>
+    </div>
+
+    <!-- 3B -->
+    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+      <div style="font-size: 14px; font-weight: 600; color: #111827;">Form 3B</div>
+      <svg width="220" height="420" viewBox="-6 -6 220 420">
+        <rect x="0" y="0" width="208" height="408" fill="#ffffff" stroke="#9ca3af" stroke-width="2"></rect>
+        <rect x="0" y="0" width="208" height="56" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="3"><line x1="6" y1="20" x2="202" y2="20"></line><line x1="6" y1="30" x2="202" y2="30"></line><line x1="6" y1="40" x2="202" y2="40"></line></g>
+        <rect x="0" y="56" width="40" height="300" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="2"><line x1="12" y1="60" x2="12" y2="350"></line><line x1="20" y1="60" x2="20" y2="350"></line><line x1="28" y1="60" x2="28" y2="350"></line></g>
+        <rect x="156" y="56" width="52" height="300" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g fill="#fef9c3" stroke="#ca8a04"><rect x="44" y="62" width="108" height="66"></rect><rect x="44" y="134" width="108" height="66"></rect><rect x="44" y="206" width="108" height="66"></rect><rect x="44" y="278" width="108" height="66"></rect></g>
+        <g fill="#dbeafe" stroke="#3b82f6"><rect x="70" y="72" width="56" height="34"></rect><rect x="70" y="144" width="56" height="34"></rect><rect x="70" y="216" width="56" height="34"></rect><rect x="70" y="288" width="56" height="34"></rect></g>
+        <rect x="0" y="356" width="208" height="52" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <!-- 3B: each unit in its own compartment (horizontal partitions + vertical from VBB and alley) -->
+        <g stroke="#111827" stroke-width="3">
+          <line x1="0" y1="56" x2="208" y2="56"></line>
+          <line x1="40" y1="56" x2="40" y2="356"></line>
+          <line x1="156" y1="56" x2="156" y2="356"></line>
+          <line x1="40" y1="131" x2="156" y2="131"></line>
+          <line x1="40" y1="203" x2="156" y2="203"></line>
+          <line x1="40" y1="275" x2="156" y2="275"></line>
+        </g>
+        <text x="104" y="392" font-size="9" text-anchor="middle" fill="#374151">cable chamber · terminals shared</text>
+      </svg>
+      <div style="font-size: 12px; color: #6b7280; max-width: 220px; text-align: center;">Each functional unit in its own compartment; outgoing terminals not separated from each other.</div>
+      <div style="font-size: 12px; color: #111827;">Uplift: <strong>+3 partitions, shrouds</strong></div>
+    </div>
+
+    <!-- 4B -->
+    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+      <div style="font-size: 14px; font-weight: 600; color: #111827;">Form 4B</div>
+      <svg width="220" height="420" viewBox="-6 -6 220 420">
+        <rect x="0" y="0" width="208" height="408" fill="#ffffff" stroke="#9ca3af" stroke-width="2"></rect>
+        <rect x="0" y="0" width="208" height="56" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="3"><line x1="6" y1="20" x2="202" y2="20"></line><line x1="6" y1="30" x2="202" y2="30"></line><line x1="6" y1="40" x2="202" y2="40"></line></g>
+        <rect x="0" y="56" width="40" height="300" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="2"><line x1="12" y1="60" x2="12" y2="350"></line><line x1="20" y1="60" x2="20" y2="350"></line><line x1="28" y1="60" x2="28" y2="350"></line></g>
+        <rect x="156" y="56" width="52" height="300" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g fill="#fef9c3" stroke="#ca8a04"><rect x="44" y="62" width="108" height="66"></rect><rect x="44" y="134" width="108" height="66"></rect><rect x="44" y="206" width="108" height="66"></rect><rect x="44" y="278" width="108" height="66"></rect></g>
+        <g fill="#dbeafe" stroke="#3b82f6"><rect x="70" y="72" width="56" height="34"></rect><rect x="70" y="144" width="56" height="34"></rect><rect x="70" y="216" width="56" height="34"></rect><rect x="70" y="288" width="56" height="34"></rect></g>
+        <rect x="0" y="356" width="208" height="52" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#111827" stroke-width="3">
+          <line x1="0" y1="56" x2="208" y2="56"></line>
+          <line x1="40" y1="56" x2="40" y2="356"></line>
+          <line x1="156" y1="56" x2="156" y2="356"></line>
+          <line x1="40" y1="131" x2="156" y2="131"></line>
+          <line x1="40" y1="203" x2="156" y2="203"></line>
+          <line x1="40" y1="275" x2="156" y2="275"></line>
+          <!-- 4B: terminals for each unit in their own compartment inside the alley -->
+          <line x1="156" y1="131" x2="208" y2="131"></line>
+          <line x1="156" y1="203" x2="208" y2="203"></line>
+          <line x1="156" y1="275" x2="208" y2="275"></line>
+        </g>
+        <text x="104" y="392" font-size="9" text-anchor="middle" fill="#374151">cable chamber · terminals per unit</text>
+      </svg>
+      <div style="font-size: 12px; color: #6b7280; max-width: 220px; text-align: center;">As 3B, plus each unit's terminals in their own compartment in the cable alley.</div>
+      <div style="font-size: 12px; color: #111827;">Uplift: <strong>+6 partitions, shrouds, glands</strong></div>
+    </div>
+
+    <div style="width: 220px; display: flex; flex-direction: column; gap: 10px; font-size: 12px; color: #374151;">
+      <div style="font-weight: 700; color: #111827;">What the app does with the form</div>
+      <div>Draws the partitions (thick black lines) so the GA sketch matches the offer wording in Annexure I.</div>
+      <div>Counts partitions and shrouds per section and feeds the <strong>enclosure uplift rule</strong> — the rule you still have to define (decision 1). Once defined, the uplift line in the costing is calculated from the drawing, not typed.</div>
+      <div>Adds the extra plate height each partition needs to the fit check, so a section that fits as 2B can correctly fail as 4B.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
