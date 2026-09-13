@@ -222,6 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
+| 4.3 Word export of the technical offer, EPLAN parts list, EPLAN project metadata | `claude/advanced-p43-word-eplan` | 2026-09-13 08:45 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
