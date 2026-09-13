@@ -394,8 +394,13 @@ Role checks per area:
 
 ### Added by migration 0100 — foundations F1 to F3 (advanced track)
 
-The first advanced-track migration, numbered from 0100 so it can never collide with a
+The first advanced-track migration, numbered from 0100 so it could never collide with a
 basic-track number on `main` (D-170). Nothing in it changes a price.
+
+*(History, since 13 Sep 2026: the two tracks are one and the migrations are one continuous
+sequence. Nothing was renamed — production has recorded these numbers — but `0018` is now dead
+and the next number is the one after the highest anywhere in the repository.
+See `D-2026-09-13-one-migration-sequence`.)*
 
 **components** (F1) — `supplier` (who invoices, as against `manufacturer`, which is the brand the
 quotation prints); `attributes` jsonb typed by category; `replaced_by → components` with a check

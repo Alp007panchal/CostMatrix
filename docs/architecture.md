@@ -56,15 +56,20 @@ order. `seed.sql` holds categories, process types and a demo company for local w
 are applied to staging and production with `supabase db push`.
 
 ### Environments
-Two to start, three before go-live. Staging means a second paid Supabase project; until there
-is real data to protect, local development is where changes are tried, so staging is deferred
-to slice 6.
+All three exist. Staging arrived on 10 September 2026 as a free project on a **second** Supabase
+account — the first had reached its two-project limit — which turned out to be the stronger
+arrangement, because the token staging uses cannot see production at all
+(`docs/reference/two-track-setup.md`).
 
-| Name | Where | Purpose | From |
+| Name | Where | Purpose | Since |
 |---|---|---|---|
-| local | a laptop, Supabase CLI + Docker | development and tests | now |
-| production | the live Supabase project (Ireland) + the live Vercel deploy | customers | now |
-| staging | a second Supabase project + preview deploy | rehearse migrations against real-looking data | slice 6 |
+| local | a laptop, Supabase CLI + Docker | development and tests | slice 0 |
+| production | the live Supabase project (Ireland) + the live Vercel deploy | customers | slice 0 |
+| staging | CostMatrix Staging (a second account) + the `advanced` preview deploy | try a feature before switching it on in production | 2026-09-10 |
+
+There is **one code line**, `main`; the `advanced` branch is the copy staging deploys from, kept
+in step by merging `main` into it. Until 13 September 2026 it was a second track where advanced
+work was built; the per-feature switch (migration 0117) made that unnecessary.
 
 ### How database changes reach production
 Migrations are applied by a GitHub Actions workflow when a change is merged to `main`, using
@@ -75,9 +80,9 @@ shared with anyone: GitHub holds them write-only. The same migration files run l
 
 ### Backups and data protection
 1. Supabase daily backups and point-in-time recovery (Pro plan).
-2. A weekly GitHub Actions job runs `supabase db dump` and uploads the file, encrypted, to an off-site bucket (an S3-compatible bucket or a second Supabase project). Retention 12 weeks.
-3. Storage objects (PDFs, logos) are included in the weekly job.
-4. A written restore drill in `docs/operations.md`: restore last week's dump into a fresh project and open a costing. Run once before go-live and every quarter.
+2. A weekly GitHub Actions job (`weekly-backup.yml`) runs `supabase db dump` three times — roles, schema, data — checks the files are not empty, and keeps them as a run artifact for 90 days. That puts them off the Supabase account, which is what this layer is for; it does not put them off GitHub. Sending them on to a bucket as well is one secret away and the job is written for it.
+3. Storage objects (PDFs, logos) are **not** in the weekly dump — it is the database only. Quotation PDFs can be regenerated from the costing data, which is in it.
+4. A written restore drill in `docs/operations.md` Part E: download the latest artifact, restore roles then schema then data into a fresh project, and check a costing's total to the cent. Run once now and every quarter. `supabase/tests/restore-drill.sh` rehearses the same mechanism in CI on every pull request, which proves the schema restores but not that any particular dump does.
 5. Access: master admin read-only by database policy; company data never crosses tenants; no shared secret keys in the browser, only the public publishable key plus the user's own token.
 6. A short plain-language terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
 
@@ -130,7 +135,7 @@ CostMatrix/
       test/
   .github/workflows/
     ci.yml                      lint, typecheck, migrations + pgTAP on a throwaway database
-    weekly-backup.yml
+    weekly-backup.yml            a full dump of production every Sunday, kept 90 days
 ```
 
 Rules inside `web/src/modules/<name>/`:

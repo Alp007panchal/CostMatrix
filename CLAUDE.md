@@ -97,13 +97,23 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   never paste or request secrets in chat.
 - Keep momentum inside an approved slice: build it to the end, verify, open the PR, report.
   Ask before anything destructive or outside the plan.
-- **Two tracks (D-169, `docs/reference/two-track-setup.md`).** `main` is the basic app on
-  production and must stay releasable: bug fixes, trial findings, labour hours, prices, the
-  enclosure uplift rule. `advanced` is the long-lived branch for the foundations (F1–F11) and
-  the AI assistant, against the separate CostMatrix Staging project. Work on a feature branch
-  off the track you are on, **one pull request per feature, never stacked**, targeting that
-  track. Advanced migrations are numbered from **0100**, basic ones from 0018 (D-170).
-  Migrations reach production on merge to `main`, and staging on merge to `advanced`.
+- **One track (`docs/reference/two-track-setup.md`).** Everything goes to `main`. Branch off
+  `main`, **one pull request per feature, never stacked**, into `main`; merging deploys to
+  production. There is no separate track for advanced work any more: instead **every new
+  feature arrives behind a switch that is off by default** (the `features` register, migration
+  0117), which is what made the whole advanced app reach production in one invisible merge.
+  `advanced` is no longer a place work is built — it is the copy that runs on the CostMatrix
+  Staging project, so the owner can try a feature there before switching it on for real work.
+- **Numbers are taken from the highest anywhere in the repository, not the highest on your
+  branch.** Sessions run in parallel, so check the open pull requests and the remote branches.
+  - **Migrations are one continuous sequence.** The next free number today is **0123**.
+    `0018` is dead and must never be used: production has recorded `0001`–`0017` *and*
+    `0100`–`0118`, so a new `0018` would sort behind eighteen migrations that have already
+    run. A re-used number is worse than a wrong one — Supabase skips it in silence.
+  - **A new decision takes a dated id**, `D-YYYY-MM-DD-short-name`, which cannot clash with
+    another session's. `D-001` to `D-293` keep their numbers for ever.
+  - `scripts/check-numbering.sh` enforces both, in CI on every pull request. Run it before
+    you push.
 - **Check, then claim, before building.** More than one session works on this repository. Before
   starting a roadmap item: `git fetch`, look at the open pull requests and the remote branches,
   and if nothing has it, put one line in `docs/build-plan.md` under *In hand right now* and push

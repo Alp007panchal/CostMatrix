@@ -63,10 +63,10 @@ for f in "$root"/supabase/tests/{0,1,2}[0-9]_*.sql; do
 done
 
 echo "→ and a released quotation, which no test leaves behind"
-"${psql_cmd[@]}" -f "$root/supabase/tests/upgrade-fill.sql"
+"${psql_cmd[@]}" -f "$root/supabase/tests/figures-fill.sql"
 
 echo "→ writing down what it says"
-"${psql_cmd[@]}" -v phase=before -f "$root/supabase/tests/upgrade-snapshot.sql"
+"${psql_cmd[@]}" -v phase=before -f "$root/supabase/tests/figures-snapshot.sql"
 
 # --- The upgrade the merge will perform --------------------------------------
 echo "→ the upgrade: migrations 01xx, in order, as the deploy workflow applies them"
@@ -76,9 +76,9 @@ for f in "$root"/supabase/migrations/01[0-9][0-9]_*.sql; do
 done
 
 echo "→ reading the same figures again"
-"${psql_cmd[@]}" -v phase=after -f "$root/supabase/tests/upgrade-snapshot.sql"
+"${psql_cmd[@]}" -v phase=after -f "$root/supabase/tests/figures-snapshot.sql"
 
 echo "→ comparing"
-psql -v ON_ERROR_STOP=1 -q -f "$root/supabase/tests/upgrade-compare.sql"
+psql -v ON_ERROR_STOP=1 -q -f "$root/supabase/tests/figures-compare.sql"
 
 echo "The upgrade rehearsal passed: every figure identical either side of it."

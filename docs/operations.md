@@ -1122,9 +1122,14 @@ and it is a one-line change.
 
 ## Part C2 — Taking the advanced app to production
 
-The advanced track has been built on the staging project since 10 September. This is how it
-reaches the app you quote from. It happens **once**; afterwards the two tracks are one again and
-new work arrives the ordinary way.
+The advanced track was built on the staging project from 10 September, and crossed to production
+on **12 September** — 75 commits and 19 migrations, every feature switched off, and nothing on
+the live app looked different.
+
+**It happens once more, and then never again.** The panel layout and the Word/EPLAN exports were
+merged into `advanced` after that release, so one more `advanced → main` pull request brings them
+across. From 13 September there is **one track**: work goes to `main`, each feature behind a
+switch that is off, and the section at the end of this part is the rhythm from then on.
 
 ### What the merge actually does
 
@@ -1174,6 +1179,23 @@ The backup from step 1 is the answer, and Part E is how to use it. Nothing in th
 data: the migrations add tables and columns and rewrite functions. A feature switched on can
 always be switched off again, and switching it off hides it without deleting what was entered
 while it was on.
+
+### From now on: one track
+
+There is no second track to release from any more, so there is no repeat of the day above. The
+ordinary rhythm is:
+
+1. A feature is built on a branch off `main` and merged into `main`. **Deploy database** applies
+   its migration to production. Nothing you can see changes, because the feature is switched off.
+2. When you want to try it, staging is where you do that: it runs the same code (the `advanced`
+   branch, which is now just the copy staging deploys from). `docs/trials/advanced-trial.md` is
+   the click-through.
+3. Then switch it on for real work on the **Features** screen, one at a time, writing a real
+   total down before and after for anything marked as changing an existing costing.
+
+**Keeping staging in step** is one thing nobody does automatically yet: after a change reaches
+`main`, `main` has to be merged into `advanced` for staging to pick it up. Worth automating once
+the two are level; until then, ask and it is one command.
 
 ## Part D — When something goes wrong
 
@@ -1232,22 +1254,50 @@ data becomes irreplaceable. Note it in your calendar now.
 ### The three layers
 
 1. **Supabase daily backups and point-in-time recovery** — automatic, once on the paid tier.
-2. **A weekly off-site dump** — an automated job in GitHub takes a full copy of the database and stores it away from Supabase, so a problem with the Supabase account itself does not take the backups with it. Kept for twelve weeks. It emails you if it fails.
-3. **Quotation PDFs** — stored in Supabase and included in the weekly dump. They can also be regenerated from the costing data.
+   **On the free tier there are none**, which is why the line above about switching matters.
+2. **A weekly dump kept away from Supabase** — the **Weekly backup** job in GitHub, which runs
+   at 02:15 UTC every Sunday and can also be started by hand (Actions → Weekly backup → Run
+   workflow). It takes three files — the roles, the schema and the data — checks they are not
+   empty, and keeps them for 90 days as an artifact on that run. If it fails you get a red tick
+   in Actions and GitHub's own failure email.
+3. **Quotation PDFs** — held in Supabase Storage. They are **not** in the weekly dump, which is
+   the database only; they can be regenerated from the costing data, which is.
+
+**Where the dump lives, honestly.** On GitHub, not on Supabase — so a problem with the Supabase
+account does not take the backups with it, which is what this layer is for. It is *not* away
+from GitHub. If you want it further away, say so and it is one secret and half an hour of work
+to send it to a bucket as well; the job is written to pick that up.
 
 ### The restore drill
 
-A backup you have never restored is not a backup. Once before go-live, and once a quarter
-after, do this and write the date in `docs/decisions.md`:
+A backup you have never restored is not a backup. Do this **once now**, and once a quarter
+after, and write the date in `docs/decisions.md`:
 
-1. Take the most recent weekly dump.
-2. Create a fresh empty Supabase project (free tier is fine for the drill).
-3. Restore the dump into it.
-4. Sign in and open a costing. Check the totals match.
+1. Actions → **Weekly backup** → open the latest green run → download the artifact at the
+   bottom of the page. You should have `roles.sql`, `schema.sql`, `data.sql` and `taken-at.txt`.
+2. Create a fresh empty Supabase project (the free tier is fine for a drill).
+3. Restore into it, in this order — the order matters, and the third file is meaningless
+   without the first two:
+
+   ```sh
+   psql "<the drill project's connection string>" -f roles.sql
+   psql "<the drill project's connection string>" -f schema.sql
+   psql "<the drill project's connection string>" -f data.sql
+   ```
+
+4. Point a local copy of the app at the drill project and sign in, or query it directly. **Open
+   a costing you know and check the total to the cent.** Counting rows is not enough: the thing
+   that matters is that a price says what it said.
 5. Delete the drill project.
 
 If any step fails, the backup process is broken and fixing it is the most urgent thing on the
-list.
+list — ahead of any feature.
+
+**What is already proved, and what is not.** Every pull request runs
+`supabase/tests/restore-drill.sh`, which dumps a full database, restores it into an empty one and
+refuses any of fourteen figures that moves. So the *mechanism* is known to work on this schema.
+What that cannot prove is that **your** dump, of **your** project, restores — only the drill
+above does that, and it is the reason to do it rather than trust the green tick.
 
 ### Data protection promise to other companies
 

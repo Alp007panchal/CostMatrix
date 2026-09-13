@@ -29,6 +29,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | — | **People: correcting a mistake (2026-09-10).** Migration 0012 and the remove-user function: the master administrator may move or remove somebody who has no records at all; everyone else is deactivated as before. Function errors now show their real message, and a new company reaches the People screen without a reload. | 2026-09-10 |
 | — | **The owner's notebook: nine changes in five pull requests. All merged and live** (migrations 0013–0017, `main` at the PR 18 merge). PR 14 costing screen in one column and the operator's name in the history; PR 15 sections inside a panel; PR 16 copy a costing or a panel; PR 17 one enquiry, one decision (and no busbar in Annexure IV); PR 18 files kept with an enquiry, on an enquiry page of its own. Next: the owner runs `docs/acceptance-test.md` on what is live; nothing is waiting on a review. | 2026-09-10 |
 | — | **Two tracks, and the advanced roadmap (2026-09-10).** The owner's roadmap (`docs/reference/roadmap-from-market-leaders.md`, foundations F1–F11) and AI-assistant spec arrived. `main` is now the basic app on production; a long-lived `advanced` branch holds all foundations and assistant work against a separate **CostMatrix Staging** project (D-169). Step 0 built the arrangement by code: `create-staging.yml` creates, wakes and seeds staging; "Deploy database" chooses its target by branch; advanced migrations start at 0100. | 2026-09-10 |
+| — | **The two tracks become one (2026-09-13).** The switch-per-feature (0117) let the whole advanced app reach production in one merge nobody could see, so the split had no job left — and it was still costing: `advanced` was fifteen commits ahead again the next morning. Everything now goes to `main`, behind a switch that is off. Migrations become one sequence from 0123 (`0018` is dead), new decisions take a dated id, and CI refuses a re-used number. `advanced` remains the copy staging runs. | 2026-09-13 |
 | F1–F3 — Foundations PR A | **Merged into `advanced`, on staging.** Migration 0100: component supplier, attributes, obsolescence, datasheet, lead time and price provenance; kit version, customer wording, labels, parameters and `qty_expression`; the kit version recorded on every costing line; a productivity factor per panel; actual hours; labour rate history. The kit-composition freeze was already built (D-177), so F2 needed no back-fill. | 2026-09-11 |
 | F4–F11 — Foundations PR B | **Built** (PR 26). Migration 0101: panel `parameters`, `origin` and `origin_ref` on every costing line, one `documents` table replacing `enquiry_attachments`, `activity_log`. Migration 0102: `approval_rules` with one default rule per company and a read-only engine, `valid_until` and `price_snapshot_at`, `import_jobs`/`import_rows` filled from the batches, `company_options` with the assistant switched off everywhere, the three assistant tables. The `extract-document` Edge Function reads PDF, Word, Excel and text. Files strip on the costing screen. 483 database assertions, test 15 unmodified. | 2026-09-11 |
 | F4–F11 — Foundations PR B | **Merged into `advanced`, on staging** (PR 26); "Deploy functions" made branch-aware by PR 27 so `extract-document` reached staging, where the owner verified the NPP-192 PDF reads. | 2026-09-11 |
@@ -214,16 +215,6 @@ straight to `main`, reviewed and merged by the owner the same day.
     a merge to `main` possible at all. Most switches hide a screen; three gate real behaviour
     (migration 0117).
 
-## In hand right now
-
-One line per roadmap item a session has started, so two sessions cannot build the same thing
-twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
-the work begins, removed when the pull request opens.
-
-| Item | Session | Since |
-|---|---|---|
-| Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
-
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
     actually asks (supplies, incomer rating and type, changeover or sync, the feeder schedule,
     correction, metering, form, IP, access, cable entry) proposed as kits at quantities, editable,
@@ -246,6 +237,19 @@ the work begins, removed when the pull request opens.
     kilograms and money, bar sizes read from his own kits, a starting schedule built from the
     board's parameters, and the schedule set beside the metres the panel is actually costed at
     (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
+
+31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+    migrations to a database already at 0017 and already full of rows, refusing any figure that
+    moves (in CI on every pull request), a go-live section in the runbook, and then the release
+    itself: one pull request from `advanced` into `main`, every feature off.
+
+32. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
+    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
+    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
+    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
+    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
+    faces for a double-front board; and a kit template plus importer so the library can be filled
+    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
 
 33. **The panel layout, stage one** (advanced track, roadmap 3.8) — the front view: the sections a
     board needs arranged by the rules of each mounting design, the kits drawn at true scale on the
@@ -288,21 +292,24 @@ the work begins, removed when the pull request opens.
     writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
     path (D-292, D-293).
 
+38. **One track** — `main` is the only place work is built, every new feature arriving behind a
+    switch that is off by default, and the migrations one continuous sequence from 0123 with
+    `0018` retired for good. `scripts/check-numbering.sh` refuses a re-used migration number or
+    decision id in CI, because the rule alone was broken three times in one week. `advanced`
+    stays as the copy staging runs, for trying a feature before switching it on.
+
+## In hand right now
+
+One line per roadmap item a session has started, so two sessions cannot build the same thing
+twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
+the work begins, removed when the pull request opens.
+
+| Item | Session | Since |
+|---|---|---|
+| _nothing in hand_ | | |
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
-
-31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
-    migrations to a database already at 0017 and already full of rows, refusing any figure that
-    moves (in CI on every pull request), a go-live section in the runbook, and then the release
-    itself: one pull request from `advanced` into `main`, every feature off.
-
-32. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
-    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
-    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
-    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
-    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
-    faces for a double-front board; and a kit template plus importer so the library can be filled
-    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
@@ -314,8 +321,10 @@ or into go-live.
 
 ## Slice 6 — Go-live hardening (about one week)
 
-- Restore drill from the weekly dump into a fresh project, written up and dated in `decisions.md`.
-- Staging environment added (second Supabase project plus preview deploys).
+- ~~Restore drill from the weekly dump into a fresh project~~ — **the weekly dump now exists**
+  (`weekly-backup.yml`, 13 Sep) and `restore-drill.sh` rehearses the mechanism in CI. What is left is
+  the owner running the drill once against the real dump and dating it in `decisions.md`.
+- ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
 - Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
 - Custom domain and email sender for Supabase Auth invitations.

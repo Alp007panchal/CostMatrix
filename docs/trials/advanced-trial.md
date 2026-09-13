@@ -5,9 +5,10 @@ switch of its own, and not one of them has been driven by a person. Tests prove 
 they cannot tell you whether a screen makes sense, whether a word is wrong, or whether the proposal a configurator makes is
 the board you would have built. That is this hour's job.
 
-`docs/acceptance-test.md` is the other script: the **basic app on production**, which is
-unchanged. This one is only for **staging** (the CostMatrix Staging project, the `advanced`
-branch's preview URL).
+`docs/acceptance-test.md` is the other script: the app your team quotes on, which is unchanged.
+This one is for **staging** (the CostMatrix Staging project, the `advanced` branch's preview URL)
+— which since 13 Sep 2026 is the copy of `main`, not a separate track. These features are all on
+production too, switched off; **this trial is what you run before switching one on.**
 
 **Before you start.** Sign in to the staging app as yourself (master administrator) — §0 needs that role to switch the features on. Have
 `docs/reference/costing-NPP-192-REV1.xlsm` open — several steps compare against it.
@@ -261,5 +262,5 @@ sentence each is plenty.
 | 3 | | | | |
 
 **What I will do with them.** Each finding comes back as its own small pull request against
-`advanced` — or against `main` if it turns out to be in the basic app too — smallest and most
-annoying first, unless you order them differently.
+`main` — there is one track now — smallest and most annoying first, unless you order them
+differently.

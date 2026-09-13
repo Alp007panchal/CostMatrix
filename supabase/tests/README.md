@@ -28,13 +28,45 @@ to it (D-272).
 So this script builds production's shape (migrations `00xx`, then every test written before the
 advanced track, which imports the real `data/seed` files and builds NPP-192, plus a released
 quotation because no test leaves one behind), writes down fourteen figures with
-`upgrade-snapshot.sql`, applies the `01xx` migrations, reads the same figures again, and
-`upgrade-compare.sql` **refuses any difference**. It runs in CI beside the suite.
+`figures-snapshot.sql`, applies the `01xx` migrations, reads the same figures again, and
+`figures-compare.sql` **refuses any difference**. It runs in CI beside the suite.
 
 If it fails, the message names the figure that moved and both values. That is a migration which is
 fine on an empty database and wrong on a full one — the kind that is otherwise found on live data.
 
+## Rehearsing a restore
+
+```sh
+./supabase/tests/restore-drill.sh
+```
+
+"A backup you have never restored is not a backup" is the line in the runbook, and until the
+weekly backup job existed the drill's first step was impossible. This proves the mechanism: it
+builds a full database, dumps it, restores the dump into an empty one, and compares the same
+fourteen figures with `figures-snapshot.sql` / `figures-compare.sql` that the upgrade rehearsal
+uses. The restore runs with `ON_ERROR_STOP` on, because a dump that only loads when errors are
+ignored restores something other than what was taken.
+
+What it cannot prove is that the owner's real dump restores — only a drill against that dump
+does, and `docs/operations.md` Part E says how.
+
+## Checking the numbers
+
+```sh
+./scripts/check-numbering.sh
+```
+
+Not a database test — it needs nothing running — but it belongs in the same habit, and CI runs it
+as its own job on every pull request. It refuses a migration number used twice, a new migration
+numbered below one that already exists **on any branch** (which is how 0116 came to be written
+twice, and how a `0018` would now sort behind eighteen migrations already applied), and a
+duplicate decision id in `docs/decisions.md`.
+
+Two sessions work on this repository at once. The rule to check first was in `CLAUDE.md` and was
+broken three times in one week, so it is a red tick now instead.
+
 ## The files
+
 
 
 | File | What it covers |

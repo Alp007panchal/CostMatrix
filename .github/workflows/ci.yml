@@ -6,6 +6,21 @@ on:
   pull_request:
 
 jobs:
+  # More than one session works on this repository at once, and three times in
+  # one week two of them took the same number: migration 0116 twice, and two
+  # sets of decision numbers. A duplicate migration number is the dangerous one
+  # — Supabase skips it silently, so the tables it creates never exist. This job
+  # refuses the clash instead of trusting everyone to remember the rule.
+  # fetch-depth: 0 so the other branches are here to compare against.
+  numbering:
+    name: Migration and decision numbers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: ./scripts/check-numbering.sh
+
   database:
     name: Migrations and isolation tests
     runs-on: ubuntu-latest
@@ -23,6 +38,12 @@ jobs:
       # production, and refuses any figure that moves.
       - name: Rehearse the upgrade on a database that already holds rows
         run: ./supabase/tests/upgrade-rehearsal.sh
+      # "A backup you have never restored is not a backup." This proves the
+      # mechanism — that a dump of this schema restores into an empty database
+      # and gives back the same costings. The drill against the owner's real
+      # dump is theirs to run, and Part E of the runbook says how.
+      - name: Rehearse restoring a backup
+        run: ./supabase/tests/restore-drill.sh
 
   web:
     name: Web app
