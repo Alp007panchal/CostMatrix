@@ -34,6 +34,7 @@ const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePag
 const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
+const TermsPage = lazy(() => import('../modules/legal/TermsPage').then((m) => ({ default: m.TermsPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,6 +61,21 @@ export function App() {
               people to, and the one the invitation function uses.
             */}
             <Route path="reset-password" element={<SetPasswordPage />} />
+            {/*
+              Also outside RequireAuth, and deliberately: somebody deciding
+              whether to accept an invitation has to be able to read what the
+              app stores before they have an account to read it with.
+            */}
+            <Route
+              path="terms"
+              element={
+                <div className="reading">
+                  <Suspense fallback={<p className="empty">Loading…</p>}>
+                    <TermsPage />
+                  </Suspense>
+                </div>
+              }
+            />
             <Route
               element={
                 <RequireAuth>
