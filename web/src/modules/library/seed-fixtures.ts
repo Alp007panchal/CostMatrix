@@ -197,6 +197,11 @@ export function seedFixtures(): SeedFixtures {
         footprint_w_mm: null,
         footprint_h_mm: null,
         footprint_d_mm: null,
+        // added by migration 0119 (roadmap 3.8): the template is blank until the
+        // owner fills it in, so every kit starts with no mounting design.
+        mounting_design: null,
+        module_height_mm: null,
+        positions_per_plate: null,
         ...parseKitName(name),
       }
       assemblies.push(kit)

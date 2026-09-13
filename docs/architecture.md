@@ -84,7 +84,7 @@ shared with anyone: GitHub holds them write-only. The same migration files run l
 3. Storage objects (PDFs, logos) are **not** in the weekly dump — it is the database only. Quotation PDFs can be regenerated from the costing data, which is in it.
 4. A written restore drill in `docs/operations.md` Part E: download the latest artifact, restore roles then schema then data into a fresh project, and check a costing's total to the cent. Run once now and every quarter. `supabase/tests/restore-drill.sh` rehearses the same mechanism in CI on every pull request, which proves the schema restores but not that any particular dump does.
 5. Access: master admin read-only by database policy; company data never crosses tenants; no shared secret keys in the browser, only the public publishable key plus the user's own token.
-6. A short plain-language terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. Shown at sign-up and linked from the footer.
+6. A short plain-language terms page in the app states what is stored, that data is held in Ireland, that no company can see another company's data, and that a company's data is deleted on request. **Built 13 Sep 2026** at `/terms`, linked from the footer of every signed-in screen and from the sign-in page; it is outside the sign-in guard, because somebody deciding whether to accept an invitation has to be able to read it first. The text lives in `web/src/modules/legal/terms.ts` and each of the four promises above is asserted by a test, so one cannot quietly go missing.
 
 ### Accounts and alerts
 Supabase, the web host and GitHub are all owned by the operator's own account. Alerts, backup

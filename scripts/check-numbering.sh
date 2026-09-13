@@ -63,13 +63,24 @@ else
   # ours and not already merged into ours. A branch whose tip is an ancestor of
   # HEAD has no independent claim — its migrations ARE ours, and counting them
   # would make a legitimate run of 0119..0122 look like 0119 clashing with 0122.
+  #
+  # The ancestry test is necessary and not quite sufficient: a branch we merged
+  # can move on afterwards — `advanced` gained a merge of `main` an hour after
+  # this branch took it — and it then stops being an ancestor while still
+  # carrying copies of the very migrations we are bringing. A claim on a file we
+  # already have, under the same name, is not a rival claim either: it is the
+  # same migration seen twice. Genuinely foreign files still count, which is what
+  # keeps two sessions from both writing 0116.
+  ours="$(ls supabase/migrations/[0-9][0-9][0-9][0-9]_*.sql 2>/dev/null | xargs -n1 basename 2>/dev/null | sort -u)"
   elsewhere="$(
     for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin); do
       [[ "$ref" == "origin/HEAD" || "$ref" == "$self" ]] && continue
       git merge-base --is-ancestor "$ref" HEAD 2>/dev/null && continue
       git ls-tree --name-only "$ref" -- supabase/migrations/ 2>/dev/null \
         | sed -n 's#supabase/migrations/\(\([0-9]\{4\}\)_.*\)#\2\t\1#p'
-    done | sort -u
+    done | sort -u | awk -F'\t' -v ours="$ours" '
+      BEGIN { n = split(ours, a, "\n"); for (i = 1; i <= n; i++) mine[a[i]] = 1 }
+      !($2 in mine)'
   )"
   on_main="$(git ls-tree --name-only origin/main -- supabase/migrations/ 2>/dev/null \
     | sed -n 's#supabase/migrations/\([0-9]\{4\}\)_.*#\1#p' | sort)"

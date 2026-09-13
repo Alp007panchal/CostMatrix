@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CostMatrix — panel-layout-kit-form (mockup)</title>
+</head>
+<body>
+
+
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2937; background: #f9fafb; }
+    a { color: #1d4ed8; } a:hover { color: #1e40af; }
+  </style>
+
+<div style="width: 760px; height: 720px; background: #f9fafb; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 22px; font-weight: 700; color: #111827;">Kit · 400A,TP,MCCB, Adjustable, 36kA-OUTGOER-KIT</div>
+  <div style="font-size: 13px; color: #6b7280;">Kits › MCCB · the two new fields sit with the existing size fields from F12</div>
+
+  <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Mounting &amp; size (for the panel layout)</div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 13px; color: #374151;">Mounting design <span style="color: #b45309;">new</span></div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 12px; font-size: 14px; background: #ffffff; display: flex; justify-content: space-between;"><span>MCCB plates — one per plate, horizontal</span><span style="color: #6b7280;">▾</span></div>
+        <div style="font-size: 11px; color: #6b7280;">Options: busbar-fed · MCCB plates · side-by-side plates · compensation · meter-board plate</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 13px; color: #374151;">Module height, mm <span style="color: #b45309;">new</span></div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 12px; font-size: 14px; background: #ffffff;">250</div>
+        <div style="font-size: 11px; color: #6b7280;">Plate height this kit consumes in an S4 section (50 mm grid). Decided by us, from the S4 planning manual.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 13px; color: #374151;">Footprint W × H × D, mm <span style="color: #9ca3af;">F12</span></div>
+        <div style="display: flex; gap: 6px;"><div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 12px; font-size: 14px; background: #ffffff; flex: 1;">140</div><div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 12px; font-size: 14px; background: #ffffff; flex: 1;">255</div><div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 12px; font-size: 14px; background: #ffffff; flex: 1;">110</div></div>
+        <div style="font-size: 11px; color: #6b7280;">Blank = main device size plus its clearances</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 13px; color: #374151;">Positions per plate <span style="color: #9ca3af;">optional</span></div>
+        <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 12px; font-size: 14px; background: #ffffff; color: #9ca3af;">— (side-by-side kits only)</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 13px; color: #374151;">Main device</div>
+        <div style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 9px 12px; font-size: 13px; background: #f9fafb;">3VJ1340-5DB32-0AA0 · 140 × 255 × 110 · plate · clearance 25/25/10/10</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #6b7280; text-transform: uppercase;">Same fields in the dimensions template (CSV)</div>
+    <div style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #111827; background: #f3f4f6; border-radius: 6px; padding: 10px 12px; white-space: pre-line;">kit_code,mounting_design,module_height_mm,footprint_w_mm,footprint_h_mm,footprint_d_mm,positions_per_plate
+400A-TP-MCCB-ADJ-36KA-OUTGOER-KIT,mccb_plates,250,140,255,110,
+1600A-4P-WITHDRAWABLE-MOTORIZED-ACB-KIT,busbar_fed,500,450,500,300,
+INDICATOR-KIT,side_by_side_plates,,54,90,70,
+50KVAR-APFC-FUSE-KIT,compensation,,150,300,200,4</div>
+    <div style="font-size: 12px; color: #6b7280;">Fill one kit group at a time; the importer writes only these fields and never touches a price.</div>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; gap: 10px;">
+    <div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 14px; font-size: 14px; background: #ffffff; color: #374151;">Cancel</div>
+    <div style="border-radius: 6px; padding: 8px 14px; font-size: 14px; background: #1d4ed8; color: #ffffff; font-weight: 600;">Save kit</div>
+  </div>
+</div>
+
+</body>
+</html>

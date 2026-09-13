@@ -54,6 +54,10 @@ export function Layout() {
           <Outlet />
         </ErrorBoundary>
       </main>
+
+      <footer className="footer">
+        <NavLink to="/terms">What CostMatrix stores</NavLink>
+      </footer>
     </div>
   )
 }

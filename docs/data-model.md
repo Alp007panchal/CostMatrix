@@ -825,6 +825,84 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
+### Panel layout, stage one (roadmap 3.8, migration 0120)
+Stage two's changes to these are listed under it; where the two disagree, stage two wins.
+- `v_panel_layout_kits` — the kits on a panel with their mounting design, module height, positions
+  per plate and footprint, and `is_sized`: whether the library says enough to place them.
+- `app.section_capacity(design, width_mm, busbar_compartment_mm, construction)` — what one section
+  holds, in the unit that design counts in, with the sentence explaining it.
+- `app.arrange_panel(panel, construction)` — the sections and placements, deterministic, with
+  `explain` (the rule that made each) and `unsized` (kits it could not place). Writes nothing.
+- `app.layout_fit(sections, construction)` — used against capacity per section and a verdict;
+  a section carrying an unsized kit is `unknown`, and one such section makes the board unknown.
+- `app.save_panel_layout(panel, sections, construction, note)` — the next `panel_layouts` version.
+- `app.apply_layout_enclosure(panel, section, replace)` — the only writer of costing lines here:
+  cubicles by width through `add_component_to_costing`, naming any width the catalogue lacks.
+- Settings in `company_options`: `layout_device_compartment_mm` (1,500, assumed),
+  `layout_vertical_busbar_mm`, `layout_cable_alley_mm`, `layout_mcb_module_mm`,
+  `layout_device_clearance_mm`.
+
+### Panel layout, stage two (roadmap 3.8, migration 0121)
+The other four views, and the two rules they brought with them.
+
+- A **section** now carries `depth_mm`, `form`, `busbar_side` (left/right) and `cable_alley`
+  (beside/behind) beside the fields stage one gave it. A section saved by stage one has none of them
+  and reads as single-front, alley beside, 800 mm deep — the defaults it assumed.
+- `app.section_capacity(design, width_mm, busbar_compartment_mm, construction, cable_alley, depth_mm)`
+  — the four-argument form is **dropped**, not left beside it, so two capacity rules cannot disagree;
+  every old call resolves here. With the alley **behind** the plates the plate runs the full width
+  left of the busbar (650 mm on an 800 mm section rather than 450) and the answer carries
+  `depth_needed_mm` and `too_shallow`.
+- `app.layout_fit(sections, construction)` — a verdict **per face** in `faces[]`; the section takes
+  its worst face's verdict and figures, the board its worst section's. A section too shallow for its
+  cable alley is `no_fit` whatever height is left. The board also returns `max_depth_mm`.
+- `app.layout_worse(a, b)` — the order of badness in one place: no_fit, unknown, tight, fits, empty.
+- `app.arrange_panel(panel, construction, access, cable_alley)` — `access` is `single_front` or
+  `double_front` and is refused on a construction whose `allows_double_front` is false. A
+  double-front board fills face A then **face B of the same section** before opening another; a
+  busbar-fed device still takes a single-front section. Returns `depth_mm`, `height_mm`, `base_mm`.
+- `app.layout_depth_for(depths, needs)` — the shallowest depth on the construction's list that holds
+  what is needed, else its deepest. The depth twin of `layout_width_for`.
+- `v_panel_door_devices` — the panel's parts whose F12 `components.mounting_type` is `door`, with
+  the size the door view draws them at and the kit each came from.
+- `v_panel_layout_weight` — the panel's weight from F12 `weight_kg`, with `without_weight`: how many
+  lines carry none, so the figure reads as the estimate it is.
+- Settings added: `layout_alley_behind_min_depth_mm` (800), `layout_alley_behind_mm` (250),
+  `layout_rear_dropper_mm` (100), `layout_door_swing_mm` (100), `layout_between_faces_mm` (200).
+
+### Panel layout fields (roadmap 3.8, migration 0119)
+The canvas is not built; these are the fields it will read, so the library can be filled in first.
+
+- `assemblies.mounting_design` (`public.mounting_design` enum: busbar_fed · mccb_plates ·
+  side_by_side_plates · compensation · meter_board_plate · inline_3nj6), `module_height_mm`
+  (50 mm grid, checked) and `positions_per_plate`. All nullable; `v_kits` carries them.
+- `layout_constructions` — master rows (company null) plus a company's own: widths, the two depth
+  lists (busbar top/bottom and busbar rear), height, base heights, forms, the module-height grid and
+  its allowed heights, kVAr per compensation section. S4 seeded from the Siemens manual; S8, the
+  meter board and `custom_double_front` named and empty. Read by anybody, written by the master
+  administrator (master rows) or a company administrator (its own).
+- `panel_layouts.cubicles` is renamed **`sections`**, and a section carries `faces[]` — a
+  double-front board is one section with a front and a rear face (spec §2.1) — plus
+  `construction_code`. Nothing writes layouts yet, which is why the rename is free.
+- `app.import_kit_layout(rows, company, apply)` fills the kit fields in bulk from
+  `data/seed/kit-layout-template.csv` (built by `scripts/build_kit_layout_template.py`).
+
+### EPLAN and Word exports (roadmap 4.3, migration 0122)
+- `costings.eplan_project`, `costings.drawing_numbers` — the drawing office's own references, free
+  text. **Added to `create_costing_revision`'s hand-written column list**, so a revision carries
+  them; a copy goes through `create_costing` and starts with none, which is right because a copy is
+  a different job.
+- `app.set_eplan_metadata(costing, project, drawings)` — draft only, writes a `eplan_metadata`
+  history line, and only when something actually changed. Blank means null, never `''`.
+- `app.import_eplan_metadata(costing, pasted, apply)` — reads `key: value`, `key=value`, `key,value`
+  and tab-separated lines, matches the key against the names EPLAN uses, and proposes unless asked
+  to apply. Returns what it found, what it could not read, and why.
+- `v_eplan_parts` — one row per frozen `costing_items` line with its panel, kit, section, part
+  number, make, description, quantity, F12 size and weight, and the **device tag** numbered over the
+  newest `panel_layouts` row for that panel in the order the GA sheet draws it (0121). The tag is
+  null where the panel has no layout.
+- Feature `eplan_exports` (sort 180), off everywhere until the master administrator turns it on.
+
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
 each entry `{label, bar_code, phases, runs_per_phase, length_m, sets, metres}` — so a revision and a
