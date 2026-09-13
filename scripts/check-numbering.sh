@@ -48,11 +48,25 @@ else
   note "  ✓ $(ls supabase/migrations/[0-9][0-9][0-9][0-9]_*.sql | wc -l | tr -d ' ') migrations, no number used twice"
 fi
 
-# --- 2. Anything new is numbered above every number taken anywhere -----------
-# "Anywhere" matters. Comparing against origin/main alone would happily hand out
-# a number another session has already taken on a branch that has not merged
-# yet, which is exactly how 0116 came to be written twice.
-note "→ new migrations are numbered above every number taken on any branch"
+# --- 2. Ordering against main, clashes against everybody ---------------------
+# Two different questions, and they need two different yardsticks. Getting this
+# wrong is what made the check refuse the very release it was written to guard.
+#
+# ORDERING is measured against origin/main's highest, because that is what has
+# actually been applied. A migration merely sitting on another branch has run
+# nowhere and cannot put a lower number behind anything. Measuring order against
+# "the highest on any branch" looks equivalent and is not: a branch bringing a
+# contiguous block trips over its own highest member — and once a second branch
+# carries the same block, no amount of ancestry-skipping saves it. The advice it
+# then gives ("use 0123 or higher") is the one thing that must never be done,
+# because renaming a migration that has already been applied gets it applied
+# twice. (Diagnosed on the other session's branch; proved here when this check
+# went red on the release with a green database suite beside it.)
+#
+# CLASHES are still checked against every branch, by filename, below. That is
+# the check that stops two sessions both writing 0116, and it is unaffected,
+# because it compares names rather than order.
+note "→ new migrations are numbered above what origin/main has applied, and clash with nobody"
 if ! git rev-parse --verify --quiet origin/main >/dev/null; then
   note "  – origin/main is not in this clone, so there is nothing to compare against."
   note "    (In CI the database job checks out with fetch-depth: 0 so that it is.)"
@@ -74,6 +88,9 @@ else
   on_main="$(git ls-tree --name-only origin/main -- supabase/migrations/ 2>/dev/null \
     | sed -n 's#supabase/migrations/\([0-9]\{4\}\)_.*#\1#p' | sort)"
 
+  # what has actually been applied — the yardstick for ordering
+  applied="$(printf '%s\n' "$on_main" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
+  # the highest anyone has claimed — only used to suggest the next free number
   highest="$(printf '%s\n' "$elsewhere" | cut -f1; printf '%s\n' "$on_main")"
   highest="$(printf '%s\n' "$highest" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
 
@@ -94,8 +111,8 @@ else
           '$1 == n && $2 != me { print $2 }' | head -n 1)"
         if [[ -n "$clash" ]]; then
           problem "$name re-uses number $n, which another branch has taken as $clash."
-        elif [[ "$((10#$n))" -lt "$((10#$highest))" ]]; then
-          problem "$name is numbered $n, below $highest which already exists."
+        elif [[ -n "$applied" && "$((10#$n))" -lt "$((10#$applied))" ]]; then
+          problem "$name is numbered $n, below $applied which origin/main has already applied."
           problem "    Migrations run in number order. Use $(printf '%04d' "$((10#$highest + 1))") or higher."
         fi
       fi
@@ -103,7 +120,7 @@ else
     if [[ "$added" -eq 0 ]]; then
       note "  ✓ this branch adds no migration; the highest taken anywhere is $highest"
     elif [[ "$fail" -eq 0 ]]; then
-      note "  ✓ $added new, all above $highest"
+      note "  ✓ $added new, all above origin/main's $applied and clashing with nothing"
     fi
   fi
 fi
