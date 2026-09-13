@@ -222,6 +222,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
+| 3.8 panel layout, stage 2 (rear, side, door and 3D views, then the GA sketch) | `claude/advanced-p38-stage-two` | 2026-09-13 04:10 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
