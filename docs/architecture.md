@@ -92,6 +92,10 @@ failures and uptime notices go to alp007panchal@gmail.com. If the team grows, mo
 notifications to a shared company mailbox before adding more users, so nothing is missed while
 one person is away.
 
+**Errors** are recorded by the app itself (migration 0124): a screen that stops drawing, or a load
+that fails, writes a row an administrator reads on **What broke**. The administrator should not
+learn that the app is broken by being told.
+
 ### Testing
 - Database: pgTAP tests for isolation and calculations, run in CI.
 - Web: unit tests for formatting helpers; a short manual demo script per slice in `docs/`.

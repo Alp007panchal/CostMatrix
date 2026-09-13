@@ -6,6 +6,7 @@ import type {
   CompatibilityRule,
   Company,
   CompanySettings,
+  ErrorReport,
   PersonWithRoles,
   Profile,
   UserRole,
@@ -334,3 +335,19 @@ export async function removeApprovalRule(id: string): Promise<void> {
   const { error } = await supabase.from('approval_rules').delete().eq('id', id)
   fail('Could not remove the rule', error)
 }
+
+/**
+ * What has broken lately. Row-level security decides whose: an administrator
+ * sees their own company's, the master administrator sees every company's.
+ */
+export async function listErrorReports(days = 30): Promise<ErrorReport[]> {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
+  const { data, error } = await supabase
+    .from('v_error_reports')
+    .select('*')
+    .gte('last_seen_at', since)
+    .order('last_seen_at', { ascending: false })
+  fail('Could not read what has gone wrong', error)
+  return (data ?? []) as ErrorReport[]
+}
+

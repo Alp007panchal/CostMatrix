@@ -309,7 +309,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| Slice 6: error reporting in the browser (migration 0124, test 48) | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-13 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
@@ -326,7 +326,11 @@ the work begins, removed when the pull request opens.
   the owner running the drill once against the real dump and dating it in `decisions.md`.
 - ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
-- Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
+- Monitoring: ~~error reporting in the browser~~ — **built 13 Sep** (migration 0124): when a screen
+  stops drawing, or something will not load, the app records it and an administrator reads it on
+  **What broke**. Repeats collapse into a count, one person cannot flood it, and rows delete
+  themselves after ninety days. Still to do: Supabase alerts, and the uptime check if PR 60 has
+  not merged yet.
 - Custom domain and email sender for Supabase Auth invitations.
 - ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
 - One-page user guide per role.

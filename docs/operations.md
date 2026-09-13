@@ -441,6 +441,32 @@ that work. The database enforces this, not just the screen.
 They click **Forgot password** on the sign-in page and get an email. If nothing arrives, send a
 reset from Supabase → Authentication → Users.
 
+### What broke — the error reports
+
+**Administrators → What broke.** Screens that failed in the last 30 days, recorded by the app
+itself when they failed. Nobody has to send you anything, which matters because most people
+never do.
+
+Two kinds of row:
+
+- **The screen stopped drawing** — the app hit an error mid-render and showed the person a
+  message instead of the screen. This is what the blank Components page was on 9 September.
+- **Something would not load** — a query came back with an error and the screen showed a red
+  line. More common, and until now completely invisible to you.
+
+Each row is one *fault*, not one occurrence: the same failure, on the same screen, for the same
+person is counted rather than repeated, so *"4 times"* tells you it is still happening. You see
+your own company's; as master administrator you see every company's, with the company named.
+
+**Nothing appears here when nothing is wrong**, which is the usual state and reads as such.
+
+Rows delete themselves after ninety days — swept by the next report rather than by a scheduled
+job, so there is nothing to maintain. What is kept is on the terms page: the message, the route,
+who was signed in and which browser. A message can quote the value that caused the failure, so it
+is not treated as harmless; it is simply not kept long.
+
+If you want something done about one, send me its wording and what the person was doing.
+
 ### What CostMatrix stores — the terms page
 
 `/terms`, linked from **What CostMatrix stores** at the bottom of every screen and from the
