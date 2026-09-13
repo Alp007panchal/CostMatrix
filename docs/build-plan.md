@@ -238,6 +238,47 @@ straight to `main`, reviewed and merged by the owner the same day.
     board's parameters, and the schedule set beside the metres the panel is actually costed at
     (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
 
+34. **The panel layout, stage one** (advanced track, roadmap 3.8) — the front view: the sections a
+    board needs arranged by the rules of each mounting design, the kits drawn at true scale on the
+    covers and plates they belong to with the owner's own device faces, a verdict per section in
+    the unit that design counts in, and the enclosure line the drawing asks for, applied only when
+    a person presses the button (migration 0120). The rear, side, door and 3D views and the GA
+    sketch are stage two.
+
+35. **The panel layout, stage two — the other four views** (advanced track, roadmap 3.8) — the
+    back of the board (cable lugs on a rear-connection section, shrouded terminals on a
+    front-connection one, sections mirrored), the plan looking down on one section, the doors with
+    the parts whose mounting type says door, and a fixed isometric for the customer; per-section
+    settings for depth, busbar side, form and where the cables run; and **double-front sections
+    judged face by face** (migration 0121). Two rules changed rather than were added: a cable alley
+    behind the plates widens the plate and costs depth, and a section too shallow for its own cables
+    does not fit. The GA sketch in the quotation PDF is the one piece of stage two still to come.
+
+36. **The general-arrangement drawing, and 3.8 finished** (advanced track, roadmap 3.8) — the saved
+    layout printed with the quotation as **Annexure V**, one A4 landscape sheet per panel that has
+    one: black line art, the two chambers, each section with its compartment and its devices, the
+    device tags `Q1, Q2 …`, a dimension line and an overall size, and a footer taking the form and
+    access from the drawing itself. The **same tag list is appended to that panel's technical-offer
+    row**, so the drawing and the offer agree by construction rather than by care (D-285). A panel
+    nobody has drawn gets no sheet and the quotation is unchanged (D-284). No migration: this is
+    all in the browser, so nothing new reaches staging but the app.
+
+37. **The drawing office: Word and EPLAN** (advanced track, roadmap 4.3) — the EPLAN project name
+    and drawing numbers on the costing, with a paste-in importer that reads whatever shape the
+    export comes in and proposes before it writes; the technical offer as an **editable `.docx`**;
+    and a **parts list** for the drawing office to import, one row per frozen line, carrying the
+    same device tags the panel layout draws (migration 0122). A revision carries the drawing
+    numbers, a copy does not — both added to the hand-written column list that has dropped frozen
+    data twice. Nothing changes a price.
+
+38. **The exceljs/uuid advisory, and the first real test of the exports** (advanced track,
+    maintenance) — the advisory was **never reachable** (exceljs imports only `uuid.v4`, with no
+    buffer; the flaw is in `v3`/`v5`/`v6` with one), and `npm audit fix --force` would have
+    downgraded exceljs breakingly for no gain. Instead an `overrides` entry moves exceljs's uuid to
+    a patched version — **0 vulnerabilities** — with the safety proven by a new round-trip test that
+    writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
+    path (D-292, D-293).
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
@@ -252,6 +293,14 @@ or into go-live.
     decision id in CI, because the rule alone was broken three times in one week. `advanced`
     stays as the copy staging runs, for trying a feature before switching it on.
 
+33. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
+    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
+    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
+    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
+    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
+    faces for a double-front board; and a kit template plus importer so the library can be filled
+    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
+
 ## In hand right now
 
 One line per roadmap item a session has started, so two sessions cannot build the same thing
@@ -260,7 +309,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

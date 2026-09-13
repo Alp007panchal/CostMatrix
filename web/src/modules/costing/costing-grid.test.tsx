@@ -16,7 +16,7 @@ const COSTING = {
   previous_revision_id: null, is_current: true, title: 'Factory', notes: null, status: 'draft',
   currency_code: 'KES', currency_label: 'KSH', exchange_rate: 1, discount_pct: 0,
   material_margin_pct: 10, labour_margin_pct: 20, negotiation_margin_pct: 0,
-  price_rounding_step: 100, tax_pct: 16, enclosure_uplift_pct: 0, chosen_option_label: null,
+  price_rounding_step: 100, tax_pct: 16, enclosure_uplift_pct: 0, chosen_option_label: null, eplan_project: null, drawing_numbers: null,
   submitted_at: null, approved_at: null, returned_at: null, return_comment: null,
   created_at: '', updated_at: '',
 } satisfies Costing

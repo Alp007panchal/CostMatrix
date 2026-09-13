@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { ImportCard } from './ImportCard'
-import { importComponents, importDimensions, importKitGroupHours, importKits } from './import-api'
+import { importComponents, importDimensions, importKitGroupHours, importKitLayout, importKits } from './import-api'
 
 /**
  * The seed importer: the three CSV files under data/seed, in order. The
@@ -71,6 +71,14 @@ export function SeedImportPage() {
         blurb="dimensions-template.csv — one row per part, its number and description already filled in, for you to add width, height, depth, what it mounts on, clearances and weight; for an enclosure cubicle, the usable area inside it and its chambers. Nothing here changes a price or a category, blank rows are counted as not done yet, and the only thing that uses the figures is the space check on a costing panel. Regenerate the file with scripts/build_dimensions_template.py; it keeps what you have already typed."
         required={['partNumber']}
         run={(rows, _second, apply) => importDimensions(rows, target, apply)}
+        onApplied={refresh}
+      />
+      <ImportCard
+        step={5}
+        title="Kit sizes and mounting (optional)"
+        blurb="kit-layout-template.csv — one row per kit, its group, name and main device already filled in, for you to add which mounting design it is built into (busbar-fed, MCCB plates, side-by-side plates, compensation, meter board plate, in-line 3NJ6), the module height it takes on the stack in 50 mm steps, how many fit across a plate, and its footprint where that is not simply the main device. What the panel layout of phase 3.8 places kits by; nothing here changes a price. Regenerate the file with scripts/build_kit_layout_template.py; it keeps what you have already typed."
+        required={['kitName']}
+        run={(rows, _second, apply) => importKitLayout(rows, target, apply)}
         onApplied={refresh}
       />
     </>

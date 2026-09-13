@@ -805,6 +805,115 @@ Components screen waiting for you.
 The grading — how much of the target goes into the biggest step, how much into the next — is a
 company setting, so it can be changed without a new version of the app. Ask and I will change it.
 
+### Lay a panel out (phase 3.8)
+On a panel in a draft costing: **Lay this panel out**. A pop-up opens with three columns — the
+kits on the panel, the board drawn at 1 : 4, and whether it fits.
+
+**Work the board out** arranges the kits by the rules of their mounting designs: a busbar-fed
+device takes a section of its own; MCCB covers stack down a device compartment until it is full and
+then a second section opens; the modular devices and the correction each get a section. Every
+section says which rule made it — open *Why each section is there*.
+
+Then correct it: **drag a kit** from the left onto a section, **double-click** one on the drawing to
+take it off. A drop onto a section built for another design is refused in words, and so is one that
+does not fit what is left.
+
+- **Save layout** keeps the drawing as the next version and **moves no price**. Earlier versions
+  are kept, so you can go back.
+- **Put these cubicles on the costing** takes the widths the drawing needs and adds them as
+  enclosure lines in an *Enclosure* section — ordinary component lines, priced and frozen. A width
+  the catalogue has no cubicle for is named rather than quietly dropped. Pressing it twice is
+  refused; *Replace the ones already there* is the deliberate second pass.
+
+**Two things it tells you honestly.** A kit the library has not described — no mounting design, or
+no module height — is shown in amber, cannot be dragged, and makes its section read *unknown*
+rather than *fits*. And the usable height of a device compartment is **assumed at 1,500 mm** until
+somebody reads it off the S4 dimension drawings; it is a company setting, so correcting it is a
+number rather than a new version of the app.
+
+#### The other four views
+Above the drawing: **Front · Rear · Plan · Door · 3D**.
+
+- **Rear** is the back of the board, with the sections **mirrored** — the order you see them in
+  walking round it. A rear-connection section shows its cable lugs and the cables behind the plates;
+  a front-connection one shows only the shrouded backs of its terminals. On a **double-front**
+  section the back is a device compartment of its own, and this view is an editor too: drag kits onto
+  face B. Dropping onto the back of a one-face section tells you to turn two faces on first.
+- **Plan** looks down on **one** section — the one you last clicked — because depth belongs to a
+  section rather than to the board. It draws the vertical busbar on its side, the mounting plate, the
+  cable alley and the door's swing, with the width and depth dimensioned.
+- **Door** draws the doors with the parts mounted on them. What counts as door-mounted is the
+  component's own **Mounting: door** on the Components screen, never a guess from its name. A
+  door-mounted part with no width and height on record is listed under the drawing instead of being
+  drawn at an invented size.
+- **3D** is an isometric picture for the customer, seen from the left or the right — press *Seen
+  from the left* to turn it round. Turn the **Doors** layer off to show the covers and devices
+  inside. It is a fixed viewpoint, not a model you can spin.
+
+The **layer** chips — Doors, Covers, Busbars, Cables, Tags, Dimensions — only hide and show. The two
+pickers to their right, **cables beside / behind** and **one face / two faces**, *re-arrange the
+board*, so they sit apart from the chips and the next *Work the board out* uses them.
+
+#### One section's settings
+Click a section on the front view and the left column's **Section** panel appears: its cable alley,
+which side the vertical busbar is on, its depth (only the depths the construction actually offers),
+its form, and whether it carries two faces. Every change re-asks the database for the verdict, so a
+choice that makes a section too small is refused by the same rule the costing uses.
+
+**The one that catches people:** putting the cable alley **behind** the plates gives you a wider
+plate — 650 mm instead of 450 on an 800 mm section, so a wider or a second device fits — but it
+needs **800 mm of depth and access from the back**. Choose it on a shallower section and the verdict
+reads *will not fit* and says why, in millimetres. That is deliberate: the cables have nowhere to go.
+
+A **double-front** section is judged face by face, and fits only when **both** faces fit. Taking the
+second face off while kits are still on it is refused rather than losing them.
+
+Under *Does it fit?* the board's own line reads its width, height, depth and roughly what it
+weighs — summed from the weights on its parts, saying how many parts carry none.
+
+#### The drawing on the quotation (Annexure V)
+Save a layout and it prints with the quotation. On the **Release** screen, *Preview* or release as
+usual: after Annexure IV comes **Annexure V — General Arrangement**, one **landscape** page per
+panel that has a saved layout, and the cover letter's annexure list grows to five.
+
+- A panel you have **not** laid out gets **no sheet**, and a quotation with no layouts at all looks
+  exactly as it did before — four annexures, nothing landscape. Nothing is ever drawn from a guess.
+- Each device carries a tag — **Q1, Q2 …** — and the same list is added to that panel's row in
+  Annexure IV, as *Device tags (see Annexure V)*. They cannot disagree: they are numbered once.
+- A device the library has never measured is drawn with a **dashed** outline and labelled *size not
+  on record*. That is the prompt to fill its module height in.
+- The scale is chosen so the board fills the page and is printed on the sheet, beside *not to scale
+  on print — work to the dimensions*. A print dialog can shrink a page; the dimensions cannot lie.
+- The footer takes the **form** and the access from the drawing itself and adds the panel's own
+  enclosure note where it has one. A board whose form nobody chose prints no form.
+
+On a **double-front** board the sheet says so and notes that face B is not shown: a front elevation
+cannot show it. A rear-elevation sheet is the next thing to add if you want one.
+
+### Fill in what the panel layout will need (phase 3.8, fields only)
+The layout pop-up itself is not built yet — the specification and the mockups are in
+`docs/reference/panel-layout-spec.md` — but the library can be filled in now, so that when it is
+built there is something to draw.
+
+Two places, whichever suits you:
+
+- **On a kit** (Kits → open one): under the footprint, three new boxes — **Mounting design** (how the
+  kit is built into a board: busbar-fed, MCCB plates, side-by-side plates, compensation, meter board
+  plate, in-line 3NJ6), **Module height** in millimetres (the S4 cover height it takes on the stack,
+  in 50 mm steps), and **Positions per plate** (only where it is not simply the plate width divided
+  by the device). Blank is fine: the layout will call such a kit unsized rather than guess.
+- **In bulk**: `python3 scripts/build_kit_layout_template.py` writes
+  `data/seed/kit-layout-template.csv`, one row per kit with its group, name and main device already
+  filled in. Fill what you know, then **Import → step 5, Kit sizes and mounting**. It previews first,
+  a blank cell is left alone so the file can be filled a group at a time, and re-running the script
+  keeps what you have typed. A module height that is not a whole 50 mm, or a design that is not one
+  of the six, is refused by name rather than quietly ignored.
+
+The widths and depths a board can be built in live in a table of their own, seeded with **SIVACON
+S4** from the Application Manual. **S8, the meter board and our own double-front frame are named and
+empty** — those figures are yours, and a made-up width would be worse than a blank one. Tell me the
+lists and I will put them in.
+
 ### Work out the busbar runs (phase 4.1)
 This is your `CU-OPT1` sheet, on the panel. In a draft costing, on the panel: **Work out the
 busbar runs**.
@@ -963,6 +1072,51 @@ detail: Vercel dashboard shows deployments; Supabase dashboard shows database he
 ### Download a backup (see Part E)
 Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the
 backup job stores it.
+
+### Hand the job to the drawing office (phase 4.3)
+On a costing, the **The drawing office** card. It changes no price — everything on it is a
+reference or a file.
+
+**The references.** Type the **EPLAN project** as the drawing office names it and the **drawing
+numbers**, one per line, then *Save project details*. They go on the costing, they appear on the
+exports, and a **revision carries them** — it is the same board on the same drawings. A **copy**
+starts with none, because a copy is a different job that will have its own.
+
+Rather than typing them, press **Paste an EPLAN project export instead** and paste the project
+properties straight out of EPLAN. It reads whatever shape they come in — `Project name: …`,
+`Drawing no = …`, a two-column export, tabs — shows you what it found, and saves nothing until you
+press the save button in that box. **Every line it could not read is listed**, so if your export
+uses a field name it does not know, you will see it rather than wonder why nothing happened. Tell
+me the name and I will add it.
+
+**The technical offer as Word.** *Technical offer as Word* writes a real `.docx` onto your machine,
+one heading per panel with the description as editable paragraphs. It is a **copy**: edit it, send
+it, nothing you type in it reaches the costing or the quotation.
+
+**The parts list.** *Parts list (CSV)* or *(Excel)* writes one row per line of the costing, with
+these columns, in this order:
+
+> Device tag · Part number · Manufacturer · Description · Quantity · Unit · Panel · Panel quantity ·
+> Section · Kit · Mounting · Width mm · Height mm · Depth mm · Weight kg · Our code · Category ·
+> Costing · EPLAN project · Drawing numbers
+
+The order is fixed on purpose: the drawing office maps it in EPLAN's parts import **once** and then
+never again. Three things to know:
+
+- **Quantity is per panel**, with the panel count in the next column — not multiplied together. A
+  board built twice shows 1 and 2, so nobody double-orders.
+- **Device tag** is the tag the panel layout draws (`Q1`, `Q2` …). Lay a panel out and its kits'
+  parts carry their tags; don't, and the column is blank — the list still imports, the devices just
+  will not match a drawing.
+- The card **warns you before you export**: how many rows have no manufacturer part number (EPLAN
+  matches on that, so those rows will not find a part) and how many kits are not placed yet.
+
+The figures are the **frozen** ones, so an old costing exports what was actually quoted rather than
+what the catalogue says today.
+
+*Not verified against a real EPLAN installation* — there is none here. The columns follow EPLAN's
+parts-import fields and are documented above; if the mapping needs a different heading, say which
+and it is a one-line change.
 
 ---
 

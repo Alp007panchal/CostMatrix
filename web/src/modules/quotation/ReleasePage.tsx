@@ -7,6 +7,7 @@ import type { QuotationTerms, ReleaseTexts } from '../../lib/database.types'
 import { getCompanySettings, listFooterLogos } from '../admin/api'
 import { getEnquiry, listContacts, listCustomers } from '../crm/api'
 import { getCostingDetail } from '../costing/api'
+import { savedLayoutsFor } from '../layout/layout-api'
 import { logoAsDataUrl, releaseQuotation, uploadQuotationPdf } from './api'
 import { prepareQuotationPdf } from './pdf/prepare'
 import { renderQuotationPdf } from './pdf/render'
@@ -81,9 +82,12 @@ export function ReleasePage() {
   async function buildPdf(referenceNo: string): Promise<Blob> {
     if (!detail.data || !company || !settings.data) throw new Error('Still loading')
     const s = settings.data
-    const [logo, footers] = await Promise.all([
+    const [logo, footers, layouts] = await Promise.all([
       logoAsDataUrl(company.logo_path),
       Promise.all((footerLogos.data ?? []).map((l) => logoAsDataUrl(l.image_path))),
+      // Roadmap 3.8: the general-arrangement sheets come from whatever layouts
+      // somebody saved. None saved, no sheets, and the quotation is unchanged.
+      savedLayoutsFor(detail.data.panels.map((panel) => panel.id)).catch(() => []),
     ])
     const data = prepareQuotationPdf({
       detail: detail.data,
@@ -100,6 +104,7 @@ export function ReleasePage() {
       subject: form.subject, salutation: form.salutation, introText: form.intro_text, closingText: form.closing_text,
       notesOnOffer: form.notes_on_offer || null, terms: form.terms,
       signatoryName: form.signatory_name || null, signatoryEmail: form.signatory_email || null,
+      layouts,
     })
     return renderQuotationPdf(data)
   }
