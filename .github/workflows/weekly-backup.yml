@@ -1,0 +1,119 @@
+name: Weekly backup
+
+# Takes a full copy of the production database once a week and keeps it away
+# from the Supabase account, so a problem with that account — a bad migration,
+# a billing lapse, a deleted project — does not take the backups with it.
+#
+# This is layer 2 of the three in docs/operations.md Part E. Layer 1 is
+# Supabase's own daily backups; layer 3 is that quotation PDFs can be
+# regenerated from the costing data.
+#
+# **Where the dump goes.** A GitHub Actions artifact, kept for 90 days. That is
+# off the Supabase account, which is the point of this layer, but it is not off
+# GitHub. Moving it further away needs one secret and a bucket; the runbook says
+# what to add and this file picks it up automatically once it is there.
+#
+# Uses the same three production secrets as "Deploy database" (operations B5):
+#   SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
+
+on:
+  schedule:
+    # 02:15 UTC every Sunday — 05:15 in Nairobi, when nobody is costing.
+    - cron: '15 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Dump the production database
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the production secrets are set
+        run: |
+          missing=0
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_PROJECT_REF SUPABASE_DB_PASSWORD; do
+            case "$name" in
+              SUPABASE_ACCESS_TOKEN) value="${{ secrets.SUPABASE_ACCESS_TOKEN }}" ;;
+              SUPABASE_PROJECT_REF)  value="${{ secrets.SUPABASE_PROJECT_REF }}" ;;
+              SUPABASE_DB_PASSWORD)  value="${{ secrets.SUPABASE_DB_PASSWORD }}" ;;
+            esac
+            if [ -z "$value" ]; then
+              echo "::error::The repository secret $name is not set. See docs/operations.md Part B5."
+              missing=1
+            fi
+          done
+          [ "$missing" = 0 ]
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link the project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+
+      # Three files, because one of them alone would not restore: the roles and
+      # the schema rebuild an empty database, and the data fills it.
+      - name: Dump the database
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p backup
+          supabase db dump --role-only -f backup/roles.sql
+          supabase db dump            -f backup/schema.sql
+          supabase db dump --data-only -f backup/data.sql
+          date -u +'%Y-%m-%dT%H:%M:%SZ' > backup/taken-at.txt
+          git rev-parse HEAD >> backup/taken-at.txt
+
+      # A dump that restores nothing is worse than no dump, because it is
+      # believed. These are the cheap checks that catch an empty one.
+      - name: Check the dump is not empty
+        run: |
+          set -euo pipefail
+          for f in backup/roles.sql backup/schema.sql backup/data.sql; do
+            size=$(wc -c < "$f")
+            echo "$f: $size bytes"
+            if [ "$size" -lt 1000 ]; then
+              echo "::error::$f is $size bytes. That is not a backup; something went wrong."
+              exit 1
+            fi
+          done
+          for table in components assemblies costings; do
+            if ! grep -q "public\.$table" backup/schema.sql; then
+              echo "::error::the schema dump does not mention public.$table."
+              exit 1
+            fi
+          done
+          echo "The dump has the shape of a real database."
+
+      - name: Keep it
+        uses: actions/upload-artifact@v4
+        with:
+          name: costmatrix-backup-${{ github.run_number }}
+          path: backup/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Say what was taken
+        run: |
+          {
+            echo "### Weekly backup"
+            echo
+            echo "Taken $(head -1 backup/taken-at.txt) from the production project."
+            echo
+            echo '| File | Size |'
+            echo '|---|---|'
+            for f in backup/*.sql; do
+              echo "| $(basename "$f") | $(du -h "$f" | cut -f1) |"
+            done
+            echo
+            echo 'Kept as an artifact on this run for 90 days. Download it from the'
+            echo '**Artifacts** section at the bottom of this page.'
+            echo
+            echo 'See docs/operations.md Part E for the restore drill.'
+          } >> "$GITHUB_STEP_SUMMARY"

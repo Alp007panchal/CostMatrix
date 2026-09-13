@@ -265,8 +265,10 @@ or into go-live.
 
 ## Slice 6 — Go-live hardening (about one week)
 
-- Restore drill from the weekly dump into a fresh project, written up and dated in `decisions.md`.
-- Staging environment added (second Supabase project plus preview deploys).
+- ~~Restore drill from the weekly dump into a fresh project~~ — **the weekly dump now exists**
+  (`weekly-backup.yml`, 13 Sep) and `restore-drill.sh` rehearses the mechanism in CI. What is left is
+  the owner running the drill once against the real dump and dating it in `decisions.md`.
+- ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
 - Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
 - Custom domain and email sender for Supabase Auth invitations.
