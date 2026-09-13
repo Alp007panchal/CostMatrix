@@ -222,7 +222,6 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 3.8 panel layout, stage 2 (rear, side, door and 3D views, then the GA sketch) | `claude/advanced-p38-stage-two` | 2026-09-13 04:10 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
@@ -254,6 +253,15 @@ the work begins, removed when the pull request opens.
     the unit that design counts in, and the enclosure line the drawing asks for, applied only when
     a person presses the button (migration 0120). The rear, side, door and 3D views and the GA
     sketch are stage two.
+
+34. **The panel layout, stage two — the other four views** (advanced track, roadmap 3.8) — the
+    back of the board (cable lugs on a rear-connection section, shrouded terminals on a
+    front-connection one, sections mirrored), the plan looking down on one section, the doors with
+    the parts whose mounting type says door, and a fixed isometric for the customer; per-section
+    settings for depth, busbar side, form and where the cables run; and **double-front sections
+    judged face by face** (migration 0121). Two rules changed rather than were added: a cable alley
+    behind the plates widens the plate and costs depth, and a section too shallow for its own cables
+    does not fit. The GA sketch in the quotation PDF is the one piece of stage two still to come.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

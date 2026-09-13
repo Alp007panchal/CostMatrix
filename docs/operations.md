@@ -805,7 +805,7 @@ Components screen waiting for you.
 The grading — how much of the target goes into the biggest step, how much into the next — is a
 company setting, so it can be changed without a new version of the app. Ask and I will change it.
 
-### Lay a panel out (phase 3.8, stage one)
+### Lay a panel out (phase 3.8)
 On a panel in a draft costing: **Lay this panel out**. A pop-up opens with three columns — the
 kits on the panel, the board drawn at 1 : 4, and whether it fits.
 
@@ -831,8 +831,47 @@ rather than *fits*. And the usable height of a device compartment is **assumed a
 somebody reads it off the S4 dimension drawings; it is a company setting, so correcting it is a
 number rather than a new version of the app.
 
-Stage one is the front view. The **Rear**, **Side**, **Door** and **3D** tabs are shown as *later*,
-and the GA sketch for Annexure IV comes with them.
+#### The other four views
+Above the drawing: **Front · Rear · Plan · Door · 3D**.
+
+- **Rear** is the back of the board, with the sections **mirrored** — the order you see them in
+  walking round it. A rear-connection section shows its cable lugs and the cables behind the plates;
+  a front-connection one shows only the shrouded backs of its terminals. On a **double-front**
+  section the back is a device compartment of its own, and this view is an editor too: drag kits onto
+  face B. Dropping onto the back of a one-face section tells you to turn two faces on first.
+- **Plan** looks down on **one** section — the one you last clicked — because depth belongs to a
+  section rather than to the board. It draws the vertical busbar on its side, the mounting plate, the
+  cable alley and the door's swing, with the width and depth dimensioned.
+- **Door** draws the doors with the parts mounted on them. What counts as door-mounted is the
+  component's own **Mounting: door** on the Components screen, never a guess from its name. A
+  door-mounted part with no width and height on record is listed under the drawing instead of being
+  drawn at an invented size.
+- **3D** is an isometric picture for the customer, seen from the left or the right — press *Seen
+  from the left* to turn it round. Turn the **Doors** layer off to show the covers and devices
+  inside. It is a fixed viewpoint, not a model you can spin.
+
+The **layer** chips — Doors, Covers, Busbars, Cables, Tags, Dimensions — only hide and show. The two
+pickers to their right, **cables beside / behind** and **one face / two faces**, *re-arrange the
+board*, so they sit apart from the chips and the next *Work the board out* uses them.
+
+#### One section's settings
+Click a section on the front view and the left column's **Section** panel appears: its cable alley,
+which side the vertical busbar is on, its depth (only the depths the construction actually offers),
+its form, and whether it carries two faces. Every change re-asks the database for the verdict, so a
+choice that makes a section too small is refused by the same rule the costing uses.
+
+**The one that catches people:** putting the cable alley **behind** the plates gives you a wider
+plate — 650 mm instead of 450 on an 800 mm section, so a wider or a second device fits — but it
+needs **800 mm of depth and access from the back**. Choose it on a shallower section and the verdict
+reads *will not fit* and says why, in millimetres. That is deliberate: the cables have nowhere to go.
+
+A **double-front** section is judged face by face, and fits only when **both** faces fit. Taking the
+second face off while kits are still on it is refused rather than losing them.
+
+Under *Does it fit?* the board's own line reads its width, height, depth and roughly what it
+weighs — summed from the weights on its parts, saying how many parts carry none.
+
+The GA sketch for Annexure IV is the one piece still to come.
 
 ### Fill in what the panel layout will need (phase 3.8, fields only)
 The layout pop-up itself is not built yet — the specification and the mockups are in

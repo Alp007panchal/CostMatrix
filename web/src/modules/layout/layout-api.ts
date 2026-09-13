@@ -1,10 +1,13 @@
 import { supabase } from '../../lib/supabase'
 import type {
+  CableAlley,
+  LayoutDoorDevice,
   LayoutEnclosureApplied,
   LayoutFit,
   LayoutKit,
   LayoutPlan,
   LayoutSection,
+  LayoutWeight,
 } from '../../lib/database.types'
 
 /**
@@ -30,11 +33,22 @@ export async function layoutKits(panelId: string): Promise<LayoutKit[]> {
   return (data ?? []) as LayoutKit[]
 }
 
-/** The sections this board needs, and the rule that made each one. Writes nothing. */
-export async function arrangePanel(panelId: string, construction: string): Promise<LayoutPlan> {
+/**
+ * The sections this board needs, and the rule that made each one. Writes nothing.
+ * Stage two added how the board is built — one face or two — and where its cables
+ * run, because both change the sections the rules produce.
+ */
+export async function arrangePanel(
+  panelId: string,
+  construction: string,
+  access: 'single_front' | 'double_front' = 'single_front',
+  cableAlley: CableAlley = 'beside',
+): Promise<LayoutPlan> {
   const { data, error } = await supabase.rpc('arrange_panel', {
     target_panel: panelId,
     construction,
+    access,
+    cable_alley: cableAlley,
   })
   fail('Could not work the board out', error)
   return data as LayoutPlan
@@ -96,10 +110,20 @@ export async function applyLayoutEnclosure(
 }
 
 /** The constructions a board can be built in, for the picker. */
-export async function constructions(): Promise<{ code: string; name: string; height_mm: number | null }[]> {
+export async function constructions(): Promise<
+  {
+    code: string
+    name: string
+    height_mm: number | null
+    allows_double_front: boolean
+    depths_busbar_top_mm: number[]
+    depths_busbar_rear_mm: number[]
+    forms: string[]
+  }[]
+> {
   const { data, error } = await supabase
     .from('layout_constructions')
-    .select('code, name, height_mm, widths_mm')
+    .select('code, name, height_mm, widths_mm, allows_double_front, depths_busbar_top_mm, depths_busbar_rear_mm, forms')
     .eq('is_active', true)
     .order('code')
   fail('Could not read the constructions', error)
@@ -107,5 +131,31 @@ export async function constructions(): Promise<{ code: string; name: string; hei
     code: string
     name: string
     height_mm: number | null
+    allows_double_front: boolean
+    depths_busbar_top_mm: number[]
+    depths_busbar_rear_mm: number[]
+    forms: string[]
   }[]
+}
+
+/** The parts of this panel that are mounted on the door (stage two). */
+export async function doorDevices(panelId: string): Promise<LayoutDoorDevice[]> {
+  const { data, error } = await supabase
+    .from('v_panel_door_devices')
+    .select('panel_id, costing_assembly_id, kit_name, name, code, quantity, width_mm, height_mm, category_code')
+    .eq('panel_id', panelId)
+    .order('name')
+  fail('Could not read what is on the door', error)
+  return (data ?? []) as LayoutDoorDevice[]
+}
+
+/** Roughly what the panel weighs, and how much of it has no weight on record. */
+export async function panelWeight(panelId: string): Promise<LayoutWeight | null> {
+  const { data, error } = await supabase
+    .from('v_panel_layout_weight')
+    .select('panel_id, weight_kg, without_weight, lines')
+    .eq('panel_id', panelId)
+    .limit(1)
+  fail('Could not read the weight', error)
+  return ((data ?? [])[0] ?? null) as LayoutWeight | null
 }

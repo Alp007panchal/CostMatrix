@@ -1403,6 +1403,9 @@ export interface LayoutFace {
   placements: LayoutPlacement[]
 }
 
+/** Where a section's outgoing cables run, which decides its plate width. */
+export type CableAlley = 'beside' | 'behind'
+
 /** One section of the board. */
 export interface LayoutSection {
   name: string
@@ -1411,6 +1414,11 @@ export interface LayoutSection {
   access: 'single_front' | 'double_front'
   design: MountingDesign | string
   faces: LayoutFace[]
+  /** Added by stage two; a section saved by stage one has none of them. */
+  depth_mm?: number
+  form?: string
+  busbar_side?: 'left' | 'right'
+  cable_alley?: CableAlley
 }
 
 /** What app.arrange_panel answers. Writes nothing. */
@@ -1425,9 +1433,31 @@ export interface LayoutPlan {
   unsized: { name: string; why: string }[]
   kvar: { used: number; limit_per_section: number | null }
   assumed: { device_compartment_mm: number; note: string }
+  /** The board's own dimensions, from the construction's lists (stage two). */
+  access?: 'single_front' | 'double_front'
+  cable_alley?: CableAlley
+  depth_mm?: number
+  height_mm?: number | null
+  base_mm?: number
 }
 
-/** One section's verdict. */
+export type LayoutVerdict = 'fits' | 'tight' | 'no_fit' | 'unknown' | 'empty'
+
+/** One face's verdict. A double-front section has two (stage two). */
+export interface LayoutFitFace {
+  side: 'front' | 'rear'
+  connection: 'front' | 'rear'
+  design: MountingDesign | string
+  used: number
+  capacity: number | null
+  unit: string
+  plate_width_mm: number | null
+  unsized: number
+  verdict: LayoutVerdict
+  why: string
+}
+
+/** One section's verdict: the figures of its worst face. */
 export interface LayoutFitSection {
   name: string
   design: MountingDesign | string
@@ -1436,16 +1466,45 @@ export interface LayoutFitSection {
   capacity: number | null
   unit: string
   unsized: number
-  verdict: 'fits' | 'tight' | 'no_fit' | 'unknown' | 'empty'
+  verdict: LayoutVerdict
   why: string
+  /** Added by stage two. */
+  depth_mm?: number | null
+  access?: 'single_front' | 'double_front'
+  cable_alley?: CableAlley
+  /** Set when the section is too shallow for the arrangement drawn on it. */
+  too_shallow?: string | null
+  faces?: LayoutFitFace[]
 }
 
 /** What app.layout_fit answers. */
 export interface LayoutFit {
-  verdict: 'fits' | 'tight' | 'no_fit' | 'unknown' | 'empty'
+  verdict: LayoutVerdict
   sections: LayoutFitSection[]
   section_count: number
   total_width_mm: number
+  max_depth_mm?: number | null
+}
+
+/** One part mounted on the door rather than inside (v_panel_door_devices). */
+export interface LayoutDoorDevice {
+  panel_id: string
+  costing_assembly_id: string
+  kit_name: string | null
+  name: string
+  code: string
+  quantity: number
+  width_mm: number | null
+  height_mm: number | null
+  category_code: string
+}
+
+/** Roughly what a panel weighs (v_panel_layout_weight). */
+export interface LayoutWeight {
+  panel_id: string
+  weight_kg: number | null
+  without_weight: number
+  lines: number
 }
 
 /** What app.apply_layout_enclosure answers. */

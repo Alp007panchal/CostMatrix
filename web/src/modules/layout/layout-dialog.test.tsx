@@ -12,6 +12,8 @@ const saveLayout = vi.fn()
 const savedLayout = vi.fn()
 const applyLayoutEnclosure = vi.fn()
 const constructions = vi.fn()
+const doorDevices = vi.fn()
+const panelWeight = vi.fn()
 vi.mock('./layout-api', () => ({
   layoutKits: (...a: unknown[]) => layoutKits(...a),
   arrangePanel: (...a: unknown[]) => arrangePanel(...a),
@@ -20,6 +22,8 @@ vi.mock('./layout-api', () => ({
   savedLayout: (...a: unknown[]) => savedLayout(...a),
   applyLayoutEnclosure: (...a: unknown[]) => applyLayoutEnclosure(...a),
   constructions: (...a: unknown[]) => constructions(...a),
+  doorDevices: (...a: unknown[]) => doorDevices(...a),
+  panelWeight: (...a: unknown[]) => panelWeight(...a),
 }))
 
 const KITS: LayoutKit[] = [
@@ -61,7 +65,10 @@ const FIT: LayoutFit = {
 
 beforeEach(() => {
   layoutKits.mockResolvedValue(KITS)
-  constructions.mockResolvedValue([{ code: 'S4', name: 'Siemens SIVACON S4', height_mm: 2000 }])
+  constructions.mockResolvedValue([{ code: 'S4', name: 'Siemens SIVACON S4', height_mm: 2000,
+    allows_double_front: false, depths_busbar_top_mm: [400, 600, 800], depths_busbar_rear_mm: [800, 1000], forms: ['2b'] }])
+  doorDevices.mockResolvedValue([])
+  panelWeight.mockResolvedValue(null)
   savedLayout.mockResolvedValue(null)
   arrangePanel.mockResolvedValue(PLAN)
   layoutFit.mockResolvedValue(FIT)
@@ -96,7 +103,7 @@ describe('the panel layout pop-up', () => {
   it('arranges the board and shows the verdict per section', async () => {
     open()
     fireEvent.click(await screen.findByText('Work the board out'))
-    await waitFor(() => expect(arrangePanel).toHaveBeenCalledWith('p1', 'S4'))
+    await waitFor(() => expect(arrangePanel).toHaveBeenCalledWith('p1', 'S4', 'single_front', 'beside'))
     expect(await screen.findByText(/2 sections, arranged by the rules/)).toBeTruthy()
     // The headline verdict and the row for S1 both read it, which is the point.
     await waitFor(() => expect(screen.getAllByText('Fits, tight').length).toBeGreaterThan(1))
@@ -157,9 +164,11 @@ describe('the panel layout pop-up', () => {
     expect(await screen.findByText('Work the board out')).toHaveProperty('disabled', true)
   })
 
-  it('shows the later views as coming rather than hiding them', async () => {
+  it('offers all five views of the board', async () => {
     open()
-    expect(await screen.findByText('Rear — later')).toBeTruthy()
-    expect(screen.getByText('3D — later')).toBeTruthy()
+    expect(await screen.findByText('Front')).toBeTruthy()
+    for (const name of ['Rear', 'Plan', 'Door', '3D']) {
+      expect(screen.getByText(name)).toBeTruthy()
+    }
   })
 })
