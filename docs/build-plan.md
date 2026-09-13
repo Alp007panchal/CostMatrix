@@ -286,7 +286,7 @@ the work begins, removed when the pull request opens.
     downgraded exceljs breakingly for no gain. Instead an `overrides` entry moves exceljs's uuid to
     a patched version — **0 vulnerabilities** — with the safety proven by a new round-trip test that
     writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
-    path (D-289, D-290).
+    path (D-292, D-293).
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
