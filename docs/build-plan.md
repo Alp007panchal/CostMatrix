@@ -279,6 +279,14 @@ straight to `main`, reviewed and merged by the owner the same day.
     writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
     path (D-292, D-293).
 
+39. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
+    signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
+    else will ever mention it), a costing waiting for an approver — shown only to somebody who can
+    actually approve — a quotation released and never marked sent, and one sent that has been
+    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0126, one view,
+    no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
+    when the desk is clear rather than saying so.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
@@ -310,7 +318,6 @@ the work begins, removed when the pull request opens.
 | Item | Session | Since |
 |---|---|---|
 | Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
-| What is on your desk: the home page showing costings returned to you, jobs waiting for an approver and quotations nobody has answered | `claude/home-desk` | 2026-09-13 14:20 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
