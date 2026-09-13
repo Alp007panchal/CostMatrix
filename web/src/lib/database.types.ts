@@ -1520,3 +1520,48 @@ export interface LayoutEnclosureApplied {
   missing: { width_mm: number; quantity: number; why: string }[]
   wanted: Record<string, number>
 }
+
+/** One fault the library has, live (v_library_issues, migration 0125). */
+export interface LibraryIssue {
+  company_id: string | null
+  library: 'master' | 'private'
+  entity: 'part' | 'kit'
+  entity_id: string
+  code: string
+  name: string
+  /** How many kits hold this part. Zero on a kit row. */
+  used_by_kits: number
+  kind: LibraryIssueKind
+  severity: LibrarySeverity
+  sort_order: number
+  detail: string
+  fix_on: string
+}
+
+export type LibrarySeverity = 'refuses' | 'silent' | 'check'
+
+export type LibraryIssueKind =
+  | 'part_no_price'
+  | 'part_placeholder'
+  | 'part_no_factor'
+  | 'part_no_rate'
+  | 'kit_unpriced_part'
+  | 'kit_no_lines'
+  | 'kit_no_group'
+  | 'kit_no_hours'
+  | 'kit_only_main_device'
+  | 'kit_no_main_device'
+  | 'kit_no_rating'
+  | 'kit_obsolete_part'
+
+/** The same faults counted by kind (v_library_health). */
+export interface LibraryHealthRow {
+  library: 'master' | 'private'
+  kind: LibraryIssueKind
+  severity: LibrarySeverity
+  sort_order: number
+  fix_on: string
+  items: number
+  used_by_kits: number
+  examples: string[]
+}

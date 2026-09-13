@@ -279,6 +279,15 @@ straight to `main`, reviewed and merged by the owner the same day.
     writes every export through the real exceljs, reads it back, and drives exceljs's own uuid code
     path (D-292, D-293).
 
+39. **Library health** (maintenance) — the data-quality list that has sat in `data/seed/README.md`
+    since the day the seed was built, read from the **live library** instead and sorted by what each
+    fault does to a costing: *stops a costing* (a part with no price, a kit holding one, a currency
+    whose landed factor has gone), *costs and leaves something out* (a kit in no group, or whose
+    group has no hours — zero labour, silently), *worth a look* (only a main device, no rating).
+    Each row names the screen that fixes it. Migration 0125, two views, no write anywhere. The
+    `refuses` rules test the same predicate the engine's refusal tests, and a test proves the view
+    and the error message name the same part.
+
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
@@ -310,7 +319,6 @@ the work begins, removed when the pull request opens.
 | Item | Session | Since |
 |---|---|---|
 | Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
-| Library health: the data-quality list in `data/seed/README.md` shown in the app, against live data | `claude/library-health` | 2026-09-13 14:05 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

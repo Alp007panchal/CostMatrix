@@ -30,6 +30,7 @@ const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m)
 const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage').then((m) => ({ default: m.ApprovalRulesPage })))
 const FeaturesPage = lazy(() => import('../modules/admin/FeaturesPage').then((m) => ({ default: m.FeaturesPage })))
 const CompatibilityRulesPage = lazy(() => import('../modules/admin/CompatibilityRulesPage').then((m) => ({ default: m.CompatibilityRulesPage })))
+const LibraryHealthPage = lazy(() => import('../modules/library/LibraryHealthPage').then((m) => ({ default: m.LibraryHealthPage })))
 const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePage').then((m) => ({ default: m.LabourVariancePage })))
 const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
@@ -134,6 +135,16 @@ export function App() {
                   <RequireRole role="company_admin">
                     <FeatureGate code="compatibility_checks">
                       <CompatibilityRulesPage />
+                    </FeatureGate>
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="library/health"
+                element={
+                  <RequireRole role="company_admin">
+                    <FeatureGate code="library_health">
+                      <LibraryHealthPage />
                     </FeatureGate>
                   </RequireRole>
                 }
