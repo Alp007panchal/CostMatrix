@@ -49,6 +49,50 @@ export interface PdfTerm {
   body: string
 }
 
+/** One device drawn on a GA sheet, with the tag the technical offer repeats. */
+export interface PdfGaDevice {
+  tag: string
+  label: string
+  costingAssemblyId: string
+  face: 'front' | 'rear'
+  heightMm: number
+  yMm: number
+  quantity: number
+  unsized: boolean
+}
+
+/** One section of the board, as the GA sheet draws it. */
+export interface PdfGaSection {
+  name: string
+  widthMm: number
+  depthMm: number | null
+  design: string
+  designWords: string
+  busbarCompartmentMm: number
+  form: string | null
+  doubleFront: boolean
+  devices: PdfGaDevice[]
+}
+
+/**
+ * One general-arrangement sheet: the front elevation of one panel, on its own
+ * landscape page (spec §5). Only panels with a saved layout get one.
+ */
+export interface PdfGaSheet {
+  panelId: string
+  panelName: string
+  optionLabel: string | null
+  construction: string
+  version: number
+  widthMm: number
+  heightMm: number
+  baseMm: number
+  depthMm: number | null
+  sections: PdfGaSection[]
+  specLine: string
+  hasRearFace: boolean
+}
+
 export interface QuotationPdfData {
   letterhead: PdfLetterhead
   referenceNo: string
@@ -66,4 +110,6 @@ export interface QuotationPdfData {
   schedules: PdfSchedule[]
   terms: PdfTerm[]
   technical: PdfTechnicalRow[]
+  /** Annexure V, one landscape sheet per panel that has a saved layout. */
+  gaSheets: PdfGaSheet[]
 }

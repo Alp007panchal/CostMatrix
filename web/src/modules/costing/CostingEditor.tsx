@@ -21,6 +21,8 @@ import { TotalsPanel } from './TotalsPanel'
 import { HistoryPanel } from './HistoryPanel'
 import { QuotationLine } from '../quotation/QuotationLine'
 import { BomExports } from './BomExports'
+import { EplanCard } from './EplanCard'
+import { buildTechnical } from '../quotation/pdf/prepare'
 import { LabourWarning } from './LabourWarning'
 import { DocumentFiles } from '../documents/DocumentFiles'
 import { BomImportCard } from './BomImportCard'
@@ -359,6 +361,23 @@ export function CostingEditor() {
               canApply={editable}
               onApplied={() => void refresh()}
             />
+
+            {/* Roadmap 4.3: the drawing office's references, and the two exports it asks for. */}
+            {on('eplan_exports') && (
+              <EplanCard
+                costingId={costing.id}
+                costingNo={costing.costing_no}
+                revisionNo={costing.revision_no}
+                title={costing.title}
+                customerName={null}
+                companyName={company.name}
+                eplanProject={costing.eplan_project}
+                drawingNumbers={costing.drawing_numbers}
+                technical={buildTechnical({ costing, panels, assemblies, items, labour, assemblyTotals, panelPrices, totals, optionTotals, kits })}
+                editable={editable}
+                onSaved={() => void refresh()}
+              />
+            )}
 
             <BomExports costingId={costing.id} costingNo={costing.costing_no} revisionNo={costing.revision_no} currencyLabel={label} />
             <HistoryPanel costingId={costing.id} />

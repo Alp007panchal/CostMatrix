@@ -2,10 +2,18 @@ import { Document, Page, Text, View } from '@react-pdf/renderer'
 import type { QuotationPdfData } from './types'
 import { s } from './styles'
 import { Letterhead, Cell } from './Chrome'
+import { GaSheet } from './GaSheet'
 
 /**
- * The quotation, laid out as the reference document is: a cover letter, then
- * four annexures. Every page carries the letterhead.
+ * The quotation, laid out as the reference document is: a cover letter, then the
+ * four annexures, and — where a panel has a saved layout — a fifth annexure of
+ * general-arrangement sheets, one landscape page each (roadmap 3.8, spec §5).
+ *
+ * Annexure IV is the detailed technical offer in the owner's own quotations, so
+ * the drawing is **Annexure V** rather than renumbering a format his customers
+ * already know. A quotation with no saved layouts is byte-identical to one
+ * released before the layout existed: the list below stays at four and no
+ * landscape page is added.
  */
 export function QuotationDocument({ data }: { data: QuotationPdfData }) {
   return (
@@ -31,6 +39,9 @@ export function QuotationDocument({ data }: { data: QuotationPdfData }) {
             ['Annexure 2:', 'Commercial Terms (Schedule of Prices)'],
             ['Annexure 3:', 'Specific Terms & Conditions'],
             ['Annexure 4:', 'Detailed Technical Offer'],
+            ...(data.gaSheets.length > 0
+              ? [['Annexure 5:', 'General Arrangement Drawings']]
+              : []),
           ].map(([k, v]) => (
             <View key={k} style={s.annexItem}>
               <Text style={s.annexKey}>{k}</Text>
@@ -170,6 +181,19 @@ export function QuotationDocument({ data }: { data: QuotationPdfData }) {
           ))}
         </View>
       </Page>
+
+      {data.gaSheets.map((sheet, i) => (
+        <GaSheet
+          key={sheet.panelId}
+          sheet={sheet}
+          referenceNo={data.referenceNo}
+          companyName={data.letterhead.companyName}
+          customerName={data.customerName}
+          dateLong={data.dateLong}
+          sheetNo={i + 1}
+          sheetCount={data.gaSheets.length}
+        />
+      ))}
     </Document>
   )
 }

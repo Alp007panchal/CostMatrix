@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CostMatrix — panel-layout-plan-view (mockup)</title>
+</head>
+<body>
+
+
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2937; background: #ffffff; }
+    a { color: #1d4ed8; } a:hover { color: #1e40af; }
+    svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  </style>
+
+<div style="width: 1000px; height: 640px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #e5e7eb;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="font-size: 18px; font-weight: 700; color: #111827;">Plan (depth) view — MCCB section, two ways to arrange it</div>
+      <div style="font-size: 13px; color: #6b7280;">Looking down on one 800 (W) × 800 (D) section · the toggle at the top of the pop-up switches between Front view and Plan</div>
+    </div>
+    <div style="display: flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; font-size: 14px;">
+      <div style="padding: 8px 14px; background: #ffffff; color: #374151;">Front view</div>
+      <div style="padding: 8px 14px; background: #1d4ed8; color: #ffffff; font-weight: 600;">Plan (depth)</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 32px; padding: 24px; align-items: flex-start;">
+    <!-- Arrangement 1: cable alley beside -->
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="font-size: 14px; font-weight: 600; color: #111827;">Arrangement 1 · cable alley beside the plates</div>
+      <svg width="360" height="400" viewBox="-20 -20 360 400">
+        <!-- section outline 800x800 @0.4 = 320x320 -->
+        <rect x="0" y="0" width="320" height="320" fill="#ffffff" stroke="#9ca3af" stroke-width="2"></rect>
+        <!-- rear busbar riser zone (HBB droppers) along the back -->
+        <rect x="0" y="0" width="320" height="40" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <text x="160" y="24" font-size="10" text-anchor="middle" fill="#374151">rear · horizontal busbar droppers / earth bar · 100 mm</text>
+        <!-- VBB chamber left -->
+        <rect x="0" y="40" width="60" height="240" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="3"><line x1="18" y1="60" x2="18" y2="260"></line><line x1="30" y1="60" x2="30" y2="260"></line><line x1="42" y1="60" x2="42" y2="260"></line></g>
+        <text x="30" y="300" font-size="9" text-anchor="middle" fill="#374151">VBB 150</text>
+        <!-- mounting plate + devices -->
+        <rect x="60" y="120" width="180" height="8" fill="#fef9c3" stroke="#ca8a04"></rect>
+        <text x="150" y="110" font-size="9" text-anchor="middle" fill="#374151">mounting plate 450 wide, 200 mm from the door</text>
+        <rect x="90" y="128" width="120" height="56" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"></rect>
+        <text x="150" y="160" font-size="10" text-anchor="middle" fill="#1e3a8a">MCCB · depth 140</text>
+        <!-- cable alley right -->
+        <rect x="240" y="40" width="80" height="240" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <text x="280" y="165" font-size="9" text-anchor="middle" fill="#374151" transform="rotate(-90 280 165)">cable alley 200 · outgoing cables</text>
+        <!-- door -->
+        <rect x="0" y="280" width="320" height="40" fill="#f3f4f6" stroke="#9ca3af"></rect>
+        <text x="160" y="304" font-size="10" text-anchor="middle" fill="#374151">front door · 100 mm swing zone</text>
+        <!-- dims -->
+        <g stroke="#6b7280" stroke-width="1" font-size="10" fill="#6b7280">
+          <line x1="0" y1="340" x2="320" y2="340"></line><line x1="0" y1="334" x2="0" y2="346"></line><line x1="320" y1="334" x2="320" y2="346"></line>
+          <text x="160" y="356" text-anchor="middle" stroke="none">800 (W)</text>
+          <line x1="335" y1="0" x2="335" y2="320"></line><line x1="329" y1="0" x2="341" y2="0"></line><line x1="329" y1="320" x2="341" y2="320"></line>
+          <text x="335" y="165" text-anchor="middle" stroke="none" transform="rotate(90 335 165)">800 (D)</text>
+        </g>
+      </svg>
+      <div style="font-size: 12px; color: #6b7280; max-width: 340px; text-align: center;">Plates are 450 mm wide; MCCBs need plate height. Used where cables must be visible from the front.</div>
+    </div>
+
+    <!-- Arrangement 2: cable alley behind -->
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="font-size: 14px; font-weight: 600; color: #111827;">Arrangement 2 · cable alley behind the plates</div>
+      <svg width="360" height="400" viewBox="-20 -20 360 400">
+        <rect x="0" y="0" width="320" height="320" fill="#ffffff" stroke="#9ca3af" stroke-width="2"></rect>
+        <rect x="0" y="0" width="320" height="40" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <text x="160" y="24" font-size="10" text-anchor="middle" fill="#374151">rear · horizontal busbar droppers / earth bar · 100 mm</text>
+        <!-- cable alley behind plates -->
+        <rect x="60" y="40" width="260" height="100" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <text x="190" y="95" font-size="10" text-anchor="middle" fill="#374151">cable alley behind · 250 mm · rear access</text>
+        <rect x="0" y="40" width="60" height="240" fill="#e5e7eb" stroke="#9ca3af"></rect>
+        <g stroke="#b45309" stroke-width="3"><line x1="18" y1="60" x2="18" y2="260"></line><line x1="30" y1="60" x2="30" y2="260"></line><line x1="42" y1="60" x2="42" y2="260"></line></g>
+        <text x="30" y="300" font-size="9" text-anchor="middle" fill="#374151">VBB 150</text>
+        <rect x="60" y="140" width="260" height="8" fill="#fef9c3" stroke="#ca8a04"></rect>
+        <text x="190" y="132" font-size="9" text-anchor="middle" fill="#374151">mounting plate 650 wide</text>
+        <rect x="90" y="148" width="120" height="56" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"></rect>
+        <text x="150" y="180" font-size="10" text-anchor="middle" fill="#1e3a8a">MCCB · depth 140</text>
+        <rect x="222" y="148" width="86" height="56" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"></rect>
+        <text x="265" y="180" font-size="10" text-anchor="middle" fill="#1e3a8a">2nd MCCB</text>
+        <rect x="0" y="280" width="320" height="40" fill="#f3f4f6" stroke="#9ca3af"></rect>
+        <text x="160" y="304" font-size="10" text-anchor="middle" fill="#374151">front door · 100 mm swing zone</text>
+        <g stroke="#6b7280" stroke-width="1" font-size="10" fill="#6b7280">
+          <line x1="0" y1="340" x2="320" y2="340"></line><line x1="0" y1="334" x2="0" y2="346"></line><line x1="320" y1="334" x2="320" y2="346"></line>
+          <text x="160" y="356" text-anchor="middle" stroke="none">800 (W)</text>
+          <line x1="335" y1="0" x2="335" y2="320"></line><line x1="329" y1="0" x2="341" y2="0"></line><line x1="329" y1="320" x2="341" y2="320"></line>
+          <text x="335" y="165" text-anchor="middle" stroke="none" transform="rotate(90 335 165)">800 (D)</text>
+        </g>
+      </svg>
+      <div style="font-size: 12px; color: #6b7280; max-width: 340px; text-align: center;">Plates are 650 mm wide, so a plate can carry a wider or a second small MCCB; needs 800 mm depth and rear access.</div>
+    </div>
+
+    <div style="width: 200px; display: flex; flex-direction: column; gap: 10px; font-size: 12px; color: #374151;">
+      <div style="font-weight: 700; color: #111827;">Section settings</div>
+      <div style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px; background: #f9fafb;">Cable alley: <strong>beside</strong> · behind</div>
+      <div style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px; background: #f9fafb;">Vertical busbar: <strong>left</strong> · right</div>
+      <div style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px; background: #f9fafb;">Depth: 600 · <strong>800</strong> · 1000</div>
+      <div style="color: #6b7280;">The choice changes the plate width the fit check uses and the depth the enclosure line needs.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

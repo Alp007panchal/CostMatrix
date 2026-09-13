@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
 /**
@@ -80,7 +81,8 @@ export function SignInPage() {
         </div>
 
         <p className="muted" style={{ fontSize: '.8125rem', marginTop: '1rem' }}>
-          Accounts are created by an administrator. If you do not have one, ask yours.
+          Accounts are created by an administrator. If you do not have one, ask yours.{' '}
+          <Link to="/terms">What CostMatrix stores</Link>.
         </p>
       </form>
     </div>

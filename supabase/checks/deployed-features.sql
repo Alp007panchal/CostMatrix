@@ -62,7 +62,25 @@ with wanted(feature, kind, name) as (values
   ('4.1 busbar runs',         'view',     'public.v_panel_busbar_check'),
   ('4.1 busbar runs',         'function', 'app.busbar_run_totals'),
   ('4.1 busbar runs',         'function', 'app.starting_busbar_runs'),
-  ('4.1 busbar runs',         'function', 'app.apply_busbar_runs')
+  ('4.1 busbar runs',         'function', 'app.apply_busbar_runs'),
+  ('3.8 layout fields',       'table',    'public.layout_constructions'),
+  ('3.8 layout fields',       'function', 'app.import_kit_layout'),
+  ('3.8 layout fields',       'column',   'public.assemblies.mounting_design'),
+  ('3.8 layout fields',       'column',   'public.panel_layouts.sections'),
+  ('3.8 layout, stage one',   'view',     'public.v_panel_layout_kits'),
+  ('3.8 layout, stage one',   'function', 'app.arrange_panel'),
+  ('3.8 layout, stage one',   'function', 'app.layout_fit'),
+  ('3.8 layout, stage one',   'function', 'app.save_panel_layout'),
+  ('3.8 layout, stage one',   'function', 'app.apply_layout_enclosure'),
+  ('3.8 layout, stage two',   'view',     'public.v_panel_door_devices'),
+  ('3.8 layout, stage two',   'view',     'public.v_panel_layout_weight'),
+  ('3.8 layout, stage two',   'function', 'app.layout_depth_for'),
+  ('3.8 layout, stage two',   'function', 'app.layout_worse'),
+  ('4.3 EPLAN and Word',      'view',     'public.v_eplan_parts'),
+  ('4.3 EPLAN and Word',      'function', 'app.set_eplan_metadata'),
+  ('4.3 EPLAN and Word',      'function', 'app.import_eplan_metadata'),
+  ('4.3 EPLAN and Word',      'column',   'public.costings.eplan_project'),
+  ('4.3 EPLAN and Word',      'column',   'public.costings.drawing_numbers')
 )
 select
   w.feature,

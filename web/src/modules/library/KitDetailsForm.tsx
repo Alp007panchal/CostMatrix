@@ -33,7 +33,17 @@ export function KitDetailsForm({
   const [fpW, setFpW] = useState(assembly.footprint_w_mm != null ? String(assembly.footprint_w_mm) : '')
   const [fpH, setFpH] = useState(assembly.footprint_h_mm != null ? String(assembly.footprint_h_mm) : '')
   const [fpD, setFpD] = useState(assembly.footprint_d_mm != null ? String(assembly.footprint_d_mm) : '')
+  // Roadmap 3.8: what the layout needs to place this kit — which mounting design
+  // it belongs to, the height it takes on the stack, how many fit across a plate.
+  const [design, setDesign] = useState<string>(assembly.mounting_design ?? '')
+  const [moduleH, setModuleH] = useState(assembly.module_height_mm != null ? String(assembly.module_height_mm) : '')
+  const [positions, setPositions] = useState(assembly.positions_per_plate != null ? String(assembly.positions_per_plate) : '')
   const [saved, setSaved] = useState(false)
+
+  const whole = (value: string): number | null => {
+    const n = Number(value.trim())
+    return value.trim() === '' || !Number.isFinite(n) || n <= 0 ? null : Math.round(n)
+  }
 
   const mm = (value: string): number | null => {
     const n = Number(value.trim())
@@ -52,6 +62,9 @@ export function KitDetailsForm({
         footprint_w_mm: mm(fpW),
         footprint_h_mm: mm(fpH),
         footprint_d_mm: mm(fpD),
+        mounting_design: (design || null) as Assembly['mounting_design'],
+        module_height_mm: whole(moduleH),
+        positions_per_plate: whole(positions),
       }),
     onSuccess: () => {
       setSaved(true)
@@ -70,7 +83,10 @@ export function KitDetailsForm({
     parseTags(tags).join(',') !== (assembly.tags ?? []).join(',') ||
     mm(fpW) !== assembly.footprint_w_mm ||
     mm(fpH) !== assembly.footprint_h_mm ||
-    mm(fpD) !== assembly.footprint_d_mm
+    mm(fpD) !== assembly.footprint_d_mm ||
+    (design || null) !== assembly.mounting_design ||
+    whole(moduleH) !== assembly.module_height_mm ||
+    whole(positions) !== assembly.positions_per_plate
 
   if (!editable) {
     const g = choices.find((c) => c.id === assembly.kit_group_id)
@@ -83,6 +99,11 @@ export function KitDetailsForm({
         {assembly.tags.length > 0 ? ` Labels: ${assembly.tags.join(', ')}.` : ''}
         {assembly.footprint_w_mm != null && assembly.footprint_h_mm != null
           ? ` Footprint: ${assembly.footprint_w_mm} × ${assembly.footprint_h_mm} mm.`
+          : ''}
+        {assembly.mounting_design != null
+          ? ` Mounting: ${DESIGNS[assembly.mounting_design]}${
+              assembly.module_height_mm != null ? `, ${assembly.module_height_mm} mm module` : ''
+            }.`
           : ''}
       </p>
     )
@@ -170,6 +191,39 @@ export function KitDetailsForm({
             ),
           )}
         </div>
+        <div className="row" style={{ alignItems: 'flex-end' }}>
+          <div className="muted" style={{ flexBasis: '100%', fontSize: '.8125rem' }}>
+            Mounting, for the panel layout <span style={{ fontWeight: 400 }}>— which design this kit
+            is built into, the height it takes on the stack (50 mm steps, the S4 cover heights), and
+            how many fit across one plate where that is not simply the plate width divided by the
+            device. Blank is fine; the layout will say a kit is unsized rather than guess.</span>
+          </div>
+          <label style={{ flex: 2, minWidth: '13rem' }}>
+            <div className="muted">Mounting design</div>
+            <select value={design} onChange={(e) => { setSaved(false); setDesign(e.target.value) }}>
+              <option value="">— not decided —</option>
+              {Object.entries(DESIGNS).map(([code, label]) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
+          </label>
+          <label style={{ flex: 1, minWidth: '8rem' }}>
+            <div className="muted">Module height (mm)</div>
+            <input
+              type="number" step="50" min="0" inputMode="numeric"
+              value={moduleH}
+              onChange={(e) => { setSaved(false); setModuleH(e.target.value) }}
+            />
+          </label>
+          <label style={{ flex: 1, minWidth: '8rem' }}>
+            <div className="muted">Positions per plate</div>
+            <input
+              type="number" step="1" min="0" inputMode="numeric"
+              value={positions}
+              onChange={(e) => { setSaved(false); setPositions(e.target.value) }}
+            />
+          </label>
+        </div>
         <p className="muted" style={{ fontSize: '.8125rem' }}>
           Version {assembly.version}, {assembly.status}. A costing keeps the version it was built
           from, so changing this kit never changes a costing already made.
@@ -177,4 +231,14 @@ export function KitDetailsForm({
       </div>
     </div>
   )
+}
+
+/** The six mounting designs of panel-layout-spec.md §3, in the words of the spec. */
+const DESIGNS: Record<string, string> = {
+  busbar_fed: 'Busbar-fed — ACB, ATS pair, changeover, isolator',
+  mccb_plates: 'MCCB plates — one device per cover, stacked',
+  side_by_side_plates: 'Side-by-side plates — MCBs, meters, contactors, terminals',
+  compensation: 'Compensation — APFC steps',
+  meter_board_plate: 'Meter board plate — wall-mounted board',
+  inline_3nj6: 'In-line 3NJ6 — plug-in fuse-switch disconnectors',
 }

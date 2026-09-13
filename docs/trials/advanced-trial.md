@@ -1,6 +1,6 @@
 # Staging trial — the advanced app, end to end
 
-**Why this exists.** Sixteen features went onto the staging app on 12 Sep 2026, each behind a
+**Why this exists.** Seventeen features went onto the staging app on 12 Sep 2026, each behind a
 switch of its own, and not one of them has been driven by a person. Tests prove the arithmetic;
 they cannot tell you whether a screen makes sense, whether a word is wrong, or whether the proposal a configurator makes is
 the board you would have built. That is this hour's job.
@@ -26,16 +26,16 @@ and so an empty menu is not mistaken for a missing feature.
 
 - [ ] Open the staging project's **SQL editor** in Supabase. Open
       `supabase/checks/deployed-features.sql` from the repository, copy the whole file in, run it.
-      **Expect:** about 50 rows, every one `present = true`. A `false` row is a feature whose
+      **Expect:** about 69 rows, every one `present = true`. A `false` row is a feature whose
       migration has not landed — write down which and stop; the rest of this script will fail in
       confusing ways.
 - [ ] **Every advanced feature now arrives off.** That is deliberate (D-266, and condition 2 of
       the two-track rule): the app has to be able to reach production looking exactly as it does
       today. So the menu is short until you say otherwise, and a short menu at this point is the
       switches working, not a feature missing.
-- [ ] Open **Features** in the top bar. **Expect:** sixteen rows, each with what it does in plain
+- [ ] Open **Features** in the top bar. **Expect:** seventeen rows, each with what it does in plain
       words, every one **off**, and a switch beside each because you are the master administrator.
-      Switch **all sixteen on** — this pass is meant to exercise the lot. Three of them are marked
+      Switch **all seventeen on** — this pass is meant to exercise the lot. Three of them are marked
       in red as changing what an existing costing does (**Approval rules in force**, **Validity and
       the nightly sweep**, **Chosen option and optional extras**); switch those on here and note
       that nothing you have already costed moves.
@@ -93,6 +93,57 @@ The space check stays silent until things have been measured, so measure enough 
       ask for it and to show the line quantities it works out from your answer.
 - [ ] **Expect** a space line on the panel now that you have measured a cubicle: *fits*, *tight* or
       *will not fit*, with the percentage. It changes no price — it is advice.
+- [ ] **Lay this panel out** *(roadmap 3.8)* — the pop-up. Press **Work the board out**.
+      **Expect:** the board drawn at true scale, a section per busbar-fed device, covers stacked
+      down the feeder sections, and a line under each saying how full it is. Open *Why each section
+      is there* and read the rules; tell me any that are wrong, because they are the whole feature.
+      **Expect** the kits the library has not described yet to sit in amber on the left, unplaceable
+      — that is most of them until the kit template is filled in.
+- [ ] Drag a kit onto a section built for another design. **Expect a refusal in words**, not a
+      silent nothing. **Save layout** — and check the costing's total has not moved. Then **Put
+      these cubicles on the costing** and see the Enclosure section appear.
+- [ ] Now the other four views, along the top: **Rear**, **Plan**, **Door**, **3D**.
+      **Expect** the rear to show the sections **mirrored** — the order you see them walking round
+      the board — each saying whether its cables land on lugs at the back or on shrouded terminals at
+      the front. **Expect** *Plan* to look down on the section you last clicked, with the vertical
+      busbar, the mounting plate, the cable alley and the door's swing, dimensioned. **Expect** the
+      door to be plain unless a part of the panel carries *Mounting: door*, and to name any
+      door-mounted part it has no size for. **Expect** *3D* to be an isometric you can see from the
+      left or the right — turn the **Doors** layer off to look inside.
+      This is the view to judge against your own mockups; tell me anything that looks wrong.
+- [ ] Click a section and find the **Section** panel on the left. Change **Cable alley** to *behind
+      the plates*. **Expect** the plate to go from 450 to 650 mm on an 800 mm section — and, if the
+      section is shallower than 800 mm, **expect the verdict to turn to "will not fit" and say why in
+      millimetres**. That refusal is the point: the cables would have nowhere to go.
+- [ ] **Save the layout**, then go to that costing's **Release** screen and press *Preview*.
+      **Expect** a new **Annexure V — General Arrangement** after the technical offer: a landscape
+      page per panel you laid out, in plain black line art, each device carrying a tag `Q1, Q2 …`,
+      a dimension line under the board and an overall size. **Expect the same tags** to appear in
+      that panel's Annexure IV row, as *Device tags (see Annexure V)* — they are numbered once, so
+      they cannot disagree. **Expect** the cover letter's annexure list to now read five.
+- [ ] **The drawing office card** *(roadmap 4.3)* — type an EPLAN project and two drawing numbers,
+      *Save project details*, and **expect the costing's total not to move**. Then press
+      **Paste an EPLAN project export instead** and paste some real project properties out of EPLAN.
+      **Expect** it to find the project and the drawings whatever shape they are in, to list every
+      line it could not read, and to save nothing until you tell it to. Any field name it misses is
+      worth telling me — it is one line to add.
+- [ ] **Technical offer as Word.** **Expect** a `.docx` that opens in Word without a warning, one
+      heading per panel, the description as paragraphs you can edit, and your EPLAN project and
+      drawing numbers at the top. Edit a sentence and check the costing is untouched.
+- [ ] **Parts list (Excel).** **Expect** one row per line of the costing, the columns in the order
+      the runbook lists, quantity **per panel** with the panel count beside it, and — for panels you
+      laid out — the same device tags `Q1, Q2 …` that the GA drawing prints. **Expect the card to
+      warn you** how many rows have no manufacturer part number before you export, not after.
+      Then hand the file to the drawing office and ask them to map it into EPLAN once: that is the
+      step I could not test, because there is no EPLAN here.
+- [ ] Preview a quotation for a costing whose panels you have **not** laid out. **Expect no
+      Annexure V at all** and the list back at four — the quotation must look exactly as it did
+      before this feature existed. If it does not, that is a bug and I want to know.
+- [ ] Pick **Our double-front frame** in the construction box — if its widths are still empty it will
+      tell you so, which is the honest answer until you give me the figures. Where it has them, set
+      **two faces** and press *Work the board out* again. **Expect** the covers that needed two
+      sections to fit one, with the seventh on **face B**, and the verdict reported **per face** —
+      a double-front section fits only when both faces do.
 - [ ] **Work out the busbar runs** on the same panel *(roadmap 4.1)* — this is your `CU-OPT1` sheet.
       Press **Start from this board**. **Expect:** the runs a board like this needs, named, with the
       bar sizes your own kits use at those ratings, and a line saying the lengths are your usual
