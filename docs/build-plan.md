@@ -260,7 +260,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| Slice 6: the terms page, promised in `architecture.md` and never built | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-13 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
