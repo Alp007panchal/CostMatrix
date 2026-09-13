@@ -90,11 +90,45 @@ Table with one row per panel:
 - Enclosure dimensions = panel `enclosure_dimensions`.
 - Data sheets: attached outside the app in release 1, as today.
 
+## Annexure V — General arrangement drawings (roadmap 3.8)
+
+**Only where a panel has a saved layout.** One **landscape** page per such panel, after the
+technical offer; a quotation whose panels have no layout has no Annexure V at all and is
+byte-identical to one released before the drawing existed — including the annexure list on the
+cover letter, which stays at four.
+
+Annexure IV is the technical offer in the owner's real quotations, so the drawing is **V** rather
+than renumbering a format his customers already know (the spec's §5 says "Annexure IV" because it
+was written before the built PDF was checked; D-284).
+
+Each sheet carries:
+
+- a header: `ANNEXURE V — GENERAL ARRANGEMENT (FRONT ELEVATION)`, the reference, the sheet number,
+  the scale with *not to scale on print — work to the dimensions*, and which saved version it was
+  drawn from;
+- the panel name and option label, the construction, the section count, and — on a double-front
+  board — a note that face B is not shown on a front elevation;
+- the drawing itself in black line art: the two chambers (horizontal busbar, cable), each section
+  outlined with its distribution-busbar compartment, each device a rectangle carrying its **tag**
+  (`Q1`, `Q2` …) and name, a dashed outline and "size not on record" where the library has never
+  measured it, and the base;
+- a dimension line with each section's width and `OVERALL w (W) × h (H) × d (D) MM`;
+- a footer: form and access taken from the drawing, the panel's own enclosure note where it has
+  one, `IEC 61439-1 & 2`, then company, customer, reference and date.
+
+**The tags match the technical offer by construction**: they are numbered once in
+`pdf/ga.ts` and the same list is appended to that panel's Annexure IV row as
+`Device tags (see Annexure V): …`. A panel with no drawing gains no such line.
+
+The scale is not fixed: it is chosen so the board fills the drawing frame, so a 6 m board and an
+800 mm one both fill the page, and the chosen ratio is printed.
+
 ## Page setup
 
 A4 portrait, margins about 20 mm, body font 10–11 pt, headings bold upper case, tables with
 thin borders as in the reference. Long technical descriptions may span pages; a table row
 must not be split mid-paragraph awkwardly, so the renderer breaks between paragraphs.
+**Annexure V is the one exception: A4 landscape**, so a wide board is legible.
 
 ## What the approver can change at release
 

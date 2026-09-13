@@ -159,3 +159,25 @@ export async function panelWeight(panelId: string): Promise<LayoutWeight | null>
   fail('Could not read the weight', error)
   return ((data ?? [])[0] ?? null) as LayoutWeight | null
 }
+
+/**
+ * The newest saved layout of each of these panels, for the quotation's
+ * general-arrangement sheets (roadmap 3.8, spec §5). Panels with no layout are
+ * simply absent — the quotation then says nothing about a board nobody has drawn.
+ */
+export async function savedLayoutsFor(panelIds: string[]): Promise<
+  { panel_id: string; sections: LayoutSection[]; construction_code: string | null; version: number }[]
+> {
+  if (panelIds.length === 0) return []
+  const { data, error } = await supabase
+    .from('panel_layouts')
+    .select('panel_id, sections, construction_code, version')
+    .in('panel_id', panelIds)
+    .order('version', { ascending: false })
+  fail('Could not read the saved layouts', error)
+  const newest = new Map<string, { panel_id: string; sections: LayoutSection[]; construction_code: string | null; version: number }>()
+  for (const row of (data ?? []) as { panel_id: string; sections: LayoutSection[]; construction_code: string | null; version: number }[]) {
+    if (!newest.has(row.panel_id)) newest.set(row.panel_id, row)
+  }
+  return [...newest.values()]
+}

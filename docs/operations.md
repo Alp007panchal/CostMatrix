@@ -871,7 +871,24 @@ second face off while kits are still on it is refused rather than losing them.
 Under *Does it fit?* the board's own line reads its width, height, depth and roughly what it
 weighs — summed from the weights on its parts, saying how many parts carry none.
 
-The GA sketch for Annexure IV is the one piece still to come.
+#### The drawing on the quotation (Annexure V)
+Save a layout and it prints with the quotation. On the **Release** screen, *Preview* or release as
+usual: after Annexure IV comes **Annexure V — General Arrangement**, one **landscape** page per
+panel that has a saved layout, and the cover letter's annexure list grows to five.
+
+- A panel you have **not** laid out gets **no sheet**, and a quotation with no layouts at all looks
+  exactly as it did before — four annexures, nothing landscape. Nothing is ever drawn from a guess.
+- Each device carries a tag — **Q1, Q2 …** — and the same list is added to that panel's row in
+  Annexure IV, as *Device tags (see Annexure V)*. They cannot disagree: they are numbered once.
+- A device the library has never measured is drawn with a **dashed** outline and labelled *size not
+  on record*. That is the prompt to fill its module height in.
+- The scale is chosen so the board fills the page and is printed on the sheet, beside *not to scale
+  on print — work to the dimensions*. A print dialog can shrink a page; the dimensions cannot lie.
+- The footer takes the **form** and the access from the drawing itself and adds the panel's own
+  enclosure note where it has one. A board whose form nobody chose prints no form.
+
+On a **double-front** board the sheet says so and notes that face B is not shown: a front elevation
+cannot show it. A rear-elevation sheet is the next thing to add if you want one.
 
 ### Fill in what the panel layout will need (phase 3.8, fields only)
 The layout pop-up itself is not built yet — the specification and the mockups are in

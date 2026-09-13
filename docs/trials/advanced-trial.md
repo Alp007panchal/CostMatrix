@@ -114,6 +114,15 @@ The space check stays silent until things have been measured, so measure enough 
       the plates*. **Expect** the plate to go from 450 to 650 mm on an 800 mm section — and, if the
       section is shallower than 800 mm, **expect the verdict to turn to "will not fit" and say why in
       millimetres**. That refusal is the point: the cables would have nowhere to go.
+- [ ] **Save the layout**, then go to that costing's **Release** screen and press *Preview*.
+      **Expect** a new **Annexure V — General Arrangement** after the technical offer: a landscape
+      page per panel you laid out, in plain black line art, each device carrying a tag `Q1, Q2 …`,
+      a dimension line under the board and an overall size. **Expect the same tags** to appear in
+      that panel's Annexure IV row, as *Device tags (see Annexure V)* — they are numbered once, so
+      they cannot disagree. **Expect** the cover letter's annexure list to now read five.
+- [ ] Preview a quotation for a costing whose panels you have **not** laid out. **Expect no
+      Annexure V at all** and the list back at four — the quotation must look exactly as it did
+      before this feature existed. If it does not, that is a bug and I want to know.
 - [ ] Pick **Our double-front frame** in the construction box — if its widths are still empty it will
       tell you so, which is the honest answer until you give me the figures. Where it has them, set
       **two faces** and press *Work the board out* again. **Expect** the covers that needed two
