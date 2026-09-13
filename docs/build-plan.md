@@ -222,7 +222,6 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| 4.3 Word export of the technical offer, EPLAN parts list, EPLAN project metadata | `claude/advanced-p43-word-eplan` | 2026-09-13 08:45 |
 | Taking `advanced` to production: the upgrade rehearsal, then the release | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-12 |
 
 27. **The guided board configurator** (advanced track, roadmap 3.1) — the questions a customer
@@ -272,6 +271,14 @@ the work begins, removed when the pull request opens.
     row**, so the drawing and the offer agree by construction rather than by care (D-285). A panel
     nobody has drawn gets no sheet and the quotation is unchanged (D-284). No migration: this is
     all in the browser, so nothing new reaches staging but the app.
+
+36. **The drawing office: Word and EPLAN** (advanced track, roadmap 4.3) — the EPLAN project name
+    and drawing numbers on the costing, with a paste-in importer that reads whatever shape the
+    export comes in and proposes before it writes; the technical offer as an **editable `.docx`**;
+    and a **parts list** for the drawing office to import, one row per frozen line, carrying the
+    same device tags the panel layout draws (migration 0122). A revision carries the drawing
+    numbers, a copy does not — both added to the hand-written column list that has dropped frozen
+    data twice. Nothing changes a price.
 
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.

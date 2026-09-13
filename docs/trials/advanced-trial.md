@@ -25,7 +25,7 @@ and so an empty menu is not mistaken for a missing feature.
 
 - [ ] Open the staging project's **SQL editor** in Supabase. Open
       `supabase/checks/deployed-features.sql` from the repository, copy the whole file in, run it.
-      **Expect:** about 60 rows, every one `present = true`. A `false` row is a feature whose
+      **Expect:** about 69 rows, every one `present = true`. A `false` row is a feature whose
       migration has not landed — write down which and stop; the rest of this script will fail in
       confusing ways.
 - [ ] **Every advanced feature now arrives off.** That is deliberate (D-266, and condition 2 of
@@ -120,6 +120,21 @@ The space check stays silent until things have been measured, so measure enough 
       a dimension line under the board and an overall size. **Expect the same tags** to appear in
       that panel's Annexure IV row, as *Device tags (see Annexure V)* — they are numbered once, so
       they cannot disagree. **Expect** the cover letter's annexure list to now read five.
+- [ ] **The drawing office card** *(roadmap 4.3)* — type an EPLAN project and two drawing numbers,
+      *Save project details*, and **expect the costing's total not to move**. Then press
+      **Paste an EPLAN project export instead** and paste some real project properties out of EPLAN.
+      **Expect** it to find the project and the drawings whatever shape they are in, to list every
+      line it could not read, and to save nothing until you tell it to. Any field name it misses is
+      worth telling me — it is one line to add.
+- [ ] **Technical offer as Word.** **Expect** a `.docx` that opens in Word without a warning, one
+      heading per panel, the description as paragraphs you can edit, and your EPLAN project and
+      drawing numbers at the top. Edit a sentence and check the costing is untouched.
+- [ ] **Parts list (Excel).** **Expect** one row per line of the costing, the columns in the order
+      the runbook lists, quantity **per panel** with the panel count beside it, and — for panels you
+      laid out — the same device tags `Q1, Q2 …` that the GA drawing prints. **Expect the card to
+      warn you** how many rows have no manufacturer part number before you export, not after.
+      Then hand the file to the drawing office and ask them to map it into EPLAN once: that is the
+      step I could not test, because there is no EPLAN here.
 - [ ] Preview a quotation for a costing whose panels you have **not** laid out. **Expect no
       Annexure V at all** and the list back at four — the quotation must look exactly as it did
       before this feature existed. If it does not, that is a bug and I want to know.

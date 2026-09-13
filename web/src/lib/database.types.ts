@@ -544,6 +544,9 @@ export interface Costing {
   enclosure_uplift_pct: number
   /** Which option the costing's own total means. Null: no choice, and it adds every panel. */
   chosen_option_label: string | null
+  /** The drawing office's own references (roadmap 4.3). A revision carries them; a copy does not. */
+  eplan_project: string | null
+  drawing_numbers: string | null
   submitted_at: string | null
   approved_at: string | null
   returned_at: string | null
