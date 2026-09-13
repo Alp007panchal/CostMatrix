@@ -97,3 +97,23 @@ tr.inactive td { color: var(--ink-soft); }
 }
 
 .empty { padding: 2rem 1rem; text-align: center; color: var(--ink-soft); }
+
+/* A pop-up, for the panel layout (roadmap 3.8). The only modal in the app: the
+   layout needs the width of the screen, and nothing else does. */
+.modal {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(17, 24, 39, .55);
+  display: grid; place-items: center; padding: 1rem;
+}
+.modal-card {
+  background: var(--card); border-radius: 10px; padding: 1rem;
+  max-height: 94vh; overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+.primary-chip {
+  background: var(--accent); color: #fff; border-radius: 999px;
+  padding: .1rem .55rem; font-weight: 600;
+}
+/* Amber: something is worth reading but nothing is wrong. Used by the busbar
+   card's gap sentence and the layout's unknown verdicts. */
+.warn { color: #b45309; }

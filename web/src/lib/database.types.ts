@@ -1362,3 +1362,99 @@ export interface BusbarApplied {
   metres: number
   replaced: number
 }
+
+// --- the panel layout (roadmap 3.8, stage one) -----------------------------
+
+/** One kit on the panel, as the layout sees it (v_panel_layout_kits). */
+export interface LayoutKit {
+  costing_assembly_id: string
+  panel_id: string
+  name: string
+  quantity: number
+  assembly_id: string
+  mounting_design: MountingDesign | null
+  module_height_mm: number | null
+  positions_per_plate: number | null
+  footprint_w_mm: number | null
+  rating: number | null
+  rating_unit: 'A' | 'KVAR' | null
+  /** Whether the library says enough about it to place it at all. */
+  is_sized: boolean
+}
+
+/** One kit placed on a face of a section. */
+export interface LayoutPlacement {
+  costing_assembly_id: string
+  face: 'front' | 'rear'
+  name: string
+  slot: number
+  height_mm: number | null
+  /** Where it sits down the compartment; absent means "under the one above". */
+  y_mm?: number
+  quantity?: number
+  unsized: boolean
+}
+
+/** One face of a section. A single-front section has one, the front. */
+export interface LayoutFace {
+  side: 'front' | 'rear'
+  connection: 'front' | 'rear'
+  design: MountingDesign | string
+  placements: LayoutPlacement[]
+}
+
+/** One section of the board. */
+export interface LayoutSection {
+  name: string
+  width_mm: number
+  busbar_compartment_mm: number
+  access: 'single_front' | 'double_front'
+  design: MountingDesign | string
+  faces: LayoutFace[]
+}
+
+/** What app.arrange_panel answers. Writes nothing. */
+export interface LayoutPlan {
+  panel_id: string
+  panel: string
+  construction: string
+  sections: LayoutSection[]
+  /** Which rule made each section, in words. */
+  explain: { section: string; why: string }[]
+  /** Kits the library has not described enough to place. */
+  unsized: { name: string; why: string }[]
+  kvar: { used: number; limit_per_section: number | null }
+  assumed: { device_compartment_mm: number; note: string }
+}
+
+/** One section's verdict. */
+export interface LayoutFitSection {
+  name: string
+  design: MountingDesign | string
+  width_mm: number
+  used: number
+  capacity: number | null
+  unit: string
+  unsized: number
+  verdict: 'fits' | 'tight' | 'no_fit' | 'unknown' | 'empty'
+  why: string
+}
+
+/** What app.layout_fit answers. */
+export interface LayoutFit {
+  verdict: 'fits' | 'tight' | 'no_fit' | 'unknown' | 'empty'
+  sections: LayoutFitSection[]
+  section_count: number
+  total_width_mm: number
+}
+
+/** What app.apply_layout_enclosure answers. */
+export interface LayoutEnclosureApplied {
+  panel_id: string
+  section: string
+  kinds: number
+  replaced: number
+  /** Widths the catalogue cannot supply, named rather than dropped. */
+  missing: { width_mm: number; quantity: number; why: string }[]
+  wanted: Record<string, number>
+}

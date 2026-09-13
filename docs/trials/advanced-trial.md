@@ -1,6 +1,6 @@
 # Staging trial — the advanced app, end to end
 
-**Why this exists.** Sixteen features went onto the staging app on 12 Sep 2026, each behind a
+**Why this exists.** Seventeen features went onto the staging app on 12 Sep 2026, each behind a
 switch of its own, and not one of them has been driven by a person. Tests prove the arithmetic;
 they cannot tell you whether a screen makes sense, whether a word is wrong, or whether the proposal a configurator makes is
 the board you would have built. That is this hour's job.
@@ -25,16 +25,16 @@ and so an empty menu is not mistaken for a missing feature.
 
 - [ ] Open the staging project's **SQL editor** in Supabase. Open
       `supabase/checks/deployed-features.sql` from the repository, copy the whole file in, run it.
-      **Expect:** about 50 rows, every one `present = true`. A `false` row is a feature whose
+      **Expect:** about 55 rows, every one `present = true`. A `false` row is a feature whose
       migration has not landed — write down which and stop; the rest of this script will fail in
       confusing ways.
 - [ ] **Every advanced feature now arrives off.** That is deliberate (D-266, and condition 2 of
       the two-track rule): the app has to be able to reach production looking exactly as it does
       today. So the menu is short until you say otherwise, and a short menu at this point is the
       switches working, not a feature missing.
-- [ ] Open **Features** in the top bar. **Expect:** sixteen rows, each with what it does in plain
+- [ ] Open **Features** in the top bar. **Expect:** seventeen rows, each with what it does in plain
       words, every one **off**, and a switch beside each because you are the master administrator.
-      Switch **all sixteen on** — this pass is meant to exercise the lot. Three of them are marked
+      Switch **all seventeen on** — this pass is meant to exercise the lot. Three of them are marked
       in red as changing what an existing costing does (**Approval rules in force**, **Validity and
       the nightly sweep**, **Chosen option and optional extras**); switch those on here and note
       that nothing you have already costed moves.
@@ -92,6 +92,15 @@ The space check stays silent until things have been measured, so measure enough 
       ask for it and to show the line quantities it works out from your answer.
 - [ ] **Expect** a space line on the panel now that you have measured a cubicle: *fits*, *tight* or
       *will not fit*, with the percentage. It changes no price — it is advice.
+- [ ] **Lay this panel out** *(roadmap 3.8, stage one)* — the pop-up. Press **Work the board out**.
+      **Expect:** the board drawn at true scale, a section per busbar-fed device, covers stacked
+      down the feeder sections, and a line under each saying how full it is. Open *Why each section
+      is there* and read the rules; tell me any that are wrong, because they are the whole feature.
+      **Expect** the kits the library has not described yet to sit in amber on the left, unplaceable
+      — that is most of them until the kit template is filled in.
+- [ ] Drag a kit onto a section built for another design. **Expect a refusal in words**, not a
+      silent nothing. **Save layout** — and check the costing's total has not moved. Then **Put
+      these cubicles on the costing** and see the Enclosure section appear.
 - [ ] **Work out the busbar runs** on the same panel *(roadmap 4.1)* — this is your `CU-OPT1` sheet.
       Press **Start from this board**. **Expect:** the runs a board like this needs, named, with the
       bar sizes your own kits use at those ratings, and a line saying the lengths are your usual

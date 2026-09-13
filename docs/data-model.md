@@ -820,6 +820,22 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
+### Panel layout, stage one (roadmap 3.8, migration 0120)
+- `v_panel_layout_kits` — the kits on a panel with their mounting design, module height, positions
+  per plate and footprint, and `is_sized`: whether the library says enough to place them.
+- `app.section_capacity(design, width_mm, busbar_compartment_mm, construction)` — what one section
+  holds, in the unit that design counts in, with the sentence explaining it.
+- `app.arrange_panel(panel, construction)` — the sections and placements, deterministic, with
+  `explain` (the rule that made each) and `unsized` (kits it could not place). Writes nothing.
+- `app.layout_fit(sections, construction)` — used against capacity per section and a verdict;
+  a section carrying an unsized kit is `unknown`, and one such section makes the board unknown.
+- `app.save_panel_layout(panel, sections, construction, note)` — the next `panel_layouts` version.
+- `app.apply_layout_enclosure(panel, section, replace)` — the only writer of costing lines here:
+  cubicles by width through `add_component_to_costing`, naming any width the catalogue lacks.
+- Settings in `company_options`: `layout_device_compartment_mm` (1,500, assumed),
+  `layout_vertical_busbar_mm`, `layout_cable_alley_mm`, `layout_mcb_module_mm`,
+  `layout_device_clearance_mm`.
+
 ### Panel layout fields (roadmap 3.8, migration 0119)
 The canvas is not built; these are the fields it will read, so the library can be filled in first.
 

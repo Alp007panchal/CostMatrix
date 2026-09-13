@@ -805,6 +805,35 @@ Components screen waiting for you.
 The grading — how much of the target goes into the biggest step, how much into the next — is a
 company setting, so it can be changed without a new version of the app. Ask and I will change it.
 
+### Lay a panel out (phase 3.8, stage one)
+On a panel in a draft costing: **Lay this panel out**. A pop-up opens with three columns — the
+kits on the panel, the board drawn at 1 : 4, and whether it fits.
+
+**Work the board out** arranges the kits by the rules of their mounting designs: a busbar-fed
+device takes a section of its own; MCCB covers stack down a device compartment until it is full and
+then a second section opens; the modular devices and the correction each get a section. Every
+section says which rule made it — open *Why each section is there*.
+
+Then correct it: **drag a kit** from the left onto a section, **double-click** one on the drawing to
+take it off. A drop onto a section built for another design is refused in words, and so is one that
+does not fit what is left.
+
+- **Save layout** keeps the drawing as the next version and **moves no price**. Earlier versions
+  are kept, so you can go back.
+- **Put these cubicles on the costing** takes the widths the drawing needs and adds them as
+  enclosure lines in an *Enclosure* section — ordinary component lines, priced and frozen. A width
+  the catalogue has no cubicle for is named rather than quietly dropped. Pressing it twice is
+  refused; *Replace the ones already there* is the deliberate second pass.
+
+**Two things it tells you honestly.** A kit the library has not described — no mounting design, or
+no module height — is shown in amber, cannot be dragged, and makes its section read *unknown*
+rather than *fits*. And the usable height of a device compartment is **assumed at 1,500 mm** until
+somebody reads it off the S4 dimension drawings; it is a company setting, so correcting it is a
+number rather than a new version of the app.
+
+Stage one is the front view. The **Rear**, **Side**, **Door** and **3D** tabs are shown as *later*,
+and the GA sketch for Annexure IV comes with them.
+
 ### Fill in what the panel layout will need (phase 3.8, fields only)
 The layout pop-up itself is not built yet — the specification and the mockups are in
 `docs/reference/panel-layout-spec.md` — but the library can be filled in now, so that when it is

@@ -15,7 +15,7 @@
 
 -- === Every company starts with everything off ===============================
 -- The number moves with every feature built: 0118 added the busbar run calculator.
-select test.eq((select count(*)::int from public.features), 16,
+select test.eq((select count(*)::int from public.features), 17,
   'every advanced feature is on the register');
 select test.eq((select count(*)::int from public.features where changes_costings), 3,
   'three of them change what an existing costing does, and say so');
@@ -30,7 +30,7 @@ select test.sign_in(:'carol');
 select count(*)::int as listed, count(*) filter (where is_on)::int as on_now
   from public.v_company_features \gset
 commit;
-select test.eq(:listed, 16, 'a costing engineer can see what exists');
+select test.eq(:listed, 17, 'a costing engineer can see what exists');
 select test.eq(:on_now, 0, 'and that none of it is on for her company');
 
 -- The assistant names the switch it has had since 0102 rather than adding a
