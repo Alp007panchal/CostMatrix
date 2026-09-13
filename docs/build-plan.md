@@ -260,7 +260,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| Slice 6: the terms page, promised in `architecture.md` and never built | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-13 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
@@ -279,7 +279,7 @@ the work begins, removed when the pull request opens.
 - Move production to the paid Supabase tier if it is not already.
 - Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
 - Custom domain and email sender for Supabase Auth invitations.
-- Terms page published and linked at sign-up.
+- ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
 - One-page user guide per role.
 - Bulk price update rehearsal: download the library, change prices, upload, confirm the preview and the price history.
 - Assembly upload and download (assemblies, their components, their hours), if not finished in slice 1.
