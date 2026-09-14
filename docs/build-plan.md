@@ -322,7 +322,7 @@ or into go-live.
     signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
     else will ever mention it), a costing waiting for an approver — shown only to somebody who can
     actually approve — a quotation released and never marked sent, and one sent that has been
-    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0126, one view,
+    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0129, one view,
     no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
     when the desk is clear rather than saying so.
 

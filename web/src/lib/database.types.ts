@@ -1521,7 +1521,7 @@ export interface LayoutEnclosureApplied {
   wanted: Record<string, number>
 }
 
-/** One thing waiting on the signed-in person (v_my_desk, migration 0126). */
+/** One thing waiting on the signed-in person (v_my_desk, migration 0129). */
 export interface DeskItem {
   kind: DeskKind
   sort_order: number

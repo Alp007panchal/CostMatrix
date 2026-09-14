@@ -5,7 +5,7 @@ import { listMyDesk } from './desk-api'
 import { ageWords, byKind, deskLink, headline } from './desk'
 
 /**
- * What is on your desk (migration 0126): the card on the home page listing the
+ * What is on your desk (migration 0129): the card on the home page listing the
  * work waiting on the person signed in.
  *
  * It shows **nothing at all** when there is nothing waiting — no empty state, no

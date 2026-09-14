@@ -1,7 +1,7 @@
 import type { DeskItem, DeskKind } from '../../lib/database.types'
 
 /**
- * What is on your desk, in words (migration 0126).
+ * What is on your desk, in words (migration 0129).
  *
  * The database decides what is waiting; this only groups it and says it. Pure,
  * so the wording is testable without a database, and so a new kind is a row here
