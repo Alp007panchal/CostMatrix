@@ -365,6 +365,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
+| Remove a panel from the grid, ask before any panel is deleted, and keep the panel names and kit names in view while scrolling | `claude/grid-remove-and-sticky` | 2026-09-14 |
 | _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
