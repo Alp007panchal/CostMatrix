@@ -344,6 +344,12 @@ or into go-live.
     Home, the costing editor, Components, Kits, Quotations and Library health are reshaped per §5;
     `nav.test.tsx` proves every route is reachable for each role. No database, engine or pricing
     change; NPP-192 untouched.
+46. **A panel is renamed where you are looking at it** (maintenance) — the grid could edit every
+    quantity in the costing but not the name of the column the quantity was in, so renaming a panel
+    meant leaving the grid and coming back. Its column heading now carries the panel's name,
+    quantity, tag, option label and the optional-extra tick, committed through the same
+    `updatePanel` the panel tab calls. A blank name is ignored and a quantity must be more than
+    nought, because a column heading is also a line on the quotation.
 
 ## In hand right now
 
