@@ -326,7 +326,7 @@ or into go-live.
     no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
     when the desk is clear rather than saying so.
 
-45. **Nothing the library depends on disappears quietly** (maintenance) — the app was careful at
+44. **Nothing the library depends on disappears quietly** (maintenance) — the app was careful at
     the door and careless at the exit: deleting a kit group silently un-grouped its kits so they
     cost zero labour, deleting a master currency factor made every part bought in it unpriceable
     while its price still showed, and `components.material_rate_code` had **no foreign key at all**
