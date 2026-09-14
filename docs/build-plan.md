@@ -318,7 +318,7 @@ or into go-live.
     `refuses` rules test the same predicate the engine's refusal tests, and a test proves the view
     and the error message name the same part.
 
-41. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
+43. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
     signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
     else will ever mention it), a costing waiting for an approver — shown only to somebody who can
     actually approve — a quotation released and never marked sent, and one sent that has been
