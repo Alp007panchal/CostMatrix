@@ -318,7 +318,15 @@ or into go-live.
     `refuses` rules test the same predicate the engine's refusal tests, and a test proves the view
     and the error message name the same part.
 
-44. **Nothing the library depends on disappears quietly** (maintenance) — the app was careful at
+43. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
+    signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
+    else will ever mention it), a costing waiting for an approver — shown only to somebody who can
+    actually approve — a quotation released and never marked sent, and one sent that has been
+    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0129, one view,
+    no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
+    when the desk is clear rather than saying so.
+
+45. **Nothing the library depends on disappears quietly** (maintenance) — the app was careful at
     the door and careless at the exit: deleting a kit group silently un-grouped its kits so they
     cost zero labour, deleting a master currency factor made every part bought in it unpriceable
     while its price still showed, and `components.material_rate_code` had **no foreign key at all**
@@ -367,7 +375,10 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
   setting in their dashboard rather than anything in this repository.
 - Custom domain and email sender for Supabase Auth invitations.
 - ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
-- One-page user guide per role.
+- ~~One-page user guide per role~~ — **built 13 Sep**, in the app at **Help** rather than in this
+  repository, because the people who need it most have never opened a repository. One page each for
+  the costing engineer, the approver and the administrator, plus one everybody gets: the things that
+  look like faults and are not. A test checks every screen a guide names is a real route.
 - Bulk price update rehearsal: download the library, change prices, upload, confirm the preview and the price history.
 - Assembly upload and download (assemblies, their components, their hours), if not finished in slice 1.
 

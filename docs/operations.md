@@ -387,6 +387,25 @@ automated job uses them from GitHub secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
+### What is on your desk (home page)
+Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
+them lists the work waiting on **you**, and nothing else:
+
+- **Sent back to you** — a costing you submitted that an approver returned, with the comment they
+  left. It is a draft again, so nothing else in the app will ever mention it: this card is the only
+  reminder.
+- **Waiting for you to approve** — shown only if you are an approver. A costing engineer is not
+  shown a queue they cannot clear.
+- **Released, never sent** — the PDF exists and the customer has not been told. Mark the quotation
+  **sent** once you have sent it and the line goes.
+- **Sent, still no answer** — neither won nor lost. Not a fault; the oldest is simply the one worth
+  asking about.
+
+Each line says how long it has sat there, oldest first, and links to the thing itself. **Nothing on
+it can be ticked off**, on purpose: every line is cleared by doing the work — fixing the costing,
+approving it, marking the quotation sent, recording the answer. And when there is nothing waiting
+the card is not there at all, rather than telling you so.
+
 ### Set up a new company (sessions 5–6 review)
 Master administrator, in this order; each step is a screen that already exists.
 1. **Companies → Add company**: name, kind (external, buyer), currency code and printed label,
@@ -466,6 +485,20 @@ who was signed in and which browser. A message can quote the value that caused t
 is not treated as harmless; it is simply not kept long.
 
 If you want something done about one, send me its wording and what the person was doing.
+### The guide people actually read — Help
+
+**Help**, in the top bar, for everybody who can sign in. One page each for the costing engineer,
+the approver and the administrator, and one everybody gets: *things that look like faults and are
+not* — the old quotation showing old prices, the colleague who has left still being named, and a
+screen that broke having already told you.
+
+It opens on the guide for that person's roles. Somebody nobody has given a role to yet sees all of
+it rather than an empty page, which is what an invited person meets on their first morning.
+
+This document is the reference and is written for you. The Help screen is the one to point a new
+engineer at; it is one screenful, and it is in the app, because a guide nobody can find is a guide
+nobody reads. **Its wording is yours** — say what you want changed and it is one small pull
+request; the text lives in one file (`web/src/modules/help/guides.ts`).
 
 ### What CostMatrix stores — the terms page
 
