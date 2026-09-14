@@ -932,3 +932,26 @@ copy carry it with the column they already copy.
 - A company admin cannot change `discount_pct` or master rows.
 - Master admin cannot write tenant rows.
 - Calculation test: a fixture costing produces known totals from the views.
+
+### Added by migration 0124 — error reporting
+
+**error_reports** — what broke in somebody's browser. `company_id`, `user_id`, `kind`
+(`render` for a screen that stopped drawing, `load` for a query that failed), `path` (the route,
+not the URL — a query string could carry anything), `message` (truncated to 500), `detail` (the
+component stack, or which query), `user_agent`, `first_seen_at`, `last_seen_at`, `times_seen`.
+
+Append-only, in the shape `activity_log` set: **no insert policy and no insert grant**, so the
+only way in is `app.report_error`. Read by an administrator of the company it happened to, and by
+the master administrator; a costing engineer may report but not read. A unique index on
+`(company_id, user_id, kind, path, md5(message))` is what makes "the same failure again" a count
+rather than a row.
+
+**app.report_error(in_kind, in_path, in_message, in_detail, in_agent)** — SECURITY DEFINER, with
+a `public.report_error` wrapper carrying the plain argument names the browser sends. It collapses
+a repeat, caps a person at twenty *distinct* faults an hour (a repeat is never capped — that
+count is the point), sweeps the company's rows older than ninety days, and **returns null rather
+than raising**: failing to record an error must never be what breaks a screen.
+
+**v_error_reports** — the same rows with the company and the person named, for the
+*What broke* screen. Security invoker, so the table's policy decides what comes back.
+

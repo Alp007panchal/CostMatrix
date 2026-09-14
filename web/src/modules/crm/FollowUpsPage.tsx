@@ -4,6 +4,7 @@ import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
 import { listQuotations } from '../quotation/api'
 import { listFollowups, setFollowupDone } from './api'
+import { PageHeader } from '../../app/PageHeader'
 
 /** What to chase, in date order: overdue first, then due, then done. */
 export function FollowUpsPage() {
@@ -23,8 +24,8 @@ export function FollowUpsPage() {
 
   return (
     <>
-      <h1>Follow-ups</h1>
-      <p className="muted">Reminders on quotations you have sent. Add one from the Quotations screen.</p>
+      <PageHeader title="Follow-ups" meta="reminders on quotations already sent" />
+      <p className="intro">Reminders on quotations you have sent. Add one from the Quotations screen.</p>
       {done.error && <p className="error">{String(done.error)}</p>}
       <div className="card">
         <div className="table-wrap">

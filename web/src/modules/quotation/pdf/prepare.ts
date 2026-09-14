@@ -135,7 +135,12 @@ export function buildTerms(terms: QuotationTerms): PdfTerm[] {
  * never blank for a costed panel.
  */
 export function buildTechnical(detail: CostingDetail, gaSheets: PdfGaSheet[] = []): PdfTechnicalRow[] {
-  const sheetByPanel = new Map(gaSheets.map((sheet) => [sheet.panelId, sheet]))
+  // The front sheet carries every device on the board, both faces, because the
+  // tags were numbered once across the whole of it. Keying on the rear sheet too
+  // would leave each double-front panel's row listing face B alone.
+  const sheetByPanel = new Map(
+    gaSheets.filter((sheet) => sheet.elevation === 'front').map((sheet) => [sheet.panelId, sheet]),
+  )
   return detail.panels.map((panel, i) => {
     const written = panel.technical_description?.trim() ?? ''
     const generated = written ? '' : describePanel({ panel, assemblies: detail.assemblies, items: detail.items, kits: detail.kits })

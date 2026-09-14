@@ -387,6 +387,78 @@ automated job uses them from GitHub secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
+### Finding your way around
+
+The links are down the **left-hand side** now, in six named groups, rather than in one long bar
+across the top. What you see depends on your roles and on which features your company has switched
+on, so a shorter list is not a fault.
+
+| Group | What is in it |
+|---|---|
+| **Overview** | Home |
+| **1 · Enquiry to quote** | Customers · Enquiries · Costings · Quotations · Follow-ups |
+| **2 · Library** | Components · Kits · Library health · Library set-up |
+| **3 · Insight** | Sales · Labour variance |
+| **Settings** | Settings · People |
+| **Help** | Help |
+
+A number beside a link means something is waiting for a person; an **orange** one means it is late.
+
+Two of those links open a page with a column of tabs down its left. Nothing moved address — every
+link you have bookmarked still works and simply lands on the right tab.
+
+| Was its own link | Now |
+|---|---|
+| Company | **Settings → Company details** |
+| Quotation wording | **Settings → Quotation wording** |
+| Approval rules | **Settings → Approval rules** |
+| Compatibility rules | **Settings → Compatibility rules** |
+| Features | **Settings → Features** |
+| Assistant | **Settings → Assistant** |
+| What broke | **Settings → What broke** |
+| Companies (master administrator) | **Settings → Companies** |
+| Rates | **Library set-up → Rates & currency factors** |
+| Kit groups | **Library set-up → Kit groups & labour hours** |
+| Price lists | **Library set-up → Price lists** |
+| Import | **Library set-up → Import** |
+
+Your name, your company and your roles are at the **bottom of the sidebar**. Two cards that used to
+be on the home page have gone: *How your company is set up* is now Settings → Company details, and
+*Your roles* is that block at the bottom of the sidebar.
+
+On a narrow screen — a phone, or a small laptop window — the sidebar becomes a row of links along
+the **bottom** instead.
+
+### A costing, tab by tab
+
+Opening a costing now shows its **panels as tabs** down the left, each with what that panel comes to,
+and the totals underneath them where they stay in view while you work. Under *Whole costing* are the
+things that belong to the costing rather than to one panel: **All panels side by side** (the grid),
+**Margins & rounding**, **Documents & imports**, **Hours actually taken**, **Assistant**,
+**Exports** (the four bills of materials, and the drawing office's files) and **Approval & history**.
+
+Across the top are four steps — Draft → Submitted → Approved → Quotation released — with the one it
+is at now in orange. That is the quickest way to see where somebody else's costing has got to.
+
+### What is on your desk (home page)
+Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
+them lists the work waiting on **you**, and nothing else:
+
+- **Sent back to you** — a costing you submitted that an approver returned, with the comment they
+  left. It is a draft again, so nothing else in the app will ever mention it: this card is the only
+  reminder.
+- **Waiting for you to approve** — shown only if you are an approver. A costing engineer is not
+  shown a queue they cannot clear.
+- **Released, never sent** — the PDF exists and the customer has not been told. Mark the quotation
+  **sent** once you have sent it and the line goes.
+- **Sent, still no answer** — neither won nor lost. Not a fault; the oldest is simply the one worth
+  asking about.
+
+Each line says how long it has sat there, oldest first, and links to the thing itself. **Nothing on
+it can be ticked off**, on purpose: every line is cleared by doing the work — fixing the costing,
+approving it, marking the quotation sent, recording the answer. And when there is nothing waiting
+the card is not there at all, rather than telling you so.
+
 ### Set up a new company (sessions 5–6 review)
 Master administrator, in this order; each step is a screen that already exists.
 1. **Companies → Add company**: name, kind (external, buyer), currency code and printed label,
@@ -440,6 +512,46 @@ that work. The database enforces this, not just the screen.
 ### Someone forgets a password
 They click **Forgot password** on the sign-in page and get an email. If nothing arrives, send a
 reset from Supabase → Authentication → Users.
+
+### What broke — the error reports
+
+**Administrators → What broke.** Screens that failed in the last 30 days, recorded by the app
+itself when they failed. Nobody has to send you anything, which matters because most people
+never do.
+
+Two kinds of row:
+
+- **The screen stopped drawing** — the app hit an error mid-render and showed the person a
+  message instead of the screen. This is what the blank Components page was on 9 September.
+- **Something would not load** — a query came back with an error and the screen showed a red
+  line. More common, and until now completely invisible to you.
+
+Each row is one *fault*, not one occurrence: the same failure, on the same screen, for the same
+person is counted rather than repeated, so *"4 times"* tells you it is still happening. You see
+your own company's; as master administrator you see every company's, with the company named.
+
+**Nothing appears here when nothing is wrong**, which is the usual state and reads as such.
+
+Rows delete themselves after ninety days — swept by the next report rather than by a scheduled
+job, so there is nothing to maintain. What is kept is on the terms page: the message, the route,
+who was signed in and which browser. A message can quote the value that caused the failure, so it
+is not treated as harmless; it is simply not kept long.
+
+If you want something done about one, send me its wording and what the person was doing.
+### The guide people actually read — Help
+
+**Help**, in the top bar, for everybody who can sign in. One page each for the costing engineer,
+the approver and the administrator, and one everybody gets: *things that look like faults and are
+not* — the old quotation showing old prices, the colleague who has left still being named, and a
+screen that broke having already told you.
+
+It opens on the guide for that person's roles. Somebody nobody has given a role to yet sees all of
+it rather than an empty page, which is what an invited person meets on their first morning.
+
+This document is the reference and is written for you. The Help screen is the one to point a new
+engineer at; it is one screenful, and it is in the app, because a guide nobody can find is a guide
+nobody reads. **Its wording is yours** — say what you want changed and it is one small pull
+request; the text lives in one file (`web/src/modules/help/guides.ts`).
 
 ### What CostMatrix stores — the terms page
 
@@ -801,12 +913,58 @@ deleted, and a second import of the same files changes nothing. Expected on the 
 a kit that holds one cannot be added to a costing until you give it a purchase price. The master
 admin imports the master library; a company admin imports private parts and kits for their company.
 
+### See what the library is missing (Library health)
+**Library health** in the top bar, for administrators, once the switch is on. It reads the library
+as it stands now — not the notes in `data/seed/README.md`, which were written on the day the seed
+was built and say nothing about what you have fixed since — and it sorts every fault by what it
+does to a costing:
+
+- **Stops a costing.** A part with no price, or a kit holding one. The costing refuses it and names
+  the part, so nothing is lost; the work simply stops until you set a price. Also here: a part
+  priced in a currency whose **landed factor** somebody has removed. Its price looks fine on the
+  Components screen and the costing still refuses it, which is the most confusing of the three, so
+  it is told apart and sends you to Rates → Currency factors rather than to the part.
+- **Costs, and leaves something out.** Worse, because nothing complains. A kit in no kit group, or
+  one whose group has no hours, is costed with its material right and **no labour at all** — and
+  the quotation can be released and sent like that. Fixing it is the three hours columns on
+  **Kit groups**, or the `kit-group-labour-template.csv` import.
+- **Worth a look.** A kit with only its main device and no busbar, cable or accessories; a kit with
+  no rating, which is how kits are found. Neither is necessarily wrong — a supply-only kit really
+  has no connection material — which is why they are not mixed in with the first two.
+
+Each row says how many there are, three or four examples, and the screen that puts it right;
+**List them** shows the lot. A part is listed with how many kits hold it, so the one that breaks
+the most costings is at the top. **The screen changes nothing.** It reads, and it never refuses.
+
+On the seed as imported it opens on eight parts waiting for a price (held by fifteen kit lines),
+thirteen kits that would be refused because of them, three kits in no group at all, one kit with
+only its main device — and almost every kit with no hours, which is the labour template.
+
 ### Change a currency's landed factor (session 1)
 Rates → Currency factors. Each currency shows one figure: KES per 1 unit **landed**, with the
-exchange rate, freight, duty and handling in it (200 per EUR today). **Change** writes your
+exchange rate, freight, duty and handling in it (200 per EUR today). Beside it, **Bought in it**
+says how many parts are purchased in that currency — the size of what your change moves. The
+material rates table has the same column, **Prices**: the copper rate carries eleven parts, which
+is the whole busbar catalogue. **Change** writes your
 company's own figure; the master admin ticks *master* to change the default for everyone, and may
 add a new currency at the bottom of the table. A purchase price in a currency with no row cannot
 be saved. New costings use the new figure; existing ones keep what they froze.
+
+### If the app refuses to remove a rate or a kit group
+Three things cannot be deleted while something still rests on them, and the message says what and
+what to do first:
+
+- a **kit group** that kits are still in — move them to another group first. Without this guard the
+  kits would simply fall out of the group and cost **zero labour**, with nothing said.
+- the **master landed factor** for a currency parts are still bought in — reprice them in another
+  currency first. Without it their price cannot be worked out at all, while the purchase price goes
+  on showing on the Components screen.
+- a **master material rate** that weight-priced parts still use — give them a fixed price first.
+  The copper rate is the one that matters: it prices the whole busbar catalogue.
+
+Your **own** currency factor or material rate can always be removed: the master row catches the
+parts, so nothing is orphaned. And a rate or group nothing depends on goes without argument — the
+guard refuses a fault, not a delete.
 
 ### Work out an APFC bank from a target (phase 3.2)
 In a draft costing, on the panel: **Work out an APFC bank**. Type the target in kVAr, choose
@@ -905,8 +1063,16 @@ panel that has a saved layout, and the cover letter's annexure list grows to fiv
 - The footer takes the **form** and the access from the drawing itself and adds the panel's own
   enclosure note where it has one. A board whose form nobody chose prints no form.
 
-On a **double-front** board the sheet says so and notes that face B is not shown: a front elevation
-cannot show it. A rear-elevation sheet is the next thing to add if you want one.
+On a **double-front** board — one where you have put kits on a face at the back — you get a
+**second landscape page straight after the first**: the rear elevation. It is the same board seen
+from behind, so the sections run **right to left** and each section's busbar chamber is on the
+other hand; the header says so in as many words. Only the devices on face B are drawn, under the
+tags they already carry on the front sheet, and a section with nothing behind it is drawn empty and
+marked *no devices on this face*, with its heading saying whether its back shows cable lugs or
+shrouded terminals.
+
+A board you have set to double-front access but not yet drawn anything behind gets **one** sheet,
+not a blank second one. Its footer still reads *front and rear access*.
 
 ### Fill in what the panel layout will need (phase 3.8, fields only)
 The layout pop-up itself is not built yet — the specification and the mockups are in
@@ -1084,8 +1250,33 @@ edited by anyone, including you. A person removed since then leaves their entry 
 *Someone no longer here*: the record of what happened never goes with them.
 
 ### Check the app is running
-Open the Vercel URL. If the page loads and you can sign in, everything is working. For more
-detail: Vercel dashboard shows deployments; Supabase dashboard shows database health.
+
+**It checks itself, four times a day.** The **Uptime check** workflow asks whether the site is
+serving the app and whether Supabase is answering, at 06:00, 12:00, 18:00 and 00:00 UTC. If
+either is down it fails, and GitHub emails you — you do not have to watch anything.
+
+It checks twice, twenty seconds apart, before it says anything is down, so a blip during a
+deployment does not cry wolf. And it looks at what comes back, not just the status code: a
+misconfigured host will happily return a cheerful error page with a 200 on it.
+
+To ask right now rather than wait: **Actions** → **Uptime check** → **Run workflow**. The run
+summary says what answered and how quickly.
+
+By hand, the same check takes ten seconds: open the Vercel URL and sign in. For more detail the
+Vercel dashboard shows deployments and the Supabase dashboard shows database health.
+
+**If you want to be told within minutes rather than within hours**, this workflow is not the
+thing to change — four times a day is deliberate, because GitHub bills Actions by the minute on
+a private repository and a five-minute check would eat about four times the free monthly
+allowance. The better answer is a free uptime service: **UptimeRobot** or **Better Stack** both
+check every five minutes on their free plan and email or text you. Point one at
+`https://cost-matrix-theta.vercel.app`, expect a 200, send alerts to your address. It takes five
+minutes to set up, needs nothing from this repository, and this workflow stays as the floor that
+needs no account and cannot lapse when a subscription does.
+
+One thing to know about scheduled workflows: **GitHub stops running them after 60 days with no
+activity in the repository.** While work is going on that never happens; if the app is ever left
+alone for two months, press *Run workflow* once to wake it up.
 
 ### Download a backup (see Part E)
 Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the

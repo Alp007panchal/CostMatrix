@@ -9,6 +9,7 @@ import type { Costing, CostingStatus, CostingTotals } from '../../lib/database.t
 import { createCosting, listCostings } from './api'
 import { CopyCostingForm } from './CopyCosting'
 import { listEnquiries } from '../crm/api'
+import { PageHeader } from '../../app/PageHeader'
 
 const STATUS_LABEL: Record<CostingStatus, string> = {
   draft: 'Draft',
@@ -39,14 +40,13 @@ export function CostingsPage() {
 
   return (
     <>
-      <div className="spread">
-        <h1>Costings</h1>
+      <PageHeader title="Costings" meta={`${rows.length} shown`}>
         {canCreate && (
-          <button className="primary" onClick={() => setCreating(true)}>
+          <button className="btn" onClick={() => setCreating(true)}>
             New costing
           </button>
         )}
-      </div>
+      </PageHeader>
 
       {creating && (
         <NewCostingForm

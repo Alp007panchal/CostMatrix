@@ -76,8 +76,11 @@ describe('Components page with the imported seed', () => {
   it('renders every part, marking the eight without a price', () => {
     renderWithSeed(<ComponentsPage />)
     expect(screen.getAllByRole('row')).toHaveLength(735 + 1)
-    expect(screen.getAllByText('no price')).toHaveLength(8)
+    // The price chip, not the purchase column: the list says how old a price is
+    // or that there is none, which is the point of the column (house style §5).
+    expect(screen.getAllByText('NO PRICE')).toHaveLength(8)
     expect(screen.getAllByText('by weight')).toHaveLength(10)
+    expect(screen.getAllByText('BY WEIGHT')).toHaveLength(10)
     // 30 x 10 mm busbar: 42 EUR ÷ 15 = 2.8 kg/m × 3,000 KES/kg.
     const busbarRow = screen.getAllByText('30X10MM')[0]!.closest('tr')!
     expect(within(busbarRow).getByText('KES 8,400.00')).toBeTruthy()

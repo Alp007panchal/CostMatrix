@@ -80,7 +80,11 @@ with wanted(feature, kind, name) as (values
   ('4.3 EPLAN and Word',      'function', 'app.set_eplan_metadata'),
   ('4.3 EPLAN and Word',      'function', 'app.import_eplan_metadata'),
   ('4.3 EPLAN and Word',      'column',   'public.costings.eplan_project'),
-  ('4.3 EPLAN and Word',      'column',   'public.costings.drawing_numbers')
+  ('4.3 EPLAN and Word',      'column',   'public.costings.drawing_numbers'),
+  ('Error reporting',         'table',    'public.error_reports'),
+  ('Error reporting',         'view',     'public.v_error_reports'),
+  ('Error reporting',         'function', 'app.report_error'),
+  ('Error reporting',         'function', 'public.report_error')
 )
 select
   w.feature,

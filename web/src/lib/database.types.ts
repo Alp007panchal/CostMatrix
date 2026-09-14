@@ -1520,3 +1520,93 @@ export interface LayoutEnclosureApplied {
   missing: { width_mm: number; quantity: number; why: string }[]
   wanted: Record<string, number>
 }
+
+/** How much rests on one library row (v_library_dependents, migration 0130). */
+export interface LibraryDependents {
+  kind: 'kit_group' | 'currency_factor' | 'material_rate'
+  entity_id: string
+  label: string
+  dependents: number
+  dependents_are: string
+}
+
+/** One thing waiting on the signed-in person (v_my_desk, migration 0129). */
+export interface DeskItem {
+  kind: DeskKind
+  sort_order: number
+  entity: 'costing' | 'quotation'
+  entity_id: string
+  reference: string
+  title: string
+  since: string
+  /** Whole days since, counted by the database's clock rather than the browser's. */
+  days: number
+  detail: string
+}
+
+export type DeskKind =
+  | 'returned_to_you'
+  | 'waiting_for_you'
+  | 'released_not_sent'
+  | 'sent_unanswered'
+/** One fault the library has, live (v_library_issues, migration 0128). */
+export interface LibraryIssue {
+  company_id: string | null
+  library: 'master' | 'private'
+  entity: 'part' | 'kit'
+  entity_id: string
+  code: string
+  name: string
+  /** How many kits hold this part. Zero on a kit row. */
+  used_by_kits: number
+  kind: LibraryIssueKind
+  severity: LibrarySeverity
+  sort_order: number
+  detail: string
+  fix_on: string
+}
+
+export type LibrarySeverity = 'refuses' | 'silent' | 'check'
+
+export type LibraryIssueKind =
+  | 'part_no_price'
+  | 'part_placeholder'
+  | 'part_no_factor'
+  | 'part_no_rate'
+  | 'kit_unpriced_part'
+  | 'kit_no_lines'
+  | 'kit_no_group'
+  | 'kit_no_hours'
+  | 'kit_only_main_device'
+  | 'kit_no_main_device'
+  | 'kit_no_rating'
+  | 'kit_obsolete_part'
+
+/** The same faults counted by kind (v_library_health). */
+export interface LibraryHealthRow {
+  library: 'master' | 'private'
+  kind: LibraryIssueKind
+  severity: LibrarySeverity
+  sort_order: number
+  fix_on: string
+  items: number
+  used_by_kits: number
+  examples: string[]
+}
+/** One thing that broke in somebody's browser (migration 0124, v_error_reports). */
+export interface ErrorReport {
+  id: string
+  company_id: string
+  company_name: string
+  user_id: string | null
+  full_name: string | null
+  kind: 'render' | 'load'
+  path: string
+  message: string
+  detail: string | null
+  user_agent: string | null
+  first_seen_at: string
+  last_seen_at: string
+  times_seen: number
+}
+

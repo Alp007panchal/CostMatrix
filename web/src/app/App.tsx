@@ -5,6 +5,7 @@ import { SessionProvider } from '../modules/auth/session'
 import { FeatureGate } from '../modules/admin/FeatureGate'
 import { RequireAuth, RequireRole } from './guards'
 import { Layout } from './Layout'
+import { LibrarySetupFirstTab, LibrarySetupLayout, SettingsFirstTab, SettingsLayout } from './TabbedPages'
 import { HomePage } from '../modules/dashboard/HomePage'
 import { SetPasswordPage } from '../modules/auth/SetPasswordPage'
 
@@ -30,10 +31,13 @@ const FollowUpsPage = lazy(() => import('../modules/crm/FollowUpsPage').then((m)
 const ApprovalRulesPage = lazy(() => import('../modules/admin/ApprovalRulesPage').then((m) => ({ default: m.ApprovalRulesPage })))
 const FeaturesPage = lazy(() => import('../modules/admin/FeaturesPage').then((m) => ({ default: m.FeaturesPage })))
 const CompatibilityRulesPage = lazy(() => import('../modules/admin/CompatibilityRulesPage').then((m) => ({ default: m.CompatibilityRulesPage })))
+const LibraryHealthPage = lazy(() => import('../modules/library/LibraryHealthPage').then((m) => ({ default: m.LibraryHealthPage })))
 const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePage').then((m) => ({ default: m.LabourVariancePage })))
 const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
+const ErrorsPage = lazy(() => import('../modules/admin/ErrorsPage').then((m) => ({ default: m.ErrorsPage })))
+const HelpPage = lazy(() => import('../modules/help/HelpPage').then((m) => ({ default: m.HelpPage })))
 const TermsPage = lazy(() => import('../modules/legal/TermsPage').then((m) => ({ default: m.TermsPage })))
 
 const queryClient = new QueryClient({
@@ -97,6 +101,8 @@ export function App() {
                 }
               />
               <Route path="quotations" element={<QuotationsPage />} />
+              {/* Every signed-in person, whatever roles they hold or do not. */}
+              <Route path="help" element={<HelpPage />} />
               <Route
                 path="sales"
                 element={
@@ -110,30 +116,89 @@ export function App() {
               <Route path="crm/enquiries" element={<EnquiriesPage />} />
               <Route path="crm/enquiries/:id" element={<EnquiryDetail />} />
               <Route path="crm/follow-ups" element={<FollowUpsPage />} />
+
+              {/*
+                Settings: eight screens that used to be eight separate links in
+                the top bar. The addresses have not changed — this is a layout
+                route with no path of its own, so `/admin/company` still works
+                and now simply draws with the tab column beside it.
+              */}
+              <Route path="settings" element={<SettingsFirstTab />} />
               <Route
-                path="admin/approval-rules"
                 element={
                   <RequireRole role="company_admin">
+                    <SettingsLayout />
+                  </RequireRole>
+                }
+              >
+                <Route path="admin/company" element={<CompanyPage />} />
+                <Route path="admin/quotation-defaults" element={<QuotationDefaultsPage />} />
+                <Route
+                  path="admin/approval-rules"
+                  element={
                     <FeatureGate code="approval_rules">
                       <ApprovalRulesPage />
                     </FeatureGate>
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="admin/features"
-                element={
-                  <RequireRole role="company_admin">
-                    <FeaturesPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="admin/compatibility-rules"
-                element={
-                  <RequireRole role="company_admin">
+                  }
+                />
+                <Route
+                  path="admin/compatibility-rules"
+                  element={
                     <FeatureGate code="compatibility_checks">
                       <CompatibilityRulesPage />
+                    </FeatureGate>
+                  }
+                />
+                <Route path="admin/features" element={<FeaturesPage />} />
+                <Route
+                  path="admin/assistant"
+                  element={
+                    <FeatureGate code="assistant">
+                      <AssistantSettingsPage />
+                    </FeatureGate>
+                  }
+                />
+                <Route path="admin/errors" element={<ErrorsPage />} />
+                <Route
+                  path="admin/companies"
+                  element={
+                    <RequireRole masterAdminOnly>
+                      <CompaniesPage />
+                    </RequireRole>
+                  }
+                />
+              </Route>
+
+              {/* Library set-up: the same arrangement for the four library screens. */}
+              <Route path="library/setup" element={<LibrarySetupFirstTab />} />
+              <Route
+                element={
+                  <RequireRole role="company_admin">
+                    <LibrarySetupLayout />
+                  </RequireRole>
+                }
+              >
+                <Route path="library/rates" element={<RatesPage />} />
+                <Route path="library/kit-groups" element={<KitGroupsPage />} />
+                <Route
+                  path="library/price-lists"
+                  element={
+                    <FeatureGate code="price_lists">
+                      <PriceListsPage />
+                    </FeatureGate>
+                  }
+                />
+                <Route path="library/import" element={<SeedImportPage />} />
+              </Route>
+
+              <Route path="library/components" element={<ComponentsPage />} />
+              <Route path="library/assemblies" element={<AssembliesPage />} />
+              <Route
+                path="library/health"
+                element={
+                  <RequireRole role="company_admin">
+                    <FeatureGate code="library_health">
+                      <LibraryHealthPage />
                     </FeatureGate>
                   </RequireRole>
                 }
@@ -149,73 +214,10 @@ export function App() {
                 }
               />
               <Route
-                path="admin/quotation-defaults"
-                element={
-                  <RequireRole role="company_admin">
-                    <QuotationDefaultsPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="admin/assistant"
-                element={
-                  <RequireRole role="company_admin">
-                    <FeatureGate code="assistant">
-                      <AssistantSettingsPage />
-                    </FeatureGate>
-                  </RequireRole>
-                }
-              />
-              <Route path="library/components" element={<ComponentsPage />} />
-              <Route path="library/assemblies" element={<AssembliesPage />} />
-              <Route path="library/kit-groups" element={<KitGroupsPage />} />
-              <Route
-                path="library/rates"
-                element={
-                  <RequireRole role="company_admin">
-                    <RatesPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="library/import"
-                element={
-                  <RequireRole role="company_admin">
-                    <SeedImportPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="library/price-lists"
-                element={
-                  <RequireRole role="company_admin">
-                    <FeatureGate code="price_lists">
-                      <PriceListsPage />
-                    </FeatureGate>
-                  </RequireRole>
-                }
-              />
-              <Route
                 path="admin/people"
                 element={
                   <RequireRole role="company_admin">
                     <PeoplePage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="admin/company"
-                element={
-                  <RequireRole role="company_admin">
-                    <CompanyPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="admin/companies"
-                element={
-                  <RequireRole masterAdminOnly>
-                    <CompaniesPage />
                   </RequireRole>
                 }
               />

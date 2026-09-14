@@ -4,6 +4,7 @@ import type {
   EffectiveCurrencyFactor,
   EffectiveMaterialRate,
   LabourRate,
+  LibraryDependents,
   MaterialRate,
 } from '../../lib/database.types'
 import { fail } from './api'
@@ -122,3 +123,14 @@ export async function addMasterCurrency(currencyCode: string, landedFactor: numb
   fail('Could not add the currency', error)
 }
 
+/**
+ * How many parts rest on each currency factor and material rate (migration 0130).
+ * Shown beside a rate so the size of a change is visible before it is made — the
+ * copper rate carries the whole busbar catalogue — and so the refusal that meets
+ * a delete is never a surprise.
+ */
+export async function listLibraryDependents(): Promise<LibraryDependents[]> {
+  const { data, error } = await supabase.from('v_library_dependents').select('*')
+  fail('Could not read what depends on the rates', error)
+  return (data ?? []) as LibraryDependents[]
+}

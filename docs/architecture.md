@@ -92,6 +92,16 @@ failures and uptime notices go to alp007panchal@gmail.com. If the team grows, mo
 notifications to a shared company mailbox before adding more users, so nothing is missed while
 one person is away.
 
+**Uptime** is `uptime.yml`, a GitHub Actions job four times a day: it asks whether the site is
+serving the app and whether Supabase answers, retries once before believing a failure, and goes
+red — which is an email — when either is down. Four times a day rather than every five minutes
+because Actions is billed by the minute on a private repository; a free external checker
+(UptimeRobot, Better Stack) is the right tool for minute-level notice and the runbook says so
+plainly rather than pretending this job is that.
+**Errors** are recorded by the app itself (migration 0124): a screen that stops drawing, or a load
+that fails, writes a row an administrator reads on **What broke**. The administrator should not
+learn that the app is broken by being told.
+
 ### Testing
 - Database: pgTAP tests for isolation and calculations, run in CI.
 - Web: unit tests for formatting helpers; a short manual demo script per slice in `docs/`.
