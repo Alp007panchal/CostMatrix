@@ -224,6 +224,29 @@ td { padding: 10px; border-bottom: 1px solid var(--paper-2); vertical-align: mid
 tbody tr:last-child td { border-bottom: none; }
 td.right, th.right, td.r, th.r, td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.mono { font-family: var(--mono); font-size: 12.5px; }
+/* The costing grid: its own scrolling box, so the panel names stay across the
+   top and the kit names stay down the left while the figures move under them.
+   `overflow-x: auto` alone would have made the page the scroller and pinned the
+   heading to the top of the window instead, which is not where the table is. */
+.grid-scroll { overflow: auto; max-height: calc(100vh - 15rem); min-height: 20rem; }
+.grid-scroll thead th { position: sticky; top: 0; z-index: 2; background: var(--white); }
+.grid-scroll tbody td:first-child, .grid-scroll tbody th:first-child {
+  position: sticky; left: 0; z-index: 1; background: var(--white);
+}
+.grid-scroll thead th:first-child { z-index: 3; }
+/* Named rows keep their own fill where they overlap the sticky column. */
+.grid-scroll tbody tr.subtotal td:first-child { background: var(--paper); }
+.grid-scroll tbody tr.grid-section td { background: var(--paper-2); }
+.grid-scroll tbody tr.sel td:first-child { background: #FBF5EF; }
+.grid-section td {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--text-dim); font-weight: 500;
+}
+/* The × that removes a panel: quiet until it is wanted, red when it is. */
+.panel-head .rm { padding: 2px 7px; font-size: 15px; line-height: 1; flex: 0 0 auto; }
+.panel-head .rm:hover { color: var(--bad); background: var(--bad-soft); }
+.panel-head .row > input.nm { flex: 1; min-width: 0; }
+
 /* A panel's column heading in the grid: its own details, edited in place, kept
    narrow enough that the heading is still a heading rather than a form. */
 .panel-head { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; min-width: 11rem; }

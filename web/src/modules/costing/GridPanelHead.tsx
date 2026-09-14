@@ -21,6 +21,7 @@ export function GridPanelHead({
   editable,
   inCompare,
   onChange,
+  onRemove,
 }: {
   panel: CostingPanel
   /** Whether this column counts towards the costing's total (roadmap 2.7). */
@@ -29,6 +30,8 @@ export function GridPanelHead({
   editable: boolean
   inCompare: boolean
   onChange: (changes: Partial<CostingPanel>) => void
+  /** Asks first; the question is in `remove-panel.ts`. */
+  onRemove: () => void
 }) {
   const warning = spaceWarning(fit)
   const style = inCompare ? { background: 'rgba(245, 158, 11, .12)' } : undefined
@@ -46,14 +49,25 @@ export function GridPanelHead({
   return (
     <th className="right" style={style}>
       <div className="panel-head">
-        <Text
-          label={`Name of ${panel.name}`}
-          value={panel.name}
-          className="nm"
-          // A panel with no name at all would leave a nameless column and a
-          // nameless line on the quotation, so an empty box means "unchanged".
-          onCommit={(v) => v.trim() !== '' && onChange({ name: v.trim() })}
-        />
+        <div className="row">
+          <Text
+            label={`Name of ${panel.name}`}
+            value={panel.name}
+            className="nm"
+            // A panel with no name at all would leave a nameless column and a
+            // nameless line on the quotation, so an empty box means "unchanged".
+            onCommit={(v) => v.trim() !== '' && onChange({ name: v.trim() })}
+          />
+          <button
+            type="button"
+            className="ghost small rm"
+            aria-label={`Remove ${panel.name}`}
+            title={`Remove ${panel.name} and everything on it`}
+            onClick={onRemove}
+          >
+            ×
+          </button>
+        </div>
         <div className="row">
           <QtyBox
             label={`Quantity of ${panel.name}`}

@@ -63,6 +63,7 @@ const handlers = (): GridHandlers => ({
   onAddPanel: vi.fn(),
   onCopyPanel: vi.fn(),
   onPanelChange: vi.fn(),
+  onRemovePanel: vi.fn(),
 })
 
 function show(over: { editable?: boolean; fits?: Record<string, PanelFit | undefined> } = {}) {
@@ -164,6 +165,26 @@ describe('the costing grid', () => {
     // The name is still there, as plain text — "MDB" alone also names an entry
     // in the Compare dropdown, so read it off the heading itself.
     expect(screen.getAllByRole('columnheader')[2]?.textContent).toContain('MDB')
+  })
+
+  it('removes a panel from its column heading, but asks first', () => {
+    const h = show()
+    const ask = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Remove MDB' }))
+    expect(ask).toHaveBeenCalledOnce()
+    // The question names the panel and what is on it, so nobody deletes blind.
+    expect(String(ask.mock.calls[0]?.[0])).toContain('“MDB”')
+    expect(h.onRemovePanel).not.toHaveBeenCalled()
+
+    ask.mockReturnValue(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Remove MDB' }))
+    expect(h.onRemovePanel).toHaveBeenCalledWith('p1')
+    ask.mockRestore()
+  })
+
+  it('offers no way to remove a panel on a costing nobody may edit', () => {
+    show({ editable: false })
+    expect(screen.queryByRole('button', { name: 'Remove MDB' })).toBeNull()
   })
 
   it('changes the quantity of the line that is there', async () => {
