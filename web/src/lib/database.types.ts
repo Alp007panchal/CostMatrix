@@ -1521,6 +1521,25 @@ export interface LayoutEnclosureApplied {
   wanted: Record<string, number>
 }
 
+/** One thing waiting on the signed-in person (v_my_desk, migration 0129). */
+export interface DeskItem {
+  kind: DeskKind
+  sort_order: number
+  entity: 'costing' | 'quotation'
+  entity_id: string
+  reference: string
+  title: string
+  since: string
+  /** Whole days since, counted by the database's clock rather than the browser's. */
+  days: number
+  detail: string
+}
+
+export type DeskKind =
+  | 'returned_to_you'
+  | 'waiting_for_you'
+  | 'released_not_sent'
+  | 'sent_unanswered'
 /** One fault the library has, live (v_library_issues, migration 0128). */
 export interface LibraryIssue {
   company_id: string | null

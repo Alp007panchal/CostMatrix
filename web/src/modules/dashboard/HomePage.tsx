@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { money, percent, roleLabel, marginToMarkup } from '../../lib/format'
 import { listFollowups } from '../crm/api'
+import { DeskCard } from './DeskCard'
 
 /** Where signing in lands you: what needs doing, who you are, how your company is set up. */
 export function HomePage() {
@@ -22,6 +23,10 @@ export function HomePage() {
         You are signed in to {company.name}
         {isMasterAdmin && ' as the master administrator'}.
       </p>
+
+      {/* Above the follow-ups on purpose: a follow-up is somebody else's move,
+          and what is on your desk is yours. */}
+      <DeskCard />
 
       {open.length > 0 && (
         <div className="card">

@@ -387,6 +387,25 @@ automated job uses them from GitHub secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
+### What is on your desk (home page)
+Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
+them lists the work waiting on **you**, and nothing else:
+
+- **Sent back to you** — a costing you submitted that an approver returned, with the comment they
+  left. It is a draft again, so nothing else in the app will ever mention it: this card is the only
+  reminder.
+- **Waiting for you to approve** — shown only if you are an approver. A costing engineer is not
+  shown a queue they cannot clear.
+- **Released, never sent** — the PDF exists and the customer has not been told. Mark the quotation
+  **sent** once you have sent it and the line goes.
+- **Sent, still no answer** — neither won nor lost. Not a fault; the oldest is simply the one worth
+  asking about.
+
+Each line says how long it has sat there, oldest first, and links to the thing itself. **Nothing on
+it can be ticked off**, on purpose: every line is cleared by doing the work — fixing the costing,
+approving it, marking the quotation sent, recording the answer. And when there is nothing waiting
+the card is not there at all, rather than telling you so.
+
 ### Set up a new company (sessions 5–6 review)
 Master administrator, in this order; each step is a screen that already exists.
 1. **Companies → Add company**: name, kind (external, buyer), currency code and printed label,

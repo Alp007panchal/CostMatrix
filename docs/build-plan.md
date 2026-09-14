@@ -318,6 +318,14 @@ or into go-live.
     `refuses` rules test the same predicate the engine's refusal tests, and a test proves the view
     and the error message name the same part.
 
+43. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
+    signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
+    else will ever mention it), a costing waiting for an approver — shown only to somebody who can
+    actually approve — a quotation released and never marked sent, and one sent that has been
+    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0129, one view,
+    no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
+    when the desk is clear rather than saying so.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
