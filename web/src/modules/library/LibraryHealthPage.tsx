@@ -6,7 +6,7 @@ import { listLibraryHealth, listLibraryIssues } from './library-health-api'
 import { bySeverity, exampleWords, headline, kindLabel, libraryLabel } from './library-health'
 
 /**
- * Library health (migration 0125): what the library is missing, live.
+ * Library health (migration 0128): what the library is missing, live.
  *
  * The same list `data/seed/README.md` has carried since 8 September — parts with
  * no price, kits with only a main device, groups with no hours — except that this

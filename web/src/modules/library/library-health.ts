@@ -1,7 +1,7 @@
 import type { LibraryHealthRow, LibraryIssueKind, LibrarySeverity } from '../../lib/database.types'
 
 /**
- * The library's faults in words (migration 0125).
+ * The library's faults in words (migration 0128).
  *
  * The database decides what is wrong and how bad it is; this only says it in a
  * sentence. Pure, so the wording can be tested without a database — and kept

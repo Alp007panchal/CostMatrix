@@ -1,4 +1,4 @@
--- 0125  What the library is missing, before a costing finds out.
+-- 0128  What the library is missing, before a costing finds out.
 --
 -- `data/seed/README.md` lists what the owner's own clean-up could not settle:
 -- seven placeholder parts with no price, one catalogue part without one, fifteen

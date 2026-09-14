@@ -284,7 +284,7 @@ straight to `main`, reviewed and merged by the owner the same day.
     fault does to a costing: *stops a costing* (a part with no price, a kit holding one, a currency
     whose landed factor has gone), *costs and leaves something out* (a kit in no group, or whose
     group has no hours — zero labour, silently), *worth a look* (only a main device, no rating).
-    Each row names the screen that fixes it. Migration 0125, two views, no write anywhere. The
+    Each row names the screen that fixes it. Migration 0128, two views, no write anywhere. The
     `refuses` rules test the same predicate the engine's refusal tests, and a test proves the view
     and the error message name the same part.
 

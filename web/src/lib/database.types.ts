@@ -1521,7 +1521,7 @@ export interface LayoutEnclosureApplied {
   wanted: Record<string, number>
 }
 
-/** One fault the library has, live (v_library_issues, migration 0125). */
+/** One fault the library has, live (v_library_issues, migration 0128). */
 export interface LibraryIssue {
   company_id: string | null
   library: 'master' | 'private'

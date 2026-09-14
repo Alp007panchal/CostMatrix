@@ -1,7 +1,7 @@
 import { supabase } from '../../lib/supabase'
 import type { LibraryHealthRow, LibraryIssue, LibraryIssueKind } from '../../lib/database.types'
 
-/** What the library is missing (migration 0125). Reads only; there is no write. */
+/** What the library is missing (migration 0128). Reads only; there is no write. */
 
 function fail(context: string, error: { message: string } | null): void {
   if (error) throw new Error(`${context}: ${error.message}`)
