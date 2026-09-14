@@ -106,7 +106,7 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   Staging project, so the owner can try a feature there before switching it on for real work.
 - **Numbers are taken from the highest anywhere in the repository, not the highest on your
   branch.** Sessions run in parallel, so check the open pull requests and the remote branches.
-  - **Migrations are one continuous sequence.** The next free number today is **0123**.
+  - **Migrations are one continuous sequence.** The next free number today is **0128**.
     `0018` is dead and must never be used: production has recorded `0001`–`0017` *and*
     `0100`–`0118`, so a new `0018` would sort behind eighteen migrations that have already
     run. A re-used number is worse than a wrong one — Supabase skips it in silence.

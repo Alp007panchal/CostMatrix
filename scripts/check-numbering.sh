@@ -14,10 +14,11 @@
 #
 # Three checks:
 #   1. No two migration files share a number.
-#   2. Every migration this branch adds is numbered higher than every migration
-#      already on `origin/main`. This also catches the 0018 trap: production has
-#      recorded 0001-0017 AND 0100-0118, so a new 0018 would sort behind
-#      eighteen migrations that have already run.
+#   2. No migration this branch adds re-uses a number another branch has taken,
+#      and none is numbered below what `origin/main` has already applied. That
+#      second half is the 0018 trap: production has recorded 0001-0017 AND
+#      0100-0118, so a new 0018 would sort behind eighteen migrations that have
+#      already run.
 #   3. No two decisions in docs/decisions.md share an id.
 #
 # Run it anywhere: ./scripts/check-numbering.sh
@@ -48,11 +49,8 @@ else
   note "  ✓ $(ls supabase/migrations/[0-9][0-9][0-9][0-9]_*.sql | wc -l | tr -d ' ') migrations, no number used twice"
 fi
 
-# --- 2. Anything new is numbered above every number taken anywhere -----------
-# "Anywhere" matters. Comparing against origin/main alone would happily hand out
-# a number another session has already taken on a branch that has not merged
-# yet, which is exactly how 0116 came to be written twice.
-note "→ new migrations are numbered above every number taken on any branch"
+# --- 2. New migrations: no clash anywhere, nothing below what has run --------
+note "→ new migrations clash with nobody, and none sorts below what has run"
 if ! git rev-parse --verify --quiet origin/main >/dev/null; then
   note "  – origin/main is not in this clone, so there is nothing to compare against."
   note "    (In CI the database job checks out with fetch-depth: 0 so that it is.)"
@@ -85,6 +83,23 @@ else
   on_main="$(git ls-tree --name-only origin/main -- supabase/migrations/ 2>/dev/null \
     | sed -n 's#supabase/migrations/\([0-9]\{4\}\)_.*#\1#p' | sort)"
 
+  # Two different yardsticks, and the difference is the whole of check 2.
+  #
+  # A CLASH is measured against every branch: a number is free only if nobody
+  # anywhere has taken it. That is what stops two sessions both writing 0116.
+  #
+  # ORDERING is measured against `origin/main` alone, because that is what has
+  # actually been applied. A migration sitting on a branch that has not merged
+  # has run nowhere, so it cannot have run *before* yours. Measuring order
+  # against it refuses correct work: on 2026-09-14 five branches held 0123 to
+  # 0127, each one the next free number when it was written, and the guard
+  # refused four of the five for being "below 0127". Only the highest-numbered
+  # branch could ever have gone green, and only if it merged first — the exact
+  # opposite of the order the numbers ask for.
+  #
+  # What those higher branches really carry is a merge-order requirement, not a
+  # fault, so they are reported as a note underneath and the run stays green.
+  applied="$(printf '%s\n' "$on_main" | grep -E '^[0-9]{4}$' | sort | tail -n 1 || true)"
   highest="$(printf '%s\n' "$elsewhere" | cut -f1; printf '%s\n' "$on_main")"
   highest="$(printf '%s\n' "$highest" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
 
@@ -92,6 +107,7 @@ else
     note "  – no migrations anywhere yet; nothing to compare against."
   else
     added=0
+    mine_new=""
     for f in supabase/migrations/[0-9][0-9][0-9][0-9]_*.sql; do
       name="$(basename "$f")"
       n="${name:0:4}"
@@ -105,16 +121,34 @@ else
           '$1 == n && $2 != me { print $2 }' | head -n 1)"
         if [[ -n "$clash" ]]; then
           problem "$name re-uses number $n, which another branch has taken as $clash."
-        elif [[ "$((10#$n))" -lt "$((10#$highest))" ]]; then
-          problem "$name is numbered $n, below $highest which already exists."
-          problem "    Migrations run in number order. Use $(printf '%04d' "$((10#$highest + 1))") or higher."
+        elif [[ -n "$applied" && "$((10#$n))" -lt "$((10#$applied))" ]]; then
+          problem "$name is numbered $n, below $applied which origin/main has already applied."
+          problem "    A migration that sorts behind one already recorded is skipped in silence."
+          problem "    Use $(printf '%04d' "$((10#$applied + 1))") or higher."
+        else
+          mine_new="$mine_new$n"$'\n'
         fi
       fi
     done
+    lowest_new="$(printf '%s\n' "$mine_new" | grep -E '^[0-9]{4}$' | sort | head -n 1 || true)"
+    above=""
+    if [[ -n "$lowest_new" ]]; then
+      above="$(printf '%s\n' "$elsewhere" | awk -F'\t' -v low="$lowest_new" \
+        '$1 != "" && $1+0 > low+0 { print $2 }' | sort -u)"
+    fi
+
     if [[ "$added" -eq 0 ]]; then
       note "  ✓ this branch adds no migration; the highest taken anywhere is $highest"
     elif [[ "$fail" -eq 0 ]]; then
-      note "  ✓ $added new, all above $highest"
+      note "  ✓ $added new, clashing with nothing, none below ${applied:-any applied migration}"
+    fi
+    if [[ -n "$above" ]]; then
+      note ""
+      note "  Note, not a fault: these are numbered above this branch and have not merged."
+      while read -r m; do [[ -n "$m" ]] && note "      $m"; done <<<"$above"
+      note "  Migrations are applied in number order, so this pull request merges BEFORE"
+      note "  them. If one of them merges first, come back and renumber this one — the"
+      note "  check above will say so, because by then it will have actually run."
     fi
   fi
 fi
