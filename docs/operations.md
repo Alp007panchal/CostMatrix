@@ -441,6 +441,32 @@ that work. The database enforces this, not just the screen.
 They click **Forgot password** on the sign-in page and get an email. If nothing arrives, send a
 reset from Supabase → Authentication → Users.
 
+### What broke — the error reports
+
+**Administrators → What broke.** Screens that failed in the last 30 days, recorded by the app
+itself when they failed. Nobody has to send you anything, which matters because most people
+never do.
+
+Two kinds of row:
+
+- **The screen stopped drawing** — the app hit an error mid-render and showed the person a
+  message instead of the screen. This is what the blank Components page was on 9 September.
+- **Something would not load** — a query came back with an error and the screen showed a red
+  line. More common, and until now completely invisible to you.
+
+Each row is one *fault*, not one occurrence: the same failure, on the same screen, for the same
+person is counted rather than repeated, so *"4 times"* tells you it is still happening. You see
+your own company's; as master administrator you see every company's, with the company named.
+
+**Nothing appears here when nothing is wrong**, which is the usual state and reads as such.
+
+Rows delete themselves after ninety days — swept by the next report rather than by a scheduled
+job, so there is nothing to maintain. What is kept is on the terms page: the message, the route,
+who was signed in and which browser. A message can quote the value that caused the failure, so it
+is not treated as harmless; it is simply not kept long.
+
+If you want something done about one, send me its wording and what the person was doing.
+
 ### What CostMatrix stores — the terms page
 
 `/terms`, linked from **What CostMatrix stores** at the bottom of every screen and from the
@@ -932,8 +958,16 @@ panel that has a saved layout, and the cover letter's annexure list grows to fiv
 - The footer takes the **form** and the access from the drawing itself and adds the panel's own
   enclosure note where it has one. A board whose form nobody chose prints no form.
 
-On a **double-front** board the sheet says so and notes that face B is not shown: a front elevation
-cannot show it. A rear-elevation sheet is the next thing to add if you want one.
+On a **double-front** board — one where you have put kits on a face at the back — you get a
+**second landscape page straight after the first**: the rear elevation. It is the same board seen
+from behind, so the sections run **right to left** and each section's busbar chamber is on the
+other hand; the header says so in as many words. Only the devices on face B are drawn, under the
+tags they already carry on the front sheet, and a section with nothing behind it is drawn empty and
+marked *no devices on this face*, with its heading saying whether its back shows cable lugs or
+shrouded terminals.
+
+A board you have set to double-front access but not yet drawn anything behind gets **one** sheet,
+not a blank second one. Its footer still reads *front and rear access*.
 
 ### Fill in what the panel layout will need (phase 3.8, fields only)
 The layout pop-up itself is not built yet — the specification and the mockups are in

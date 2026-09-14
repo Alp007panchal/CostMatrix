@@ -41,6 +41,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
       'Customers, contacts, projects and enquiries entered by the company, and any files attached to an enquiry, such as drawings and specifications.',
       'Your name, your email address, and which roles you hold.',
       'A record of who submitted, approved or changed a costing, and when.',
+      'When a screen breaks for somebody: what the error said, which page it happened on, who was signed in and which browser. It can quote a value that caused the failure, so it is kept no longer than ninety days and then deleted automatically.',
     ],
   },
   {
