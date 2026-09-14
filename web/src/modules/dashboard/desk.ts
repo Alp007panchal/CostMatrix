@@ -8,26 +8,30 @@ import type { DeskItem, DeskKind } from '../../lib/database.types'
  * rather than a branch in the home page.
  */
 
-export const KINDS: { kind: DeskKind; label: string; blurb: string }[] = [
+export const KINDS: { kind: DeskKind; label: string; blurb: string; next: string }[] = [
   {
     kind: 'returned_to_you',
     label: 'Sent back to you',
     blurb: 'It is a draft again, so nothing else will remind you. The comment says what to change.',
+    next: 'Change it and submit again',
   },
   {
     kind: 'waiting_for_you',
     label: 'Waiting for you to approve',
     blurb: 'Submitted, and nobody can release a quotation from it until you have looked.',
+    next: 'Approve or return',
   },
   {
     kind: 'released_not_sent',
     label: 'Released, never sent',
     blurb: 'The PDF exists and the customer has not been told. Mark it sent once you have sent it.',
+    next: 'Send it, then mark it sent',
   },
   {
     kind: 'sent_unanswered',
     label: 'Sent, still no answer',
     blurb: 'Not a fault — the oldest is simply the one worth asking about.',
+    next: 'Chase it',
   },
 ]
 
@@ -35,11 +39,17 @@ export function kindLabel(kind: DeskKind): string {
   return KINDS.find((k) => k.kind === kind)?.label ?? kind
 }
 
+/** The "what next" column (house style §5): the one move that clears this line. */
+export function nextStep(kind: DeskKind): string {
+  return KINDS.find((k) => k.kind === kind)?.next ?? ''
+}
+
 /** The items grouped by kind, in the database's own order; empty kinds left out. */
 export function byKind(items: DeskItem[]): {
   kind: DeskKind
   label: string
   blurb: string
+  next: string
   items: DeskItem[]
 }[] {
   return KINDS.map((k) => ({

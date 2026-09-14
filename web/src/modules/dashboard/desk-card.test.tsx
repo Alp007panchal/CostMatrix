@@ -42,10 +42,16 @@ describe('the card on the home page', () => {
     renderCard([item()])
     expect(screen.getByText('On your desk')).toBeTruthy()
     expect(screen.getByText('CM-2026-0001')).toBeTruthy()
-    // Read off the line itself: the age also appears in the sentence above it.
-    const line = screen.getByRole('listitem').textContent ?? ''
-    expect(line).toContain('The 400 A feeder is priced twice')
-    expect(line).toContain('9 days ago')
+    // Read off the row itself: the age also appears in the sentence beside the
+    // heading, so a plain text match would find either.
+    const row = screen.getByRole('cell', { name: /400 A feeder/ }).closest('tr')
+    expect(row?.textContent).toContain('The 400 A feeder is priced twice')
+    expect(row?.textContent).toContain('9 days ago')
+  })
+
+  it('says what would clear the line, rather than offering a button that cannot', () => {
+    renderCard([item()])
+    expect(screen.getByText('Change it and submit again')).toBeTruthy()
   })
 
   it('links each line to the thing itself, because that is how it is cleared', () => {

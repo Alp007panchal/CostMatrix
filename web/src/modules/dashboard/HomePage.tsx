@@ -1,124 +1,93 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
-import { money, percent, roleLabel, marginToMarkup } from '../../lib/format'
+import { useFeatures } from '../admin/use-features'
+import { PageHeader } from '../../app/PageHeader'
 import { listFollowups } from '../crm/api'
+import { listQuotations } from '../quotation/api'
+import { listLibraryHealth } from '../library/library-health-api'
+import { listMyDesk } from './desk-api'
+import { todayIso } from './attention'
+import { exceptions, homeTiles } from './home-tiles'
 import { DeskCard } from './DeskCard'
+import { FollowUpsSection } from './FollowUpsSection'
 
-/** Where signing in lands you: what needs doing, who you are, how your company is set up. */
+/**
+ * Where signing in lands you (house style §5): four tiles, one bar of things
+ * that need a decision today, then the two sections that are actual work.
+ *
+ * What left, and where it went: "How your company is set up" is now Settings ›
+ * Company details, and "Your roles" is the block at the bottom of the sidebar.
+ * Neither was ever something a person came here to read — they were here because
+ * there was nowhere else to put them.
+ */
 export function HomePage() {
-  const { profile, company, roles, isMasterAdmin } = useSession()
+  const { profile, company, isMasterAdmin } = useSession()
+  const { on } = useFeatures()
+  const desk = useQuery({ queryKey: ['my-desk'], queryFn: listMyDesk, enabled: on('my_desk') })
+  const quotations = useQuery({ queryKey: ['quotations'], queryFn: listQuotations })
   const followups = useQuery({ queryKey: ['followups'], queryFn: listFollowups })
+  const library = useQuery({
+    queryKey: ['library-health'],
+    queryFn: listLibraryHealth,
+    enabled: on('library_health'),
+  })
   if (!profile || !company) return null
 
-  const today = new Date().toISOString().slice(0, 10)
-  const open = (followups.data ?? []).filter((f) => !f.done_at)
-  const overdue = open.filter((f) => f.due_on < today)
-  const dueSoon = open.filter((f) => f.due_on >= today).slice(0, 5)
+  const today = todayIso()
+  const tiles = homeTiles(desk.data ?? [], quotations.data ?? [], followups.data ?? [], today)
+  const bar = exceptions(desk.data ?? [], followups.data ?? [], library.data ?? [], today)
 
   return (
     <>
-      <h1>Good day, {profile.full_name.split(' ')[0]}</h1>
-      <p className="muted">
-        You are signed in to {company.name}
-        {isMasterAdmin && ' as the master administrator'}.
+      <PageHeader
+        title={`Good day, ${profile.full_name.split(' ')[0]}`}
+        meta={`${company.name}${isMasterAdmin ? ' · master administrator' : ''}`}
+      />
+      <p className="intro">
+        Everything here comes from costings and quotations already in the app — nothing is typed
+        twice. Red means somebody must act today; amber means watch it.
       </p>
 
-      {/* Above the follow-ups on purpose: a follow-up is somebody else's move,
-          and what is on your desk is yours. */}
-      <DeskCard />
-
-      {open.length > 0 && (
-        <div className="card">
-          <div className="spread">
-            <h2 style={{ margin: 0 }}>Follow-ups</h2>
-            <Link to="/crm/followups">All follow-ups</Link>
+      <div className="kpi-row">
+        {tiles.map((tile) => (
+          <div className={tile.tone === undefined ? 'kpi' : `kpi k-${tile.tone}`} key={tile.label}>
+            <div className="label">{tile.label}</div>
+            <div className="value">{tile.value}</div>
+            <div className="delta">{tile.delta}</div>
           </div>
-          <p className="muted" style={{ margin: '.4rem 0 .6rem' }}>
-            {overdue.length > 0 ? <strong className="error">{overdue.length} overdue</strong> : 'Nothing overdue'}
-            {dueSoon.length > 0 && `, ${dueSoon.length} coming up`}.
-          </p>
-          <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
-            {[...overdue, ...dueSoon].slice(0, 6).map((f) => (
-              <li key={f.id}>
-                <span className={f.due_on < today ? 'error' : 'muted'}>{f.due_on}</span> — {f.note || 'Chase the quotation'}
-              </li>
+        ))}
+      </div>
+
+      {bar.length > 0 && (
+        <div className="exbar">
+          <div className="exbar-head">
+            <span className="n">{bar.length}</span>
+            <span className="t">
+              {bar.length === 1 ? 'one thing needs a decision now' : `${bar.length} things need a decision now`}
+            </span>
+            <span className="hint">click one to open where it came from</span>
+          </div>
+          <div className="exlist">
+            {bar.map((item) => (
+              <Link className={item.watch === true ? 'exitem watch' : 'exitem'} to={item.to} key={item.src}>
+                <span className="sev" />
+                <div>
+                  <div className="hl">{item.hl}</div>
+                  <div className="why">{item.why}</div>
+                  <div className="src">{item.src}</div>
+                </div>
+                <span className="fig">{item.fig}</span>
+              </Link>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
-      <div className="card">
-        <div className="spread">
-          <h2 style={{ margin: 0 }}>Your roles</h2>
-        </div>
-        {roles.length === 0 ? (
-          <p className="muted">
-            No roles yet, so there is not much you can do. Ask your company administrator.
-          </p>
-        ) : (
-          <p>
-            {roles.map((role) => (
-              <span className="badge" key={role}>
-                {roleLabel(role)}
-              </span>
-            ))}
-          </p>
-        )}
+      <div className="grid2">
+        <DeskCard />
+        <FollowUpsSection />
       </div>
-
-      <div className="card">
-        <h2 style={{ marginTop: 0 }}>How {company.name} is set up</h2>
-        <div className="table-wrap">
-          <table>
-            <tbody>
-              <tr>
-                <th>Currency</th>
-                <td>
-                  {company.currency_label} ({company.currency_code})
-                  {company.currency_code !== 'KES' &&
-                    ` — 1 ${company.currency_code} = ${company.exchange_rate} KES`}
-                </td>
-              </tr>
-              <tr>
-                <th>Discount on master prices</th>
-                <td>{percent(company.discount_pct)}</td>
-              </tr>
-              <tr>
-                <th>Material margin</th>
-                <td>
-                  {percent(company.material_margin_pct)}{' '}
-                  <span className="muted">
-                    (a {percent(marginToMarkup(company.material_margin_pct))} markup on cost)
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <th>Labour margin</th>
-                <td>
-                  {percent(company.labour_margin_pct)}{' '}
-                  <span className="muted">
-                    (a {percent(marginToMarkup(company.labour_margin_pct))} markup on cost)
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <th>VAT</th>
-                <td>{percent(company.tax_pct)}</td>
-              </tr>
-              <tr>
-                <th>Panel prices rounded up to</th>
-                <td>{money(company.price_rounding_step, company.currency_label)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <p className="muted">
-        Start with <Link to="/costings">Costings</Link>, or log a new request under{' '}
-        <Link to="/crm/enquiries">Enquiries</Link>.
-      </p>
     </>
   )
 }
