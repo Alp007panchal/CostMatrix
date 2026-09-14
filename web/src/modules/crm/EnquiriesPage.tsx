@@ -8,6 +8,7 @@ import type { Enquiry, EnquiryStatus } from '../../lib/database.types'
 import { createEnquiry, listContacts, listCustomers, listEnquiries, listProjects, updateEnquiry } from './api'
 import { DecideEnquiry } from './DecideEnquiry'
 import { listQuotations } from '../quotation/api'
+import { PageHeader } from '../../app/PageHeader'
 
 // Won and lost are not in this list: they are decided once, on the enquiry,
 // naming the quotation that won it (the Won or lost? button).
@@ -38,11 +39,10 @@ export function EnquiriesPage() {
 
   return (
     <>
-      <div className="spread">
-        <h1>Enquiries</h1>
-        {canEdit && <button className="primary" onClick={() => setAdding(true)} disabled={(customers.data ?? []).length === 0}>Log enquiry</button>}
-      </div>
-      <p className="muted">
+      <PageHeader title="Enquiries" meta={`${rows.length} shown`}>
+        {canEdit && <button className="btn" onClick={() => setAdding(true)} disabled={(customers.data ?? []).length === 0}>Log enquiry</button>}
+      </PageHeader>
+      <p className="intro">
         Log each request as it comes in. Costings are created against an enquiry, and sending a
         quotation marks the enquiry quoted. When you hear back, <strong>Won or lost?</strong>
         decides the whole enquiry at once: winning it names the quotation that won, and the other

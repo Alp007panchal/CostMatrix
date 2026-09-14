@@ -7,6 +7,7 @@ import type { PersonWithRoles, UserRole } from '../../lib/database.types'
 import { grantRole, listPeople, movePerson, removePerson, revokeRole, setPersonActive } from './api'
 import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { InviteForm } from './InviteForm'
+import { PageHeader } from '../../app/PageHeader'
 
 const ALL_ROLES: UserRole[] = ['company_admin', 'costing_engineer', 'approver']
 
@@ -48,8 +49,8 @@ export function PeoplePage() {
 
   return (
     <>
-      <h1>People</h1>
-      <p className="muted">
+      <PageHeader title="People" meta={company.name} />
+      <p className="intro">
         Roles decide what someone may do. Only an approver can approve a costing or release a
         quotation, and that is enforced by the database, not just by this screen.
       </p>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSession } from '../auth/session'
 import { GUIDES, guidesFor, isYours, type Guide } from './guides'
+import { PageHeader } from '../../app/PageHeader'
 
 const ROLE_NAMES: Record<string, string> = {
   costing_engineer: 'costing engineer',
@@ -48,8 +49,8 @@ export function HelpPage() {
 
   return (
     <>
-      <h1>How to use CostMatrix</h1>
-      <p className="muted">
+      <PageHeader title="How to use CostMatrix" meta={`${ordered.length} guides`} />
+      <p className="intro">
         {mine.length > 0
           ? 'Your own guide is first. The others are here because most people end up doing a bit of everything.'
           : 'Nobody has given you a role yet, so here is all of it. Your administrator decides which parts you can use.'}{' '}

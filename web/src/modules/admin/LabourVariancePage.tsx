@@ -3,6 +3,7 @@ import { Async } from '../../ui/Async'
 import type { KitGroupLabourVariance, UnattributedLabourHours } from '../../lib/database.types'
 import { applyLabourSuggestion, listKitGroupVariance, listUnattributedHours } from './labour-variance-api'
 import { byHoursAtStake, groupLabel, varianceSentence, weigh, weightSentence, worthChanging } from './labour-variance'
+import { PageHeader } from '../../app/PageHeader'
 
 /**
  * Where the labour standards are wrong (roadmap 2.8). Built from the hours
@@ -25,8 +26,8 @@ export function LabourVariancePage() {
 
   return (
     <>
-      <h1>Labour variance</h1>
-      <p className="muted">
+      <PageHeader title="Labour variance" meta="recorded hours against costed hours" />
+      <p className="intro">
         What the shop floor took against what the kits were costed at, by kit group and process. A
         board's hours are shared across its kits in proportion to the estimate, because hours are
         recorded per board — so read a row with its sample size beside it. Nothing on this screen

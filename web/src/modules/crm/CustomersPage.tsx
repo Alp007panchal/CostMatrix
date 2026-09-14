@@ -6,6 +6,7 @@ import { Async, Field } from '../../ui/Async'
 import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { createCustomer, listCustomers, type CustomerInput } from './api'
 import { CustomerDetail } from './CustomerDetail'
+import { PageHeader } from '../../app/PageHeader'
 
 /** Customers, typed once and chosen from a list everywhere else. */
 export function CustomersPage() {
@@ -32,11 +33,10 @@ export function CustomersPage() {
 
   return (
     <>
-      <div className="spread">
-        <h1>Customers</h1>
-        {canEdit && <button className="primary" onClick={() => setAdding(true)}>Add customer</button>}
-      </div>
-      <p className="muted">Enter a customer once here; enquiries and quotations then pick it from a list.</p>
+      <PageHeader title="Customers" meta={`${rows.length} on the books`}>
+        {canEdit && <button className="btn" onClick={() => setAdding(true)}>Add customer</button>}
+      </PageHeader>
+      <p className="intro">Enter a customer once here; enquiries and quotations then pick it from a list.</p>
 
       {adding && (
         <NewCustomerForm

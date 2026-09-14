@@ -387,6 +387,59 @@ automated job uses them from GitHub secrets without showing them to anyone.
 These describe the finished app. Some screens do not exist yet; each says which build slice
 brings it.
 
+### Finding your way around
+
+The links are down the **left-hand side** now, in six named groups, rather than in one long bar
+across the top. What you see depends on your roles and on which features your company has switched
+on, so a shorter list is not a fault.
+
+| Group | What is in it |
+|---|---|
+| **Overview** | Home |
+| **1 · Enquiry to quote** | Customers · Enquiries · Costings · Quotations · Follow-ups |
+| **2 · Library** | Components · Kits · Library health · Library set-up |
+| **3 · Insight** | Sales · Labour variance |
+| **Settings** | Settings · People |
+| **Help** | Help |
+
+A number beside a link means something is waiting for a person; an **orange** one means it is late.
+
+Two of those links open a page with a column of tabs down its left. Nothing moved address — every
+link you have bookmarked still works and simply lands on the right tab.
+
+| Was its own link | Now |
+|---|---|
+| Company | **Settings → Company details** |
+| Quotation wording | **Settings → Quotation wording** |
+| Approval rules | **Settings → Approval rules** |
+| Compatibility rules | **Settings → Compatibility rules** |
+| Features | **Settings → Features** |
+| Assistant | **Settings → Assistant** |
+| What broke | **Settings → What broke** |
+| Companies (master administrator) | **Settings → Companies** |
+| Rates | **Library set-up → Rates & currency factors** |
+| Kit groups | **Library set-up → Kit groups & labour hours** |
+| Price lists | **Library set-up → Price lists** |
+| Import | **Library set-up → Import** |
+
+Your name, your company and your roles are at the **bottom of the sidebar**. Two cards that used to
+be on the home page have gone: *How your company is set up* is now Settings → Company details, and
+*Your roles* is that block at the bottom of the sidebar.
+
+On a narrow screen — a phone, or a small laptop window — the sidebar becomes a row of links along
+the **bottom** instead.
+
+### A costing, tab by tab
+
+Opening a costing now shows its **panels as tabs** down the left, each with what that panel comes to,
+and the totals underneath them where they stay in view while you work. Under *Whole costing* are the
+things that belong to the costing rather than to one panel: **All panels side by side** (the grid),
+**Margins & rounding**, **Documents & imports**, **Hours actually taken**, **Assistant**,
+**Exports** (the four bills of materials, and the drawing office's files) and **Approval & history**.
+
+Across the top are four steps — Draft → Submitted → Approved → Quotation released — with the one it
+is at now in orange. That is the quickest way to see where somebody else's costing has got to.
+
 ### What is on your desk (home page)
 Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
 them lists the work waiting on **you**, and nothing else:
