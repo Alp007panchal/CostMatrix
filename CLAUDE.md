@@ -114,11 +114,13 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
     another session's. `D-001` to `D-293` keep their numbers for ever.
   - `scripts/check-numbering.sh` enforces both, in CI on every pull request. Run it before
     you push.
-- **Check, then claim, before building.** More than one session works on this repository. Before
-  starting a roadmap item: `git fetch`, look at the open pull requests and the remote branches,
-  and if nothing has it, put one line in `docs/build-plan.md` under *In hand right now* and push
-  that first. Two sessions built roadmap 2.8 on the same morning and one of them was thrown away
-  (D-240); a line in a file is what stops it happening again.
+- **Check, then claim, before building — anything, not just a roadmap item.** More than one
+  session works on this repository. Before starting: `git fetch`, look at the open pull requests
+  and the remote branches, and if nothing has it, put one line in `docs/build-plan.md` under
+  *In hand right now* and push that first. Two sessions built roadmap 2.8 on the same morning and
+  one was thrown away (D-240); then two sessions built the same release **two seconds apart**,
+  neither having claimed it, because a release is not a roadmap item. It is now: a release, a
+  fix, a document, a chore — if it will take more than a few minutes, claim it.
 - Verify before claiming: `supabase/tests/run-local.sh` (it imports the real `data/seed`
   files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
   Never edit `data/seed/*` by hand: it is the owner's data. Say plainly what could not be
