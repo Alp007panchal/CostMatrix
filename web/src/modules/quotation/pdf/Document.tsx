@@ -184,7 +184,7 @@ export function QuotationDocument({ data }: { data: QuotationPdfData }) {
 
       {data.gaSheets.map((sheet, i) => (
         <GaSheet
-          key={sheet.panelId}
+          key={`${sheet.panelId}-${sheet.elevation}`}
           sheet={sheet}
           referenceNo={data.referenceNo}
           companyName={data.letterhead.companyName}

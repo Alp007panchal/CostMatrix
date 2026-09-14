@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import type { CostingDetail } from '../../costing/api'
 import type { LayoutSection } from '../../../lib/database.types'
 import { buildGaSheets, gaTagLine, type SavedPanelLayout } from './ga'
-import { devicePlace, gaGeometry, scaleWords, sheetTags } from './ga-geometry'
+import { devicePlace, gaGeometry, scaleWords, sectionBands, sheetTags } from './ga-geometry'
+import type { PdfGaSection } from './types'
 import { buildTechnical } from './prepare'
 
 function detail(over: Partial<CostingDetail> = {}): CostingDetail {
@@ -44,6 +45,19 @@ const feeders: LayoutSection = {
   ] }],
 }
 
+/** The same feeder section, with a compartment of its own behind it. */
+const doubled: LayoutSection = {
+  ...feeders, name: 'S3', access: 'double_front',
+  faces: [
+    { side: 'front', connection: 'front', design: 'mccb_plates', placements: [
+      { costing_assembly_id: 'ca4', face: 'front', name: '630 A MCCB', slot: 0, height_mm: 300, y_mm: 0, unsized: false },
+    ] },
+    { side: 'rear', connection: 'rear', design: 'mccb_plates', placements: [
+      { costing_assembly_id: 'ca9', face: 'rear', name: 'CHANGEOVER', slot: 0, height_mm: 300, y_mm: 0, unsized: false },
+    ] },
+  ],
+}
+
 const saved = (sections: LayoutSection[], over: Partial<SavedPanelLayout> = {}): SavedPanelLayout => ({
   panel_id: 'p1', sections, construction_code: 'S4', version: 2, ...over,
 })
@@ -80,21 +94,23 @@ describe('the general-arrangement sheets', () => {
     expect(sheet!.sections[1]?.designWords).toBe('OUTGOING FEEDERS')
   })
 
-  it('say on the sheet that a double-front board has a face this elevation cannot show', () => {
-    const doubled: LayoutSection = {
-      ...feeders, access: 'double_front',
-      faces: [
-        feeders.faces[0]!,
-        { side: 'rear', connection: 'rear', design: 'mccb_plates', placements: [
-          { costing_assembly_id: 'ca9', face: 'rear', name: 'CHANGEOVER', slot: 0, height_mm: 300, unsized: false },
-        ] },
-      ],
-    }
+  it('say on the front sheet that the board is double-front, and tag both faces', () => {
     const [sheet] = buildGaSheets(detail({ panels: [panel('p1', 'B')] }), [saved([doubled])])
     expect(sheet!.hasRearFace).toBe(true)
     expect(sheet!.sections[0]?.designWords).toContain('DOUBLE-FRONT')
     // The rear device is still tagged, so the schedule and the drawing agree.
-    expect(sheetTags(sheet!)).toEqual(['Q1', 'Q2', 'Q3'])
+    expect(sheetTags(sheet!)).toEqual(['Q1', 'Q2'])
+  })
+
+  it('leave a board set to double-front that nobody has drawn behind with one sheet', () => {
+    // Access says front and rear; there is no face B yet. Drawing an empty second
+    // sheet would be a page saying nothing, so the board is drawn once and the
+    // spec line still tells the truth about how it is reached.
+    const empty: LayoutSection = { ...feeders, access: 'double_front' }
+    const sheets = buildGaSheets(detail({ panels: [panel('p1', 'B')] }), [saved([empty])])
+    expect(sheets).toHaveLength(1)
+    expect(sheets[0]?.hasRearFace).toBe(false)
+    expect(sheets[0]?.specLine).toContain('FRONT AND REAR ACCESS')
   })
 
   it('take the form from the drawing and claim nothing else', () => {
@@ -148,6 +164,7 @@ describe('fitting the drawing on the page', () => {
   const sheetOf = (widthMm: number) => ({
     panelId: 'p1', panelName: 'B', optionLabel: null, construction: 'S4', version: 1,
     widthMm, heightMm: 2000, baseMm: 100, depthMm: 800, sections: [], specLine: '', hasRearFace: false,
+    elevation: 'front' as const,
   })
 
   it('scales the board to the frame, so a long board and a short one both fill it', () => {
@@ -184,3 +201,102 @@ describe('fitting the drawing on the page', () => {
     expect(place.height).toBeGreaterThan(6)
   })
 })
+
+describe('the rear elevation', () => {
+  it('is a second sheet, after the front one, only for a board with a face behind', () => {
+    const d = detail({ panels: [panel('p1', 'MAIN LV BOARD')] })
+    expect(buildGaSheets(d, [saved([incomer, feeders])]).map((s) => s.elevation)).toEqual(['front'])
+    expect(buildGaSheets(d, [saved([incomer, doubled])]).map((s) => s.elevation))
+      .toEqual(['front', 'rear'])
+  })
+
+  it('reads the sections right to left, because that is the order you walk round to', () => {
+    const d = detail({ panels: [panel('p1', 'MAIN LV BOARD')] })
+    const [front, rear] = buildGaSheets(d, [saved([incomer, feeders, doubled])])
+    expect(front!.sections.map((s) => s.name)).toEqual(['S1', 'S2', 'S3'])
+    expect(rear!.sections.map((s) => s.name)).toEqual(['S3', 'S2', 'S1'])
+    // Same board: the same overall width, the same spec line, the same version.
+    expect(rear!.widthMm).toBe(front!.widthMm)
+    expect(rear!.specLine).toBe(front!.specLine)
+    expect(rear!.version).toBe(front!.version)
+  })
+
+  it('carries face B alone, under the tag the front sheet gave it', () => {
+    const d = detail({ panels: [panel('p1', 'B')] })
+    const [front, rear] = buildGaSheets(d, [saved([incomer, doubled])])
+    // Q1 incomer, Q2 the front of S3, Q3 behind it.
+    expect(sheetTags(front!)).toEqual(['Q1', 'Q2', 'Q3'])
+    expect(sheetTags(rear!)).toEqual(['Q3'])
+    expect(rear!.sections[0]?.devices[0]?.label).toBe('CHANGEOVER')
+    expect(rear!.sections[0]?.devices.every((device) => device.face === 'rear')).toBe(true)
+  })
+
+  it('says what is behind a section that has no devices of its own', () => {
+    const d = detail({ panels: [panel('p1', 'B')] })
+    const [, rear] = buildGaSheets(d, [saved([incomer, doubled])])
+    // S1 comes last on a rear sheet and has nothing behind it; the drawing says
+    // what it does show, in the same words as the rear view on screen.
+    const last = rear!.sections[rear!.sections.length - 1]
+    expect(last?.name).toBe('S1')
+    expect(last?.devices).toEqual([])
+    expect(last?.rearWords).toBe('FRONT CONNECTION · TERMINALS SHROUDED · CABLES TO THE CABLE SPACE')
+    expect(rear!.sections[0]?.rearWords).toBe('FACE B · A DEVICE COMPARTMENT OF ITS OWN')
+  })
+
+  it('does not make the technical offer list face B twice', () => {
+    const d = detail({ panels: [panel('p1', 'MAIN LV BOARD')] })
+    const sheets = buildGaSheets(d, [saved([incomer, doubled])])
+    const line = buildTechnical(d, sheets)[0]?.description ?? ''
+    expect(line.match(/Q3 Changeover/g) ?? []).toHaveLength(1)
+    expect(line).toContain('Q1 1600 a acb')
+  })
+})
+
+describe('mirroring a section for the rear sheet', () => {
+  const gaSection = (over: Partial<PdfGaSection> = {}): PdfGaSection => ({
+    name: 'S1', widthMm: 800, depthMm: 800, design: 'mccb_plates', designWords: 'OUTGOING FEEDERS',
+    busbarCompartmentMm: 200, busbarSide: 'left', form: '2b', doubleFront: false,
+    rearWords: 'FRONT CONNECTION · TERMINALS SHROUDED', devices: [], ...over,
+  })
+
+  it('leaves the front elevation exactly where it was drawn before', () => {
+    const g = gaGeometry({ ...sheetOfWidth(1600), sections: [] })
+    const section = gaSection()
+    const width = section.widthMm * g.scale
+    const front = sectionBands(section, 0, width, g, false)
+    expect(front.compartmentX).toBe(0)
+    expect(front.deviceX).toBeCloseTo(front.compartmentWidth + 6, 6)
+    expect(front.deviceWidth).toBeCloseTo(width - front.compartmentWidth - 14, 6)
+  })
+
+  it('puts the busbar chamber on the other hand, and the devices with it', () => {
+    const g = gaGeometry({ ...sheetOfWidth(1600), sections: [] })
+    const section = gaSection()
+    const width = section.widthMm * g.scale
+    const front = sectionBands(section, 0, width, g, false)
+    const rear = sectionBands(section, 0, width, g, true)
+    expect(rear.compartmentX).toBeCloseTo(width - front.compartmentWidth, 6)
+    expect(rear.compartmentWidth).toBe(front.compartmentWidth)
+    expect(rear.deviceX).toBeLessThan(front.deviceX)
+    expect(rear.deviceWidth).toBe(front.deviceWidth)
+    // And the devices still stop short of the chamber rather than running into it.
+    expect(rear.deviceX + rear.deviceWidth).toBeLessThanOrEqual(rear.compartmentX)
+  })
+
+  it('mirrors a section whose chamber is already on the right back to the left', () => {
+    const g = gaGeometry({ ...sheetOfWidth(1600), sections: [] })
+    const section = gaSection({ busbarSide: 'right' })
+    const width = section.widthMm * g.scale
+    expect(sectionBands(section, 0, width, g, false).compartmentX)
+      .toBeCloseTo(width - section.busbarCompartmentMm * g.scale, 6)
+    expect(sectionBands(section, 0, width, g, true).compartmentX).toBe(0)
+  })
+})
+
+function sheetOfWidth(widthMm: number) {
+  return {
+    panelId: 'p1', panelName: 'B', optionLabel: null, construction: 'S4', version: 1,
+    widthMm, heightMm: 2000, baseMm: 100, depthMm: 800, sections: [], specLine: '',
+    hasRearFace: false, elevation: 'front' as const,
+  }
+}

@@ -98,6 +98,9 @@ red — which is an email — when either is down. Four times a day rather than 
 because Actions is billed by the minute on a private repository; a free external checker
 (UptimeRobot, Better Stack) is the right tool for minute-level notice and the runbook says so
 plainly rather than pretending this job is that.
+**Errors** are recorded by the app itself (migration 0124): a screen that stops drawing, or a load
+that fails, writes a row an administrator reads on **What broke**. The administrator should not
+learn that the app is broken by being told.
 
 ### Testing
 - Database: pgTAP tests for isolation and calculations, run in CI.
