@@ -301,13 +301,6 @@ or into go-live.
     decision id in CI, because the rule alone was broken three times in one week. `advanced`
     stays as the copy staging runs, for trying a feature before switching it on.
 
-40. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
-    signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
-    else will ever mention it), a costing waiting for an approver — shown only to somebody who can
-    actually approve — a quotation released and never marked sent, and one sent that has been
-    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0126, one view,
-    no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
-    when the desk is clear rather than saying so.
 39. **The rear elevation on the quotation** (roadmap 3.8) — a panel whose saved layout has a face
     at the back now gets a **second** Annexure V sheet: the same board walked round, sections right
     to left, each busbar chamber on the other hand, face B's devices under the tags the front sheet
@@ -315,6 +308,14 @@ or into go-live.
     its back shows, in the same words as the rear view on screen. A board set to double-front that
     nobody has drawn behind still gets one sheet, not a blank second one. No migration: this is all
     in the browser.
+
+40. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
+    signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
+    else will ever mention it), a costing waiting for an approver — shown only to somebody who can
+    actually approve — a quotation released and never marked sent, and one sent that has been
+    neither won nor lost. Oldest first, each linking to the thing itself. Migration 0126, one view,
+    no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
+    when the desk is clear rather than saying so.
 
 ## In hand right now
 
