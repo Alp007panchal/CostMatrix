@@ -485,6 +485,20 @@ who was signed in and which browser. A message can quote the value that caused t
 is not treated as harmless; it is simply not kept long.
 
 If you want something done about one, send me its wording and what the person was doing.
+### The guide people actually read — Help
+
+**Help**, in the top bar, for everybody who can sign in. One page each for the costing engineer,
+the approver and the administrator, and one everybody gets: *things that look like faults and are
+not* — the old quotation showing old prices, the colleague who has left still being named, and a
+screen that broke having already told you.
+
+It opens on the guide for that person's roles. Somebody nobody has given a role to yet sees all of
+it rather than an empty page, which is what an invited person meets on their first morning.
+
+This document is the reference and is written for you. The Help screen is the one to point a new
+engineer at; it is one screenful, and it is in the app, because a guide nobody can find is a guide
+nobody reads. **Its wording is yours** — say what you want changed and it is one small pull
+request; the text lives in one file (`web/src/modules/help/guides.ts`).
 
 ### What CostMatrix stores — the terms page
 

@@ -366,7 +366,10 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
   setting in their dashboard rather than anything in this repository.
 - Custom domain and email sender for Supabase Auth invitations.
 - ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
-- One-page user guide per role.
+- ~~One-page user guide per role~~ — **built 13 Sep**, in the app at **Help** rather than in this
+  repository, because the people who need it most have never opened a repository. One page each for
+  the costing engineer, the approver and the administrator, plus one everybody gets: the things that
+  look like faults and are not. A test checks every screen a guide names is a real route.
 - Bulk price update rehearsal: download the library, change prices, upload, confirm the preview and the price history.
 - Assembly upload and download (assemblies, their components, their hours), if not finished in slice 1.
 
