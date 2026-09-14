@@ -3,6 +3,11 @@
 One line per decision. Never delete a line; if a decision is reversed, add a new line that
 says so and references the old one.
 
+> **This file is the archive, and it is closed.** A decision made from 14 September 2026
+> onwards is **one file** in [`docs/decisions/`](decisions/) — see its README for why and for
+> the shape of one. Nothing here is moving; both places are one `grep` apart and
+> `scripts/check-numbering.sh` checks ids across both.
+
 **Ids.** `D-001` to `D-293` are running numbers and keep them for ever. Everything after that
 takes a **dated id** — `D-YYYY-MM-DD-short-name` — because two sessions writing on the same
 morning cannot both be given "the next number" and three times in one week they were.

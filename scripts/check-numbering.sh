@@ -18,7 +18,10 @@
 #      already on `origin/main`. This also catches the 0018 trap: production has
 #      recorded 0001-0017 AND 0100-0118, so a new 0018 would sort behind
 #      eighteen migrations that have already run.
-#   3. No two decisions in docs/decisions.md share an id.
+#   3. No two decisions share an id — across the docs/decisions.md archive AND
+#      the docs/decisions/ folder, which is where new ones go.
+#   4. Every file in docs/decisions/ carries the id its filename promises. A
+#      decision filed under the wrong name is a decision nobody finds again.
 #
 # Run it anywhere: ./scripts/check-numbering.sh
 
@@ -119,17 +122,60 @@ else
   fi
 fi
 
-# --- 3. No two decisions share an id -----------------------------------------
+# --- 3. No two decisions share an id, wherever they live ---------------------
+# Two places hold decisions now: docs/decisions.md is the archive, closed, and
+# docs/decisions/ is one file per decision, which is what new ones are. An id
+# has to be unique across BOTH, or a reference to it resolves to two things.
 note "→ decision ids are unique"
-ids="$(sed -n 's/^| \(D-[A-Za-z0-9-]*\) |.*/\1/p' docs/decisions.md)"
+archive_ids="$(sed -n 's/^| \(D-[A-Za-z0-9-]*\) |.*/\1/p' docs/decisions.md)"
+folder_ids=""
+if [[ -d docs/decisions ]]; then
+  for f in docs/decisions/*.md; do
+    [[ -e "$f" ]] || continue
+    [[ "$(basename "$f")" == "README.md" ]] && continue
+    folder_ids="${folder_ids}D-$(basename "$f" .md)"$'\n'
+  done
+fi
+ids="$(printf '%s\n%s\n' "$archive_ids" "$folder_ids" | grep -E '^D-' || true)"
 dupe_ids="$(printf '%s\n' "$ids" | sort | uniq -d)"
 if [[ -n "$dupe_ids" ]]; then
   while read -r d; do
     [[ -n "$d" ]] || continue
-    problem "$d appears $(printf '%s\n' "$ids" | grep -cx "$d") times in docs/decisions.md"
+    where=""
+    printf '%s\n' "$archive_ids" | grep -qx "$d" && where="the archive"
+    printf '%s\n' "$folder_ids" | grep -qx "$d" && where="${where:+$where and }docs/decisions/"
+    problem "$d appears $(printf '%s\n' "$ids" | grep -cx "$d") times, in $where"
   done <<<"$dupe_ids"
 else
   note "  ✓ $(printf '%s\n' "$ids" | grep -c . ) decisions, no id used twice"
+fi
+
+# --- 4. A decision file carries the id its name promises ---------------------
+# The filename is the id, minus the D-. If the heading inside says something
+# else, every reference to one of the two is wrong and nobody notices until
+# they go looking for a decision that is filed under another name.
+note "→ decision files are named for the id inside them"
+checked=0
+if [[ -d docs/decisions ]]; then
+  for f in docs/decisions/*.md; do
+    [[ -e "$f" ]] || continue
+    [[ "$(basename "$f")" == "README.md" ]] && continue
+    want="D-$(basename "$f" .md)"
+    got="$(sed -n 's/^# \(D-[A-Za-z0-9-]*\) *$/\1/p' "$f" | head -n 1)"
+    if [[ -z "$got" ]]; then
+      problem "$(basename "$f") has no id heading. Its first heading must be '# $want'."
+    elif [[ "$got" != "$want" ]]; then
+      problem "$(basename "$f") says '# $got' but its name promises '$want'."
+      problem "    Rename the file, or fix the heading — they have to agree."
+    else
+      checked=$((checked + 1))
+    fi
+  done
+fi
+if [[ "$checked" -gt 0 && "$fail" -eq 0 ]]; then
+  note "  ✓ every decision file in docs/decisions/ ($checked) is named for the id it carries"
+elif [[ "$checked" -eq 0 && "$fail" -eq 0 ]]; then
+  note "  – no decision files yet; new decisions go in docs/decisions/ (see its README)"
 fi
 
 if [[ "$fail" -ne 0 ]]; then
@@ -137,7 +183,8 @@ if [[ "$fail" -ne 0 ]]; then
   note "Numbering clash. Two sessions work on this repository at once, so a number"
   note "is free only if it is free EVERYWHERE — check the open pull requests and the"
   note "remote branches, not just this one. New decisions take a dated id"
-  note "(D-YYYY-MM-DD-short-name), which cannot clash at all."
+  note "(D-YYYY-MM-DD-short-name) in a file of their own under docs/decisions/,"
+  note "which cannot clash at all. See docs/decisions/README.md."
   exit 1
 fi
 

@@ -110,9 +110,13 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
     `0018` is dead and must never be used: production has recorded `0001`–`0017` *and*
     `0100`–`0118`, so a new `0018` would sort behind eighteen migrations that have already
     run. A re-used number is worse than a wrong one — Supabase skips it in silence.
-  - **A new decision takes a dated id**, `D-YYYY-MM-DD-short-name`, which cannot clash with
-    another session's. `D-001` to `D-293` keep their numbers for ever.
-  - `scripts/check-numbering.sh` enforces both, in CI on every pull request. Run it before
+  - **A new decision is one file**, `docs/decisions/YYYY-MM-DD-short-name.md`, carrying
+    `# D-YYYY-MM-DD-short-name` as its first line. Two sessions writing on the same morning
+    make two files, which git merges without asking; two paragraphs appended to one file is a
+    conflict every time, and with nine pull requests open it was thirty-six of them.
+    `docs/decisions.md` is the archive — `D-001` to `D-293` keep their numbers for ever — and
+    it is closed. `docs/decisions/README.md` has the shape of a decision file.
+  - `scripts/check-numbering.sh` enforces all of it, in CI on every pull request. Run it before
     you push.
 - **Check, then claim, before building.** More than one session works on this repository. Before
   starting a roadmap item: `git fetch`, look at the open pull requests and the remote branches,
@@ -123,8 +127,9 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
   Never edit `data/seed/*` by hand: it is the owner's data. Say plainly what could not be
   verified (this environment has no browser).
-- Record every decision as one line in `docs/decisions.md`; keep `docs/build-plan.md` and
-  `docs/open-questions.md` current; no source file over roughly 300 lines.
+- Record every decision as one file in `docs/decisions/` (see its README); keep
+  `docs/build-plan.md` and `docs/open-questions.md` current; no source file over roughly
+  300 lines.
 
 ## Where things are
 
