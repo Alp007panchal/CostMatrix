@@ -458,6 +458,15 @@ tab, which until today deleted on one click without asking anything.
 With several panels open the grid scrolls inside its own box: the **panel names stay across the top**
 and the **kit names stay down the left** while the figures move under them.
 
+**Show** is a row of buttons, one per panel. Press the ones you want to look at and the rest leave the
+table, so the columns you are comparing sit next to each other. Press two or more and every row where
+they do not all agree is marked in amber — a panel that does not have a row at all counts as nought,
+which is usually the fault you are looking for. Press a panel again to drop it, or **All** to go back
+to the whole costing.
+
+Two things always cover **every** panel, whichever are shown: the last column, which reads *All 5
+panels*, and the **Excel** file. A spreadsheet that quietly left panels out would be worse than none.
+
 ### What is on your desk (home page)
 Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
 them lists the work waiting on **you**, and nothing else:

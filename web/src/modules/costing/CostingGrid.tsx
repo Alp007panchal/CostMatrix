@@ -53,8 +53,8 @@ export function CostingGrid({
   editable: boolean
   handlers: GridHandlers
 }) {
-  const [compareA, setCompareA] = useState('')
-  const [compareB, setCompareB] = useState('')
+  // Empty means every panel: the grid arrives showing the whole costing.
+  const [chosen, setChosen] = useState<string[]>([])
   const [picking, setPicking] = useState<string | null>(null)
   const [openKit, setOpenKit] = useState<string | null>(null)
   const [refused, setRefused] = useState<string | null>(null)
@@ -67,13 +67,23 @@ export function CostingGrid({
     [panels, assemblies, items, panelPrices, totals, kits, components, categoryNames, costing.price_rounding_step],
   )
 
-  const comparing = compareA !== '' && compareB !== '' && compareA !== compareB
-  const differing = useMemo(
-    () => (comparing ? differingRows(model, compareA, compareB) : new Set<string>()),
-    [comparing, model, compareA, compareB],
+  // A panel that has since been removed must not keep a column alive, or hide
+  // every other one, so the choice is filtered against the panels that exist.
+  const picked = useMemo(
+    () => chosen.filter((id) => panels.some((p) => p.id === id)),
+    [chosen, panels],
   )
-  const inCompare = (panelId: string) => comparing && (panelId === compareA || panelId === compareB)
+  const columns = useMemo(
+    () => (picked.length === 0 ? model.columns : model.columns.filter((c) => picked.includes(c.panel.id))),
+    [model.columns, picked],
+  )
+  const comparing = picked.length >= 2
+  const differing = useMemo(() => differingRows(model, picked), [model, picked])
+  const inCompare = (panelId: string) => comparing && picked.includes(panelId)
   const label = costing.currency_label
+
+  const toggle = (panelId: string) =>
+    setChosen((was) => (was.includes(panelId) ? was.filter((id) => id !== panelId) : [...was, panelId]))
 
   const edit = (row: GridRow, panelId: string, typed: number | null) => {
     const action = cellAction(row, panelId, typed)
@@ -107,12 +117,10 @@ export function CostingGrid({
       <GridToolbar
         panels={panels}
         editable={editable}
-        comparing={comparing}
+        chosen={picked}
         differingCount={differing.size}
-        compareA={compareA}
-        compareB={compareB}
-        onCompareA={setCompareA}
-        onCompareB={setCompareB}
+        onToggle={toggle}
+        onShowAll={() => setChosen([])}
         onExcel={() => void downloadGridXlsx(model, costing.costing_no, costing.revision_no, label)}
         onAddPanel={handlers.onAddPanel}
         onCopyPanel={handlers.onCopyPanel}
@@ -128,7 +136,7 @@ export function CostingGrid({
             <tr>
               <th style={{ minWidth: '18rem' }}>Kit / component</th>
               <th>Group</th>
-              {model.columns.map((c) => (
+              {columns.map((c) => (
                 <GridPanelHead
                   key={c.panel.id}
                   panel={c.panel}
@@ -148,8 +156,11 @@ export function CostingGrid({
                   )}
                 />
               ))}
+              {/* Always every panel, never only the shown ones: it is the
+                  costing's own figure, and it would be a quiet lie to change
+                  what it counts when somebody filters the view. */}
               <th className="right">
-                All panels
+                All {model.columns.length} panels
                 <div className="muted" style={{ fontSize: '.75rem', fontWeight: 400 }}>× panel qty</div>
               </th>
             </tr>
@@ -158,7 +169,7 @@ export function CostingGrid({
             {model.sections.map((section) => (
               <Fragment key={section.heading}>
                 <tr className="grid-section">
-                  <td colSpan={model.columns.length + 3}>{section.heading}</td>
+                  <td colSpan={columns.length + 3}>{section.heading}</td>
                 </tr>
                 {section.rows.map((row) => (
                   <Fragment key={row.key}>
@@ -185,7 +196,7 @@ export function CostingGrid({
                         )}
                       </td>
                       <td className="muted">{row.group}</td>
-                      {model.columns.map((c) => (
+                      {columns.map((c) => (
                         <GridCell
                           key={c.panel.id}
                           cell={row.cells[c.panel.id]}
@@ -199,7 +210,7 @@ export function CostingGrid({
                     </tr>
                     {openKit === row.key && (
                       <tr>
-                        <td colSpan={model.columns.length + 3} className="muted" style={{ fontSize: '.8125rem' }}>
+                        <td colSpan={columns.length + 3} className="muted" style={{ fontSize: '.8125rem' }}>
                           {kitLinesOf(row).length === 0
                             ? 'This kit has no lines on this costing.'
                             : kitLinesOf(row).map((i) => `${round3(Number(i.quantity))} × ${i.name}`).join(' · ')}
@@ -214,7 +225,7 @@ export function CostingGrid({
             {editable && (
               <tr>
                 <td colSpan={2} className="muted" style={{ fontSize: '.8125rem' }}>Add a kit to a panel</td>
-                {model.columns.map((c) => (
+                {columns.map((c) => (
                   <td key={c.panel.id} className="right">
                     <button
                       title={`Add a kit to ${c.panel.name}`}
@@ -234,11 +245,13 @@ export function CostingGrid({
                   {total.label}
                   {total.note && <span className="muted" style={{ fontWeight: 400 }}> ({total.note})</span>}
                 </td>
-                {total.values.map((v, i) => (
-                  <td key={model.columns[i]?.panel.id ?? i} className="right" style={{ fontWeight: total.strong ? 700 : undefined }}>
-                    {v === null ? '' : money(v, label)}
-                  </td>
-                ))}
+                {total.values.map((v, i) => ({ v, panelId: model.columns[i]?.panel.id }))
+                  .filter((cell) => cell.panelId !== undefined && columns.some((c) => c.panel.id === cell.panelId))
+                  .map((cell) => (
+                    <td key={cell.panelId} className="right" style={{ fontWeight: total.strong ? 700 : undefined }}>
+                      {cell.v === null ? '' : money(cell.v, label)}
+                    </td>
+                  ))}
                 <td className="right" style={{ fontWeight: total.strong ? 700 : undefined }}>
                   {total.total === null ? '' : money(total.total, label)}
                 </td>
