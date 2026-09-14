@@ -1,7 +1,7 @@
 import type { LibraryDependents } from '../../lib/database.types'
 
 /**
- * How much rests on one rate (migration 0127).
+ * How much rests on one rate (migration 0130).
  *
  * Shown beside a currency factor and a material rate because that is the size of
  * what a change to it moves: the copper rate carries the whole busbar catalogue,

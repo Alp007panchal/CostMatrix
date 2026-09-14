@@ -1,4 +1,4 @@
--- Can anything the library depends on still be deleted quietly? (migration 0127)
+-- Can anything the library depends on still be deleted quietly? (migration 0130)
 --
 -- Each of the three guards is tested the same way, and the order matters:
 --

@@ -124,7 +124,7 @@ export async function addMasterCurrency(currencyCode: string, landedFactor: numb
 }
 
 /**
- * How many parts rest on each currency factor and material rate (migration 0127).
+ * How many parts rest on each currency factor and material rate (migration 0130).
  * Shown beside a rate so the size of a change is visible before it is made — the
  * copper rate carries the whole busbar catalogue — and so the refusal that meets
  * a delete is never a surprise.
