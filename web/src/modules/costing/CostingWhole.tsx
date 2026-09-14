@@ -5,7 +5,7 @@ import type {
 import type { CostingDetail } from './api'
 import {
   addAssemblyToPanel, addComponentToPanel, addPanel, copyPanel, removeCostingAssembly, removeItem,
-  setCostingAssemblyQuantity, setItemQuantity, updateCosting, updatePanel,
+  removePanel, setCostingAssemblyQuantity, setItemQuantity, updateCosting, updatePanel,
 } from './api'
 import { CostingGrid } from './CostingGrid'
 import { costingWarningSummary } from './warnings'
@@ -96,6 +96,7 @@ export function CostingWhole({
               pid, costing.id, `${panels.find((p) => p.id === pid)?.name ?? 'Panel'} (copy)`,
             )),
             onPanelChange: (pid, changes) => run(() => updatePanel(pid, changes)),
+            onRemovePanel: (pid) => run(() => removePanel(pid)),
           }}
         />
       </>
