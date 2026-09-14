@@ -350,6 +350,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
+| The house style: the shared Opsmatrix shell, tokens and per-screen changes (`docs/reference/house-style.md`) | `claude/house-style` | 2026-09-14 |
 | _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
