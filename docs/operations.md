@@ -440,6 +440,16 @@ things that belong to the costing rather than to one panel: **All panels side by
 Across the top are four steps — Draft → Submitted → Approved → Quotation released — with the one it
 is at now in orange. That is the quickest way to see where somebody else's costing has got to.
 
+**All panels side by side** puts every panel in a column and every kit in a row. While the costing is
+a draft you can change a panel's own details straight from the top of its column: its **name**, how
+many of it, its **tag**, its **option** label, and the **extra** tick that prices a panel and prints
+it but leaves it out of the total. Type and press Enter, or click away — the same as every other box
+in the app. A name typed blank is ignored rather than saved, so a column can never lose its name, and
+a quantity must be more than nought.
+
+Three of a panel's fields are still only on the panel's own tab, because they need room to read: the
+unit, the enclosure dimensions and the technical description that prints on the quotation.
+
 ### What is on your desk (home page)
 Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
 them lists the work waiting on **you**, and nothing else:

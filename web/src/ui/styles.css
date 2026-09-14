@@ -224,6 +224,21 @@ td { padding: 10px; border-bottom: 1px solid var(--paper-2); vertical-align: mid
 tbody tr:last-child td { border-bottom: none; }
 td.right, th.right, td.r, th.r, td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.mono { font-family: var(--mono); font-size: 12.5px; }
+/* A panel's column heading in the grid: its own details, edited in place, kept
+   narrow enough that the heading is still a heading rather than a form. */
+.panel-head { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; min-width: 11rem; }
+.panel-head input { min-height: 28px; padding: 3px 7px; font-size: 12.5px; text-align: right; }
+.panel-head input.nm { font-weight: 600; }
+.panel-head input.qty { width: 3.5rem; }
+.panel-head .row { display: flex; gap: 5px; align-items: center; width: 100%; flex-wrap: nowrap; }
+.panel-head .row > label {
+  display: flex; align-items: center; gap: 4px; white-space: nowrap;
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-dim); font-weight: 500;
+}
+.panel-head input::placeholder { font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; }
+th .sub { display: block; font-size: 11px; color: var(--text-dim); font-weight: 400; text-transform: none; letter-spacing: 0; margin-top: 2px; }
+
 /* The second line inside a cell: the facts that would otherwise want a column. */
 td .sub { display: block; font-size: 12px; color: var(--text-dim); margin-top: 1px; }
 tr.inactive td { color: var(--text-dim); }

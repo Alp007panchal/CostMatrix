@@ -9,6 +9,7 @@ import { downloadGridXlsx } from './grid-io'
 import { KitPicker } from './KitPicker'
 import { GridCell } from './GridCell'
 import { GridToolbar } from './GridToolbar'
+import { GridPanelHead } from './GridPanelHead'
 
 /**
  * The costing as one grid — panels across, kits and loose components down
@@ -28,6 +29,8 @@ export interface GridHandlers {
   onRemoveItem: (itemId: string) => void
   onAddPanel: () => void
   onCopyPanel: (sourcePanelId: string) => void
+  /** The panel's own details, changed in its column heading. */
+  onPanelChange: (panelId: string, changes: Partial<CostingPanel>) => void
 }
 
 export function CostingGrid({
@@ -122,22 +125,15 @@ export function CostingGrid({
               <th style={{ minWidth: '18rem' }}>Kit / component</th>
               <th>Group</th>
               {model.columns.map((c) => (
-                <th
+                <GridPanelHead
                   key={c.panel.id}
-                  className="right"
-                  style={inCompare(c.panel.id) ? { background: 'rgba(245, 158, 11, .12)' } : undefined}
-                >
-                  {c.panel.name}
-                  <div className="muted" style={{ fontSize: '.75rem', fontWeight: 400 }}>
-                    {[c.panel.tag, `qty ${Number(c.panel.quantity)}`, c.isOption ? 'option' : null]
-                      .filter(Boolean).join(' · ')}
-                  </div>
-                  {spaceWarning(fits[c.panel.id]) && (
-                    <div className="error" style={{ fontSize: '.75rem', fontWeight: 400 }} title={spaceWarning(fits[c.panel.id]) ?? ''}>
-                      {spaceWarning(fits[c.panel.id])}
-                    </div>
-                  )}
-                </th>
+                  panel={c.panel}
+                  isOption={c.isOption}
+                  fit={fits[c.panel.id]}
+                  editable={editable}
+                  inCompare={inCompare(c.panel.id)}
+                  onChange={(changes) => handlers.onPanelChange(c.panel.id, changes)}
+                />
               ))}
               <th className="right">
                 All panels
@@ -258,14 +254,6 @@ export function CostingGrid({
       )}
     </div>
   )
-}
-
-/** Only when the space check has something an engineer can act on (F12). */
-function spaceWarning(fit: PanelFit | undefined): string | null {
-  if (!fit || fit.used_pct === null) return null
-  if (fit.verdict === 'no_fit') return `space ${Math.round(fit.used_pct)} % · will not fit`
-  if (fit.verdict === 'tight') return `space ${Math.round(fit.used_pct)} % · check`
-  return null
 }
 
 function round3(n: number): string {
