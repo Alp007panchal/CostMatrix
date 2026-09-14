@@ -1111,8 +1111,33 @@ edited by anyone, including you. A person removed since then leaves their entry 
 *Someone no longer here*: the record of what happened never goes with them.
 
 ### Check the app is running
-Open the Vercel URL. If the page loads and you can sign in, everything is working. For more
-detail: Vercel dashboard shows deployments; Supabase dashboard shows database health.
+
+**It checks itself, four times a day.** The **Uptime check** workflow asks whether the site is
+serving the app and whether Supabase is answering, at 06:00, 12:00, 18:00 and 00:00 UTC. If
+either is down it fails, and GitHub emails you — you do not have to watch anything.
+
+It checks twice, twenty seconds apart, before it says anything is down, so a blip during a
+deployment does not cry wolf. And it looks at what comes back, not just the status code: a
+misconfigured host will happily return a cheerful error page with a 200 on it.
+
+To ask right now rather than wait: **Actions** → **Uptime check** → **Run workflow**. The run
+summary says what answered and how quickly.
+
+By hand, the same check takes ten seconds: open the Vercel URL and sign in. For more detail the
+Vercel dashboard shows deployments and the Supabase dashboard shows database health.
+
+**If you want to be told within minutes rather than within hours**, this workflow is not the
+thing to change — four times a day is deliberate, because GitHub bills Actions by the minute on
+a private repository and a five-minute check would eat about four times the free monthly
+allowance. The better answer is a free uptime service: **UptimeRobot** or **Better Stack** both
+check every five minutes on their free plan and email or text you. Point one at
+`https://cost-matrix-theta.vercel.app`, expect a 200, send alerts to your address. It takes five
+minutes to set up, needs nothing from this repository, and this workflow stays as the floor that
+needs no account and cannot lapse when a subscription does.
+
+One thing to know about scheduled workflows: **GitHub stops running them after 60 days with no
+activity in the repository.** While work is going on that never happens; if the app is ever left
+alone for two months, press *Run workflow* once to wake it up.
 
 ### Download a backup (see Part E)
 Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the
