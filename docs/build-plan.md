@@ -335,6 +335,15 @@ or into go-live.
     `before delete` guards that refuse and name what is holding the row and what to do first, plus
     `v_library_dependents` so the Rates screen shows the count beside each rate before anybody
     tries. A company's own factor or rate still goes freely — it falls back to the master row.
+45. **The house style** (maintenance) — the shell the app shares with Opsmatrix
+    (`docs/reference/house-style.md` and its six mockups): a dark sidebar of six named groups
+    instead of twenty-five links in one top bar, the 60 rem page cap gone, a top bar each screen
+    fills with its own title, meta line and buttons, and a stylesheet that restyles the names the
+    app already uses — `.card` *is* the mockup's `.panel` — so every screen picked it up without
+    changing a line. Settings and Library set-up become vertical-tab pages and no address moved.
+    Home, the costing editor, Components, Kits, Quotations and Library health are reshaped per §5;
+    `nav.test.tsx` proves every route is reachable for each role. No database, engine or pricing
+    change; NPP-192 untouched.
 
 ## In hand right now
 
@@ -350,7 +359,6 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| The house style: the shared Opsmatrix shell, tokens and per-screen changes (`docs/reference/house-style.md`) | `claude/house-style` | 2026-09-14 |
 | _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
