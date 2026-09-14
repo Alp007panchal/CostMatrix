@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async } from '../../ui/Async'
+import { PageHeader } from '../../app/PageHeader'
+import { todayIso } from '../dashboard/attention'
 import { CompanyFilterSelect, useCompanyFilter } from '../../ui/CompanyFilter'
 import { longDate } from '../../lib/format'
 import type { Enquiry, QuotationRow, QuotationStatus } from '../../lib/database.types'
@@ -10,7 +12,8 @@ import { checkMyQuotationExpiry, listQuotations, listValidity, pdfDownloadUrl, s
 import { sweepLabel } from './validity'
 import { groupQuotations } from './quotation-groups'
 import { QuotationFamily } from './QuotationFamily'
-import { createFollowup, listCustomers, listEnquiries } from '../crm/api'
+import { createFollowup, listCustomers, listEnquiries, listFollowups } from '../crm/api'
+import { quotationTiles, QUOTATION_TABS, keepTab, type QuotationTab } from './quotation-view'
 import { DecideEnquiry } from '../crm/DecideEnquiry'
 
 export const STATUS: Record<QuotationStatus, string> = {
@@ -32,6 +35,8 @@ export function QuotationsPage() {
   const validity = useQuery({ queryKey: ['quotation-validity'], queryFn: listValidity })
   const [swept, setSwept] = useState<string | null>(null)
   const enquiries = useQuery({ queryKey: ['enquiries'], queryFn: listEnquiries })
+  const followups = useQuery({ queryKey: ['followups'], queryFn: listFollowups })
+  const [tab, setTab] = useState<QuotationTab>('open')
   const customers = useQuery({ queryKey: ['customers'], queryFn: listCustomers })
   const [deciding, setDeciding] = useState<Enquiry | null>(null)
   const [chasing, setChasing] = useState<QuotationRow | null>(null)
@@ -66,18 +71,51 @@ export function QuotationsPage() {
   const byCompany = useCompanyFilter()
   const enquiryById = (id: string | null) => enquiries.data?.find((e) => e.id === id)
   const customerName = (id: string) => customers.data?.find((c) => c.id === id)?.name ?? ''
+  const nextFollowup = (quotationId: string): string | null =>
+    (followups.data ?? [])
+      .filter((f) => f.quotation_id === quotationId && f.done_at === null)
+      .map((f) => f.due_on)
+      .sort()[0] ?? null
   const openPdf = (path: string) =>
     pdfDownloadUrl(path).then((url) => window.open(url, '_blank')).catch((e: unknown) => alert(String(e)))
 
   return (
     <>
-      <h1>Quotations</h1>
-      <p className="muted">
+      <PageHeader title="Quotations" meta={`${(quotations.data ?? []).length} released to date`}>
+        {canChange && (
+          <button
+            title="Mark the quotations whose validity has passed, and raise a follow-up on the ones that were sent"
+            disabled={sweep.isPending}
+            onClick={() => sweep.mutate()}
+          >
+            {sweep.isPending ? 'Checking…' : 'Check what has run out'}
+          </button>
+        )}
+      </PageHeader>
+      <p className="intro">
         One job, one line: the offers made against an enquiry, with the revisions of each behind
         the newest. Mark a quotation sent when it goes out; when you hear back, decide the whole
         enquiry — the quotation that won it is named, and the others are marked superseded rather
         than lost, because they were never turned down.
       </p>
+
+      <div className="kpi-row">
+        {quotationTiles(quotations.data ?? [], validity.data ?? [], followups.data ?? [], todayIso()).map((t) => (
+          <div className={t.tone === undefined ? 'kpi' : `kpi k-${t.tone}`} key={t.label}>
+            <div className="label">{t.label}</div>
+            <div className="value">{t.value}</div>
+            <div className="delta">{t.delta}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="tabs">
+        {QUOTATION_TABS.map((t) => (
+          <button key={t.key} className={tab === t.key ? 'tab active' : 'tab'} onClick={() => setTab(t.key)}>
+            {t.label}
+          </button>
+        ))}
+      </div>
 
       {change.error && <p className="error">{String(change.error)}</p>}
 
@@ -105,27 +143,31 @@ export function QuotationsPage() {
 
       <div className="row end">
         {swept && <span className="ok" style={{ fontSize: '.8125rem' }}>{swept}</span>}
-        {canChange && (
-          <button
-            title="Mark the quotations whose validity has passed, and raise a follow-up on the ones that were sent"
-            disabled={sweep.isPending}
-            onClick={() => sweep.mutate()}
-          >
-            {sweep.isPending ? 'Checking…' : 'Check what has run out'}
-          </button>
-        )}
         {byCompany.multi && <CompanyFilterSelect filter={byCompany} />}
       </div>
       {sweep.error && <p className="error">{String(sweep.error)}</p>}
 
       <Async query={quotations} empty="No quotations released yet. Approve a costing, then release one from it.">
-        {(all) => (
+        {(all) => {
+          const groups = groupQuotations(
+            all
+              .filter((q) => byCompany.keep(q.company_id))
+              .filter((q) => keepTab(q, (validity.data ?? []).find((v) => v.quotation_id === q.id), tab)),
+          )
+          if (groups.length === 0) {
+            return (
+              <p className="empty">
+                Nothing under {QUOTATION_TABS.find((t) => t.key === tab)?.label.toLowerCase()}. Try another tab.
+              </p>
+            )
+          }
+          return (
           <>
-            {groupQuotations(all.filter((q) => byCompany.keep(q.company_id))).map((group) => {
+            {groups.map((group) => {
               const enquiry = enquiryById(group.enquiryId)
               const decided = enquiry ? ['won', 'lost'].includes(enquiry.status) : false
               return (
-                <div className="card" key={group.enquiryId ?? group.families[0]?.key}>
+                <div className="panel" key={group.enquiryId ?? group.families[0]?.key}>
                   <div className="spread" style={{ alignItems: 'flex-start' }}>
                     <div>
                       <h2 style={{ margin: 0, fontSize: '1.05rem' }}>
@@ -142,7 +184,7 @@ export function QuotationsPage() {
                       )}
                     </div>
                     <div className="row end">
-                      {enquiry && <span className="badge">{enquiry.status}</span>}
+                      {enquiry && <span className="chip">{enquiry.status.toUpperCase()}</span>}
                       {enquiry && canChange && !decided && (
                         <button className="primary" onClick={() => setDeciding(enquiry)}>Won or lost?</button>
                       )}
@@ -161,7 +203,8 @@ export function QuotationsPage() {
                             onOpenCosting={(id) => navigate(`/costings/${id}`)}
                             onPdf={openPdf}
                             validity={(validity.data ?? []).find((v) => v.quotation_id === family.latest.id)}
-                  onSent={(id) => change.mutate({ id, status: 'sent', reason: null })}
+                            nextFollowup={nextFollowup(family.latest.id)}
+                            onSent={(id) => change.mutate({ id, status: 'sent', reason: null })}
                             onChase={setChasing}
                           />
                         ))}
@@ -172,7 +215,8 @@ export function QuotationsPage() {
               )
             })}
           </>
-        )}
+          )
+        }}
       </Async>
     </>
   )
