@@ -301,6 +301,14 @@ or into go-live.
     decision id in CI, because the rule alone was broken three times in one week. `advanced`
     stays as the copy staging runs, for trying a feature before switching it on.
 
+39. **The rear elevation on the quotation** (roadmap 3.8) — a panel whose saved layout has a face
+    at the back now gets a **second** Annexure V sheet: the same board walked round, sections right
+    to left, each busbar chamber on the other hand, face B's devices under the tags the front sheet
+    already gave them. A section with nothing behind it is drawn as the steel it is and says what
+    its back shows, in the same words as the rear view on screen. A board set to double-front that
+    nobody has drawn behind still gets one sheet, not a blank second one. No migration: this is all
+    in the browser.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
