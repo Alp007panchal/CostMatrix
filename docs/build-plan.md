@@ -308,6 +308,13 @@ or into go-live.
     neither won nor lost. Oldest first, each linking to the thing itself. Migration 0126, one view,
     no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
     when the desk is clear rather than saying so.
+39. **The rear elevation on the quotation** (roadmap 3.8) — a panel whose saved layout has a face
+    at the back now gets a **second** Annexure V sheet: the same board walked round, sections right
+    to left, each busbar chamber on the other hand, face B's devices under the tags the front sheet
+    already gave them. A section with nothing behind it is drawn as the steel it is and says what
+    its back shows, in the same words as the rear view on screen. A board set to double-front that
+    nobody has drawn behind still gets one sheet, not a blank second one. No migration: this is all
+    in the browser.
 
 ## In hand right now
 
@@ -323,7 +330,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| The build plan back in reading order, and the claim rule widened past roadmap items | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-13 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
@@ -340,7 +347,13 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
   the owner running the drill once against the real dump and dating it in `decisions.md`.
 - ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
-- Monitoring: ~~uptime check on the web app~~ — **built 13 Sep** (`uptime.yml`, four times a day, red tick and an email when the site or Supabase stops answering; a free external checker is the upgrade for minute-level notice and the runbook says how). Still to do: Supabase alerts, and error reporting in the browser so a screen that breaks for somebody says so without them mentioning it.
+- Monitoring: ~~uptime check on the web app~~ and ~~error reporting in the browser~~ — **both built
+  13 Sep**. `uptime.yml` asks four times a day whether the site and Supabase are answering and goes
+  red, which is an email; a free external checker is the upgrade for minute-level notice and the
+  runbook says how. Migration 0124 records a screen that stops drawing or will not load, and an
+  administrator reads it on **What broke** — repeats collapse into a count, one person cannot flood
+  it, rows delete themselves after ninety days. **Still to do: Supabase's own alerts**, which are a
+  setting in their dashboard rather than anything in this repository.
 - Custom domain and email sender for Supabase Auth invitations.
 - ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
 - One-page user guide per role.

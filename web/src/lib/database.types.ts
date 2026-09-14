@@ -1540,3 +1540,20 @@ export type DeskKind =
   | 'waiting_for_you'
   | 'released_not_sent'
   | 'sent_unanswered'
+/** One thing that broke in somebody's browser (migration 0124, v_error_reports). */
+export interface ErrorReport {
+  id: string
+  company_id: string
+  company_name: string
+  user_id: string | null
+  full_name: string | null
+  kind: 'render' | 'load'
+  path: string
+  message: string
+  detail: string | null
+  user_agent: string | null
+  first_seen_at: string
+  last_seen_at: string
+  times_seen: number
+}
+

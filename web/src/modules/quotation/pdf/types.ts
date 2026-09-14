@@ -69,14 +69,19 @@ export interface PdfGaSection {
   design: string
   designWords: string
   busbarCompartmentMm: number
+  /** Which side of the section its distribution busbar chamber stands on. */
+  busbarSide: 'left' | 'right'
   form: string | null
   doubleFront: boolean
+  /** What the back of this section shows, in the words the layout views use. */
+  rearWords: string
   devices: PdfGaDevice[]
 }
 
 /**
- * One general-arrangement sheet: the front elevation of one panel, on its own
- * landscape page (spec §5). Only panels with a saved layout get one.
+ * One general-arrangement sheet: one elevation of one panel, on its own landscape
+ * page (spec §5). Only panels with a saved layout get one, and a board with a
+ * rear face gets a second sheet for it.
  */
 export interface PdfGaSheet {
   panelId: string
@@ -91,6 +96,8 @@ export interface PdfGaSheet {
   sections: PdfGaSection[]
   specLine: string
   hasRearFace: boolean
+  /** Which way the board is being looked at. A rear sheet reads right to left. */
+  elevation: 'front' | 'rear'
 }
 
 export interface QuotationPdfData {

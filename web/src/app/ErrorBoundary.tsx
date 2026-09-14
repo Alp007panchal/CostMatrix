@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { reportError } from '../lib/report-error'
 
 /**
  * Catches a render crash on one screen and says so, instead of React unmounting
@@ -14,6 +15,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
 
   override componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('Screen crashed:', error, info.componentStack)
+    // …and tell the database, so the administrator does not depend on the
+    // person below reading that message and passing it on (migration 0124).
+    reportError('render', error.message, info.componentStack)
   }
 
   override render() {
