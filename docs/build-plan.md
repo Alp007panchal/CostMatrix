@@ -370,6 +370,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
+| Compare any number of panels in the grid, with the ones not chosen hidden, in place of the two dropdowns | `claude/grid-compare-many` | 2026-09-14 |
 | _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
