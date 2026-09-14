@@ -326,7 +326,7 @@ the work begins, removed when the pull request opens.
   the owner running the drill once against the real dump and dating it in `decisions.md`.
 - ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
-- Monitoring: Supabase alerts, uptime check on the web app, error reporting in the browser.
+- Monitoring: ~~uptime check on the web app~~ — **built 13 Sep** (`uptime.yml`, four times a day, red tick and an email when the site or Supabase stops answering; a free external checker is the upgrade for minute-level notice and the runbook says how). Still to do: Supabase alerts, and error reporting in the browser so a screen that breaks for somebody says so without them mentioning it.
 - Custom domain and email sender for Supabase Auth invitations.
 - ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
 - ~~One-page user guide per role~~ — **built 13 Sep**, in the app at **Help** rather than in this
