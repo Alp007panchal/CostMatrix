@@ -42,9 +42,26 @@ Until then the panel says so in those words, which is the intended behaviour.
 | Upload the header logo and footer marks | Before the first real quotation | **Quotation wording** → Header logo and Footer strip. PNG with transparent background prints best. |
 | **Read the terms page and change any wording you disagree with** — `/terms`, linked from the footer | Before inviting another company | It says what the app does: what is stored, that it is in Ireland, that no company sees another's, and that data is deleted on request. It claims **no retention period**, because none has been decided — tell me one and it goes in. It is not a lawyer's document; if you want it to be, that is a lawyer's job, not mine. |
 | Sizes and fittings for the compatibility checks (roadmap 3.4): the depth of a device, the usable depth inside a cubicle, and the devices a part is listed for | Before the checks can say anything | Until they are recorded the checks stay silent, which is correct rather than broken. The dimensions importer (`dimensions-template.csv`) takes the sizes in bulk; the rest is the Components screen. |
-| **Run the restore drill once** — Actions → Weekly backup → run it, download the artifact, restore it into a throwaway Supabase project and check a costing's total | **Now**, and quarterly after | The job and the steps exist (operations Part E); only a drill against your real dump proves your backup works. Date it in `docs/decisions.md`. |
+| **Run the restore drill once** — Actions → Weekly backup → run it, download the artifact, restore it into a throwaway Supabase project and check a costing's total | **Now**, and quarterly after | The job and the steps exist (operations Part E); only a drill against your real dump proves your backup works. Date it in `docs/decisions/`. |
 | Do you want the weekly dump sent somewhere beyond GitHub as well? | Whenever you like | It is kept 90 days as a GitHub artifact, which is off Supabase but not off GitHub. A bucket is one secret and half an hour. |
 | Run `docs/acceptance-test.md` on what is live | **Now** | Each finding comes back as its own pull request, as the notebook changes did. |
+
+## Known and not scheduled: the second place two sessions collide
+
+Nothing here needs you; it is written down so it is not forgotten.
+
+`docs/decisions.md` was the file every pull request appended to, and on 13 September nine open
+pull requests all conflicted with each other in it. That is fixed — a decision is now a file of
+its own (`docs/decisions/`), and two sessions writing on the same morning no longer collide.
+
+**`web/src/lib/database.types.ts` has the same shape and is not fixed.** It is one hand-written
+file that every feature appends an interface to, and it showed up in one of those nine pairs. The
+remedy is different in kind: `docs/architecture.md` already says each module owns its own
+`types.ts`, and the code has drifted away from that. Putting it back is a few hours of moving
+type definitions into the ten module folders, touching most of the app but changing nothing it
+does — which makes it a poor thing to merge while a queue of feature pull requests is open, and a
+good thing to do on a quiet morning when it is not. It is worth doing before the queue is nine
+deep again.
 
 ## Assumptions in force until you say otherwise
 
