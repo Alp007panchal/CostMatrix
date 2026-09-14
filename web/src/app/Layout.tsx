@@ -31,6 +31,7 @@ export function Layout() {
           {canAdminister && <NavLink to="/library/rates">Rates</NavLink>}
           {canAdminister && on('price_lists') && <NavLink to="/library/price-lists">Price lists</NavLink>}
           {canAdminister && <NavLink to="/library/import">Import</NavLink>}
+          {canAdminister && on('library_health') && <NavLink to="/library/health">Library health</NavLink>}
           {canAdminister && <NavLink to="/admin/people">People</NavLink>}
           {canAdminister && <NavLink to="/admin/company">Company</NavLink>}
           {canAdminister && on('approval_rules') && <NavLink to="/admin/approval-rules">Approval rules</NavLink>}

@@ -827,6 +827,33 @@ deleted, and a second import of the same files changes nothing. Expected on the 
 a kit that holds one cannot be added to a costing until you give it a purchase price. The master
 admin imports the master library; a company admin imports private parts and kits for their company.
 
+### See what the library is missing (Library health)
+**Library health** in the top bar, for administrators, once the switch is on. It reads the library
+as it stands now — not the notes in `data/seed/README.md`, which were written on the day the seed
+was built and say nothing about what you have fixed since — and it sorts every fault by what it
+does to a costing:
+
+- **Stops a costing.** A part with no price, or a kit holding one. The costing refuses it and names
+  the part, so nothing is lost; the work simply stops until you set a price. Also here: a part
+  priced in a currency whose **landed factor** somebody has removed. Its price looks fine on the
+  Components screen and the costing still refuses it, which is the most confusing of the three, so
+  it is told apart and sends you to Rates → Currency factors rather than to the part.
+- **Costs, and leaves something out.** Worse, because nothing complains. A kit in no kit group, or
+  one whose group has no hours, is costed with its material right and **no labour at all** — and
+  the quotation can be released and sent like that. Fixing it is the three hours columns on
+  **Kit groups**, or the `kit-group-labour-template.csv` import.
+- **Worth a look.** A kit with only its main device and no busbar, cable or accessories; a kit with
+  no rating, which is how kits are found. Neither is necessarily wrong — a supply-only kit really
+  has no connection material — which is why they are not mixed in with the first two.
+
+Each row says how many there are, three or four examples, and the screen that puts it right;
+**List them** shows the lot. A part is listed with how many kits hold it, so the one that breaks
+the most costings is at the top. **The screen changes nothing.** It reads, and it never refuses.
+
+On the seed as imported it opens on eight parts waiting for a price (held by fifteen kit lines),
+thirteen kits that would be refused because of them, three kits in no group at all, one kit with
+only its main device — and almost every kit with no hours, which is the labour template.
+
 ### Change a currency's landed factor (session 1)
 Rates → Currency factors. Each currency shows one figure: KES per 1 unit **landed**, with the
 exchange rate, freight, duty and handling in it (200 per EUR today). Beside it, **Bought in it**
