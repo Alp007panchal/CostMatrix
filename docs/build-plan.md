@@ -326,11 +326,13 @@ the work begins, removed when the pull request opens.
   the owner running the drill once against the real dump and dating it in `decisions.md`.
 - ~~Staging environment added~~ — done (D-181, D-182): a second Supabase account, plus preview deploys.
 - Move production to the paid Supabase tier if it is not already.
-- Monitoring: ~~error reporting in the browser~~ — **built 13 Sep** (migration 0124): when a screen
-  stops drawing, or something will not load, the app records it and an administrator reads it on
-  **What broke**. Repeats collapse into a count, one person cannot flood it, and rows delete
-  themselves after ninety days. Still to do: Supabase alerts, and the uptime check if PR 60 has
-  not merged yet.
+- Monitoring: ~~uptime check on the web app~~ and ~~error reporting in the browser~~ — **both built
+  13 Sep**. `uptime.yml` asks four times a day whether the site and Supabase are answering and goes
+  red, which is an email; a free external checker is the upgrade for minute-level notice and the
+  runbook says how. Migration 0124 records a screen that stops drawing or will not load, and an
+  administrator reads it on **What broke** — repeats collapse into a count, one person cannot flood
+  it, rows delete themselves after ninety days. **Still to do: Supabase's own alerts**, which are a
+  setting in their dashboard rather than anything in this repository.
 - Custom domain and email sender for Supabase Auth invitations.
 - ~~Terms page published and linked at sign-up~~ — **built 13 Sep** at `/terms`, linked from the footer and the sign-in page. The wording is the owner's to change; it says what the app does and is not a lawyer's document.
 - One-page user guide per role.
