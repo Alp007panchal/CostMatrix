@@ -62,6 +62,7 @@ const handlers = (): GridHandlers => ({
   onRemoveItem: vi.fn(),
   onAddPanel: vi.fn(),
   onCopyPanel: vi.fn(),
+  onPanelChange: vi.fn(),
 })
 
 function show(over: { editable?: boolean; fits?: Record<string, PanelFit | undefined> } = {}) {
@@ -96,13 +97,73 @@ afterEach(() => { cleanup(); vi.clearAllMocks() })
 describe('the costing grid', () => {
   it('shows a column per panel and a row per kit, with the roll-up', () => {
     show()
-    expect(screen.getAllByRole('columnheader').map((h) => h.textContent?.slice(0, 4)))
-      .toEqual(['Kit ', 'Grou', 'MDBq', 'DB-1', 'All '])
+    const heads = screen.getAllByRole('columnheader')
+    expect(heads).toHaveLength(5)
+    // The two panel headings are boxes now, so the name is a value, not text.
+    expect(heads.map((h) => within(h).queryByRole('textbox', { name: /^Name of/ })?.getAttribute('value')))
+      .toEqual([undefined, undefined, 'MDB', 'DB-1', undefined])
     expect(screen.getByText('Incomer')).toBeTruthy()
     const mccb = cellsOf('250A MCCB KIT')
     // kit / group / MDB / DB-1 / all panels
     expect(mccb).toHaveLength(5)
     expect(mccb[4]?.textContent).toBe('7')
+  })
+
+  it('renames a panel from its column heading, without leaving the grid', async () => {
+    const h = show()
+    const name = screen.getByRole('textbox', { name: 'Name of MDB' })
+    fireEvent.change(name, { target: { value: 'MDB 1600 A' } })
+    fireEvent.blur(name)
+    await waitFor(() => expect(h.onPanelChange).toHaveBeenCalledWith('p1', { name: 'MDB 1600 A' }))
+  })
+
+  it('refuses a nameless panel rather than leaving a nameless column', () => {
+    const h = show()
+    const name = screen.getByRole('textbox', { name: 'Name of MDB' })
+    fireEvent.change(name, { target: { value: '   ' } })
+    fireEvent.blur(name)
+    expect(h.onPanelChange).not.toHaveBeenCalled()
+  })
+
+  it('changes the panel quantity, and refuses nought or a word', () => {
+    const h = show()
+    const qty = screen.getByRole('textbox', { name: 'Quantity of MDB' })
+    fireEvent.change(qty, { target: { value: '0' } })
+    fireEvent.blur(qty)
+    fireEvent.change(qty, { target: { value: 'two' } })
+    fireEvent.blur(qty)
+    expect(h.onPanelChange).not.toHaveBeenCalled()
+
+    fireEvent.change(qty, { target: { value: '3' } })
+    fireEvent.blur(qty)
+    expect(h.onPanelChange).toHaveBeenCalledWith('p1', { quantity: 3 })
+  })
+
+  it('clears the tag and the option label to nothing, not to an empty string', () => {
+    const h = show()
+    const tag = screen.getByRole('textbox', { name: 'Tag of MDB' })
+    fireEvent.change(tag, { target: { value: '  ' } })
+    fireEvent.blur(tag)
+    expect(h.onPanelChange).toHaveBeenCalledWith('p1', { tag: null })
+
+    const option = screen.getByRole('textbox', { name: 'Option of MDB' })
+    fireEvent.change(option, { target: { value: 'Option 2' } })
+    fireEvent.blur(option)
+    expect(h.onPanelChange).toHaveBeenCalledWith('p1', { option_label: 'Option 2' })
+  })
+
+  it('marks a panel an optional extra from the heading', () => {
+    const h = show()
+    fireEvent.click(screen.getAllByRole('checkbox')[0]!)
+    expect(h.onPanelChange).toHaveBeenCalledWith('p1', { is_option: true })
+  })
+
+  it('offers no boxes at all on a costing nobody may edit', () => {
+    show({ editable: false })
+    expect(screen.queryByRole('textbox', { name: 'Name of MDB' })).toBeNull()
+    // The name is still there, as plain text — "MDB" alone also names an entry
+    // in the Compare dropdown, so read it off the heading itself.
+    expect(screen.getAllByRole('columnheader')[2]?.textContent).toContain('MDB')
   })
 
   it('changes the quantity of the line that is there', async () => {
