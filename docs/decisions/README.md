@@ -1,63 +1,54 @@
 # Decisions — one file each
 
-**A decision made from 14 September 2026 onwards is a file in this folder.**
-`../decisions.md` is the archive of everything decided before that, and it is closed.
+Every decision taken about this app, one file per decision, named
+`YYYY-MM-DD-short-name.md`.
 
-## Why this folder exists
+## Why it is a directory and not a list
 
-Every pull request used to end by appending a paragraph to the bottom of one file. Two sessions
-work on this repository at once, so two pull requests would each add a paragraph in the same
-place — and git cannot merge two additions at the same spot without asking somebody which comes
-first. Neither answer is wrong; both paragraphs belong. It is a conflict with no disagreement in
-it.
+It used to be a list: `docs/decisions.md`, one row appended per decision. That file is still
+here, and it is still the record of everything decided up to 13 September 2026 — but nothing is
+added to it any more.
 
-That cost is not constant, it is quadratic. On 13 September nine pull requests were open, every
-one of them green against `main` and **every pair of them conflicting with each other**, always
-in `decisions.md`. Merging one turned the other eight red; resolving those and merging a second
-turned seven red. Draining the queue that way takes about thirty-six resolutions, not one of
-which is a decision anybody has to make.
+On 14 September nine pull requests were open at once, two sessions working in parallel. Every one
+of them was green against `main`. **Every pair of them conflicted with every other pair**, and the
+file was the same one every time: both had appended a paragraph to the end of `decisions.md`.
+Draining nine of those takes about thirty-six conflict resolutions, not one of which is a
+disagreement — every one is "keep both paragraphs".
 
-Two sessions writing a decision on the same morning now create two different files, and git
-merges two new files without a word.
+Two sessions writing a decision on the same morning now create two different files, and git merges
+two new files without asking anybody anything.
 
-This is the third time the same shape of problem has been fixed the same way. Migration numbers
-and decision numbers were both conventions that two sessions had to remember, both were broken
-within a week, and both were replaced by a mechanism. Decision *text* is the third.
+This is the third time the same shape of problem has turned up here. Migration numbers were fixed
+by `scripts/check-numbering.sh`; decision *numbers* were fixed by dating them; this is decision
+*text*. Each time the answer was the same: replace a convention everyone has to remember with a
+mechanism nobody can forget.
 
-## The three rules
+## How to add one
 
-1. **One file per decision**, named `YYYY-MM-DD-short-name.md` — the date it was decided and a
-   few words of slug.
-2. **The file's id is `D-` plus its filename**, and the file says so on its first line. The file
-   above is `D-2026-09-14-decisions-one-file-each`. A decision filed under the wrong name is a
-   decision nobody finds again.
-3. **An id is used once, ever** — here or in the archive. `scripts/check-numbering.sh` checks
-   both, in CI, on every pull request.
-
-## The shape of one
+Create `docs/decisions/YYYY-MM-DD-short-name.md`:
 
 ```markdown
 # D-2026-09-14-short-name
 
-**14 September 2026.** One sentence in bold saying what was decided.
-
-Then the why, in as many paragraphs as it needs. What the alternative was and why it lost is
-worth more than the decision itself, because that is the part nobody can reconstruct later.
+What was decided, and why — in the register the rest of the documents use: plain words, the
+reason before the mechanics, and what it cost or what it rules out. One paragraph is usually
+right; two if the reason needs it.
 ```
 
-Nothing else is required. No front matter, no fixed sections, no index to keep in step — the
-folder listing is the index, and it sorts by date on its own.
+Three rules, and `scripts/check-numbering.sh` enforces all three in CI:
 
-## Reversing one
+1. **The id on the first line must match the filename.** `2026-09-14-foo.md` holds `D-2026-09-14-foo`.
+   A decision filed under the wrong name is a decision nobody finds again.
+2. **The id must be unique** across this directory *and* the archive.
+3. The date in the id is the day it was decided, and it does not change afterwards.
 
-Never edit a decision to say the opposite, and never delete one: the record of what was believed
-at the time is the whole value. Write a new file that says what changed and names the id it
-supersedes, exactly as the archive's own rule has always said.
+## Where the old ones are
 
-## The archive
+`docs/decisions.md` — D-001 to D-293 as running numbers, then the dated ids up to
+`D-2026-09-13-terms-page`. It is closed, not deprecated: every one of those decisions still
+stands unless a later one says otherwise, and the several hundred references to them elsewhere in
+the documents all still resolve.
 
-`../decisions.md` holds `D-001` to `D-293` as running numbers, then the dated ids used between
-13 and 14 September, and it stays exactly as it is. Splitting three hundred rows into three
-hundred files would have conflicted with every open pull request at once — the fix would have
-inflicted the very cost it removes. Both places are searched by the same `grep`, and both are
-checked by the same script.
+It was left alone on purpose. Splitting three hundred rows into three hundred files would have
+conflicted with all nine open pull requests — the fix would have inflicted exactly the cost it
+exists to remove.

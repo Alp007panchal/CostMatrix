@@ -15,9 +15,11 @@
 # Three checks:
 #   1. No two migration files share a number.
 #   2. Every migration this branch adds is numbered higher than every migration
-#      already on `origin/main`. This also catches the 0018 trap: production has
-#      recorded 0001-0017 AND 0100-0118, so a new 0018 would sort behind
-#      eighteen migrations that have already run.
+#      already on `origin/main`, and does not re-use a number another open branch
+#      has taken. This catches the 0018 trap: production has recorded 0001-0017
+#      AND 0100-0118, so a new 0018 would sort behind eighteen migrations that
+#      have already run. Being numbered below another *unmerged* branch is not a
+#      fault — it only says which of the two merges first, and it is reported.
 #   3. No two decisions share an id — across the docs/decisions.md archive AND
 #      the docs/decisions/ folder, which is where new ones go.
 #   4. Every file in docs/decisions/ carries the id its filename promises. A
@@ -55,7 +57,7 @@ fi
 # "Anywhere" matters. Comparing against origin/main alone would happily hand out
 # a number another session has already taken on a branch that has not merged
 # yet, which is exactly how 0116 came to be written twice.
-note "→ new migrations are numbered above every number taken on any branch"
+note "→ new migrations are above what has been applied, and clash with nobody"
 if ! git rev-parse --verify --quiet origin/main >/dev/null; then
   note "  – origin/main is not in this clone, so there is nothing to compare against."
   note "    (In CI the database job checks out with fetch-depth: 0 so that it is.)"
@@ -88,8 +90,23 @@ else
   on_main="$(git ls-tree --name-only origin/main -- supabase/migrations/ 2>/dev/null \
     | sed -n 's#supabase/migrations/\([0-9]\{4\}\)_.*#\1#p' | sort)"
 
-  highest="$(printf '%s\n' "$elsewhere" | cut -f1; printf '%s\n' "$on_main")"
-  highest="$(printf '%s\n' "$highest" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
+  # The ordering floor is what has ALREADY BEEN APPLIED, which is what `main`
+  # carries — not what another branch has merely claimed.
+  #
+  # It used to include the other branches, and that made the check unusable the
+  # moment more than one was open: with branches holding 0123, 0126, 0127 and
+  # 0128, only the branch holding 0128 could be pushed to again, because every
+  # other one is "below 0128 which already exists". Four correct branches, three
+  # of them refused, and the refusal cannot be satisfied — renumbering one to be
+  # highest simply moves the failure to whichever branch it overtook.
+  #
+  # Nothing is lost. A number two branches both take is still refused, by name,
+  # just below; a number `main` has already applied is still refused, which is
+  # the 0018 trap. What is no longer treated as a fault is a branch numbered
+  # below another branch's claim, because that is a question of merge order, and
+  # no numbering can answer it: whichever of the two is lower is "wrong" right up
+  # until it merges. It is reported instead, with the order it implies.
+  highest="$(printf '%s\n' "$on_main" | grep -E '^[0-9]{4}$' | sort | tail -n 1)"
 
   if [[ -z "$highest" ]]; then
     note "  – no migrations anywhere yet; nothing to compare against."
@@ -115,10 +132,33 @@ else
       fi
     done
     if [[ "$added" -eq 0 ]]; then
-      note "  ✓ this branch adds no migration; the highest taken anywhere is $highest"
+      note "  ✓ this branch adds no migration; the highest applied is $highest"
     elif [[ "$fail" -eq 0 ]]; then
-      note "  ✓ $added new, all above $highest"
+      note "  ✓ $added new, all above $highest, which is the highest on main"
     fi
+
+    # The next free number, worked out rather than remembered. CLAUDE.md used to
+    # carry it as a literal and it was wrong within the hour, twice — which is
+    # the same fault this whole script exists to stop, so it is computed here
+    # and CLAUDE.md points at the script instead of quoting a number.
+    taken="$(printf '%s\n' "$elsewhere" | cut -f1; printf '%s\n' "$on_main"
+      ls supabase/migrations/[0-9][0-9][0-9][0-9]_*.sql 2>/dev/null \
+        | xargs -n1 basename 2>/dev/null | cut -c1-4)"
+    top="$(printf '%s\n' "$taken" | grep -E '^[0-9]{4}$' | sort | tail -n 1 || true)"
+    if [[ -n "$top" ]]; then
+      note "  → the next free migration number is $(printf '%04d' "$((10#$top + 1))") (highest taken anywhere: $top)"
+    fi
+
+    # Not a fault, but worth saying out loud: a branch numbered below one
+    # another branch has claimed has to merge before it, or the migrations run
+    # out of order. That is the reviewer's to sequence, so it is named here
+    # rather than refused.
+    for f in supabase/migrations/[0-9][0-9][0-9][0-9]_*.sql; do
+      name="$(basename "$f")"; n="${name:0:4}"
+      git cat-file -e "origin/main:supabase/migrations/$name" 2>/dev/null && continue
+      above="$(printf '%s\n' "$elsewhere" | awk -F'\t' -v n="$n" '$1 > n { print $2 }' | sort | tail -n 1)"
+      [[ -n "$above" ]] && note "  – note: $name sits below $above on another branch, so merge this one first."
+    done
   fi
 fi
 
@@ -126,6 +166,7 @@ fi
 # Two places hold decisions now: docs/decisions.md is the archive, closed, and
 # docs/decisions/ is one file per decision, which is what new ones are. An id
 # has to be unique across BOTH, or a reference to it resolves to two things.
+# docs/decisions/README.md says this rule is enforced in CI; this is where.
 note "→ decision ids are unique"
 archive_ids="$(sed -n 's/^| \(D-[A-Za-z0-9-]*\) |.*/\1/p' docs/decisions.md)"
 folder_ids=""
@@ -152,8 +193,9 @@ fi
 
 # --- 4. A decision file carries the id its name promises ---------------------
 # The filename is the id, minus the D-. If the heading inside says something
-# else, every reference to one of the two is wrong and nobody notices until
-# they go looking for a decision that is filed under another name.
+# else, every reference to one of the two is wrong, and nobody notices until
+# they go looking for a decision filed under another name. This is rule 1 of
+# docs/decisions/README.md, which until now nothing checked.
 note "→ decision files are named for the id inside them"
 checked=0
 if [[ -d docs/decisions ]]; then

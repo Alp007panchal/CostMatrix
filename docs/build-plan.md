@@ -30,7 +30,7 @@ Time estimates assume one developer working with you part-time and are rough.
 | — | **The owner's notebook: nine changes in five pull requests. All merged and live** (migrations 0013–0017, `main` at the PR 18 merge). PR 14 costing screen in one column and the operator's name in the history; PR 15 sections inside a panel; PR 16 copy a costing or a panel; PR 17 one enquiry, one decision (and no busbar in Annexure IV); PR 18 files kept with an enquiry, on an enquiry page of its own. Next: the owner runs `docs/acceptance-test.md` on what is live; nothing is waiting on a review. | 2026-09-10 |
 | — | **Two tracks, and the advanced roadmap (2026-09-10).** The owner's roadmap (`docs/reference/roadmap-from-market-leaders.md`, foundations F1–F11) and AI-assistant spec arrived. `main` is now the basic app on production; a long-lived `advanced` branch holds all foundations and assistant work against a separate **CostMatrix Staging** project (D-169). Step 0 built the arrangement by code: `create-staging.yml` creates, wakes and seeds staging; "Deploy database" chooses its target by branch; advanced migrations start at 0100. | 2026-09-10 |
 | — | **The two tracks become one (2026-09-13).** The switch-per-feature (0117) let the whole advanced app reach production in one merge nobody could see, so the split had no job left — and it was still costing: `advanced` was fifteen commits ahead again the next morning. Everything now goes to `main`, behind a switch that is off. Migrations become one sequence from 0123 (`0018` is dead), new decisions take a dated id, and CI refuses a re-used number. `advanced` remains the copy staging runs. | 2026-09-13 |
-| — | **One file per decision (2026-09-14).** Nine pull requests were open, each green against `main` and every pair conflicting with each other — always in `docs/decisions.md`, because every pull request appended a paragraph to the same spot. Draining that queue would have cost about thirty-six resolutions, not one of them a judgement anybody had to make. A decision is now a file in `docs/decisions/`, so two sessions writing on the same morning merge silently; the archive is closed, not split, because splitting it would have conflicted with all nine at once. `check-numbering.sh` grew a third and fourth check: ids unique across archive and folder, and a file named for the id inside it. The same shape in `web/src/lib/database.types.ts` is named in the open questions and deliberately not done here. | 2026-09-14 |
+| — | **One file per decision (2026-09-14), built by both sessions within the hour.** Nine pull requests were open, each green against `main` and every pair conflicting with every other — always in `docs/decisions.md`, because every pull request appended a paragraph to the same spot. Draining that queue would have cost about thirty-six resolutions, not one of them a judgement anybody had to make. A decision is now a file in `docs/decisions/`, and the archive is closed rather than split, because splitting three hundred rows would have conflicted with all nine at once. The folder and its README came from the other session; the enforcement came from this one — `check-numbering.sh` now actually checks the two rules that README says are checked (an id unique across archive *and* folder, and a file named for the id inside it), and `CLAUDE.md` stops telling every session to append to the closed archive. The same shape in `web/src/lib/database.types.ts` is named in the open questions and deliberately left alone. | 2026-09-14 |
 | F1–F3 — Foundations PR A | **Merged into `advanced`, on staging.** Migration 0100: component supplier, attributes, obsolescence, datasheet, lead time and price provenance; kit version, customer wording, labels, parameters and `qty_expression`; the kit version recorded on every costing line; a productivity factor per panel; actual hours; labour rate history. The kit-composition freeze was already built (D-177), so F2 needed no back-fill. | 2026-09-11 |
 | F4–F11 — Foundations PR B | **Built** (PR 26). Migration 0101: panel `parameters`, `origin` and `origin_ref` on every costing line, one `documents` table replacing `enquiry_attachments`, `activity_log`. Migration 0102: `approval_rules` with one default rule per company and a read-only engine, `valid_until` and `price_snapshot_at`, `import_jobs`/`import_rows` filled from the batches, `company_options` with the assistant switched off everywhere, the three assistant tables. The `extract-document` Edge Function reads PDF, Word, Excel and text. Files strip on the costing screen. 483 database assertions, test 15 unmodified. | 2026-09-11 |
 | F4–F11 — Foundations PR B | **Merged into `advanced`, on staging** (PR 26); "Deploy functions" made branch-aware by PR 27 so `extract-document` reached staging, where the owner verified the NPP-192 PDF reads. | 2026-09-11 |
@@ -239,14 +239,27 @@ straight to `main`, reviewed and merged by the owner the same day.
     board's parameters, and the schedule set beside the metres the panel is actually costed at
     (migration 0118). Saving moves no price; applying adds ordinary busbar lines.
 
-34. **The panel layout, stage one** (advanced track, roadmap 3.8) — the front view: the sections a
+31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
+    migrations to a database already at 0017 and already full of rows, refusing any figure that
+    moves (in CI on every pull request), a go-live section in the runbook, and then the release
+    itself: one pull request from `advanced` into `main`, every feature off.
+
+32. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
+    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
+    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
+    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
+    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
+    faces for a double-front board; and a kit template plus importer so the library can be filled
+    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
+
+33. **The panel layout, stage one** (advanced track, roadmap 3.8) — the front view: the sections a
     board needs arranged by the rules of each mounting design, the kits drawn at true scale on the
     covers and plates they belong to with the owner's own device faces, a verdict per section in
     the unit that design counts in, and the enclosure line the drawing asks for, applied only when
     a person presses the button (migration 0120). The rear, side, door and 3D views and the GA
     sketch are stage two.
 
-35. **The panel layout, stage two — the other four views** (advanced track, roadmap 3.8) — the
+34. **The panel layout, stage two — the other four views** (advanced track, roadmap 3.8) — the
     back of the board (cable lugs on a rear-connection section, shrouded terminals on a
     front-connection one, sections mirrored), the plan looking down on one section, the doors with
     the parts whose mounting type says door, and a fixed isometric for the customer; per-section
@@ -255,7 +268,7 @@ straight to `main`, reviewed and merged by the owner the same day.
     behind the plates widens the plate and costs depth, and a section too shallow for its own cables
     does not fit. The GA sketch in the quotation PDF is the one piece of stage two still to come.
 
-36. **The general-arrangement drawing, and 3.8 finished** (advanced track, roadmap 3.8) — the saved
+35. **The general-arrangement drawing, and 3.8 finished** (advanced track, roadmap 3.8) — the saved
     layout printed with the quotation as **Annexure V**, one A4 landscape sheet per panel that has
     one: black line art, the two chambers, each section with its compartment and its devices, the
     device tags `Q1, Q2 …`, a dimension line and an overall size, and a footer taking the form and
@@ -264,7 +277,7 @@ straight to `main`, reviewed and merged by the owner the same day.
     nobody has drawn gets no sheet and the quotation is unchanged (D-284). No migration: this is
     all in the browser, so nothing new reaches staging but the app.
 
-37. **The drawing office: Word and EPLAN** (advanced track, roadmap 4.3) — the EPLAN project name
+36. **The drawing office: Word and EPLAN** (advanced track, roadmap 4.3) — the EPLAN project name
     and drawing numbers on the costing, with a paste-in importer that reads whatever shape the
     export comes in and proposes before it writes; the technical offer as an **editable `.docx`**;
     and a **parts list** for the drawing office to import, one row per frozen line, carrying the
@@ -272,7 +285,7 @@ straight to `main`, reviewed and merged by the owner the same day.
     numbers, a copy does not — both added to the hand-written column list that has dropped frozen
     data twice. Nothing changes a price.
 
-38. **The exceljs/uuid advisory, and the first real test of the exports** (advanced track,
+37. **The exceljs/uuid advisory, and the first real test of the exports** (advanced track,
     maintenance) — the advisory was **never reachable** (exceljs imports only `uuid.v4`, with no
     buffer; the flaw is in `v3`/`v5`/`v6` with one), and `npm audit fix --force` would have
     downgraded exceljs breakingly for no gain. Instead an `overrides` entry moves exceljs's uuid to
@@ -283,30 +296,23 @@ straight to `main`, reviewed and merged by the owner the same day.
 Slices 5 and 6 below are kept for the record; their items are folded into the sessions above
 or into go-live.
 
-31. **Taking `advanced` to production** — an upgrade rehearsal that applies the advanced
-    migrations to a database already at 0017 and already full of rows, refusing any figure that
-    moves (in CI on every pull request), a go-live section in the runbook, and then the release
-    itself: one pull request from `advanced` into `main`, every feature off.
-
-32. **One track** — `main` is the only place work is built, every new feature arriving behind a
+38. **One track** — `main` is the only place work is built, every new feature arriving behind a
     switch that is off by default, and the migrations one continuous sequence from 0123 with
     `0018` retired for good. `scripts/check-numbering.sh` refuses a re-used migration number or
     decision id in CI, because the rule alone was broken three times in one week. `advanced`
     stays as the copy staging runs, for trying a feature before switching it on.
 
-33. **The panel layout specification, and the fields it needs** (advanced track, roadmap 3.8) — the
-    owner's confirmed spec and mockups committed (`docs/reference/panel-layout-spec.md`,
-    `sivacon-s4-construction.md`, `mockups/panel-layout-*`), and migration 0119: the mounting
-    design, module height and positions per plate on a kit; `layout_constructions` with S4 seeded
-    from the Siemens manual; `panel_layouts.cubicles` renamed `sections`, a section carrying two
-    faces for a double-front board; and a kit template plus importer so the library can be filled
-    in now. **The canvas itself is not built** — it comes later, against the high-fidelity mockups.
-
 ## In hand right now
 
-One line per roadmap item a session has started, so two sessions cannot build the same thing
-twice — as happened with 2.8 on 2026-09-12, where a day's work went in the bin. Claimed before
-the work begins, removed when the pull request opens.
+One line per **piece of work** a session has started — not only roadmap items — so two sessions
+cannot build the same thing twice. Claimed before the work begins, removed when the pull request
+opens.
+
+*Not only roadmap items*, because of what happened on 2026-09-13: two sessions built the same
+`advanced → main` release and opened it **two seconds apart**, neither having claimed it, on the
+reasonable reading that a release is not a roadmap item. One of the two was thrown away. The rule
+before that was written after 2.8 was built twice on 2026-09-12, which cost a day. A release, a
+fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|

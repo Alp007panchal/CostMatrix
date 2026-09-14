@@ -106,7 +106,10 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
   Staging project, so the owner can try a feature there before switching it on for real work.
 - **Numbers are taken from the highest anywhere in the repository, not the highest on your
   branch.** Sessions run in parallel, so check the open pull requests and the remote branches.
-  - **Migrations are one continuous sequence.** The next free number today is **0123**.
+  - **Migrations are one continuous sequence.** Do not trust a number written down here or
+    anywhere else — run `scripts/check-numbering.sh` and it prints the next free one, worked
+    out from `main` and every remote branch. This line used to carry the number as text and it
+    was wrong within the hour, twice, which is the same fault the script exists to stop.
     `0018` is dead and must never be used: production has recorded `0001`–`0017` *and*
     `0100`–`0118`, so a new `0018` would sort behind eighteen migrations that have already
     run. A re-used number is worse than a wrong one — Supabase skips it in silence.
@@ -118,11 +121,13 @@ Each session adapts what exists (see `docs/build-plan.md` for what is already li
     it is closed. `docs/decisions/README.md` has the shape of a decision file.
   - `scripts/check-numbering.sh` enforces all of it, in CI on every pull request. Run it before
     you push.
-- **Check, then claim, before building.** More than one session works on this repository. Before
-  starting a roadmap item: `git fetch`, look at the open pull requests and the remote branches,
-  and if nothing has it, put one line in `docs/build-plan.md` under *In hand right now* and push
-  that first. Two sessions built roadmap 2.8 on the same morning and one of them was thrown away
-  (D-240); a line in a file is what stops it happening again.
+- **Check, then claim, before building — anything, not just a roadmap item.** More than one
+  session works on this repository. Before starting: `git fetch`, look at the open pull requests
+  and the remote branches, and if nothing has it, put one line in `docs/build-plan.md` under
+  *In hand right now* and push that first. Two sessions built roadmap 2.8 on the same morning and
+  one was thrown away (D-240); then two sessions built the same release **two seconds apart**,
+  neither having claimed it, because a release is not a roadmap item. It is now: a release, a
+  fix, a document, a chore — if it will take more than a few minutes, claim it.
 - Verify before claiming: `supabase/tests/run-local.sh` (it imports the real `data/seed`
   files and rebuilds NPP-192); in `web/` `npm run typecheck`, `npm test`, `npm run build`.
   Never edit `data/seed/*` by hand: it is the owner's data. Say plainly what could not be
