@@ -1528,6 +1528,8 @@ export interface LibraryDependents {
   label: string
   dependents: number
   dependents_are: string
+}
+
 /** One fault the library has, live (v_library_issues, migration 0128). */
 export interface LibraryIssue {
   company_id: string | null
