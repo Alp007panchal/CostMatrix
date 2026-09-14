@@ -52,7 +52,27 @@ insert into public.components (id, company_id, category_code, code, name, unit, 
                                purchase_price, purchase_currency)
 values ('00000000-0000-0000-0000-0000000049a2', null, :'cat', 'LH-NOFACTOR', 'PART IN A CURRENCY NOBODY PRICES',
         'pcs', 'fixed', 99, 'CHF');
+-- Migration 0127 refuses this deletion — which is the point of it. So the state
+-- is reachable only on a database where a factor went before that guard existed,
+-- which is every database today, 0127 being unmerged: the rule stays, and the
+-- test reaches the state the one way left, by standing the guard down for a
+-- single statement. Written to work whether or not 0127 is present, because the
+-- two arrive as separate pull requests and either may merge first — found by
+-- merging all nine open branches together and running the suite on the result,
+-- which neither branch's own CI could have shown.
+do $$
+begin
+  if exists (select 1 from pg_trigger where tgname = 'currency_factors_refuse_orphaning') then
+    execute 'alter table public.currency_factors disable trigger currency_factors_refuse_orphaning';
+  end if;
+end $$;
 delete from public.currency_factors where company_id is null and currency_code = 'CHF';
+do $$
+begin
+  if exists (select 1 from pg_trigger where tgname = 'currency_factors_refuse_orphaning') then
+    execute 'alter table public.currency_factors enable trigger currency_factors_refuse_orphaning';
+  end if;
+end $$;
 
 insert into public.kit_groups (id, company_id, name) values
   ('00000000-0000-0000-0000-0000000049b1', null, 'LH timed group'),
