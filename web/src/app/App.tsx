@@ -34,6 +34,7 @@ const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePag
 const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
+const ErrorsPage = lazy(() => import('../modules/admin/ErrorsPage').then((m) => ({ default: m.ErrorsPage })))
 const HelpPage = lazy(() => import('../modules/help/HelpPage').then((m) => ({ default: m.HelpPage })))
 const TermsPage = lazy(() => import('../modules/legal/TermsPage').then((m) => ({ default: m.TermsPage })))
 
@@ -128,6 +129,14 @@ export function App() {
                 element={
                   <RequireRole role="company_admin">
                     <FeaturesPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/errors"
+                element={
+                  <RequireRole role="company_admin">
+                    <ErrorsPage />
                   </RequireRole>
                 }
               />

@@ -90,3 +90,31 @@ export function devicePlace(
 export function sheetTags(sheet: PdfGaSheet): string[] {
   return sheet.sections.flatMap((s) => s.devices.map((d) => d.tag))
 }
+
+/**
+ * Where a section's busbar compartment and its devices sit across the section, in
+ * points. On a rear elevation everything is mirrored: the chamber a person sees on
+ * the left when standing at the front is on their right once they walk round the
+ * back, and drawing it on the same side would put the cables through the steel.
+ *
+ * The front case is arithmetically what the sheet drew before this existed, so
+ * the front elevation is unchanged to the point.
+ */
+export function sectionBands(
+  section: PdfGaSection,
+  x: number,
+  width: number,
+  geometry: GaGeometry,
+  mirrored: boolean,
+): { compartmentX: number; compartmentWidth: number; deviceX: number; deviceWidth: number } {
+  const compartmentWidth = section.busbarCompartmentMm * geometry.scale
+  const onLeft = mirrored ? section.busbarSide === 'right' : section.busbarSide === 'left'
+  const gap = 6
+  const deviceWidth = Math.max(width - compartmentWidth - gap - 8, 10)
+  return {
+    compartmentX: onLeft ? x : x + width - compartmentWidth,
+    compartmentWidth,
+    deviceX: onLeft ? x + compartmentWidth + gap : x + 8,
+    deviceWidth,
+  }
+}

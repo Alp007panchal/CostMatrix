@@ -1,5 +1,6 @@
 import type { LayoutSection } from '../../../lib/database.types'
 import type { CostingDetail } from '../../costing/api'
+import { rearWords } from '../../layout/layout-views'
 import type { PdfGaDevice, PdfGaSection, PdfGaSheet } from './types'
 
 /**
@@ -12,6 +13,12 @@ import type { PdfGaDevice, PdfGaSection, PdfGaSheet } from './types'
  *
  * A panel with no saved layout gets **no sheet**. The quotation says nothing
  * about a board nobody has drawn rather than printing a guessed one.
+ *
+ * A board with a rear face gets **two** sheets: the front elevation and, after it,
+ * the rear. The rear one is the same board walked round — the sections right to
+ * left, the busbar chambers on the other hand, the devices of face B — and it
+ * carries the tags the front sheet numbered, because a device has one tag wherever
+ * it is drawn.
  */
 
 /** One panel's saved layout, as the release page reads it. */
@@ -60,8 +67,13 @@ export function buildGaSheets(detail: CostingDetail, layouts: SavedPanelLayout[]
         design: String(section.design),
         designWords: sectionWords(section),
         busbarCompartmentMm: section.busbar_compartment_mm ?? 0,
+        busbarSide: section.busbar_side ?? 'left',
         form: section.form ?? null,
         doubleFront: (section.access ?? 'single_front') === 'double_front',
+        // The same sentence the rear view on screen prints, borrowed rather than
+        // written again, so the drawing and the app cannot end up disagreeing
+        // about what is behind a section.
+        rearWords: rearWords(section).toUpperCase(),
         devices,
       }
     })
@@ -69,7 +81,7 @@ export function buildGaSheets(detail: CostingDetail, layouts: SavedPanelLayout[]
     const widthMm = sections.reduce((total, s) => total + s.widthMm, 0)
     const depthMm = sections.reduce((deepest, s) => Math.max(deepest, s.depthMm ?? 0), 0)
 
-    sheets.push({
+    const front: PdfGaSheet = {
       panelId: panel.id,
       panelName: panel.name.toUpperCase(),
       optionLabel: panel.option_label?.trim() ?? null,
@@ -81,13 +93,33 @@ export function buildGaSheets(detail: CostingDetail, layouts: SavedPanelLayout[]
       depthMm: depthMm > 0 ? depthMm : null,
       sections,
       specLine: specLine(sections, panel.enclosure_dimensions),
-      // Any rear face at all means the board has a back elevation worth a sheet
-      // of its own; until that sheet exists the front one says the board is
-      // double-front rather than quietly drawing half of it.
-      hasRearFace: sections.some((s) => s.doubleFront),
-    })
+      // A face at the back, rather than an access setting: a board set to
+      // double-front that nobody has put anything behind yet is still drawn once,
+      // and the front sheet says its access is front and rear.
+      hasRearFace: saved.sections.some((s) => (s.faces ?? []).some((f) => f.side === 'rear')),
+      elevation: 'front',
+    }
+    sheets.push(front)
+    if (front.hasRearFace) sheets.push(rearElevation(front))
   }
   return sheets
+}
+
+/**
+ * The same board from behind. Nothing is recalculated: the sections are the front
+ * sheet's own, reversed, because walking round a board reverses the order you read
+ * it in — the mockup's caption is "sections mirrored". Only the devices on face B
+ * are kept; the rest of the board is drawn as the steel it is.
+ */
+function rearElevation(front: PdfGaSheet): PdfGaSheet {
+  return {
+    ...front,
+    elevation: 'rear',
+    sections: [...front.sections].reverse().map((section) => ({
+      ...section,
+      devices: section.devices.filter((device) => device.face === 'rear'),
+    })),
+  }
 }
 
 /** "Q1 ACB 1600 A · Q2 …" — the line the technical offer carries, so the tags match. */

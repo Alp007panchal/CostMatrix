@@ -39,6 +39,7 @@ export function Layout() {
           {canAdminister && <NavLink to="/admin/quotation-defaults">Quotation wording</NavLink>}
           {canAdminister && on('assistant') && <NavLink to="/admin/assistant">Assistant</NavLink>}
           {canAdminister && <NavLink to="/admin/features">Features</NavLink>}
+          {canAdminister && <NavLink to="/admin/errors">What broke</NavLink>}
           {isMasterAdmin && <NavLink to="/admin/companies">Companies</NavLink>}
           <NavLink to="/help">Help</NavLink>
         </nav>
