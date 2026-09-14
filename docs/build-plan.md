@@ -309,7 +309,7 @@ the work begins, removed when the pull request opens.
 
 | Item | Session | Since |
 |---|---|---|
-| Bringing the six features built on `advanced` (PRs 48–52, 54) onto the one track | `claude/sync-advanced-to-main` | 2026-09-13 10:20 |
+| One file per decision, so parallel pull requests stop conflicting | `session_017KDE7hzzvKgDA7jLZP3Nht` | 2026-09-14 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
