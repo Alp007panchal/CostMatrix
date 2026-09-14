@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    :root{ --ink:#14181F; --ink-soft:#2A313D; --paper:#F4F5F2; --paper-2:#EAEBE6; --line:#DCDDD6; --line-dark:#33394450;
+      --accent:#C9622B; --accent-soft:#F0DCC9; --ok:#3D7A4C; --ok-soft:#DEEBE1; --warn:#B8862E; --warn-soft:#F3E7CC;
+      --bad:#B84438; --bad-soft:#F3DBD6; --blue:#3A6EA5; --blue-soft:#DCE6F2; --text:#1C2027; --text-dim:#5B6270; --white:#fff; --radius:3px;
+      --mono:'IBM Plex Mono','SF Mono',Consolas,monospace; --sans:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif; --disp:'Space Grotesk','IBM Plex Sans',sans-serif; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);color:var(--text);background:var(--paper);font-size:14px;line-height:1.5;}
+    .app{width:1440px;height:1000px;display:flex;background:var(--paper);overflow:hidden;}
+    /* sidebar */
+    .sidebar{width:232px;flex-shrink:0;background:var(--ink);color:#C7CDD6;display:flex;flex-direction:column;}
+    .brand{padding:22px 20px 16px;border-bottom:1px solid var(--line-dark);}
+    .brand .mark{font-family:var(--disp);font-weight:700;font-size:16px;color:#fff;letter-spacing:.03em;}
+    .brand .sub{font-family:var(--mono);font-size:10px;color:#8891A0;margin-top:4px;letter-spacing:.05em;}
+    .nav-group{padding:10px 0;border-bottom:1px solid var(--line-dark);}
+    .nav-group-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7382;padding:6px 20px 6px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#B7BEC9;border-left:2px solid transparent;}
+    .nav-item.active{background:#20262F;color:#fff;border-left-color:var(--accent);font-weight:600;}
+    .nav-item .dot{width:5px;height:5px;border-radius:50%;background:#4A5261;flex-shrink:0;}
+    .nav-item .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#8891A0;}
+    .nav-item .cnt.hot{color:#fff;background:var(--accent);border-radius:10px;padding:1px 7px;}
+    .who{margin-top:auto;padding:14px 20px;border-top:1px solid var(--line-dark);font-size:12px;color:#B7BEC9;line-height:1.4;}
+    .who b{display:block;color:#fff;font-weight:600;} .who .r{font-family:var(--mono);font-size:10px;color:#8891A0;margin-top:2px;}
+    /* main */
+    .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 36px;border-bottom:1px solid var(--line);background:#fff;}
+    .topbar h1{font-family:var(--disp);font-size:22px;margin:0;font-weight:600;letter-spacing:-.01em;line-height:1.2;}
+    .topbar .meta{font-family:var(--mono);font-size:11.5px;color:var(--text-dim);margin-top:3px;}
+    .topbar .right{display:flex;align-items:center;gap:10px;}
+    .content{padding:24px 36px 32px;flex:1;overflow:hidden;}
+    .intro{font-size:13.5px;color:var(--text-dim);margin:0 0 18px;max-width:900px;}
+    .tabs{display:flex;gap:4px;margin-bottom:22px;border-bottom:1px solid var(--line);}
+    .tab{padding:10px 16px;font-size:13.5px;font-weight:600;color:var(--text-dim);border-bottom:2px solid transparent;margin-bottom:-1px;}
+    .tab.active{color:var(--ink);border-bottom-color:var(--accent);}
+    .btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:var(--radius);border:1px solid var(--ink);background:var(--ink);color:#fff;display:inline-block;white-space:nowrap;}
+    .btn.secondary{background:#fff;color:var(--ink);border-color:var(--line);} .btn.accent{background:var(--accent);border-color:var(--accent);} .btn.small{padding:5px 11px;font-size:11.5px;} .btn.ghost{background:transparent;border-color:transparent;color:var(--text-dim);}
+    /* sections */
+    .section{margin-bottom:22px;}
+    .section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
+    .section-head .n{font-family:var(--mono);font-size:11px;color:var(--text-dim);}
+    .section-head .sd{width:8px;height:8px;border-radius:50%;background:var(--ok);align-self:center;} .section-head .sd.warn{background:var(--warn);} .section-head .sd.bad{background:var(--bad);}
+    .section-head h2{font-family:var(--disp);font-size:16px;font-weight:600;margin:0;}
+    .section-head .q{margin-left:auto;font-size:12.5px;color:var(--text-dim);}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);}
+    .panel-body{padding:16px 20px;}
+    /* kpi */
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+    .kpi{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;}
+    .kpi .label{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);}
+    .kpi .value{font-family:var(--disp);font-size:30px;font-weight:700;margin-top:6px;line-height:1.1;}
+    .kpi .delta{font-size:12px;margin-top:5px;color:var(--text-dim);}
+    .kpi.k-crit{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad);} .kpi.k-crit .value{color:var(--bad);}
+    .kpi.k-watch{border-color:var(--warn);box-shadow:inset 3px 0 0 var(--warn);} .kpi.k-watch .value{color:var(--warn);}
+    /* exception bar */
+    .exbar{border:1px solid var(--bad);border-left:4px solid var(--bad);border-radius:var(--radius);background:#fff;margin-bottom:22px;overflow:hidden;}
+    .exbar.clear{border-color:var(--ok);}
+    .exbar-head{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);}
+    .exbar-head .n{font-family:var(--disp);font-size:24px;font-weight:700;line-height:1;color:var(--bad);} .exbar-head .t{font-family:var(--disp);font-size:15px;font-weight:700;color:var(--bad);}
+    .exbar-head .hint{margin-left:auto;font-size:12px;color:var(--text-dim);}
+    .exlist{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);}
+    .exitem{background:#fff;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
+    .exitem .sev{width:3px;align-self:stretch;border-radius:2px;background:var(--bad);flex:0 0 auto;} .exitem.watch .sev{background:var(--warn);}
+    .exitem .hl{font-size:13.5px;font-weight:600;line-height:1.35;color:var(--bad);} .exitem.watch .hl{color:var(--warn);}
+    .exitem .why{font-size:12.5px;color:var(--text-dim);margin-top:4px;line-height:1.45;}
+    .exitem .src{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);margin-top:8px;}
+    .exitem .fig{font-family:var(--disp);font-size:22px;font-weight:700;line-height:1;color:var(--bad);margin-left:auto;} .exitem.watch .fig{color:var(--warn);}
+    /* tables */
+    table{width:100%;border-collapse:collapse;font-size:13.5px;}
+    th{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);font-weight:500;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);}
+    td{padding:10px 10px;border-bottom:1px solid var(--paper-2);vertical-align:middle;} tr:last-child td{border-bottom:none;}
+    td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;} td.mono{font-family:var(--mono);font-size:12.5px;} td .sub{display:block;font-size:12px;color:var(--text-dim);margin-top:1px;}
+    tr.sel td{background:#FBF5EF;}
+    .chip{display:inline-block;white-space:nowrap;font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:2px;letter-spacing:.04em;}
+    .chip.ok{background:var(--ok-soft);color:var(--ok);} .chip.warn{background:var(--warn-soft);color:var(--warn);} .chip.bad{background:var(--bad-soft);color:var(--bad);} .chip.blue{background:var(--blue-soft);color:var(--blue);} .chip.dim{background:var(--paper-2);color:var(--text-dim);}
+    .grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;} .grid2>*{min-width:0;}
+    /* vertical tabs */
+    .vlayout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;}
+    .vtabs{display:flex;flex-direction:column;gap:2px;}
+    .vtab{padding:10px 14px;border-radius:var(--radius);font-size:13.5px;color:var(--text-dim);display:flex;align-items:center;gap:10px;border-left:2px solid transparent;}
+    .vtab.active{background:#fff;color:var(--ink);font-weight:600;border-left-color:var(--accent);box-shadow:0 0 0 1px var(--line);}
+    .vtab .cnt{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text-dim);} .vtab .cnt.bad{color:var(--bad);}
+    .vtabs .vlabel{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);padding:10px 14px 4px;}
+    /* forms */
+    .field{display:flex;flex-direction:column;gap:5px;} .field label{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);}
+    .input{border:1px solid var(--line);border-radius:var(--radius);padding:9px 11px;background:#fff;font-size:13.5px;min-height:38px;} .input.dim{color:var(--text-dim);}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;} .full{grid-column:1/-1;}
+    .filters{display:flex;gap:10px;align-items:center;margin-bottom:14px;} .filters .input{flex:1;min-width:120px;}
+    .alert-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--paper-2);font-size:13.5px;} .alert-item:last-child{border-bottom:none;}
+    .alert-dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0;} .alert-dot.bad{background:var(--bad);} .alert-dot.warn{background:var(--warn);} .alert-dot.blue{background:var(--blue);} .alert-dot.ok{background:var(--ok);}
+    .alert-item .t{color:var(--text-dim);font-family:var(--mono);font-size:10.5px;display:block;margin-top:3px;}
+    .total{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--paper-2);font-size:13.5px;} .total.big{font-family:var(--disp);font-size:19px;font-weight:700;border-bottom:none;padding-top:12px;gap:12px;}
+    .total .v{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+    .note{font-size:12px;color:var(--text-dim);}
+    .steps{display:flex;align-items:center;gap:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;}
+    .step{display:flex;align-items:center;gap:6px;color:var(--text-dim);} .step .c{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:10px;background:#fff;}
+    .step.done .c{background:var(--ok);border-color:var(--ok);color:#fff;} .step.done{color:var(--ok);} .step.now .c{background:var(--accent);border-color:var(--accent);color:#fff;} .step.now{color:var(--ink);font-weight:600;}
+    .step + .step:before{content:"";width:34px;height:1px;background:var(--line);margin:0 10px;}
+    .subtotal td{background:var(--paper);font-weight:600;} .subtotal td.l{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);font-weight:500;}
+</style>
+</helmet>
+<div class="app"><div class="sidebar"><div class="brand"><div class="mark">COSTMATRIX</div><div class="sub">NATIONWIDE ELECTRICAL IND.</div></div><div class="nav-group"><div class="nav-group-label">OVERVIEW</div><div class="nav-item"><span class="dot"></span>Home</div></div><div class="nav-group"><div class="nav-group-label">1 · ENQUIRY TO QUOTE</div><div class="nav-item"><span class="dot"></span>Customers</div><div class="nav-item"><span class="dot"></span>Enquiries<span class="cnt">4</span></div><div class="nav-item active"><span class="dot"></span>Costings<span class="cnt">7</span></div><div class="nav-item"><span class="dot"></span>Quotations<span class="cnt">12</span></div><div class="nav-item"><span class="dot"></span>Follow-ups<span class="cnt hot">3</span></div></div><div class="nav-group"><div class="nav-group-label">2 · LIBRARY</div><div class="nav-item"><span class="dot"></span>Components</div><div class="nav-item"><span class="dot"></span>Kits</div><div class="nav-item"><span class="dot"></span>Library health<span class="cnt hot">2</span></div><div class="nav-item"><span class="dot"></span>Library set-up</div></div><div class="nav-group"><div class="nav-group-label">3 · INSIGHT</div><div class="nav-item"><span class="dot"></span>Sales</div><div class="nav-item"><span class="dot"></span>Labour variance</div></div><div class="nav-group"><div class="nav-group-label">SETTINGS</div><div class="nav-item"><span class="dot"></span>Settings</div><div class="nav-item"><span class="dot"></span>People</div></div><div class="nav-group"><div class="nav-group-label">HELP</div><div class="nav-item"><span class="dot"></span>Help</div></div><div class="who"><b>Alpesh Panchal</b>Nationwide Electrical Industries<div class="r">MASTER ADMIN · APPROVER</div></div></div><div class="main"><div class="topbar"><div><h1>NPP-201 · Kenya Power · Ruaraka MDB</h1><div class="meta">Costing · revision 0 · 3 panels · <span class="chip warn">SUBMITTED</span></div></div><div class="right"><span class="btn secondary small">← Costings</span><span class="btn secondary small">Copy</span><span class="btn secondary small">Exports ▾</span><span class="btn accent small">Approve</span><span class="btn secondary small">Return</span><span class="meta" style="margin-left:6px">Mon, 14 Sept 2026 · 11:02 · Nairobi</span><span class="btn secondary small">Sign out</span></div></div><div class="content">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+  <div class="steps"><span class="step done"><span class="c">✓</span>Draft</span><span class="step now"><span class="c">2</span>Submitted</span><span class="step"><span class="c">3</span>Approved</span><span class="step"><span class="c">4</span>Quotation released</span></div>
+  <span class="note">Submitted by V. Musembi · Thu 11 Sep 14:20 · rule: over KES 5 M needs a director</span>
+</div>
+<div class="vlayout">
+  <div>
+    <div class="vtabs">
+      <div class="vlabel">Panels in this costing</div>
+      <div class="vtab active">1 · MDB 1600 A<span class="cnt">7.54 M</span></div>
+      <div class="vtab">2 · Sub-board A<span class="cnt">1.20 M</span></div>
+      <div class="vtab">3 · APFC 400 kvar<span class="cnt bad">8 unpriced</span></div>
+      <div class="vtab" style="color:var(--accent)">+ Add a panel</div>
+      <div class="vlabel" style="margin-top:14px">Whole costing</div>
+      <div class="vtab">All panels side by side</div>
+      <div class="vtab">Documents<span class="cnt">3</span></div>
+      <div class="vtab">Approval &amp; history</div>
+    </div>
+    <div class="panel" style="margin-top:18px"><div class="panel-body">
+      <div class="note" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Totals · 3 panels · KES</div>
+      <div class="total"><span>Material</span><span class="v">5,612,400</span></div>
+      <div class="total"><span>Labour · 224.5 h</span><span class="v">417,900</span></div>
+      <div class="total"><span>Margins 20 %</span><span class="v">1,507,600</span></div>
+      <div class="total big"><span>Ex-VAT</span><span class="v">7,537,900</span></div>
+      <div class="note" style="margin-top:4px">prices frozen 12 Sep · rounded up to KES 100 per panel</div>
+    </div></div>
+  </div>
+  <div>
+    <div class="section-head"><span class="n">1</span><span class="sd ok"></span><h2>MDB 1600 A main LV board</h2><span class="q">SIVACON S4 · 4 200 × 2 000 × 800 · Form 2b · qty 1</span></div>
+    <div class="panel" style="margin-bottom:20px">
+      <div style="display:flex;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line);align-items:center"><span class="btn small">+ Add kit</span><span class="btn secondary small">+ Free line</span><span class="btn secondary small">Layout</span><span class="btn secondary small">Copy panel</span><span class="note" style="margin-left:auto">17 lines · 2 checks open</span></div>
+      <table>
+        <tr><th>Tag</th><th>Kit</th><th class="r">Qty</th><th class="r">Material</th><th class="r">Labour</th><th class="r">Line total</th><th>Check</th></tr>
+        <tr><td class="mono">Q1–Q2</td><td>1600 A 4P ACB · ATS pair<span class="sub">ATS · 38.0 h</span></td><td class="r">1</td><td class="r">1,842,600</td><td class="r">76,000</td><td class="r">1,918,600</td><td><span class="chip ok">OK</span></td></tr>
+        <tr><td class="mono">Q3</td><td>1600 A 3P fixed ACB · solar<span class="sub">ACB frame 1 · 18.0 h</span></td><td class="r">1</td><td class="r">612,400</td><td class="r">36,000</td><td class="r">648,400</td><td><span class="chip ok">OK</span></td></tr>
+        <tr class="subtotal"><td class="l" colspan="3">Incoming</td><td class="r">2,455,000</td><td class="r">112,000</td><td class="r">2,567,000</td><td></td></tr>
+        <tr><td class="mono">Q4</td><td>630 A TP MCCB outgoer<span class="sub">OUTGOER-KIT · 5.5 h</span></td><td class="r">1</td><td class="r">96,200</td><td class="r">11,000</td><td class="r">107,200</td><td><span class="chip ok">OK</span></td></tr>
+        <tr><td class="mono">Q5–Q7</td><td>400 A TP MCCB outgoer<span class="sub">OUTGOER-KIT · 5.5 h each</span></td><td class="r">3</td><td class="r">214,800</td><td class="r">33,000</td><td class="r">247,800</td><td><span class="chip ok">OK</span></td></tr>
+        <tr><td class="mono">Q8–Q16</td><td>250 A / 160 A TP MCCB outgoer<span class="sub">OUTGOER-KIT · 5.5 h each</span></td><td class="r">9</td><td class="r">386,100</td><td class="r">99,000</td><td class="r">485,100</td><td><span class="chip warn">3 NOT PLACED</span></td></tr>
+        <tr class="subtotal"><td class="l" colspan="3">Outgoing</td><td class="r">697,100</td><td class="r">143,000</td><td class="r">840,100</td><td></td></tr>
+        <tr><td class="mono">—</td><td>Enclosure · SIVACON S4 · 5 × 800 + 1 × 400<span class="sub">from the layout · Form 2b</span></td><td class="r">6</td><td class="r">1,120,000</td><td class="r">—</td><td class="r">1,120,000</td><td><span class="chip blue">FROM LAYOUT</span></td></tr>
+        <tr><td class="mono">—</td><td>Busbar · 4 × 100×10 Cu · 4.2 m<span class="sub">188 kg · 24.0 h</span></td><td class="r">1</td><td class="r">338,400</td><td class="r">74,500</td><td class="r">412,900</td><td><span class="chip ok">OK</span></td></tr>
+        <tr class="subtotal"><td class="l" colspan="3">Enclosure &amp; busbar</td><td class="r">1,458,400</td><td class="r">74,500</td><td class="r">1,532,900</td><td></td></tr>
+      </table>
+    </div>
+    <div class="section-head"><span class="n">2</span><span class="sd warn"></span><h2>Checks on this panel</h2><span class="q">2 open</span></div>
+    <div class="panel"><div class="panel-body" style="padding-top:4px;padding-bottom:4px">
+      <div class="alert-item"><span class="alert-dot warn"></span><div>Layout: 3 MCCBs are not placed and section D is full — suggested fix: make section F a 600 mm MCCB section.<span class="t">LAYOUT · OPEN THE LAYOUT TO APPLY</span></div></div>
+      <div class="alert-item"><span class="alert-dot warn"></span><div>ACB frame 1 has no group hours — the 18 h on Q3 is a kit override, not a standard.<span class="t">LIBRARY · KIT GROUPS</span></div></div>
+    </div></div>
+  </div>
+</div></div></div></div>
+</x-dc>
+</body>
+</html>

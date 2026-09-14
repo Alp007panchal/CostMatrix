@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Async } from '../../ui/Async'
+import { PageHeader } from '../../app/PageHeader'
 import type { LibraryIssueKind } from '../../lib/database.types'
 import { listLibraryHealth, listLibraryIssues } from './library-health-api'
 import { bySeverity, exampleWords, headline, kindLabel, libraryLabel } from './library-health'
@@ -22,8 +23,8 @@ export function LibraryHealthPage() {
 
   return (
     <>
-      <h1>Library health</h1>
-      <p className="muted">
+      <PageHeader title="Library health" meta="read only · nothing here is changed for you" />
+      <p className="intro">
         What the library is missing, as it stands today. Nothing here is changed for you: each row
         says what the fault does to a costing and which screen puts it right.
       </p>
@@ -31,14 +32,19 @@ export function LibraryHealthPage() {
       <Async query={health} empty="Nothing to fix: every part can be priced and every kit is ready to cost.">
         {(rows) => (
           <>
-            <p>
+            <p className="intro">
               <strong>{headline(rows)}</strong>
             </p>
 
-            {bySeverity(rows).map((group) => (
-              <section key={group.severity} className="card">
-                <h2>{group.label}</h2>
-                <p className="muted">{group.blurb}</p>
+            {bySeverity(rows).map((group, i) => (
+              <section key={group.severity} className="section">
+                <div className="section-head">
+                  <span className="n">{i + 1}</span>
+                  <span className={group.severity === 'refuses' ? 'sd bad' : 'sd warn'} />
+                  <h2>{group.label}</h2>
+                  <span className="q">{group.blurb}</span>
+                </div>
+                <div className="panel flush">
                 <div className="table-wrap">
                   <table>
                     <thead>
@@ -59,9 +65,10 @@ export function LibraryHealthPage() {
                           <td className="num">{row.items.toLocaleString()}</td>
                           <td className="muted">{exampleWords(row)}</td>
                           <td>{row.fix_on}</td>
-                          <td>
+                          <td className="right">
                             <button
                               type="button"
+                              className="ghost small"
                               onClick={() => setOpen(open === row.kind ? null : row.kind)}
                             >
                               {open === row.kind ? 'Hide' : 'List them'}
@@ -75,6 +82,7 @@ export function LibraryHealthPage() {
                 {group.rows.some((row) => row.kind === open) && open !== null && (
                   <IssueList kind={open} />
                 )}
+                </div>
               </section>
             ))}
           </>

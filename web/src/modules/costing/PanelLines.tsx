@@ -76,12 +76,12 @@ export function PanelLines({
           {groups.map((group) => (
             <Fragment key={group.heading}>
               {showHeadings && (
-                <tr style={{ background: 'var(--page)' }}>
-                  <th colSpan={2}>{group.heading}</th>
-                  <th className="right">{money(group.material, label)}</th>
-                  <th className="right">{money(group.labour, label)}</th>
-                  <th className="right">{money(group.material + group.labour, label)}</th>
-                  <th></th>
+                <tr className="subtotal">
+                  <td className="l" colSpan={2}>{group.heading}</td>
+                  <td className="right">{money(group.material, label)}</td>
+                  <td className="right">{money(group.labour, label)}</td>
+                  <td className="right">{money(group.material + group.labour, label)}</td>
+                  <td></td>
                 </tr>
               )}
               {group.lines.map((a) => (
@@ -113,12 +113,12 @@ export function PanelLines({
                 <td colSpan={6} className="muted">APFC bank: {kvar} kVAr in steps (the kits above, rating × quantity)</td>
               </tr>
             )}
-            <tr>
-              <th colSpan={2}>Cost of one panel</th>
-              <th className="right">{money(price.material_cost, label)}</th>
-              <th className="right">{money(price.labour_cost, label)}</th>
-              <th className="right">{money(price.material_cost + price.labour_cost, label)}</th>
-              <th></th>
+            <tr className="subtotal">
+              <td className="l" colSpan={2}>Cost of one panel</td>
+              <td className="right">{money(price.material_cost, label)}</td>
+              <td className="right">{money(price.labour_cost, label)}</td>
+              <td className="right">{money(price.material_cost + price.labour_cost, label)}</td>
+              <td></td>
             </tr>
           </tfoot>
         )}

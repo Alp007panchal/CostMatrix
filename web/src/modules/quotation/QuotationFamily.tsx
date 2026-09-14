@@ -3,6 +3,8 @@ import { longDate } from '../../lib/format'
 import type { QuotationRow, QuotationValidity } from '../../lib/database.types'
 import { validityLabel } from './validity'
 import type { FamilyGroup } from './quotation-groups'
+import { statusChip, whatNext } from './what-next'
+import { todayIso } from '../dashboard/attention'
 import { STATUS } from './QuotationsPage'
 
 /**
@@ -15,6 +17,7 @@ export function QuotationFamily({
   canChange,
   decidedOnEnquiry,
   validity,
+  nextFollowup,
   onOpenCosting,
   onPdf,
   onSent,
@@ -26,6 +29,8 @@ export function QuotationFamily({
   decidedOnEnquiry: boolean
   /** How long this one has left (roadmap 2.6); absent while it is loading. */
   validity?: QuotationValidity | undefined
+  /** The next open reminder on this quotation, so the last column can name a date. */
+  nextFollowup?: string | null
   onOpenCosting: (costingId: string) => void
   onPdf: (path: string) => void
   onSent: (id: string) => void
@@ -33,6 +38,7 @@ export function QuotationFamily({
 }) {
   const [showEarlier, setShowEarlier] = useState(false)
   const q = family.latest
+  const chip = statusChip(q, validity)
 
   return (
     <>
@@ -63,11 +69,13 @@ export function QuotationFamily({
         </td>
         <td className="muted">{longDate(q.released_at)}</td>
         <td>
-          <span className="badge">{STATUS[q.status]}</span>
+          <span className={`chip ${chip.tone}`}>{chip.text}</span>
           {q.status === 'lost' && q.lost_reason && (
             <div className="muted" style={{ fontSize: '.75rem' }}>{q.lost_reason}</div>
           )}
         </td>
+        {/* What next, not what happened: the whole point of the column (§5). */}
+        <td>{whatNext(q, validity, nextFollowup ?? null, todayIso())}</td>
         <td className="right">
           <button onClick={() => onPdf(q.pdf_path)}>PDF</button>{' '}
           {canChange && q.status === 'released' && <button onClick={() => onSent(q.id)}>Mark sent</button>}{' '}
@@ -89,8 +97,9 @@ export function QuotationFamily({
               {old.costing && <span className="badge">Rev {old.costing.revision_no}</span>}
             </td>
             <td className="muted">{longDate(old.released_at)}</td>
-            <td><span className="badge">{STATUS[old.status]}</span></td>
-            <td className="right"><button onClick={() => onPdf(old.pdf_path)}>PDF</button></td>
+            <td><span className="chip dim">{STATUS[old.status]}</span></td>
+            <td className="muted">superseded by {q.reference_no}</td>
+            <td className="right"><button className="ghost small" onClick={() => onPdf(old.pdf_path)}>PDF</button></td>
           </tr>
         ))}
     </>

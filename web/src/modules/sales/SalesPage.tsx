@@ -6,6 +6,7 @@ import { money } from '../../lib/format'
 import { listGroupOutcomes, listMarginAchieved, listPipeline, listSalesOutcomes } from './api'
 import { SalesBreakdowns } from './SalesBreakdowns'
 import { averageDaysToDecide, percent, pipelineSummary, restsOn, tally } from './sales'
+import { PageHeader } from '../../app/PageHeader'
 
 /**
  * Sales analytics (roadmap 3.6): what was won, what was lost and why, the hit rate
@@ -27,8 +28,8 @@ export function SalesPage() {
 
   return (
     <>
-      <h1>Sales</h1>
-      <p className="muted">
+      <PageHeader title="Sales" meta="ex-VAT · decided jobs only" />
+      <p className="intro">
         Won, lost and still out there — from the decisions recorded on enquiries and the costings
         behind them. Values are ex-VAT. A hit rate counts decided jobs only: a month with three
         offers still open is not a month with three losses.

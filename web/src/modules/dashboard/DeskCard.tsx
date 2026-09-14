@@ -5,7 +5,7 @@ import { listMyDesk } from './desk-api'
 import { ageWords, byKind, deskLink, headline } from './desk'
 
 /**
- * What is on your desk (migration 0129): the card on the home page listing the
+ * What is on your desk (migration 0129): section 1 of the home page, listing the
  * work waiting on the person signed in.
  *
  * It shows **nothing at all** when there is nothing waiting — no empty state, no
@@ -13,7 +13,8 @@ import { ageWords, byKind, deskLink, headline } from './desk'
  * appears when it has something to say is read.
  *
  * Nothing on it can be ticked off: every line is cleared by doing the work the
- * line is about, which is why each one is a link rather than a checkbox.
+ * line is about, which is why each one is a link and the last column says what
+ * that work is rather than offering a button that would only pretend.
  */
 export function DeskCard() {
   const { on } = useFeatures()
@@ -22,28 +23,49 @@ export function DeskCard() {
   if (!on('my_desk') || items.length === 0) return null
 
   return (
-    <div className="card">
-      <div className="spread">
-        <h2 style={{ margin: 0 }}>On your desk</h2>
+    <div className="section">
+      <div className="section-head">
+        <span className="n">1</span>
+        <span className="sd ok" />
+        <h2>On your desk</h2>
+        <span className="q">{headline(items)}</span>
       </div>
-      <p className="muted" style={{ margin: '.4rem 0 .6rem' }}>{headline(items)}</p>
-
-      {byKind(items).map((group) => (
-        <div key={group.kind} style={{ marginTop: '.6rem' }}>
-          <strong>{group.label}</strong>
-          <p className="muted" style={{ margin: '.15rem 0 .3rem' }}>{group.blurb}</p>
-          <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
-            {group.items.map((item) => (
-              <li key={item.entity_id}>
-                <Link to={deskLink(item)}>{item.reference}</Link> — {item.title}{' '}
-                <span className="muted">
-                  · {item.detail} · {ageWords(item.days)}
-                </span>
-              </li>
+      <div className="panel flush">
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>What it is</th>
+                <th>Waiting</th>
+                <th>What next</th>
+              </tr>
+            </thead>
+            {byKind(items).map((group) => (
+              <tbody key={group.kind}>
+                <tr className="subtotal">
+                  <td className="l" colSpan={4} title={group.blurb}>
+                    {group.label}
+                  </td>
+                </tr>
+                {group.items.map((item) => (
+                  <tr key={item.entity_id}>
+                    <td className="mono">
+                      <Link to={deskLink(item)}>{item.reference}</Link>
+                    </td>
+                    <td>
+                      {item.title}
+                      <span className="sub">{item.detail}</span>
+                    </td>
+                    <td>{ageWords(item.days)}</td>
+                    <td>{group.next}</td>
+                  </tr>
+                ))}
+              </tbody>
             ))}
-          </ul>
+          </table>
         </div>
-      ))}
+      </div>
     </div>
   )
 }

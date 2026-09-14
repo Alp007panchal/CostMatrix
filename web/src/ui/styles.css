@@ -1,132 +1,307 @@
-/* One stylesheet. Few rules, plain names, no framework to learn. */
+/* One stylesheet, in the house style shared with Opsmatrix
+   (`docs/reference/house-style.md`; the mockups are the picture of it).
+
+   Two rules kept this file from doubling in size. The names the app already
+   uses are restyled rather than replaced — `.card` IS `.panel`, `.badge` IS
+   `.chip` — so every screen picked up the new look without a line of its own
+   changing. And the new parts (sidebar, tiles, exception bar, tabs, steps) are
+   the mockup's own classes, so a screen can be compared against the picture
+   without translating anything. */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --ink: #1b1f24;
-  --ink-soft: #56606a;
-  --line: #dde2e7;
-  --page: #f6f7f9;
-  --card: #ffffff;
-  --accent: #1f5fbf;
-  --accent-ink: #ffffff;
-  --danger: #b3261e;
-  --ok: #1e7a44;
-  --radius: 8px;
+  --ink: #14181F; --ink-soft: #2A313D;              /* sidebar, primary button */
+  --paper: #F4F5F2; --paper-2: #EAEBE6;             /* page, subtle fills */
+  --line: #DCDDD6; --line-dark: #33394450;          /* borders */
+  --accent: #C9622B; --accent-soft: #F0DCC9;        /* active nav, tabs, approve/release */
+  --ok: #3D7A4C; --ok-soft: #DEEBE1;                /* approved, priced, won */
+  --warn: #B8862E; --warn-soft: #F3E7CC;            /* submitted, expiring, watch */
+  --bad: #B84438; --bad-soft: #F3DBD6;              /* overdue, unpriced, lost */
+  --blue: #3A6EA5; --blue-soft: #DCE6F2;            /* sent, from layout, info */
+  --text: #1C2027; --text-dim: #5B6270; --white: #fff; --radius: 3px;
+  --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+  --sans: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  --disp: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  /* The old names, still referenced in a few places. */
+  --danger: var(--bad); --card: var(--white); --page: var(--paper);
   color-scheme: light;
 }
 
 * { box-sizing: border-box; }
 
 body {
-  margin: 0;
-  background: var(--page);
-  color: var(--ink);
-  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  margin: 0; background: var(--paper); color: var(--text);
+  font: 14px/1.5 var(--sans);
 }
-
 a { color: var(--accent); }
 
-h1 { font-size: 1.5rem; margin: 0 0 1rem; letter-spacing: -0.01em; }
-h2 { font-size: 1.1rem; margin: 1.5rem 0 .75rem; }
-p  { margin: .5rem 0; }
-.muted { color: var(--ink-soft); }
-.error { color: var(--danger); }
+h1 { font-family: var(--disp); font-size: 22px; font-weight: 600; letter-spacing: -.01em; margin: 0 0 12px; }
+h2 { font-family: var(--disp); font-size: 16px; font-weight: 600; margin: 22px 0 10px; }
+h3 { font-family: var(--disp); font-size: 14px; font-weight: 600; margin: 16px 0 8px; }
+p { margin: .5rem 0; }
+
+.muted, .note, .hint { color: var(--text-dim); }
+.error { color: var(--bad); }
 .ok { color: var(--ok); }
+.warn { color: var(--warn); }
+/* One plain sentence under the title saying what the page is for (§4 rule 1). */
+.intro { font-size: 13.5px; color: var(--text-dim); margin: 0 0 18px; max-width: 900px; }
 
-/* Layout ------------------------------------------------------------------ */
-.shell { min-height: 100vh; display: flex; flex-direction: column; }
+/* The shell ---------------------------------------------------------------
+   Sidebar beside the page rather than a top bar of twenty-five links. */
+.shell { min-height: 100vh; display: flex; background: var(--paper); }
 
+.sidebar {
+  width: 232px; flex-shrink: 0; background: var(--ink); color: #C7CDD6;
+  display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.brand { padding: 22px 20px 16px; border-bottom: 1px solid var(--line-dark); }
+.brand .mark { font-family: var(--disp); font-weight: 700; font-size: 16px; color: #fff; letter-spacing: .03em; }
+.brand .sub { font-family: var(--mono); font-size: 10px; color: #8891A0; margin-top: 4px; letter-spacing: .05em; }
+
+.nav-group { padding: 10px 0; border-bottom: 1px solid var(--line-dark); }
+.nav-group-label {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: #6B7382; padding: 6px 20px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 20px; font-size: 13px;
+  color: #B7BEC9; border-left: 2px solid transparent; text-decoration: none;
+}
+.nav-item:hover { color: #fff; }
+.nav-item.active { background: #20262F; color: #fff; border-left-color: var(--accent); font-weight: 600; }
+.nav-item .dot { width: 5px; height: 5px; border-radius: 50%; background: #4A5261; flex-shrink: 0; }
+.nav-item .cnt { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: #8891A0; }
+.nav-item .cnt.hot { color: #fff; background: var(--accent); border-radius: 10px; padding: 1px 7px; }
+.who {
+  margin-top: auto; padding: 14px 20px; border-top: 1px solid var(--line-dark);
+  font-size: 12px; color: #B7BEC9; line-height: 1.4;
+}
+.who b { display: block; color: #fff; font-weight: 600; }
+.who .r { font-family: var(--mono); font-size: 10px; color: #8891A0; margin-top: 2px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .topbar {
-  display: flex; align-items: center; gap: 1.5rem;
-  padding: .75rem 1.25rem;
-  background: var(--card); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 18px 36px; border-bottom: 1px solid var(--line); background: #fff;
 }
-.topbar .brand { font-weight: 650; letter-spacing: -0.01em; }
-.topbar nav { display: flex; gap: 1rem; flex: 1; flex-wrap: wrap; }
-.topbar nav a { color: var(--ink-soft); text-decoration: none; padding: .25rem 0; }
-.topbar nav a:hover { color: var(--ink); }
-.topbar nav a.active { color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
-.topbar .who { color: var(--ink-soft); font-size: .875rem; text-align: right; }
+.topbar h1 { margin: 0; line-height: 1.2; }
+.topbar .titles { min-width: 0; }
+/* The brand shows only until a screen portals its own title into the slot. */
+.topbar .titles > div:not(:empty) ~ .fallback { display: none; }
+.topbar .meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); margin-top: 3px; }
+.topbar .right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.topbar .when { font-family: var(--mono); font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+/* No width cap: the tables are wide and the screen is the screen. */
+.page { flex: 1; padding: 24px 36px 32px; min-width: 0; }
+.centred { display: grid; place-items: center; min-height: 100vh; padding: 1.25rem; background: var(--paper); }
 
-.page { flex: 1; width: 100%; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
-.centred { display: grid; place-items: center; min-height: 100vh; padding: 1.25rem; }
-
-.card {
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem;
+/* Panels, sections, tiles ------------------------------------------------- */
+.card, .panel {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 20px; margin-bottom: 16px;
 }
+.panel.flush { padding: 0; }
+.panel-body { padding: 16px 20px; }
 .card.narrow { width: min(24rem, 100%); }
 
-/* A page meant to be read rather than worked in: one column, a comfortable
-   measure, and space between the sections. */
+.section { margin-bottom: 22px; }
+.section-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.section-head .n { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+.section-head .sd { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); align-self: center; }
+.section-head .sd.warn { background: var(--warn); }
+.section-head .sd.bad { background: var(--bad); }
+.section-head .sd.blue { background: var(--blue); }
+.section-head h2 { font-family: var(--disp); font-size: 16px; font-weight: 600; margin: 0; }
+.section-head .q { margin-left: auto; font-size: 12.5px; color: var(--text-dim); }
+
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.kpi { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.kpi .label { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-dim); }
+.kpi .value { font-family: var(--disp); font-size: 30px; font-weight: 700; margin-top: 6px; line-height: 1.1; }
+.kpi .delta { font-size: 12px; margin-top: 5px; color: var(--text-dim); }
+.kpi.k-crit { border-color: var(--bad); box-shadow: inset 3px 0 0 var(--bad); }
+.kpi.k-crit .value { color: var(--bad); }
+.kpi.k-watch { border-color: var(--warn); box-shadow: inset 3px 0 0 var(--warn); }
+.kpi.k-watch .value { color: var(--warn); }
+
+/* The one bar that says what needs a decision now. */
+.exbar {
+  border: 1px solid var(--bad); border-left: 4px solid var(--bad); border-radius: var(--radius);
+  background: #fff; margin-bottom: 22px; overflow: hidden;
+}
+.exbar.clear { border-color: var(--ok); }
+.exbar-head { display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid var(--line); }
+.exbar-head .n { font-family: var(--disp); font-size: 24px; font-weight: 700; line-height: 1; color: var(--bad); }
+.exbar-head .t { font-family: var(--disp); font-size: 15px; font-weight: 700; color: var(--bad); }
+.exbar.clear .exbar-head .n, .exbar.clear .exbar-head .t { color: var(--ok); }
+.exbar-head .hint { margin-left: auto; font-size: 12px; color: var(--text-dim); }
+.exlist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
+.exitem { background: #fff; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; color: inherit; text-decoration: none; }
+.exitem:hover { background: #FCFBF9; }
+.exitem .sev { width: 3px; align-self: stretch; border-radius: 2px; background: var(--bad); flex: 0 0 auto; }
+.exitem.watch .sev { background: var(--warn); }
+.exitem .hl { font-size: 13.5px; font-weight: 600; line-height: 1.35; color: var(--bad); }
+.exitem.watch .hl { color: var(--warn); }
+.exitem .why { font-size: 12.5px; color: var(--text-dim); margin-top: 4px; line-height: 1.45; }
+.exitem .src { font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-top: 8px; }
+.exitem .fig { font-family: var(--disp); font-size: 22px; font-weight: 700; line-height: 1; color: var(--bad); margin-left: auto; }
+.exitem.watch .fig { color: var(--warn); }
+
+/* Tabs --------------------------------------------------------------------- */
+.tabs { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tab {
+  padding: 10px 16px; font-size: 13.5px; font-weight: 600; color: var(--text-dim);
+  border: 0; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  cursor: pointer; text-decoration: none;
+}
+.tab.active { color: var(--ink); border-bottom-color: var(--accent); }
+
+.vlayout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 22px; }
+.vtabs { display: flex; flex-direction: column; gap: 2px; }
+.vtab {
+  padding: 10px 14px; border-radius: var(--radius); font-size: 13.5px; color: var(--text-dim);
+  display: flex; align-items: center; gap: 10px; border: 0; border-left: 2px solid transparent;
+  background: none; cursor: pointer; text-align: left; text-decoration: none; width: 100%;
+}
+.vtab.active { background: #fff; color: var(--ink); font-weight: 600; border-left-color: var(--accent); box-shadow: 0 0 0 1px var(--line); }
+.vtab .cnt { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+.vtab .cnt.bad { color: var(--bad); }
+.vtabs .vlabel {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-dim); padding: 10px 14px 4px;
+}
+
+/* Buttons ------------------------------------------------------------------
+   A bare <button> is the white secondary, because that is what most of the app's
+   buttons are; `.primary` and `.btn` are the one dark action. */
+button, .btn {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600; padding: 8px 16px;
+  border-radius: var(--radius); border: 1px solid var(--line); background: #fff; color: var(--ink);
+  cursor: pointer; white-space: nowrap; display: inline-block; text-decoration: none;
+}
+button:hover:not(:disabled), .btn:hover { border-color: var(--ink-soft); }
+button:disabled, .btn:disabled { opacity: .55; cursor: default; }
+button.primary, .btn { border-color: var(--ink); background: var(--ink); color: #fff; }
+button.primary:hover:not(:disabled), .btn:hover { border-color: var(--ink-soft); background: var(--ink-soft); }
+.btn.secondary { background: #fff; color: var(--ink); border-color: var(--line); }
+.btn.secondary:hover { background: #fff; border-color: var(--ink-soft); }
+/* Orange is reserved: Approve and Release, and nothing else. */
+.btn.accent, button.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.accent:hover, button.accent:hover:not(:disabled) { background: #b2561f; border-color: #b2561f; }
+.btn.ghost, button.ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
+.btn.ghost:hover, button.ghost:hover:not(:disabled) { background: var(--paper-2); border-color: transparent; }
+.btn.small, button.small { padding: 5px 11px; font-size: 11.5px; }
+button.danger { color: var(--bad); background: #fff; border-color: var(--line); }
+
+/* Forms -------------------------------------------------------------------- */
+.field { display: block; margin-bottom: 14px; }
+.field > span, .field > label { display: block; font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-bottom: 5px; }
+.field > span .hint { text-transform: none; letter-spacing: 0; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid .full { grid-column: 1 / -1; }
+input, select, textarea, .input {
+  width: 100%; padding: 9px 11px; min-height: 38px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: #fff; color: inherit; font-family: var(--sans); font-size: 13.5px;
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+input[type="checkbox"] { width: auto; min-height: 0; }
+textarea { min-height: 5rem; resize: vertical; }
+.filters { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.filters input, .filters select { flex: 1; min-width: 120px; width: auto; }
+
+/* Tables ------------------------------------------------------------------- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-dim); font-weight: 500; text-align: left; padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+}
+td { padding: 10px; border-bottom: 1px solid var(--paper-2); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+td.right, th.right, td.r, th.r, td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.mono { font-family: var(--mono); font-size: 12.5px; }
+/* The second line inside a cell: the facts that would otherwise want a column. */
+td .sub { display: block; font-size: 12px; color: var(--text-dim); margin-top: 1px; }
+tr.inactive td { color: var(--text-dim); }
+tr.sel td { background: #FBF5EF; }
+tr.subtotal td { background: var(--paper); font-weight: 600; }
+tr.subtotal td.l { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-dim); font-weight: 500; }
+
+/* Chips, alerts, totals, steps ---------------------------------------------- */
+.badge, .chip {
+  display: inline-block; white-space: nowrap; font-family: var(--mono); font-size: 10.5px;
+  padding: 3px 9px; border-radius: 2px; letter-spacing: .04em;
+  background: var(--paper-2); color: var(--text-dim); border: 0;
+}
+.chip.ok, .badge.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.warn, .badge.warn { background: var(--warn-soft); color: var(--warn); }
+.chip.bad, .badge.bad { background: var(--bad-soft); color: var(--bad); }
+.chip.blue, .badge.blue { background: var(--blue-soft); color: var(--blue); }
+.chip.dim, .badge.dim { background: var(--paper-2); color: var(--text-dim); }
+.primary-chip { background: var(--accent); color: #fff; border-radius: 2px; padding: 3px 9px; font-family: var(--mono); font-size: 10.5px; }
+
+.alert-item { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--paper-2); font-size: 13.5px; }
+.alert-item:last-child { border-bottom: none; }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; background: var(--text-dim); }
+.alert-dot.bad { background: var(--bad); }
+.alert-dot.warn { background: var(--warn); }
+.alert-dot.blue { background: var(--blue); }
+.alert-dot.ok { background: var(--ok); }
+/* The source line: which check said this, so a warning can be argued with. */
+.alert-item .t { color: var(--text-dim); font-family: var(--mono); font-size: 10.5px; display: block; margin-top: 3px; }
+
+.total { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--paper-2); font-size: 13.5px; }
+.total.big { font-family: var(--disp); font-size: 19px; font-weight: 700; border-bottom: none; padding-top: 12px; }
+.total .v { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.steps { display: flex; align-items: center; font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; flex-wrap: wrap; }
+.step { display: flex; align-items: center; gap: 6px; color: var(--text-dim); }
+.step .c { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; background: #fff; }
+.step.done .c { background: var(--ok); border-color: var(--ok); color: #fff; }
+.step.done { color: var(--ok); }
+.step.now .c { background: var(--accent); border-color: var(--accent); color: #fff; }
+.step.now { color: var(--ink); font-weight: 600; }
+.step + .step:before { content: ""; width: 34px; height: 1px; background: var(--line); margin: 0 10px; }
+
+/* Odds and ends ------------------------------------------------------------ */
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row.end { justify-content: flex-end; }
+.spread { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; }
+.grid2 > * { min-width: 0; }
+.empty { padding: 2rem 1rem; text-align: center; color: var(--text-dim); }
+
+/* A page meant to be read rather than worked in. */
 .reading { width: min(44rem, 100%); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 .prose section { margin-top: 1.75rem; }
 .prose h2 { font-size: 1.0625rem; margin: 0 0 .5rem; }
-.prose p { margin: 0 0 .75rem; line-height: 1.6; }
-.prose ul { margin: 0 0 .75rem; padding-left: 1.25rem; line-height: 1.6; }
+.prose p, .prose ul { margin: 0 0 .75rem; line-height: 1.6; }
+.prose ul { padding-left: 1.25rem; }
 .prose li { margin-bottom: .375rem; }
 
-.footer { border-top: 1px solid var(--line); padding: 1rem 1.25rem; text-align: center; }
-.footer a { color: var(--ink-soft); text-decoration: none; font-size: .8125rem; }
-.footer a:hover { color: var(--ink); }
+/* The pop-up for the panel layout keeps its own drawing styles and the only
+   shadow in the app: it needs the width of the screen, and nothing else does. */
+.modal { position: fixed; inset: 0; z-index: 50; background: rgba(17, 24, 39, .55); display: grid; place-items: center; padding: 1rem; }
+.modal-card { background: #fff; border-radius: 6px; padding: 1rem; max-height: 94vh; overflow: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, .35); }
 
-.row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
-.row.end { justify-content: flex-end; }
-.spread { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
-
-/* Forms ------------------------------------------------------------------- */
-.field { display: block; margin-bottom: .9rem; }
-.field > span { display: block; font-size: .8125rem; color: var(--ink-soft); margin-bottom: .25rem; }
-.field > span .hint { color: var(--ink-soft); font-weight: 400; }
-input, select, textarea {
-  width: 100%; padding: .5rem .6rem;
-  border: 1px solid var(--line); border-radius: 6px;
-  background: #fff; color: inherit; font: inherit;
+/* Below 900 px the sidebar becomes a bottom bar, as Opsmatrix does. */
+@media (max-width: 900px) {
+  .shell { flex-direction: column; }
+  .sidebar {
+    width: 100%; height: auto; position: fixed; bottom: 0; top: auto; z-index: 40;
+    flex-direction: row; overflow-x: auto; overflow-y: hidden; border-top: 1px solid var(--line-dark);
+  }
+  .sidebar .brand, .sidebar .who, .nav-group-label, .nav-item .dot { display: none; }
+  .nav-group { display: flex; padding: 0; border-bottom: 0; border-right: 1px solid var(--line-dark); }
+  .nav-item { border-left: 0; border-top: 2px solid transparent; padding: 12px 14px; white-space: nowrap; }
+  .nav-item.active { border-left: 0; border-top-color: var(--accent); }
+  .main { padding-bottom: 56px; }
+  .topbar, .page { padding-left: 16px; padding-right: 16px; }
+  .kpi-row, .exlist, .vlayout, .grid2, .form-grid { grid-template-columns: 1fr; }
+  .vlayout { gap: 14px; }
+  .vtabs { flex-direction: row; overflow-x: auto; }
 }
-input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-input[type="checkbox"] { width: auto; }
-textarea { min-height: 5rem; resize: vertical; }
-
-button {
-  padding: .5rem .9rem; border-radius: 6px; border: 1px solid var(--line);
-  background: var(--card); color: var(--ink); font: inherit; cursor: pointer;
-}
-button:hover:not(:disabled) { border-color: var(--ink-soft); }
-button:disabled { opacity: .55; cursor: default; }
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-button.danger { color: var(--danger); }
-
-/* Tables ------------------------------------------------------------------ */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid var(--line); }
-th { font-size: .8125rem; color: var(--ink-soft); font-weight: 600; }
-td.right, th.right { text-align: right; }
-tr.inactive td { color: var(--ink-soft); }
-
-.badge {
-  display: inline-block; padding: .1rem .45rem; margin-right: .25rem;
-  border: 1px solid var(--line); border-radius: 999px;
-  font-size: .75rem; color: var(--ink-soft);
-}
-
-.empty { padding: 2rem 1rem; text-align: center; color: var(--ink-soft); }
-
-/* A pop-up, for the panel layout (roadmap 3.8). The only modal in the app: the
-   layout needs the width of the screen, and nothing else does. */
-.modal {
-  position: fixed; inset: 0; z-index: 50;
-  background: rgba(17, 24, 39, .55);
-  display: grid; place-items: center; padding: 1rem;
-}
-.modal-card {
-  background: var(--card); border-radius: 10px; padding: 1rem;
-  max-height: 94vh; overflow: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
-}
-.primary-chip {
-  background: var(--accent); color: #fff; border-radius: 999px;
-  padding: .1rem .55rem; font-weight: 600;
-}
-/* Amber: something is worth reading but nothing is wrong. Used by the busbar
-   card's gap sentence and the layout's unknown verdicts. */
-.warn { color: #b45309; }
