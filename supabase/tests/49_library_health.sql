@@ -52,11 +52,11 @@ insert into public.components (id, company_id, category_code, code, name, unit, 
                                purchase_price, purchase_currency)
 values ('00000000-0000-0000-0000-0000000049a2', null, :'cat', 'LH-NOFACTOR', 'PART IN A CURRENCY NOBODY PRICES',
         'pcs', 'fixed', 99, 'CHF');
--- Migration 0127 refuses this deletion — which is the point of it. So the state
+-- Migration 0130 refuses this deletion — which is the point of it. So the state
 -- is reachable only on a database where a factor went before that guard existed,
--- which is every database today, 0127 being unmerged: the rule stays, and the
+-- which is every database today, 0130 being unmerged: the rule stays, and the
 -- test reaches the state the one way left, by standing the guard down for a
--- single statement. Written to work whether or not 0127 is present, because the
+-- single statement. Written to work whether or not 0130 is present, because the
 -- two arrive as separate pull requests and either may merge first — found by
 -- merging all nine open branches together and running the suite on the result,
 -- which neither branch's own CI could have shown.

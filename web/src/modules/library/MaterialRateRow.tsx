@@ -23,6 +23,8 @@ export function MaterialRateRow(props: {
   currencyCode: string
   currencyLabel: string
   isMasterAdmin: boolean
+  /** How many parts this rate prices — the size of what changing it moves. */
+  usedBy: string
   masterRateId: string | undefined
   onSaved: () => void
 }) {
@@ -74,6 +76,7 @@ export function MaterialRateRow(props: {
           ? `Yours (${props.rateEntered} ${props.rateCurrency})`
           : `Master default, ${props.masterRate} ${props.masterCurrency}/${props.unit}`}
       </td>
+      <td className="right muted">{props.usedBy}</td>
       <td className="right">
         {editing ? (
           <span className="row end" style={{ gap: '.35rem' }}>

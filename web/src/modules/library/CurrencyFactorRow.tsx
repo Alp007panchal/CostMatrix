@@ -19,11 +19,14 @@ export function CurrencyFactorRow({
   row,
   companyId,
   isMasterAdmin,
+  usedBy,
   onSaved,
 }: {
   row: EffectiveCurrencyFactor
   companyId: string
   isMasterAdmin: boolean
+  /** How many parts are bought in this currency — what a change to it moves. */
+  usedBy: string
   onSaved: () => void
 }) {
   const [editing, setEditing] = useState(false)
@@ -67,6 +70,7 @@ export function CurrencyFactorRow({
       <td className="muted">
         {row.source === 'company' ? `Yours (master ${row.master_landed_factor})` : 'Master default'}
       </td>
+      <td className="right muted">{usedBy}</td>
       <td className="right">
         {editing ? (
           <span className="row end" style={{ gap: '.35rem' }}>
@@ -135,6 +139,7 @@ export function NewCurrencyRow({ onSaved }: { onSaved: () => void }) {
         <input type="number" step="0.000001" min="0" value={factor} placeholder="KES per 1, landed" style={{ maxWidth: '9rem', textAlign: 'right' }} onChange={(e) => setFactor(e.target.value)} />
       </td>
       <td className="muted">New master currency</td>
+      <td />
       <td className="right">
         <button className="primary" disabled={add.isPending} onClick={() => add.mutate()}>
           Add

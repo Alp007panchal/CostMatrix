@@ -1521,6 +1521,15 @@ export interface LayoutEnclosureApplied {
   wanted: Record<string, number>
 }
 
+/** How much rests on one library row (v_library_dependents, migration 0130). */
+export interface LibraryDependents {
+  kind: 'kit_group' | 'currency_factor' | 'material_rate'
+  entity_id: string
+  label: string
+  dependents: number
+  dependents_are: string
+}
+
 /** One thing waiting on the signed-in person (v_my_desk, migration 0129). */
 export interface DeskItem {
   kind: DeskKind

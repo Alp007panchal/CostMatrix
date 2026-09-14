@@ -326,6 +326,15 @@ or into go-live.
     no write. Nothing can be ticked off: every line is cleared by doing the work. The card is absent
     when the desk is clear rather than saying so.
 
+44. **Nothing the library depends on disappears quietly** (maintenance) — the app was careful at
+    the door and careless at the exit: deleting a kit group silently un-grouped its kits so they
+    cost zero labour, deleting a master currency factor made every part bought in it unpriceable
+    while its price still showed, and `components.material_rate_code` had **no foreign key at all**
+    so a material rate could be removed from under the busbar catalogue. Migration 0130 adds three
+    `before delete` guards that refuse and name what is holding the row and what to do first, plus
+    `v_library_dependents` so the Rates screen shows the count beside each rate before anybody
+    tries. A company's own factor or rate still goes freely — it falls back to the master row.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
