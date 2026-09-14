@@ -309,7 +309,16 @@ or into go-live.
     nobody has drawn behind still gets one sheet, not a blank second one. No migration: this is all
     in the browser.
 
-40. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
+42. **Library health** (maintenance) — the data-quality list that has sat in `data/seed/README.md`
+    since the day the seed was built, read from the **live library** instead and sorted by what each
+    fault does to a costing: *stops a costing* (a part with no price, a kit holding one, a currency
+    whose landed factor has gone), *costs and leaves something out* (a kit in no group, or whose
+    group has no hours — zero labour, silently), *worth a look* (only a main device, no rating).
+    Each row names the screen that fixes it. Migration 0128, two views, no write anywhere. The
+    `refuses` rules test the same predicate the engine's refusal tests, and a test proves the view
+    and the error message name the same part.
+
+41. **What is on your desk** (maintenance) — the home page lists the work waiting on the person
     signed in: a costing an approver sent back with its comment (it is a draft again, so nothing
     else will ever mention it), a costing waiting for an approver — shown only to somebody who can
     actually approve — a quotation released and never marked sent, and one sent that has been
