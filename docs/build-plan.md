@@ -350,6 +350,11 @@ or into go-live.
     quantity, tag, option label and the optional-extra tick, committed through the same
     `updatePanel` the panel tab calls. A blank name is ignored and a quantity must be more than
     nought, because a column heading is also a line on the quotation.
+47. **Nothing deletes a panel without asking** (maintenance) — the grid gains a × that removes a
+    panel, and both it and the panel tab's **Remove panel**, which until today deleted a panel and
+    every kit on it on one click with no question at all, go through one `confirmRemovePanel` that
+    names the panel, what is on it and what it is worth. The grid also gets its own scrolling box,
+    so the panel names stay across the top and the kit names down the left with five panels open.
 
 ## In hand right now
 
@@ -365,7 +370,6 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| Remove a panel from the grid, ask before any panel is deleted, and keep the panel names and kit names in view while scrolling | `claude/grid-remove-and-sticky` | 2026-09-14 |
 | _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)

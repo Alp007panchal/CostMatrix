@@ -450,6 +450,14 @@ a quantity must be more than nought.
 Three of a panel's fields are still only on the panel's own tab, because they need room to read: the
 unit, the enclosure dimensions and the technical description that prints on the quotation.
 
+The **×** beside a panel's name removes that panel. It asks first, and the question names the panel,
+says how many kits are on it and what it is worth — read it before you say yes, because **a removed
+panel does not come back**. The same question is now asked by **Remove panel** on the panel's own
+tab, which until today deleted on one click without asking anything.
+
+With several panels open the grid scrolls inside its own box: the **panel names stay across the top**
+and the **kit names stay down the left** while the figures move under them.
+
 ### What is on your desk (home page)
 Signing in already shows your follow-ups. With **What is on your desk** switched on, a card above
 them lists the work waiting on **you**, and nothing else:

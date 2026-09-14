@@ -10,6 +10,7 @@ import { KitPicker } from './KitPicker'
 import { GridCell } from './GridCell'
 import { GridToolbar } from './GridToolbar'
 import { GridPanelHead } from './GridPanelHead'
+import { confirmRemovePanel } from './remove-panel'
 
 /**
  * The costing as one grid — panels across, kits and loose components down
@@ -29,6 +30,7 @@ export interface GridHandlers {
   onRemoveItem: (itemId: string) => void
   onAddPanel: () => void
   onCopyPanel: (sourcePanelId: string) => void
+  onRemovePanel: (panelId: string) => void
   /** The panel's own details, changed in its column heading. */
   onPanelChange: (panelId: string, changes: Partial<CostingPanel>) => void
 }
@@ -118,7 +120,9 @@ export function CostingGrid({
 
       {refused && <p className="error" style={{ marginTop: '.5rem' }}>{refused}</p>}
 
-      <div className="table-wrap" style={{ marginTop: '.75rem' }}>
+      {/* Its own scrolling box, so the panel names and the kit names can stay
+          put while the rest moves under them. */}
+      <div className="table-wrap grid-scroll" style={{ marginTop: '.75rem' }}>
         <table>
           <thead>
             <tr>
@@ -133,6 +137,15 @@ export function CostingGrid({
                   editable={editable}
                   inCompare={inCompare(c.panel.id)}
                   onChange={(changes) => handlers.onPanelChange(c.panel.id, changes)}
+                  onRemove={() => confirmRemovePanel(
+                    {
+                      panel: c.panel,
+                      lines: assemblies.filter((a) => a.panel_id === c.panel.id),
+                      price: panelPrices.find((p) => p.panel_id === c.panel.id),
+                      money: (n) => money(n, label),
+                    },
+                    () => handlers.onRemovePanel(c.panel.id),
+                  )}
                 />
               ))}
               <th className="right">
@@ -144,10 +157,8 @@ export function CostingGrid({
           <tbody>
             {model.sections.map((section) => (
               <Fragment key={section.heading}>
-                <tr style={{ background: 'var(--tint, #f3f4f6)' }}>
-                  <td colSpan={model.columns.length + 3} style={{ fontSize: '.75rem', letterSpacing: '.04em', textTransform: 'uppercase', fontWeight: 700 }}>
-                    {section.heading}
-                  </td>
+                <tr className="grid-section">
+                  <td colSpan={model.columns.length + 3}>{section.heading}</td>
                 </tr>
                 {section.rows.map((row) => (
                   <Fragment key={row.key}>
@@ -218,7 +229,7 @@ export function CostingGrid({
             )}
 
             {model.totals.map((total) => (
-              <tr key={total.label} style={{ background: 'var(--tint, #f9fafb)' }}>
+              <tr key={total.label} className="subtotal">
                 <td colSpan={2} style={{ fontWeight: total.strong ? 700 : 600 }}>
                   {total.label}
                   {total.note && <span className="muted" style={{ fontWeight: 400 }}> ({total.note})</span>}

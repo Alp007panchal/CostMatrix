@@ -13,6 +13,7 @@ import type {
   PanelPrice,
 } from '../../lib/database.types'
 import { PanelLines } from './PanelLines'
+import { confirmRemovePanel } from './remove-panel'
 import { CopyPanel } from './CopyPanel'
 import { ApfcCard } from './ApfcCard'
 import { BoardCard } from './BoardCard'
@@ -149,8 +150,17 @@ export function PanelCard({
               {panel.option_label} — not the chosen option
             </div>
           )}
+          {/* It asks first now. Until today this deleted a panel and every kit
+              on it on one click, with no undo and no trace. */}
           {editable && (
-            <button className="danger" style={{ marginTop: '.5rem' }} onClick={() => handlers.onPanelRemove(panel.id)}>
+            <button
+              className="danger"
+              style={{ marginTop: '.5rem' }}
+              onClick={() => confirmRemovePanel(
+                { panel, lines: assemblies, price, money: (n) => money(n, label) },
+                () => handlers.onPanelRemove(panel.id),
+              )}
+            >
               Remove panel
             </button>
           )}
