@@ -384,7 +384,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| Reviving the zero-labour warning (the other session's closed PR 62), and a worksheet for the 17 groups' hours | `claude/labour-warning-revived` | 2026-09-15 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

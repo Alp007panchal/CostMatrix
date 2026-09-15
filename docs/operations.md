@@ -1205,6 +1205,12 @@ Company → Enclosure uplift %. Added to catalogue cubicle prices (components ti
 cubicle*) when they enter a costing, and frozen there.
 
 ### Set kit group hours (session 1)
+**Start here if you have not done it yet.** Every group is blank today, so every costing charges
+nothing for assembly, wiring or busbar time — the material prices correctly and the time is left
+out. `docs/reference/labour-hours-worksheet.md` is the 17 groups laid out biggest first, with an
+example kit against each and what the three processes cover, so the 51 figures can be filled in
+one sitting; the top four groups alone cover 183 of the 296 kits.
+
 Kits → kit group (link in the intro) → type the hours per kind of work in each group's row;
 they save when you leave the cell. A kit with its own figure for one kind of work keeps it; blank
 on the kit means the group's hours apply. On a kit: choose its group, rating and poles under
