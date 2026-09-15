@@ -38,6 +38,13 @@ export function LayoutKits({
           <div className="muted" style={{ fontSize: '.65rem', textTransform: 'uppercase', letterSpacing: '.04em' }}>
             {design === 'none' ? 'Not described yet' : designWords(design)}
           </div>
+          {design === 'none' && (
+            <p className="muted" style={{ fontSize: '.68rem', margin: '.15rem 0 .1rem' }}>
+              These have no mounting design, so there is no rule to place them by. Set it on the kit
+              under <strong>Kits</strong>, or for the whole library under <strong>Import</strong>,
+              step 5.
+            </p>
+          )}
           {inGroup.map((kit) => {
             const done = placed[kit.costing_assembly_id] ?? 0
             const canDrag = kit.is_sized

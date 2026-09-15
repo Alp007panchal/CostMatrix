@@ -24,7 +24,7 @@ import {
   saveLayout,
   savedLayout,
 } from './layout-api'
-import { dropRefusal, placeKit, removePlacement } from './layout'
+import { dropRefusal, libraryGap, placeKit, removePlacement } from './layout'
 import { LAYERS, type Layer, isDoubleFront, patchSection, weightWords, wouldLose } from './layout-views'
 
 type Construction = {
@@ -233,6 +233,7 @@ export function LayoutDialog({
               doorParts={doorParts}
               layers={layers}
               from={from}
+              gap={libraryGap(kits)}
               onDropKit={drop}
               onRemove={(name, index, side) => setSections(removePlacement(sections, name, index, side))}
               onSelect={setSelected}

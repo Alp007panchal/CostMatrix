@@ -216,6 +216,22 @@ export function designWords(design: MountingDesign | string | null): string {
   }
 }
 
+/**
+ * Why the drawing is empty, when the reason is the library rather than the board.
+ *
+ * A panel whose kits the library has not described cannot be arranged at all, and
+ * pressing the button will not change that. Telling somebody "no sections yet" in
+ * that state is true and useless — it describes the button rather than the
+ * obstacle, which is exactly how the owner came to ask what the screen was for.
+ * Null means the board is simply not arranged yet, which the ordinary wording
+ * covers.
+ */
+export function libraryGap(kits: LayoutKit[]): { undescribed: number; total: number } | null {
+  if (kits.length === 0) return null
+  const undescribed = kits.filter((k) => !k.is_sized).length
+  return undescribed === kits.length ? { undescribed, total: kits.length } : null
+}
+
 /** Which symbol of the owner's drawing set stands for a kit of this design. */
 export function symbolFor(design: MountingDesign | string | null): string {
   switch (design) {

@@ -46,6 +46,27 @@ Until then the panel says so in those words, which is the intended behaviour.
 | Do you want the weekly dump sent somewhere beyond GitHub as well? | Whenever you like | It is kept 90 days as a GitHub artifact, which is off Supabase but not off GitHub. A bucket is one secret and half an hour. |
 | Run `docs/acceptance-test.md` on what is live | **Now** | Each finding comes back as its own pull request, as the notebook changes did. |
 
+## Found on 15 September, not fixed: a revision loses the panel drawing
+
+Nothing here needs you either; it is written down so it is not lost.
+
+`app.create_costing_revision` copies the costing, its rates, its panels, its kit lines, its items
+and its labour — but **not `panel_layouts`**. A revision's panels are new rows, and a drawing hangs
+off a panel, so **revising a costing leaves every panel undrawn** and the general-arrangement sheet
+disappears from the revised quotation. A copy of a costing does the same.
+
+This was found while writing the runbook for the layout screen, by checking a sentence rather than
+trusting it. It is the same shape as the bug `0011` fixed once and `0014` fixed again — a
+hand-written column list that silently drops whatever was added after it was written — and the
+remedy is the same: copy the current layout onto the new panel inside the revision function, which
+is a migration and a test, not a screen.
+
+It is **not** obviously a bug in every case: a revision usually means the board has changed, so a
+drawing copied forward could be a wrong drawing carried into a quotation, which is worse than a
+missing one. That is the owner's call, and it is the reason this is a question rather than a fix.
+The runbook now says plainly that a revision starts undrawn, so nobody is surprised by it in the
+meantime.
+
 ## Known and not scheduled: the second place two sessions collide
 
 Nothing here needs you; it is written down so it is not forgotten.
