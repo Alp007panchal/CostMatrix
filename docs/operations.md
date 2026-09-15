@@ -1101,29 +1101,76 @@ shrouded terminals.
 A board you have set to double-front access but not yet drawn anything behind gets **one** sheet,
 not a blank second one. Its footer still reads *front and rear access*.
 
-### Fill in what the panel layout will need (phase 3.8, fields only)
-The layout pop-up itself is not built yet — the specification and the mockups are in
-`docs/reference/panel-layout-spec.md` — but the library can be filled in now, so that when it is
-built there is something to draw.
+### Draw the panel, and put the enclosure on the costing (phase 3.8)
 
-Two places, whichever suits you:
+On a panel in a draft costing: **Layout**. It draws the board at true scale — the frame, the
+busbar chamber across the top, each section with its devices on their covers — and turns that
+drawing into the enclosure lines on the costing.
 
-- **On a kit** (Kits → open one): under the footprint, three new boxes — **Mounting design** (how the
-  kit is built into a board: busbar-fed, MCCB plates, side-by-side plates, compensation, meter board
-  plate, in-line 3NJ6), **Module height** in millimetres (the S4 cover height it takes on the stack,
-  in 50 mm steps), and **Positions per plate** (only where it is not simply the plate width divided
-  by the device). Blank is fine: the layout will call such a kit unsized rather than guess.
-- **In bulk**: `python3 scripts/build_kit_layout_template.py` writes
-  `data/seed/kit-layout-template.csv`, one row per kit with its group, name and main device already
-  filled in. Fill what you know, then **Import → step 5, Kit sizes and mounting**. It previews first,
-  a blank cell is left alone so the file can be filled a group at a time, and re-running the script
-  keeps what you have typed. A module height that is not a whole 50 mm, or a design that is not one
-  of the six, is refused by name rather than quietly ignored.
+**Before it can draw anything, the library has to describe the kits.** This is the part that
+catches people out: a board whose kits have no *mounting design* cannot be arranged at all, and
+until then the screen shows every kit in amber under **Not described yet** and draws nothing. It
+now says so on the drawing itself, and names the two places to fix it.
 
-The widths and depths a board can be built in live in a table of their own, seeded with **SIVACON
-S4** from the Application Manual. **S8, the meter board and our own double-front frame are named and
-empty** — those figures are yours, and a made-up width would be worse than a blank one. Tell me the
-lists and I will put them in.
+**What each kit needs**
+
+- **Mounting design** — how the kit is built into a board, and therefore what rule arranges it:
+  *busbar-fed* (an ACB, an ATS pair, a changeover or an isolator, which takes a section of its own
+  and connects straight to the horizontal busbar), *MCCB cover* (one device per cover, stacked down
+  the compartment), *side-by-side plate* (MCBs, contactors, meters, terminals, across the width of a
+  plate), *correction* (APFC steps, with the kVAr limit per section), *meter board plate*, or
+  *in-line 3NJ6*.
+- **Module height** in millimetres, on the 50 mm grid — the cover height the kit takes on the stack.
+  Every design except the side-by-side plate needs it; a kit with a design but no height is still
+  listed, with the missing half named beside it.
+- Optionally **positions per plate**, and a footprint where that is not simply the main device.
+
+Two ways in, whichever suits: on one kit at a time under **Kits**, in the boxes under its
+footprint; or for the whole library at once under **Import**, step 5, *Kit sizes and mounting*.
+Step 4, *Dimensions*, is what draws each device at its true size — the layout works without it, but
+the devices are drawn at their compartment's spacing rather than their own.
+
+**A first draft of the designs, to save typing it 296 times.**
+`python3 scripts/draft_kit_layout.py` writes `docs/reference/kit-layout-draft.csv` with a mounting
+design proposed for every kit from its group, the same columns as the template, so you can correct
+it and upload it straight to Import step 5. It **never proposes a module height** — those are yours,
+from the S4 planning manual, and a guessed one would be drawn at true scale and look just as
+authoritative as a real one. It prints the two groups whose answer is a judgement rather than a
+reading, and it checks every kit's own name against the design proposed for its group, so an ACB
+filed under MCCB is named rather than quietly mis-drawn.
+
+**Using the screen**
+
+1. Choose the **construction** at the top right. *Siemens SIVACON S4* is seeded from the Application
+   Manual. S8, the meter board and our own double-front frame are named and empty — those widths are
+   yours, and a made-up one would be worse than a blank.
+2. **Work the board out** arranges every described kit into sections by the rules of its design.
+   It is a starting point, not an answer: drag a kit onto another section to move it, and the drop
+   is refused with a reason when there is no room.
+3. The two dropdowns above the drawing set how a section is built: whether the cable alley sits
+   **beside** the vertical busbar or **behind** it (behind adds depth and widens the plate), and
+   whether the board is **one face** or double-front. *Section* on the left edits the selected
+   section on its own — width, connection, design, depth.
+4. The **view tabs** are Front (the editor), Rear (an editor too when any section is double-front,
+   otherwise the rear connections read-only), Plan, Door and 3D. The **layer chips** — Doors,
+   Covers, Busbars, Cables, Tags, Dimensions — only show and hide; none of them changes the board.
+5. **Does it fit?** on the right gives a verdict per section in the unit that design counts in:
+   millimetres of height for covers, positions for side-by-side plates, kVAr for correction.
+6. **Save layout** keeps the drawing with the panel. It **moves no price at all**, and it comes
+   back when you open that panel again. Save before you leave: the next step needs a saved
+   drawing, and **a revision or a copy of the costing does not carry the drawing** — its panels
+   are new rows, and they start undrawn. Worth knowing before you revise a job whose quotation
+   carried a general-arrangement sheet.
+
+**Putting the enclosure on the costing** is the one button here that touches money. It works from
+the **saved** drawing, so press *Save layout* first — on a panel with nothing saved it says so
+rather than using what is on screen.
+**Put these cubicles on the costing** adds the cubicles the drawing asks for as ordinary component
+lines in an *Enclosure* section, priced and frozen exactly like hand-typed ones. Press it twice and
+it refuses rather than doubling them; if you have changed the drawing and want the new cubicles in
+place of the old lines, use **Replace the ones already there**. Anything the drawing needs that the
+catalogue has no part for is listed rather than invented.
+
 
 ### Work out the busbar runs (phase 4.1)
 This is your `CU-OPT1` sheet, on the panel. In a draft costing, on the panel: **Work out the

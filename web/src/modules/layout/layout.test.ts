@@ -5,6 +5,7 @@ import {
   designWords,
   dropRefusal,
   frontFace,
+  libraryGap,
   mm,
   placeKit,
   placedCounts,
@@ -157,5 +158,20 @@ describe('the words a person reads', () => {
     expect(symbolFor('busbar_fed')).toBe('acb')
     expect(symbolFor('mccb_plates')).toBe('mccb')
     expect(symbolFor('compensation')).toBe('cap')
+  })
+})
+
+describe('why the drawing is empty', () => {
+  it('blames the library only when every kit is undescribed', () => {
+    expect(libraryGap([kit({ is_sized: false }), kit({ is_sized: false })]))
+      .toEqual({ undescribed: 2, total: 2 })
+  })
+
+  it('says nothing when one kit can still be placed, because the board is simply not arranged', () => {
+    expect(libraryGap([kit({ is_sized: true }), kit({ is_sized: false })])).toBeNull()
+  })
+
+  it('says nothing about a panel with no kits on it at all', () => {
+    expect(libraryGap([])).toBeNull()
   })
 })

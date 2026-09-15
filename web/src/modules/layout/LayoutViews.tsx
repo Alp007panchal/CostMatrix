@@ -25,6 +25,7 @@ export function LayoutViews({
   onDropKit,
   onRemove,
   onSelect,
+  gap = null,
 }: {
   view: View
   sections: LayoutSection[]
@@ -38,6 +39,8 @@ export function LayoutViews({
   onDropKit: (sectionName: string, side: 'front' | 'rear') => void
   onRemove: (sectionName: string, index: number, side: 'front' | 'rear') => void
   onSelect: (sectionName: string) => void
+  /** Set when every kit on the panel is undescribed; the front view explains it. */
+  gap?: { undescribed: number; total: number } | null
 }) {
   const chosen = sections.find((s) => s.name === selected) ?? sections[0] ?? null
 
@@ -77,6 +80,7 @@ export function LayoutViews({
       heightMm={heightMm}
       selected={selected}
       onSelect={onSelect}
+      gap={gap}
       onDropKit={(name) => onDropKit(name, 'front')}
       onRemove={(name, index) => onRemove(name, index, 'front')}
     />

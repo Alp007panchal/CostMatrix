@@ -100,6 +100,34 @@ describe('the panel layout pop-up', () => {
     expect(await screen.findByText(/No sections yet/)).toBeTruthy()
   })
 
+  // The owner opened a real panel, saw an empty drawing, and had to ask what the
+  // screen was for. Every kit in their library is undescribed, so the button
+  // could never have worked — and the wording above talks about the button.
+  it('says the library is the obstacle when no kit on the panel is described', async () => {
+    layoutKits.mockResolvedValue(KITS.map((k) => ({
+      ...k, mounting_design: null, module_height_mm: null, is_sized: false,
+    })))
+    open()
+    expect(await screen.findByText(/the library has not described these kits/)).toBeTruthy()
+    // It names both ways to fix it, because neither suits everybody.
+    expect(screen.getByText(/Kit sizes and mounting/)).toBeTruthy()
+    expect(screen.getAllByText(/Mounting design/).length).toBeGreaterThan(0)
+    // And it does NOT fall back to describing a button that cannot work.
+    expect(screen.queryByText(/No sections yet/)).toBeNull()
+  })
+
+  it('keeps the ordinary wording when at least one kit can be placed', async () => {
+    open()
+    expect(await screen.findByText(/No sections yet/)).toBeTruthy()
+    expect(screen.queryByText(/the library has not described these kits/)).toBeNull()
+  })
+
+  it('tells the undescribed group where its mounting design comes from', async () => {
+    open()
+    expect(await screen.findByText('Not described yet')).toBeTruthy()
+    expect(screen.getByText(/no rule to place them by/)).toBeTruthy()
+  })
+
   it('arranges the board and shows the verdict per section', async () => {
     open()
     fireEvent.click(await screen.findByText('Work the board out'))
