@@ -825,6 +825,15 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
+<<<<<<< HEAD
+### The missing-labour check (migration 0131)
+- `v_costing_labour_gaps` — one row per costing: `kit_lines`, `kit_lines_without_hours`,
+  `groups_to_fill` (the kit groups and how many lines each accounts for), `processes_without_rate`
+  and `labour_rows_without_rate` (hours frozen at a zero rate), `material_cost`, `labour_cost`,
+  `labour_share_pct`, and a `verdict` of `ok` · `none` · `some` · `no_rate` · `no_kits`.
+  Read-only, `security_invoker`, writes nothing and blocks nothing.
+- Feature `labour_check` (sort 190), off until the master administrator turns it on.
+=======
 ### Panel layout, stage one (roadmap 3.8, migration 0120)
 Stage two's changes to these are listed under it; where the two disagree, stage two wins.
 - `v_panel_layout_kits` — the kits on a panel with their mounting design, module height, positions
@@ -902,6 +911,7 @@ The canvas is not built; these are the fields it will read, so the library can b
   newest `panel_layouts` row for that panel in the order the GA sheet draws it (0121). The tag is
   null where the panel has no layout.
 - Feature `eplan_exports` (sort 180), off everywhere until the master administrator turns it on.
+>>>>>>> origin/main
 
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,

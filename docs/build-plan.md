@@ -361,6 +361,15 @@ or into go-live.
     disagrees with the rest, a blank counting as nought. The roll-up column and the Excel export
     keep covering every panel, and both now say so.
 
+49. **The missing-labour check, revived** (maintenance) — a costing whose kits carry no hours
+    charges nothing for labour, and said nothing about it: the material priced correctly, the
+    time left out, the quotation looking finished. Built by the other session, whose PR 62 was
+    closed with conflicts rather than on its merits, and revived here at the owner's request:
+    `v_costing_labour_gaps` (migration 0131) reports it on the costing, names the kit groups
+    whose template rows would fix it, and tells apart the quieter case of hours priced at a zero
+    rate. Behind `labour_check`, off by default. It blocks nothing and changes no price. With it,
+    a worksheet of the 17 groups so the 51 figures can be filled in one sitting.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions

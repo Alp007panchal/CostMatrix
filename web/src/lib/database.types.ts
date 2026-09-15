@@ -1610,3 +1610,18 @@ export interface ErrorReport {
   times_seen: number
 }
 
+/** Whether a costing has the labour it ought to (v_costing_labour_gaps, 0123). */
+export interface CostingLabourGaps {
+  costing_id: string
+  kit_lines: number
+  kit_lines_without_hours: number
+  /** The kit groups to fill in, with how many lines each is responsible for. */
+  groups_to_fill: string | null
+  /** Processes whose frozen rate is zero, so their hours cost nothing. */
+  processes_without_rate: string | null
+  labour_rows_without_rate: number
+  material_cost: number
+  labour_cost: number
+  labour_share_pct: number | null
+  verdict: 'ok' | 'none' | 'some' | 'no_rate' | 'no_kits'
+}
