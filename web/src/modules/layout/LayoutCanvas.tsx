@@ -29,6 +29,7 @@ export function LayoutCanvas({
   onRemove,
   selected,
   onSelect,
+  gap = null,
 }: {
   sections: LayoutSection[]
   fit: LayoutFit | null
@@ -37,12 +38,43 @@ export function LayoutCanvas({
   onRemove: (sectionName: string, index: number) => void
   selected: string | null
   onSelect: (sectionName: string) => void
+  /** Set when every kit on the panel is undescribed, so nothing can be arranged. */
+  gap?: { undescribed: number; total: number } | null
 }) {
   const widthMm = boardWidthMm(sections)
   const totalHeight = heightMm + BASE_MM
   const runs = sectionRuns(sections)
 
   if (sections.length === 0) {
+    // A board nobody has arranged yet, and a board that CANNOT be arranged, look
+    // identical on screen. Only the second one is the owner's to act on, so it is
+    // the one that gets told what to do about it.
+    if (gap) {
+      return (
+        <div style={{ padding: '1rem', maxWidth: '34rem' }}>
+          <p>
+            <strong>Nothing can be drawn yet: the library has not described these kits.</strong>
+          </p>
+          <p className="muted">
+            All {gap.total} kits on this panel are missing their <em>mounting design</em> — whether the
+            kit is busbar-fed, goes on MCCB covers, sits side by side on a plate, is correction gear,
+            or is a meter board plate. Until a kit says which, there is no rule to arrange it by, and
+            pressing <em>Work the board out</em> will not change that.
+          </p>
+          <p className="muted">
+            Two ways to fill it in, whichever suits: on one kit at a time under{' '}
+            <strong>Kits</strong>, in the <em>Mounting design</em> box; or for the whole library at
+            once under <strong>Import</strong>, step 5, <em>Kit sizes and mounting</em>.
+          </p>
+          <p className="muted">
+            Most designs need a <em>module height</em> as well — the height the kit takes on the
+            stack, in 50 mm steps, from your S4 planning manual. Side-by-side plates are the
+            exception and need only the design. A kit with one but not the other is still listed
+            here, with the missing half named beside it.
+          </p>
+        </div>
+      )
+    }
     return (
       <p className="muted" style={{ padding: '1rem' }}>
         No sections yet. The button above arranges the kits on this panel by the rules of their
