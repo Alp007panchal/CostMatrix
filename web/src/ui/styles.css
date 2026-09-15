@@ -224,6 +224,21 @@ td { padding: 10px; border-bottom: 1px solid var(--paper-2); vertical-align: mid
 tbody tr:last-child td { border-bottom: none; }
 td.right, th.right, td.r, th.r, td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.mono { font-family: var(--mono); font-size: 12.5px; }
+/* Which panels the grid is showing: one button per panel, pressed in or out.
+   A pressed one is the dark ink of a primary action, because it is a choice in
+   force rather than one on offer. */
+.grid-picker {
+  display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 14px;
+}
+.grid-picker .lab, .grid-picker .note {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--text-dim);
+}
+.grid-picker .note { text-transform: none; letter-spacing: 0; font-family: var(--sans); font-size: 12.5px; }
+.pick { padding: 5px 12px; font-size: 12px; }
+.pick.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.pick.on:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
+
 /* The costing grid: its own scrolling box, so the panel names stay across the
    top and the kit names stay down the left while the figures move under them.
    `overflow-x: auto` alone would have made the page the scroller and pinned the

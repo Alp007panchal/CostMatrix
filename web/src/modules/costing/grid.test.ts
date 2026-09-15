@@ -164,19 +164,51 @@ describe('the grid model', () => {
   })
 })
 
-describe('comparing two columns', () => {
+describe('comparing columns', () => {
   it('names the rows that differ, a blank against a figure included', () => {
     const model = buildGrid(input())
-    const differ = differingRows(model, 'p1', 'p2')
+    const differ = differingRows(model, ['p1', 'p2'])
     expect([...differ].sort()).toEqual(['item:CT800', 'kit:ACB-1600', 'kit:MCCB-250'])
   })
+
   it('finds nothing between two identical panels', () => {
     const model = buildGrid(input({
       panels: [panel('p1', 'A'), panel('p2', 'B')],
       assemblies: [kitLine('a1', 'p1', 'MCCB-250', 4), kitLine('a2', 'p2', 'MCCB-250', 4)],
       items: [],
     }))
-    expect(differingRows(model, 'p1', 'p2').size).toBe(0)
+    expect(differingRows(model, ['p1', 'p2']).size).toBe(0)
+  })
+
+  it('marks a row where any one of three disagrees with the rest', () => {
+    const model = buildGrid(input({
+      panels: [panel('p1', 'A'), panel('p2', 'B'), panel('p3', 'C')],
+      assemblies: [
+        kitLine('a1', 'p1', 'MCCB-250', 4),
+        kitLine('a2', 'p2', 'MCCB-250', 4),
+        // The odd one out, which is the whole point of comparing more than two.
+        kitLine('a3', 'p3', 'MCCB-250', 3),
+      ],
+      items: [],
+    }))
+    expect([...differingRows(model, ['p1', 'p2', 'p3'])]).toEqual(['kit:MCCB-250'])
+    // The two that agree, on their own, show nothing.
+    expect(differingRows(model, ['p1', 'p2']).size).toBe(0)
+  })
+
+  it('counts a panel that does not have the row at all as nought', () => {
+    const model = buildGrid(input({
+      panels: [panel('p1', 'A'), panel('p2', 'B'), panel('p3', 'C')],
+      assemblies: [kitLine('a1', 'p1', 'MCCB-250', 4), kitLine('a2', 'p2', 'MCCB-250', 4)],
+      items: [],
+    }))
+    expect([...differingRows(model, ['p1', 'p2', 'p3'])]).toEqual(['kit:MCCB-250'])
+  })
+
+  it('marks nothing at all with fewer than two panels, because that is not a comparison', () => {
+    const model = buildGrid(input())
+    expect(differingRows(model, []).size).toBe(0)
+    expect(differingRows(model, ['p1']).size).toBe(0)
   })
 })
 
