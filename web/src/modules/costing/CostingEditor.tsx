@@ -18,6 +18,7 @@ import { warningsByPanel } from './warnings'
 import { useFeatures } from '../admin/use-features'
 import { readCostingView, writeCostingView } from './costing-view'
 import { TotalsPanel } from './TotalsPanel'
+import { LabourWarning } from './LabourWarning'
 import { CostingHeader } from './CostingHeader'
 import { CostingWhole } from './CostingWhole'
 import { costingTabs, firstTabKey } from './costing-tabs'
@@ -170,6 +171,10 @@ export function CostingEditor() {
                 </div>
 
                 <div style={{ marginTop: 18 }}>
+                  {/* A costing that charges nothing for labour says so here, where
+                      the total is read. It blocks nothing (migration 0131). */}
+                  {on('labour_check') && <LabourWarning costingId={costing.id} />}
+
                   <TotalsPanel
                     costing={costing}
                     totals={totals}

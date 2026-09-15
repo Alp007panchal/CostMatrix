@@ -1252,6 +1252,12 @@ Company → Enclosure uplift %. Added to catalogue cubicle prices (components ti
 cubicle*) when they enter a costing, and frozen there.
 
 ### Set kit group hours (session 1)
+**Start here if you have not done it yet.** Every group is blank today, so every costing charges
+nothing for assembly, wiring or busbar time — the material prices correctly and the time is left
+out. `docs/reference/labour-hours-worksheet.md` is the 17 groups laid out biggest first, with an
+example kit against each and what the three processes cover, so the 51 figures can be filled in
+one sitting; the top four groups alone cover 183 of the 296 kits.
+
 Kits → kit group (link in the intro) → type the hours per kind of work in each group's row;
 they save when you leave the cell. A kit with its own figure for one kind of work keeps it; blank
 on the kit means the group's hours apply. On a kit: choose its group, rating and poles under
@@ -1351,6 +1357,24 @@ needs no account and cannot lapse when a subscription does.
 One thing to know about scheduled workflows: **GitHub stops running them after 60 days with no
 activity in the repository.** While work is going on that never happens; if the app is ever left
 alone for two months, press *Run workflow* once to wake it up.
+
+### When a costing says it charges nothing for labour (migration 0131)
+Switch **The missing-labour check** on (master administrator → Features) and a costing that carries
+no labour tells you so, above the totals. It **blocks nothing and changes no price** — a supply-only
+job legitimately has no labour, so it reports and leaves the judgement to you.
+
+Two different faults, with two different fixes:
+
+- **"This costing charges nothing for labour."** Its kits have no hours in the library. The warning
+  names the **kit groups** responsible — those are the rows of
+  `data/seed/kit-group-labour-template.csv`, or the **Kit groups** screen. Fill them in, then make a
+  **new revision**: a costing freezes the hours it was given, so an existing one will not pick them up.
+- **"Some hours are priced at nothing."** The hours are there, but the hourly rate frozen onto that
+  costing is zero. Set it under **Rates → Labour rates** and, again, make a new revision — a rate set
+  after a costing is created does not reach it.
+
+While the labour template is empty this will fire on every costing, which is correct: every kit
+currently costs zero labour.
 
 ### Download a backup (see Part E)
 Supabase dashboard → Database → Backups. Or fetch the weekly off-site dump from where the
