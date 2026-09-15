@@ -162,8 +162,8 @@ describe('the costing grid', () => {
   it('offers no boxes at all on a costing nobody may edit', () => {
     show({ editable: false })
     expect(screen.queryByRole('textbox', { name: 'Name of MDB' })).toBeNull()
-    // The name is still there, as plain text — "MDB" alone also names an entry
-    // in the Compare dropdown, so read it off the heading itself.
+    // The name is still there, as plain text — "MDB" alone also names the button
+    // that picks this panel, so read it off the heading itself.
     expect(screen.getAllByRole('columnheader')[2]?.textContent).toContain('MDB')
   })
 
@@ -221,10 +221,42 @@ describe('the costing grid', () => {
 
   it('marks the rows that differ when two columns are compared', () => {
     show()
-    fireEvent.change(screen.getByLabelText('Compare this panel'), { target: { value: 'p1' } })
-    fireEvent.change(screen.getByLabelText('Compare with this panel'), { target: { value: 'p2' } })
-    expect(screen.getByText(/2 rows differ/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'MDB' }))
+    fireEvent.click(screen.getByRole('button', { name: 'DB-1' }))
+    expect(screen.getByText(/2 side by side · 2 rows differ/)).toBeTruthy()
     expect(screen.getByText('250A MCCB KIT').closest('tr')?.className).toBe('row-differs')
+  })
+
+  it('shows every panel until one is picked, then only the picked ones', () => {
+    show()
+    // Nothing picked: both columns, plus Kit / component, Group and the roll-up.
+    expect(screen.getAllByRole('columnheader')).toHaveLength(5)
+
+    fireEvent.click(screen.getByRole('button', { name: 'MDB' }))
+    expect(screen.getAllByRole('columnheader')).toHaveLength(4)
+    expect(screen.queryByRole('textbox', { name: 'Name of DB-1' })).toBeNull()
+    expect(screen.getByText('one panel on its own — pick another to compare them')).toBeTruthy()
+  })
+
+  it('goes back to every panel on Show all, and pressing a panel again drops it', () => {
+    show()
+    fireEvent.click(screen.getByRole('button', { name: 'MDB' }))
+    fireEvent.click(screen.getByRole('button', { name: 'MDB' }))
+    expect(screen.getAllByRole('columnheader')).toHaveLength(5)
+
+    fireEvent.click(screen.getByRole('button', { name: 'DB-1' }))
+    expect(screen.getAllByRole('columnheader')).toHaveLength(4)
+    fireEvent.click(screen.getByRole('button', { name: 'All 2' }))
+    expect(screen.getAllByRole('columnheader')).toHaveLength(5)
+  })
+
+  it('keeps the roll-up counting every panel, whatever is shown', () => {
+    show()
+    fireEvent.click(screen.getByRole('button', { name: 'MDB' }))
+    // 7 is the 250A MCCB KIT across both panels, not only the one on screen.
+    expect(screen.getByText('All 2 panels')).toBeTruthy()
+    const mccb = within(screen.getByText('250A MCCB KIT').closest('tr')!).getAllByRole('cell')
+    expect(mccb[mccb.length - 1]?.textContent).toBe('7')
   })
 
   it('says which row has a part the library no longer prices', () => {

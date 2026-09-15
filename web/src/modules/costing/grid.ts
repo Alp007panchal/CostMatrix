@@ -254,16 +254,24 @@ function totalRows(input: GridInput, columns: GridColumn[]): GridTotalRow[] {
 }
 
 /**
- * Compare two columns: the rows whose quantities differ, a blank against a
- * figure included. One pair at a time, as the spec says.
+ * Compare any number of columns: the rows where the chosen panels do not all
+ * agree, a blank counting as nought against a figure.
+ *
+ * It took exactly two until 14 September. Two is the pair the roadmap asked for
+ * and the wrong number for the job the owner actually does — five sub-boards
+ * that ought to be identical, where the question is not "do these two differ"
+ * but "which row is the odd one out". With three or more chosen, a row is marked
+ * when any one of them disagrees with the rest.
+ *
+ * Fewer than two chosen is not a comparison, so nothing is marked.
  */
-export function differingRows(model: GridModel, aPanelId: string, bPanelId: string): Set<string> {
+export function differingRows(model: GridModel, panelIds: string[]): Set<string> {
   const differ = new Set<string>()
+  if (panelIds.length < 2) return differ
   for (const section of model.sections) {
     for (const row of section.rows) {
-      const a = row.cells[aPanelId]?.quantity ?? 0
-      const b = row.cells[bPanelId]?.quantity ?? 0
-      if (a !== b) differ.add(row.key)
+      const first = row.cells[panelIds[0]!]?.quantity ?? 0
+      if (panelIds.some((id) => (row.cells[id]?.quantity ?? 0) !== first)) differ.add(row.key)
     }
   }
   return differ

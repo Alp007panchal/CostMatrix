@@ -355,6 +355,11 @@ or into go-live.
     every kit on it on one click with no question at all, go through one `confirmRemovePanel` that
     names the panel, what is on it and what it is worth. The grid also gets its own scrolling box,
     so the panel names stay across the top and the kit names down the left with five panels open.
+48. **Compare any number of panels** (maintenance) — the grid's two "compare A with B" dropdowns
+    become one button per panel, and the panels not chosen leave the table, because two columns to
+    compare are no use four columns apart. With three or more chosen a row is marked when any one
+    disagrees with the rest, a blank counting as nought. The roll-up column and the Excel export
+    keep covering every panel, and both now say so.
 
 ## In hand right now
 
