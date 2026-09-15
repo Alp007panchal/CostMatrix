@@ -375,7 +375,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| The panel layout says what the library is missing, a runbook recipe for it, and a draft of the kit mounting designs | `claude/layout-says-whats-missing` | 2026-09-15 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
