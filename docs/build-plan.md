@@ -370,6 +370,15 @@ or into go-live.
     rate. Behind `labour_check`, off by default. It blocks nothing and changes no price. With it,
     a worksheet of the 17 groups so the 51 figures can be filled in one sitting.
 
+50. **A revision keeps the panel drawing** (maintenance, migration 0132) — `create_costing_revision`
+    copied panels but not `panel_layouts`, so a revised costing started undrawn and Annexure V
+    vanished from the revised quotation without a word. Behind `layout_follows_revision`, off by
+    default, each panel's latest drawing now comes across — and because a layout's jsonb carries a
+    `costing_assembly_id` per placement, the copy **re-points every id** at the revision's own kit
+    lines rather than cloning. A clone would render perfectly and be wired to nothing; the naive
+    version was written first to prove the assertion that catches it. A copy of a costing is
+    deliberately unchanged: a copy is a new job.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
