@@ -825,7 +825,6 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
-<<<<<<< HEAD
 ### The missing-labour check (migration 0131)
 - `v_costing_labour_gaps` — one row per costing: `kit_lines`, `kit_lines_without_hours`,
   `groups_to_fill` (the kit groups and how many lines each accounts for), `processes_without_rate`
@@ -833,7 +832,7 @@ written so that *off* reproduces the older text exactly (D-267):
   `labour_share_pct`, and a `verdict` of `ok` · `none` · `some` · `no_rate` · `no_kits`.
   Read-only, `security_invoker`, writes nothing and blocks nothing.
 - Feature `labour_check` (sort 190), off until the master administrator turns it on.
-=======
+
 ### Panel layout, stage one (roadmap 3.8, migration 0120)
 Stage two's changes to these are listed under it; where the two disagree, stage two wins.
 - `v_panel_layout_kits` — the kits on a panel with their mounting design, module height, positions
@@ -911,7 +910,6 @@ The canvas is not built; these are the fields it will read, so the library can b
   newest `panel_layouts` row for that panel in the order the GA sheet draws it (0121). The tag is
   null where the panel has no layout.
 - Feature `eplan_exports` (sort 180), off everywhere until the master administrator turns it on.
->>>>>>> origin/main
 
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
@@ -965,6 +963,25 @@ than raising**: failing to record an error must never be what breaks a screen.
 **v_error_reports** — the same rows with the company and the person named, for the
 *What broke* screen. Security invoker, so the table's policy decides what comes back.
 
+### A revision keeps the panel drawing (migration 0132)
+
+`app.create_costing_revision` copied panels but never `panel_layouts`, so a revised costing started
+undrawn and `pdf/ga.ts` — which gives a panel with no saved layout no sheet — dropped Annexure V
+from the quotation without a word.
+
+Behind the feature `layout_follows_revision`, **off by default**, the revision now copies each old
+panel's **latest** layout onto its new panel as version 1. Off, nothing is copied at all: the
+behaviour that shipped, exactly.
+
+`panel_layouts.sections` is jsonb and every placement inside it carries a `costing_assembly_id`,
+which a revision re-creates as a new row. So the copy is not a clone: **`app.remap_layout_sections`
+and `app.remap_placements` re-point every id** through `copied_assemblies`, the mapping the revision
+already builds. A placement the mapping cannot cover is **dropped, never carried** — a device drawn
+over a kit line that is not on the costing would look right and be wrong, which is the failure this
+is built to avoid. `supabase/tests/53_layout_follows_revision.sql` asserts it directly, and a clone
+of the jsonb fails that assertion and no other.
+
+`copy_costing` and `copy_panel` are deliberately unchanged: a copy is a new job.
 
 ### Added by migration 0133 — the assistant drafts the quotation's wording
 

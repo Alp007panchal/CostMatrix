@@ -370,7 +370,16 @@ or into go-live.
     rate. Behind `labour_check`, off by default. It blocks nothing and changes no price. With it,
     a worksheet of the 17 groups so the 51 figures can be filled in one sitting.
 
-50. **The assistant drafts the quotation's cover letter** (roadmap 3.7, first of three) — on the
+50. **A revision keeps the panel drawing** (maintenance, migration 0132) — `create_costing_revision`
+    copied panels but not `panel_layouts`, so a revised costing started undrawn and Annexure V
+    vanished from the revised quotation without a word. Behind `layout_follows_revision`, off by
+    default, each panel's latest drawing now comes across — and because a layout's jsonb carries a
+    `costing_assembly_id` per placement, the copy **re-points every id** at the revision's own kit
+    lines rather than cloning. A clone would render perfectly and be wired to nothing; the naive
+    version was written first to prove the assertion that catches it. A copy of a costing is
+    deliberately unchanged: a copy is a new job.
+
+51. **The assistant drafts the quotation's cover letter** (roadmap 3.7, first of three) — on the
     Release page, *Draft the wording*: the subject, the opening, the closing and the notes on offer,
     written from the costing into the four boxes the approver already edits there. It proposes and a
     person takes it — `quotation_wording` is the one proposal type the database never applies
@@ -395,6 +404,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
