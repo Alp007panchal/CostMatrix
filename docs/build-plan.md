@@ -393,7 +393,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| Roadmap 3.7, last slice: switch the assistant on for another company | `claude/assistant-per-company` | 2026-09-16 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
