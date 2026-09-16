@@ -370,6 +370,17 @@ or into go-live.
     rate. Behind `labour_check`, off by default. It blocks nothing and changes no price. With it,
     a worksheet of the 17 groups so the 51 figures can be filled in one sitting.
 
+50. **The assistant drafts the quotation's cover letter** (roadmap 3.7, first of three) — on the
+    Release page, *Draft the wording*: the subject, the opening, the closing and the notes on offer,
+    written from the costing into the four boxes the approver already edits there. It proposes and a
+    person takes it — `quotation_wording` is the one proposal type the database never applies
+    (migration 0133), and `apply_proposal` refuses it in a sentence. Nothing saves until Release,
+    and no price can move, because the payload is text and a figure in it is refused before it is
+    stored. A drafted line that would overwrite words the approver already typed is marked as such
+    before the button is pressed. It rides the `assistant` switch, off by default. The other two
+    thirds of 3.7 — questions over the company's own data, and external companies switched on per
+    company — are not in it.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
@@ -384,7 +395,6 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| Roadmap 3.7, first slice: the assistant drafts the quotation wording | `claude/assistant-drafts-the-letter` | 2026-09-16 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

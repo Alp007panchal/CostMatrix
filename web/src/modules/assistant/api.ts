@@ -168,6 +168,16 @@ export async function applyProposal(proposalId: string, decisions: ApplyDecision
   return data as ApplyResult
 }
 
+/**
+ * The approver took the assistant's wording into the Release form. Records that
+ * a person chose it (migration 0133); it writes to no costing and no quotation,
+ * so pressing Release is still the only thing that releases anything.
+ */
+export async function useQuotationWording(proposalId: string): Promise<void> {
+  const { error } = await supabase.rpc('use_quotation_wording', { proposal: proposalId })
+  fail('Could not record that you used the wording', error)
+}
+
 export async function rejectProposal(proposalId: string, reason: string | null): Promise<void> {
   const { error } = await supabase.rpc('reject_proposal', { proposal: proposalId, reason })
   fail('Could not reject the proposal', error)

@@ -1282,6 +1282,24 @@ reference number issued in one step. If anything fails, nothing is released — 
 Once released, nothing on it changes. To alter a quoted job, create a new revision of the
 costing; releasing that gives the same number with the next REV.
 
+**Let the assistant write the letter.** Under *Cover letter* on the same screen there is
+**Draft the wording** — visible only when the assistant is switched on for your company. It reads
+this costing and writes four things: the subject line, the opening, the closing and the notes on
+the offer. It cannot write a price, a discount, a payment term or a delivery date; the Edge
+Function refuses a draft that names a figure, and the price schedule is built from the costing as
+it always was.
+
+What comes back is a proposal, not a change. You read it, and then:
+
+- **Use this wording** puts it in the four boxes. If you had already typed something in one of
+  them, that box is marked *replaces what you wrote* before you press anything, and a line says
+  how many of your own lines would go.
+- **Discard** throws it away and leaves the form exactly as it was.
+
+Either way nothing is saved: **Release** is still the only button that releases a quotation, and
+the words are still yours to edit afterwards. The costing's history records that the wording came
+from the assistant and who took it.
+
 ### Log a customer and an enquiry
 **Customers** → **Add customer**, then on the customer's page add the people and projects.
 **Enquiries** → **Log enquiry** → choose the customer (and contact or project if you like),

@@ -7,7 +7,7 @@
  * words, so it can correct itself; it is never stored half-right.
  */
 
-export type ProposalType = 'draft_costing' | 'review' | 'line_change'
+export type ProposalType = 'draft_costing' | 'review' | 'line_change' | 'quotation_wording'
 
 export type Checked = { ok: true; value: Record<string, unknown> } | { ok: false; errors: string[] }
 
@@ -24,8 +24,53 @@ export function validateProposal(type: ProposalType, payload: unknown): Checked 
     case 'line_change':
       checkLineChange(payload, '', errors)
       break
+    case 'quotation_wording':
+      checkWording(payload, errors)
+      break
   }
   return errors.length === 0 ? { ok: true, value: payload } : { ok: false, errors }
+}
+
+/**
+ * The cover letter's four pieces (0133). Lengths are capped because this text
+ * goes into a PDF with a fixed layout: a subject that runs to three lines pushes
+ * the letter off its page, and nobody would notice until a customer had it.
+ *
+ * `notes` may be empty — a costing that says nothing about form or IP rating
+ * should produce no notes rather than the usual ones, which is exactly what the
+ * task template tells the model.
+ */
+const WORDING_LIMITS = {
+  subject: 200,
+  opening: 1200,
+  closing: 1200,
+  notes: 2000,
+} as const
+
+function checkWording(p: Record<string, unknown>, errors: string[]): void {
+  for (const field of ['subject', 'opening', 'closing'] as const) {
+    const value = p[field]
+    if (typeof value !== 'string' || value.trim() === '') {
+      errors.push(`${field} is required`)
+    } else if (value.length > WORDING_LIMITS[field]) {
+      errors.push(`${field} is longer than ${WORDING_LIMITS[field]} characters`)
+    }
+  }
+  const notes = p['notes']
+  if (notes !== undefined && notes !== null && typeof notes !== 'string') {
+    errors.push('notes must be text, or left out')
+  } else if (typeof notes === 'string' && notes.length > WORDING_LIMITS['notes']) {
+    errors.push(`notes is longer than ${WORDING_LIMITS['notes']} characters`)
+  }
+  // A price in the prose is the one thing this text must never carry: the
+  // schedule is built from the costing, and a figure typed into a sentence is a
+  // figure nobody checked. Refused rather than trimmed, so the model rewrites.
+  for (const field of ['subject', 'opening', 'closing', 'notes'] as const) {
+    const value = p[field]
+    if (typeof value === 'string' && /\b(?:KES|KSH|USD|EUR)\s*[\d,]|[\d,]{4,}\s*(?:KES|KSH)\b/i.test(value)) {
+      errors.push(`${field} states a price; the price schedule is built from the costing, never written in prose`)
+    }
+  }
 }
 
 const CONFIDENCE = ['high', 'medium', 'low']

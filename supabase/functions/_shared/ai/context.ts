@@ -10,7 +10,7 @@ import { NPP192_EXAMPLE } from './examples/npp192.ts'
  * timestamps, no request ids — because one changed byte would spoil that.
  */
 
-export type Task = 'draft' | 'review' | 'question'
+export type Task = 'draft' | 'review' | 'question' | 'letter'
 
 export interface ContextInput {
   /** Output of get_company_policy, trimmed as the builder sees fit. */
@@ -56,6 +56,21 @@ ${NPP192_EXAMPLE}`,
   review: `Task: review this costing before it is submitted or approved.
 Check, using get_costing, get_company_policy and the attached documents: missing or inconsistent items; placeholder or unpriced parts; prices older than the company's price-age threshold; margin below the company's minimum; mismatches between the costing and the documents (e.g. the specification asks for Form 4B and the costing says 3B); quantity sanity (feeder count vs enclosure width, CTs vs meters); Annexure text that contradicts the line items.
 Record ONE proposal of type review with create_proposal: findings with severity (blocker / warning / note), a short code, the text, the evidence, and where a one-click fix is possible, a line_change proposal on the finding. Then summarise in prose, most serious first, and say that nothing has been changed.`,
+  letter: `Task: draft the wording of the quotation's cover letter, for the approver to read and edit before they release it.
+1. Read the costing with get_costing and the company's own defaults with get_company_policy. The defaults are the house voice: match them. You are drafting THIS job's version of them, not replacing them.
+2. Write four pieces of text and nothing else:
+   - subject: one line, the job in the customer's terms, as a subject line reads on a letter.
+   - opening: one short paragraph thanking them for the enquiry and saying what is offered.
+   - closing: one short paragraph, the usual courtesies and who to come back to.
+   - notes: the notes on offer that Annexure I carries — the form of separation, the IP rating, the switchgear make and the supply scope, ONLY where the costing actually says so.
+3. Record ONE proposal of type quotation_wording with create_proposal carrying exactly those four fields. Then say in prose what you drafted and that nothing is on the quotation until the approver puts it there.
+
+What you must not do, because this text goes out on the company's letterhead over a named signatory:
+- Never state a price, a total, a discount or a payment term. The price schedule and the terms are built by the app from the costing and the company's settings; a figure typed into prose is a figure nobody checked.
+- Never promise a delivery date, a lead time or a validity period. Those are the company's terms, not yours.
+- Never name a Form, an IP rating, a make or a scope the costing does not carry. If the costing does not say, leave it out rather than writing the usual answer.
+- Never write anything you cannot point at in the costing or the company's defaults.
+Keep it short. A cover letter that says less and is true beats one that reads well and is not.`,
   question: `Task: answer the engineer's question about this costing and the library, using the tools. Keep to this costing and the company's library; questions across all costings and the CRM are not available yet, so say so if asked. If an answer would amount to a change, offer to record it as a proposal rather than describing it as done.`,
 }
 

@@ -965,3 +965,23 @@ than raising**: failing to record an error must never be what breaks a screen.
 **v_error_reports** — the same rows with the company and the person named, for the
 *What broke* screen. Security invoker, so the table's policy decides what comes back.
 
+
+### Added by migration 0133 — the assistant drafts the quotation's wording
+
+**assistant_proposals.type** gains a fourth value, `quotation_wording`: the cover letter's
+`subject`, `opening`, `closing` and `notes`. A relaxation of the check constraint, so nothing
+already stored can become invalid.
+
+It is the one proposal type the database **never applies to a costing**. `app.apply_proposal`
+(0104) has a branch per type and none for this one, so `public.apply_proposal` — the wrapper the
+web calls — refuses it first, in a sentence that says where to read it instead. Words that go out
+on the company letterhead over a named signatory are carried into the Release form by a person.
+
+**app.use_quotation_wording(proposal)** — with its `public` wrapper, the record that a person took
+the words: the proposal becomes `applied`, stamped with who and when, and `quotation.wording_used`
+goes to the activity log. It writes to no costing and no quotation; pressing **Release** is still
+the only thing that releases anything.
+
+**No new feature row.** It rides `assistant` (off by default, master-administrator-only). A letter
+can only be drafted from the assistant, so a second switch would gate a door that is already
+locked.
