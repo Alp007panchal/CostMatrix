@@ -9,6 +9,7 @@ import { getEnquiry, listContacts, listCustomers } from '../crm/api'
 import { getCostingDetail } from '../costing/api'
 import { savedLayoutsFor } from '../layout/layout-api'
 import { logoAsDataUrl, releaseQuotation, uploadQuotationPdf } from './api'
+import { LetterDraft } from './LetterDraft'
 import { prepareQuotationPdf } from './pdf/prepare'
 import { renderQuotationPdf } from './pdf/render'
 
@@ -216,6 +217,16 @@ export function ReleasePage() {
           <div style={{ flex: 1 }}><Field label="Signed by"><input value={form.signatory_name} onChange={(e) => set('signatory_name', e.target.value)} /></Field></div>
           <div style={{ flex: 1 }}><Field label="Email"><input value={form.signatory_email} onChange={(e) => set('signatory_email', e.target.value)} /></Field></div>
         </div>
+        {/* The assistant can write these four boxes; it fills the form and
+            saves nothing (roadmap 3.7). Absent when the assistant is off. */}
+        <LetterDraft
+          costingId={costing.id}
+          form={{
+            subject: form.subject, intro_text: form.intro_text,
+            closing_text: form.closing_text, notes_on_offer: form.notes_on_offer,
+          }}
+          onUse={(next) => setForm((f) => ({ ...f, ...next }))}
+        />
       </div>
 
       <div className="card">

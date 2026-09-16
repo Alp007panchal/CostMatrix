@@ -99,7 +99,12 @@ export function AssistantPanel({
 
   if (!mayUse) return null
 
-  const openProposal = (proposals.data ?? []).find(isOpen)
+  // A drafted cover letter (0133) is read on the Release page, not here: it
+  // carries no lines, so the proposal card would render an empty table with an
+  // Apply button on it. Point at where it lives instead.
+  const open_ = (proposals.data ?? []).filter(isOpen)
+  const openProposal = open_.find((p) => p.type !== 'quotation_wording')
+  const openLetter = open_.some((p) => p.type === 'quotation_wording')
   const actions = suggestedActions(entityType, {
     hasDocuments: (documents.data ?? []).length > 0,
     hasLines: panels.length > 0,
@@ -171,6 +176,11 @@ export function AssistantPanel({
             </>
           )}
 
+          {openLetter && (
+            <p className="muted" style={{ marginTop: '.5rem' }}>
+              A drafted cover letter is waiting on the Release page.
+            </p>
+          )}
           {openProposal && openProposal.type === 'review' && (
             <ReviewCard
               proposal={openProposal}

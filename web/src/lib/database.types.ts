@@ -1148,7 +1148,7 @@ export interface QuotationFollowup {
 // --- the assistant (migrations 0102 to 0104) --------------------------------
 
 export type AssistantEntityType = 'enquiry' | 'costing'
-export type ProposalType = 'draft_costing' | 'review' | 'line_change'
+export type ProposalType = 'draft_costing' | 'review' | 'line_change' | 'quotation_wording'
 export type ProposalStatus = 'open' | 'partially_applied' | 'applied' | 'rejected' | 'expired'
 
 export interface AssistantConversation {
@@ -1245,6 +1245,16 @@ export type ProposalPayload =
   | { summary?: string; panels?: DraftPanel[]; notes_for_engineer?: string[] }
   | { summary?: string; findings?: ReviewFinding[] }
   | LineChange
+  | QuotationWording
+
+/** The cover letter the assistant drafted (migration 0133). Never applied by the
+ *  database: the approver carries it into the Release form themselves. */
+export interface QuotationWording {
+  subject?: string
+  opening?: string
+  closing?: string
+  notes?: string | null
+}
 
 export interface ProposalResult {
   costing_id?: string

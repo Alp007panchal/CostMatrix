@@ -825,7 +825,6 @@ written so that *off* reproduces the older text exactly (D-267):
   per proposal. Settings: `ANTHROPIC_API_KEY`, `AI_PROVIDER`, `AI_MODEL`, `AI_MODEL_FAST`,
   `AI_FALLBACKS`.
 
-<<<<<<< HEAD
 ### The missing-labour check (migration 0131)
 - `v_costing_labour_gaps` — one row per costing: `kit_lines`, `kit_lines_without_hours`,
   `groups_to_fill` (the kit groups and how many lines each accounts for), `processes_without_rate`
@@ -833,7 +832,7 @@ written so that *off* reproduces the older text exactly (D-267):
   `labour_share_pct`, and a `verdict` of `ok` · `none` · `some` · `no_rate` · `no_kits`.
   Read-only, `security_invoker`, writes nothing and blocks nothing.
 - Feature `labour_check` (sort 190), off until the master administrator turns it on.
-=======
+
 ### Panel layout, stage one (roadmap 3.8, migration 0120)
 Stage two's changes to these are listed under it; where the two disagree, stage two wins.
 - `v_panel_layout_kits` — the kits on a panel with their mounting design, module height, positions
@@ -911,7 +910,6 @@ The canvas is not built; these are the fields it will read, so the library can b
   newest `panel_layouts` row for that panel in the order the GA sheet draws it (0121). The tag is
   null where the panel has no layout.
 - Feature `eplan_exports` (sort 180), off everywhere until the master administrator turns it on.
->>>>>>> origin/main
 
 ### Busbar runs (roadmap 4.1, migration 0118)
 No new table. A panel's run schedule is an array under `costing_panels.parameters -> 'busbar_runs'`,
@@ -984,3 +982,23 @@ is built to avoid. `supabase/tests/53_layout_follows_revision.sql` asserts it di
 of the jsonb fails that assertion and no other.
 
 `copy_costing` and `copy_panel` are deliberately unchanged: a copy is a new job.
+
+### Added by migration 0133 — the assistant drafts the quotation's wording
+
+**assistant_proposals.type** gains a fourth value, `quotation_wording`: the cover letter's
+`subject`, `opening`, `closing` and `notes`. A relaxation of the check constraint, so nothing
+already stored can become invalid.
+
+It is the one proposal type the database **never applies to a costing**. `app.apply_proposal`
+(0104) has a branch per type and none for this one, so `public.apply_proposal` — the wrapper the
+web calls — refuses it first, in a sentence that says where to read it instead. Words that go out
+on the company letterhead over a named signatory are carried into the Release form by a person.
+
+**app.use_quotation_wording(proposal)** — with its `public` wrapper, the record that a person took
+the words: the proposal becomes `applied`, stamped with who and when, and `quotation.wording_used`
+goes to the activity log. It writes to no costing and no quotation; pressing **Release** is still
+the only thing that releases anything.
+
+**No new feature row.** It rides `assistant` (off by default, master-administrator-only). A letter
+can only be drafted from the assistant, so a second switch would gate a door that is already
+locked.

@@ -25,7 +25,10 @@ Staging is still its own Supabase project on a second account
 not changed.
 
 **One thing is yours** before a live assistant draft will answer: credit on the Anthropic account.
-Until then the panel says so in those words, which is the intended behaviour.
+Until then the panel says so in those words, which is the intended behaviour. That now covers the
+Release page's **Draft the wording** as well (roadmap 3.7): the button is there whenever the
+assistant is switched on, but until there is credit it answers with the same sentence and the same
+remedy. Nothing else on that screen depends on it — a quotation is released exactly as before.
 
 ## Waiting on you
 

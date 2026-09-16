@@ -41,7 +41,7 @@ export interface AskInput {
   entityType: AssistantEntityType
   entityId: string
   message: string
-  task: 'draft' | 'review' | 'question'
+  task: 'draft' | 'review' | 'question' | 'letter'
   conversationId?: string | null
 }
 

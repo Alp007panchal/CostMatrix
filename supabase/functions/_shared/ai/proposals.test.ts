@@ -78,3 +78,49 @@ describe('a line_change proposal', () => {
     expect(validateProposal('line_change', { action: 'set_parameter', panel_line_item_id: kit, parameter: 'form', value: '4B', reason: 'r' }).ok).toBe(true)
   })
 })
+
+// The cover letter (0133). It goes out on the company's letterhead over a named
+// signatory, so what it must NOT contain is worth more tests than what it must.
+describe('a quotation_wording proposal', () => {
+  const good = {
+    subject: 'QUOTATION FOR THE SUPPLY OF ONE MAIN LV BOARD',
+    opening: 'Thank you for your enquiry. We are pleased to offer the following.',
+    closing: 'We look forward to your instructions. Please come back to the undersigned.',
+    notes: 'Form 3B separation, IP31, Siemens switchgear. Supply only.',
+  }
+
+  it('is accepted with its four pieces', () => {
+    expect(validateProposal('quotation_wording', good).ok).toBe(true)
+  })
+
+  it('accepts no notes at all, because a costing that says nothing should produce none', () => {
+    const { notes: _drop, ...rest } = good
+    expect(validateProposal('quotation_wording', rest).ok).toBe(true)
+  })
+
+  it('requires the subject, the opening and the closing', () => {
+    const r = validateProposal('quotation_wording', { ...good, subject: '   ' })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.join(' ')).toMatch(/subject is required/)
+  })
+
+  it('refuses a subject long enough to push the letter off its page', () => {
+    const r = validateProposal('quotation_wording', { ...good, subject: 'X'.repeat(201) })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.join(' ')).toMatch(/longer than 200/)
+  })
+
+  // The one that matters: a figure in the prose is a figure nobody checked.
+  it('refuses a price written into the wording, wherever it appears', () => {
+    for (const field of ['subject', 'opening', 'closing', 'notes']) {
+      const r = validateProposal('quotation_wording', { ...good, [field]: `Our price is KES 5,784,800 ex-works.` })
+      expect(r.ok).toBe(false)
+      if (!r.ok) expect(r.errors.join(' ')).toMatch(/states a price/)
+    }
+  })
+
+  it('still allows an ordinary sentence with a rating in it', () => {
+    const r = validateProposal('quotation_wording', { ...good, notes: 'One 1600 A incomer, Form 3B, IP31.' })
+    expect(r.ok).toBe(true)
+  })
+})

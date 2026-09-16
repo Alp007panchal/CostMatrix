@@ -70,7 +70,12 @@ Deno.serve(async (request: Request) => {
   const entityType = body.entity_type
   const entityId = body.entity_id
   const message = (body.message ?? '').trim()
-  const task: Task = body.task === 'draft' || body.task === 'review' ? body.task : 'question'
+  // Anything not named here is answered as a question. `letter` (0133) is named
+  // because without it a request to draft the quotation's wording would be
+  // answered as an ordinary question, and every prohibition in the letter task
+  // — never a price, never a delivery promise — would never reach the model.
+  const KNOWN_TASKS = ['draft', 'review', 'letter'] as const
+  const task: Task = (KNOWN_TASKS as readonly string[]).includes(body.task ?? '') ? (body.task as Task) : 'question'
   if (entityType !== 'enquiry' && entityType !== 'costing') return reply({ error: 'entity_type must be enquiry or costing' }, 400)
   if (!entityId) return reply({ error: 'entity_id is required' }, 400)
   if (!message) return reply({ error: 'message is required' }, 400)

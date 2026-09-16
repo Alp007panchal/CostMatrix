@@ -139,10 +139,10 @@ export const TOOL_SPECS: ToolSpec[] = [
   {
     name: 'create_proposal',
     description:
-      'Record a proposal for a person to review: a draft costing, a review of an existing costing, or a single line change. The ONLY way to propose a change. Nothing is applied by this call; a person applies it later, or rejects it. Use kit and component ids from search results, never invented ones, and cite the document and page for every line.',
+      'Record a proposal for a person to review: a draft costing, a review of an existing costing, a single line change, or the wording of a cover letter for a quotation. The ONLY way to propose a change. Nothing is applied by this call; a person applies it later, or rejects it. Use kit and component ids from search results, never invented ones, and cite the document and page for every line.',
     input_schema: obj(
       {
-        type: { type: 'string', enum: ['draft_costing', 'review', 'line_change'] },
+        type: { type: 'string', enum: ['draft_costing', 'review', 'line_change', 'quotation_wording'] },
         payload: { type: 'object', description: 'The proposal, in the shape the type requires (AI spec §6.3)' },
       },
       ['type', 'payload'],
