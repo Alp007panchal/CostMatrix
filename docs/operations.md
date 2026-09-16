@@ -291,6 +291,17 @@ budget are the company administrator's. A rough guide: drafting from a ten-page 
 about 30,000 to 60,000 tokens, a review 10,000 to 20,000 — cents, not pounds — and the assistant
 warns at 80 % of the budget and stops at 100 %.
 
+**Switching it on for another company.** As the master administrator you see a **Whose assistant**
+box at the top of that screen. Pick a company and the whole page — the switch, the budget, the
+thresholds, the usage — becomes theirs, with a red line saying so, because switching on the wrong
+company is the mistake worth making hard. This is the only way an external company gets the
+assistant at all: the switch is yours alone, so without the picker it could only ever be your own
+company. Their own administrator still sets their budget and thresholds; they still cannot switch
+it on or off.
+
+Before you switch a company on, look at what it will cost them: the usage tables below the switch
+are that company's, so you are reading their spending, not yours.
+
 ### B9b. Turn on two-factor authentication
 
 Not required to finish setup, so skip the prompts if they interrupt you — but do it before real
