@@ -1157,10 +1157,16 @@ filed under MCCB is named rather than quietly mis-drawn.
 5. **Does it fit?** on the right gives a verdict per section in the unit that design counts in:
    millimetres of height for covers, positions for side-by-side plates, kVAr for correction.
 6. **Save layout** keeps the drawing with the panel. It **moves no price at all**, and it comes
-   back when you open that panel again. Save before you leave: the next step needs a saved
-   drawing, and **a revision or a copy of the costing does not carry the drawing** — its panels
-   are new rows, and they start undrawn. Worth knowing before you revise a job whose quotation
-   carried a general-arrangement sheet.
+   back when you open that panel again. Save before you leave — the next step needs a saved
+   drawing.
+
+   **A revision starts undrawn unless you say otherwise.** A revision's panels are new rows, so
+   by default they carry no drawing and the general-arrangement sheet drops off the revised
+   quotation. Switch on **A revision keeps the panel drawing** (Features) and each panel's latest
+   drawing comes across instead, with the devices re-pointed at the revision's own kit lines.
+   Off is the default on purpose: a revision usually means the board has changed, and a drawing
+   carried onto a board that has changed is worse than a missing one. **A copy of a costing never
+   carries the drawing** — a copy is a new job.
 
 **Putting the enclosure on the costing** is the one button here that touches money. It works from
 the **saved** drawing, so press *Save layout* first — on a panel with nothing saved it says so

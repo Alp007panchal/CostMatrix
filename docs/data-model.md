@@ -965,3 +965,22 @@ than raising**: failing to record an error must never be what breaks a screen.
 **v_error_reports** — the same rows with the company and the person named, for the
 *What broke* screen. Security invoker, so the table's policy decides what comes back.
 
+### A revision keeps the panel drawing (migration 0132)
+
+`app.create_costing_revision` copied panels but never `panel_layouts`, so a revised costing started
+undrawn and `pdf/ga.ts` — which gives a panel with no saved layout no sheet — dropped Annexure V
+from the quotation without a word.
+
+Behind the feature `layout_follows_revision`, **off by default**, the revision now copies each old
+panel's **latest** layout onto its new panel as version 1. Off, nothing is copied at all: the
+behaviour that shipped, exactly.
+
+`panel_layouts.sections` is jsonb and every placement inside it carries a `costing_assembly_id`,
+which a revision re-creates as a new row. So the copy is not a clone: **`app.remap_layout_sections`
+and `app.remap_placements` re-point every id** through `copied_assemblies`, the mapping the revision
+already builds. A placement the mapping cannot cover is **dropped, never carried** — a device drawn
+over a kit line that is not on the costing would look right and be wrong, which is the failure this
+is built to avoid. `supabase/tests/53_layout_follows_revision.sql` asserts it directly, and a clone
+of the jsonb fails that assertion and no other.
+
+`copy_costing` and `copy_panel` are deliberately unchanged: a copy is a new job.
