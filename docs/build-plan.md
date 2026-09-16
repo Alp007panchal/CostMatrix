@@ -384,7 +384,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| A revision carries the panel drawing forward, behind a switch that is off | `claude/revision-carries-drawing` | 2026-09-16 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
