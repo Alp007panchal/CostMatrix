@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { Async, Field } from '../../ui/Async'
+import { listCompanies } from '../admin/api'
 import { getAssistantOptions, getUsage, setAssistantOption } from './api'
 
 /**
@@ -11,17 +12,33 @@ import { getAssistantOptions, getUsage, setAssistantOption } from './api'
  * administrator alone may switch the assistant on or off for a company
  * (a trigger refuses anyone else), while the company's own administrator sets
  * the budget and the two thresholds.
+ *
+ * **Whose settings.** The master administrator picks the company at the top
+ * (roadmap 3.7, migration 0134). Without that they could only ever switch it on
+ * for their own company, so an external company could never have it — which is
+ * the whole of the roadmap line. Everybody else sees their own company and no
+ * picker, exactly as before.
  */
 export function AssistantSettingsPage() {
   const { company, isMasterAdmin } = useSession()
   const queryClient = useQueryClient()
-  const companyId = company?.id
+  // Empty means "my own company", so a company administrator never sends a
+  // company id at all and the database answers about them.
+  const [chosen, setChosen] = useState('')
+  const companyId = chosen || company?.id
+  const elsewhere = Boolean(chosen) && chosen !== company?.id
+
+  const companies = useQuery({ queryKey: ['companies'], queryFn: listCompanies, enabled: isMasterAdmin })
   const options = useQuery({
     queryKey: ['assistant-options', companyId],
     queryFn: () => getAssistantOptions(companyId as string),
     enabled: Boolean(companyId),
   })
-  const usage = useQuery({ queryKey: ['assistant-usage'], queryFn: getUsage })
+  const usage = useQuery({
+    queryKey: ['assistant-usage', companyId],
+    queryFn: () => getUsage(elsewhere ? (companyId as string) : undefined),
+    enabled: Boolean(companyId),
+  })
   const [saved, setSaved] = useState<string | null>(null)
 
   const save = useMutation({
@@ -35,16 +52,35 @@ export function AssistantSettingsPage() {
   })
 
   if (!company) return null
+  const chosenName = (companies.data ?? []).find((c) => c.id === companyId)?.name ?? company.name
 
   return (
     <>
       <h1>Assistant</h1>
+
+      {isMasterAdmin && (companies.data ?? []).length > 1 && (
+        <div className="card">
+          <Field label="Whose assistant" hint="you are the only person who can switch this on for a company">
+            <select value={chosen} onChange={(e) => { setChosen(e.target.value); setSaved(null) }}>
+              <option value="">{company.name} (yours)</option>
+              {(companies.data ?? []).filter((c) => c.id !== company.id).map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </Field>
+          {elsewhere && (
+            <p className="error" style={{ margin: 0 }}>
+              Everything below is <strong>{chosenName}</strong>’s, not yours.
+            </p>
+          )}
+        </div>
+      )}
       <Async query={options}>
         {(o) => {
           const enabled = o['ai_enabled'] === true
           const num = (key: string, fallback: number) => (typeof o[key] === 'number' ? (o[key] as number) : fallback)
           return (
-            <div className="card">
+            <div className="card" key={companyId}>
               <div className="spread">
                 <div>
                   <h2 style={{ margin: 0 }}>{enabled ? 'Switched on' : 'Switched off'}</h2>

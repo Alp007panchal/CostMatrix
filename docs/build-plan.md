@@ -379,6 +379,17 @@ or into go-live.
     version was written first to prove the assertion that catches it. A copy of a costing is
     deliberately unchanged: a copy is a new job.
 
+51. **The assistant, switched on for another company** (roadmap 3.7, last of three, migration 0134) —
+    the master administrator is the only person who may switch the assistant on, and the settings
+    screen read the signed-in company, so they could switch it on for their own company and nobody
+    else's: an external company could never have it. A **Whose assistant** picker moves the switch,
+    the budget, the thresholds *and* the usage onto the chosen company, with a red line naming it.
+    `assistant_allowance` and `assistant_usage` now take the company they are asked about — shown
+    beside a switch for one company they would have reported another's spending — and refuse anybody
+    but the master administrator who names a company not their own. No new switch: this changes who
+    can reach an existing one. **Roadmap 3.7 is complete, and none of it can answer until there is
+    credit on the Anthropic account.**
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions

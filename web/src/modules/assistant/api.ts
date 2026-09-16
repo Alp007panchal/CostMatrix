@@ -65,8 +65,14 @@ export async function getAllowance(): Promise<AssistantAllowance> {
   return data as AssistantAllowance
 }
 
-export async function getUsage(): Promise<AssistantUsage> {
-  const { data, error } = await supabase.rpc('assistant_usage')
+/**
+ * A company's use of the assistant. No argument means your own company; the
+ * master administrator may name another, which is how they see what a company
+ * has been doing before switching it on or off (migration 0134). The database
+ * refuses anybody else who names one.
+ */
+export async function getUsage(companyId?: string): Promise<AssistantUsage> {
+  const { data, error } = await supabase.rpc('assistant_usage', companyId ? { for_company: companyId } : {})
   fail('Could not load the assistant’s usage', error)
   return data as AssistantUsage
 }

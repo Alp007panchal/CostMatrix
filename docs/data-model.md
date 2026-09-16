@@ -984,3 +984,22 @@ is built to avoid. `supabase/tests/53_layout_follows_revision.sql` asserts it di
 of the jsonb fails that assertion and no other.
 
 `copy_costing` and `copy_panel` are deliberately unchanged: a copy is a new job.
+
+### Added by migration 0134 — the assistant, per company
+
+Roadmap 3.7's last third, *"external companies switched on per company"*. The permission has
+existed since 0102 (`company_options_write_master`, and `app.protect_master_options` refusing
+everyone else the `ai_*` keys); what was missing was that the screen read the signed-in company, so
+the one person allowed to switch the assistant on could switch it on only for their own company.
+
+**app.assistant_company(for_company)** — the one rule, stated once: null means the caller's own
+company, a different company is refused unless `app.is_master_admin()`. It raises rather than
+returning null, so a figure can never come back for a company the caller did not ask about.
+
+**app.assistant_allowance(for_company)** and **app.assistant_usage(for_company)** replace the
+no-argument pair from 0103 and 0104, which read `app.current_company_id()` and would therefore have
+shown one company's spending beside another's switch. Both now resolve through
+`app.assistant_company` and carry `company_id` in what they return. Dropped and recreated rather
+than replaced: a defaulted argument beside a zero-argument function makes every call ambiguous.
+
+The Edge Function calls `assistant_allowance` with no argument and is unchanged.
