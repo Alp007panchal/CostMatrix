@@ -379,6 +379,14 @@ or into go-live.
     version was written first to prove the assertion that catches it. A copy of a costing is
     deliberately unchanged: a copy is a new job.
 
+51. **The roadmap says what is left** (maintenance) — `roadmap-from-market-leaders.md` is the one
+    document that answers "what is still to build", and it was answering wrongly: 2.1 to 2.9, 3.3,
+    3.4 and 3.8 were all built and live, and every one of them still read as outstanding. Marked
+    against what is actually in `supabase/migrations/` rather than from memory, with a legend, a
+    one-line summary at the top, and 3.7 marked **partly** built because two of its three parts are
+    open pull requests rather than merged. What is genuinely left is now short: 3.5 (waiting on the
+    Opsmatrix feed, outside this repository), 4.4, 4.5, and 3.7's remaining third.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
