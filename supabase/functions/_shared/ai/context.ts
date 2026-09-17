@@ -15,9 +15,12 @@ export type Task = 'draft' | 'review' | 'question'
 export interface ContextInput {
   /** Output of get_company_policy, trimmed as the builder sees fit. */
   policy: unknown
-  /** Output of get_costing or get_enquiry for the record the panel is open on. */
+  /**
+   * Output of get_costing or get_enquiry for the record the panel is open on,
+   * and null when the conversation is about the company rather than a record.
+   */
   record: unknown
-  entityType: 'enquiry' | 'costing'
+  entityType: 'enquiry' | 'costing' | 'company'
   task: Task
 }
 
@@ -56,7 +59,11 @@ ${NPP192_EXAMPLE}`,
   review: `Task: review this costing before it is submitted or approved.
 Check, using get_costing, get_company_policy and the attached documents: missing or inconsistent items; placeholder or unpriced parts; prices older than the company's price-age threshold; margin below the company's minimum; mismatches between the costing and the documents (e.g. the specification asks for Form 4B and the costing says 3B); quantity sanity (feeder count vs enclosure width, CTs vs meters); Annexure text that contradicts the line items.
 Record ONE proposal of type review with create_proposal: findings with severity (blocker / warning / note), a short code, the text, the evidence, and where a one-click fix is possible, a line_change proposal on the finding. Then summarise in prose, most serious first, and say that nothing has been changed.`,
-  question: `Task: answer the engineer's question about this costing and the library, using the tools. Keep to this costing and the company's library; questions across all costings and the CRM are not available yet, so say so if asked. If an answer would amount to a change, offer to record it as a proposal rather than describing it as done.`,
+  question: `Task: answer the engineer's question, using the tools.
+When the conversation is about one enquiry or one costing, that record and the company's library are the subject; search_costings is there when the question reaches past it ("have we quoted this customer before?").
+When the conversation is about the company, there is no record: use search_costings for its jobs and quotations, and get_costing for any one of them the question turns out to need.
+Two things to hold to. **Name the jobs; never add their figures together** — each is frozen in its own currency at its own date, so a total across them reads as authoritative and means nothing; if somebody asks for one, say why you are listing instead. And answer only from what the tools return: if the answer is not there, say so rather than reasoning towards a figure.
+If an answer would amount to a change, offer to record it as a proposal rather than describing it as done — and from a company-wide conversation say plainly that a proposal has to be made on the job itself.`,
 }
 
 export function buildSystemPrompt(input: ContextInput): string {
@@ -64,7 +71,9 @@ export function buildSystemPrompt(input: ContextInput): string {
     ROLE_AND_RULES,
     GLOSSARY,
     `Company context (from the database, current):\n${compact(input.policy)}`,
-    `The ${input.entityType} this conversation is about (from the database, current):\n${compact(input.record)}`,
+    input.entityType === 'company'
+      ? 'This conversation is not about one record: it is about the company\u2019s own jobs. There is nothing here to read; find what the question needs with the tools.'
+      : `The ${input.entityType} this conversation is about (from the database, current):\n${compact(input.record)}`,
     TASKS[input.task],
   ]
   return parts.join('\n\n---\n\n')

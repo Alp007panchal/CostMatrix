@@ -1147,7 +1147,10 @@ export interface QuotationFollowup {
 
 // --- the assistant (migrations 0102 to 0104) --------------------------------
 
-export type AssistantEntityType = 'enquiry' | 'costing'
+/** What an assistant conversation is about. 'company' (migration 0135) is a
+ *  question over the company's own jobs rather than one record; a proposal is
+ *  still only ever about an enquiry or a costing. */
+export type AssistantEntityType = 'enquiry' | 'costing' | 'company'
 export type ProposalType = 'draft_costing' | 'review' | 'line_change'
 export type ProposalStatus = 'open' | 'partially_applied' | 'applied' | 'rejected' | 'expired'
 

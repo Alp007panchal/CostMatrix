@@ -984,3 +984,26 @@ is built to avoid. `supabase/tests/53_layout_follows_revision.sql` asserts it di
 of the jsonb fails that assertion and no other.
 
 `copy_costing` and `copy_panel` are deliberately unchanged: a copy is a new job.
+
+### Added by migration 0135 — questions across the company's own jobs
+
+Roadmap 3.7's remaining third. Two changes, neither of them a new permission.
+
+**assistant_conversations.entity_type** gains `company`, with the company's own id as the entity:
+a conversation that is about the business rather than one record. **`assistant_proposals` keeps its
+two-value constraint**, so a company-wide conversation cannot propose anything — the check
+constraint is the guard, not a rule in the prompt. A question answers; it cannot become a change.
+
+**app.search_costings(q, filters, lim)** — with its `public` wrapper — the company's own costings
+and the quotations released from them: number, revision, status, customer, dates, each costing's
+own frozen figures, and the quotation's reference, status and validity. Filters: `status`,
+`current_only`, `quoted`, `won`, `since`, `until`. Capped at 50 rows.
+
+`security invoker`, so row-level security decides what comes back exactly as it does for the
+screens: **the assistant sees what the person asking could see by clicking, and nothing more.**
+
+What it deliberately does not do is total anything. Every row carries its own currency and its own
+frozen date, and the result includes a `note` telling the reader not to add them together — a sum
+across costings in different currencies, revisions and states reads as authoritative and means
+nothing.
+

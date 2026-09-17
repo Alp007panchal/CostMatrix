@@ -284,6 +284,21 @@ If it cannot answer, the card says why and what to do. The four you are most lik
 | The model it is set to use does not exist | Check `AI_MODEL` and `AI_MODEL_FAST` on the function. |
 | The assistant is switched off for your company | The master administrator switches it on (below). |
 
+### Ask the assistant about your jobs
+
+**Ask about your jobs** in the sidebar, under *Insight* — visible when the assistant is switched
+on for your company. It is the same assistant, with no costing in front of it: questions across
+your own costings and quotations rather than the one on screen. *What have we quoted this month?
+Which jobs are still waiting to be approved? Have we quoted this customer before?*
+
+Two things worth knowing before you rely on it. It reads **only what you could see by clicking** —
+your company's work, never another's, and that is the database enforcing it rather than the
+assistant being careful. And it **names jobs rather than totalling them**: each costing is frozen
+in its own currency on its own date, so a figure added across them would look authoritative and
+mean nothing. If you want a total, the Sales screen adds up what is meant to be added up.
+
+It cannot change anything from here. To alter a costing, open the costing and ask there.
+
 **Assistant** in the top navigation (company administrators) holds the switch, the monthly token
 budget, the two thresholds a review uses, and the usage: tokens by month, who used it this month,
 and what it has cost. Only the master administrator can switch it on or off; the thresholds and the

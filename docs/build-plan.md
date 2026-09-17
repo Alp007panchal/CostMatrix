@@ -379,6 +379,17 @@ or into go-live.
     version was written first to prove the assertion that catches it. A copy of a costing is
     deliberately unchanged: a copy is a new job.
 
+51. **Questions across the company's own jobs** (roadmap 3.7, last of three, migration 0135) — the
+    assistant could only ever be asked about the record on screen, and its own task text said so.
+    A conversation may now be about the **company**, on a screen of its own, with one new read —
+    `search_costings` over the company's costings and the quotations released from them. It is
+    `security invoker`, so it shows what the person asking could see by clicking and nothing more,
+    and it is told to name jobs rather than total them, because a sum across frozen figures in
+    different currencies reads as authoritative and means nothing. A company-wide conversation
+    **cannot propose anything**: `assistant_proposals` keeps its two-value entity constraint, so
+    that is the database refusing rather than the prompt asking nicely. **Roadmap 3.7 is complete**,
+    and none of it can answer until there is credit on the Anthropic account.
+
 ## In hand right now
 
 One line per **piece of work** a session has started — not only roadmap items — so two sessions
@@ -393,7 +404,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| Roadmap 3.7, remaining third: questions across the company's own jobs | `claude/assistant-asks-across-jobs` | 2026-09-17 |
+| _nothing in hand_ | | |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 

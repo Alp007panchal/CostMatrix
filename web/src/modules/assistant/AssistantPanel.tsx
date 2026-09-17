@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../auth/session'
 import { listDocuments } from '../documents/api'
 import { listKits } from '../costing/api'
-import type { AssistantEntityType, CostingPanel } from '../../lib/database.types'
+import type { AssistantEntityType, CostingPanel, DocumentEntityType } from '../../lib/database.types'
 import { ask, getAllowance, listConversations, listMessages, listProposals, type ApplyResult } from './api'
 import { suggestedActions, type AssistantEvent, type Failure } from './events'
 import { isOpen } from './proposal-rows'
@@ -20,7 +20,7 @@ import { ReviewCard } from './ReviewCard'
  * sentence and offers nothing else.
  */
 export function AssistantPanel({
-  entityType, entityId, panels = [], canApply, onApplied,
+  entityType, entityId, panels = [], canApply, onApplied, startOpen = false,
 }: {
   entityType: AssistantEntityType
   entityId: string
@@ -28,10 +28,12 @@ export function AssistantPanel({
   panels?: CostingPanel[]
   canApply: boolean
   onApplied?: (result: ApplyResult) => void
+  /** Open from the first render, for a screen whose whole purpose is asking. */
+  startOpen?: boolean
 }) {
   const { hasRole, isMasterAdmin } = useSession()
   const queryClient = useQueryClient()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(startOpen)
   const mayUse = hasRole('costing_engineer') || hasRole('approver') || isMasterAdmin
 
   const allowance = useQuery({ queryKey: ['assistant-allowance'], queryFn: getAllowance, enabled: open })
@@ -51,10 +53,15 @@ export function AssistantPanel({
     queryFn: () => listProposals(entityType, entityId),
     enabled: open,
   })
+  // A company-wide conversation (0135) has no record and so no files: nothing
+  // is attached to a company, and asking would be a type error as well as a
+  // wasted round trip.
+  const fileEntity: DocumentEntityType | null =
+    entityType === 'enquiry' || entityType === 'costing' ? entityType : null
   const documents = useQuery({
     queryKey: ['documents', entityType, entityId],
-    queryFn: () => listDocuments(entityType, entityId),
-    enabled: open,
+    queryFn: () => listDocuments(fileEntity as DocumentEntityType, entityId),
+    enabled: open && fileEntity !== null,
   })
   const kits = useQuery({ queryKey: ['kits'], queryFn: listKits, enabled: open })
 
