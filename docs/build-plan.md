@@ -393,7 +393,7 @@ fix, a document, a chore — if it will take more than a few minutes, claim it.
 
 | Item | Session | Since |
 |---|---|---|
-| _nothing in hand_ | | |
+| Roadmap 3.7, remaining third: questions across the company's own jobs | `claude/assistant-asks-across-jobs` | 2026-09-17 |
 
 ## Slice 5 — Multi-tenant library features (about two weeks)
 
