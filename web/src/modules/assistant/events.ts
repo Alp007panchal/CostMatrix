@@ -143,5 +143,17 @@ export function suggestedActions(
     task: 'question' as const,
     message: 'What kits match a 630 A outgoer?',
   }
+  // A company-wide conversation (0135) has no record to draft or review: the
+  // openers are the questions somebody actually walks over to ask.
+  if (entityType === 'company') {
+    return [
+      { label: 'What have we quoted this month?', task: 'question' as const,
+        message: 'What have we quoted this month? List the jobs with their references and customers.' },
+      { label: 'Which jobs are still waiting to be approved?', task: 'question' as const,
+        message: 'Which costings are submitted but not yet approved? Oldest first.' },
+      { label: 'Have we quoted this customer before?', task: 'question' as const,
+        message: 'Have we quoted this customer before? Ask me for the name if you need it.' },
+    ]
+  }
   return entityType === 'enquiry' ? [draft, ask] : [draft, review, ask]
 }

@@ -51,6 +51,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: '3 · Insight',
     items: [
+      { to: '/assistant', label: 'Ask about your jobs', feature: 'assistant' },
       { to: '/sales', label: 'Sales', feature: 'sales_analytics' },
       { to: '/admin/labour-variance', label: 'Labour variance', feature: 'labour_actuals', admin: true },
     ],

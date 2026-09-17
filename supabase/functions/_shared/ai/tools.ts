@@ -8,7 +8,7 @@ import { validateProposal, type ProposalType } from './proposals.ts'
  * would. A costing of another company comes back null, which reads here as
  * "not found" (acceptance test 3) — the model is told that, not shown an error.
  *
- * Eight tools read. One writes, and it writes to `assistant_proposals` alone:
+ * Nine tools read. One writes, and it writes to `assistant_proposals` alone:
  * nothing the assistant produces reaches a costing until a person clicks Apply
  * (decision A3).
  *
@@ -40,7 +40,8 @@ export interface ToolOutcome {
 /** Where the conversation lives; the write tool needs it. */
 export interface ToolContext {
   conversation_id: string
-  entity_type: 'enquiry' | 'costing'
+  /** 'company' is a question about the company's own jobs; it may not propose. */
+  entity_type: 'enquiry' | 'costing' | 'company'
   entity_id: string
 }
 
@@ -100,6 +101,23 @@ export const TOOL_SPECS: ToolSpec[] = [
         rating_a: { type: 'string' },
         poles: { type: 'string' },
         unit: { type: 'string' },
+      },
+      [],
+    ),
+  },
+  {
+    name: 'search_costings',
+    description:
+      'Find up to 20 of THIS COMPANY\u2019S OWN past and present jobs by words in the costing number, title, customer name, enquiry number or quotation reference, with optional filters. Returns each job\u2019s number, revision, status, customer, dates, its own frozen figures and the quotation released from it, if any. Use it for questions that range wider than whatever is open on screen. Each job\u2019s figures are in its own currency and frozen at its own date: name the jobs, never add them together.',
+    input_schema: obj(
+      {
+        q: { type: 'string', description: 'Words to look for; leave out for the most recent jobs' },
+        status: { type: 'string', description: 'draft, submitted or approved' },
+        current_only: { type: 'boolean', description: 'true to ignore superseded revisions' },
+        quoted: { type: 'boolean', description: 'true for jobs with a released quotation, false for those without' },
+        won: { type: 'boolean', description: 'true for jobs whose quotation was won' },
+        since: { type: 'string', description: 'ISO date; jobs created on or after it' },
+        until: { type: 'string', description: 'ISO date; jobs created before it' },
       },
       [],
     ),
@@ -177,6 +195,10 @@ export async function runTool(
         const { q, ...filters } = input
         return ok(await db.rpc('search_components', { q: q ?? '', filters, lim: 20 }))
       }
+      case 'search_costings': {
+        const { q, ...filters } = input
+        return ok(await db.rpc('search_costings', { q: q ?? null, filters, lim: 20 }))
+      }
       case 'get_kit':
         return found(await db.rpc('kit_detail', { target: str(input, 'kit_id') }))
       case 'get_company_policy':
@@ -184,6 +206,9 @@ export async function runTool(
       case 'price_preview':
         return ok(await db.rpc('price_preview', { lines: input['lines'] ?? [] }))
       case 'create_proposal': {
+        if (context.entity_type === 'company') {
+          return fail('this conversation is about the company, not one job: open the costing or the enquiry to propose anything')
+        }
         const type = input['type']
         if (type !== 'draft_costing' && type !== 'review' && type !== 'line_change') {
           return fail('type must be draft_costing, review or line_change')

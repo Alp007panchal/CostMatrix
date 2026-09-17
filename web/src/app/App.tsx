@@ -36,6 +36,7 @@ const LabourVariancePage = lazy(() => import('../modules/admin/LabourVariancePag
 const SalesPage = lazy(() => import('../modules/sales/SalesPage').then((m) => ({ default: m.SalesPage })))
 const QuotationDefaultsPage = lazy(() => import('../modules/admin/QuotationDefaultsPage').then((m) => ({ default: m.QuotationDefaultsPage })))
 const AssistantSettingsPage = lazy(() => import('../modules/assistant/AssistantSettingsPage').then((m) => ({ default: m.AssistantSettingsPage })))
+const AssistantPage = lazy(() => import('../modules/assistant/AssistantPage').then((m) => ({ default: m.AssistantPage })))
 const ErrorsPage = lazy(() => import('../modules/admin/ErrorsPage').then((m) => ({ default: m.ErrorsPage })))
 const HelpPage = lazy(() => import('../modules/help/HelpPage').then((m) => ({ default: m.HelpPage })))
 const TermsPage = lazy(() => import('../modules/legal/TermsPage').then((m) => ({ default: m.TermsPage })))
@@ -155,6 +156,14 @@ export function App() {
                   element={
                     <FeatureGate code="assistant">
                       <AssistantSettingsPage />
+                    </FeatureGate>
+                  }
+                />
+                <Route
+                  path="assistant"
+                  element={
+                    <FeatureGate code="assistant">
+                      <AssistantPage />
                     </FeatureGate>
                   }
                 />

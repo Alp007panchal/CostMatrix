@@ -35,7 +35,20 @@ describe('the system prompt', () => {
   it('shows the worked NPP-192 example only for the draft task', () => {
     expect(buildSystemPrompt({ ...input, task: 'draft' })).toMatch(/1600A 4P WITHDRAWABLE MOTORIZED ACB with changeover/)
     expect(buildSystemPrompt(input)).not.toMatch(/WITHDRAWABLE MOTORIZED ACB with changeover/)
-    expect(buildSystemPrompt({ ...input, task: 'question' })).toMatch(/not available yet/)
+    // The question task used to say questions across all costings were "not
+    // available yet" (0135 made them available). What it must say now is the
+    // rule that replaced it.
+    expect(buildSystemPrompt({ ...input, task: 'question' })).toMatch(/never add their figures together/)
+  })
+
+  // 0135: a conversation about the company has no record to print. The prompt
+  // must say so in words rather than printing "null", which the model would
+  // read as a record that exists and is empty.
+  it('says there is no record when the conversation is about the company', () => {
+    const prompt = buildSystemPrompt({ ...input, entityType: 'company', record: null })
+    expect(prompt).toMatch(/not about one record/)
+    expect(prompt).not.toMatch(/conversation is about \(from the database/)
+    expect(prompt).not.toMatch(/\bnull\b/)
   })
 
   it('contains nothing that changes with the clock', () => {
@@ -59,10 +72,10 @@ describe('document text goes to the model inside a closed fence', () => {
 })
 
 describe('the tool list the model sees', () => {
-  it('has the nine tools of spec §5, and create_proposal is the only one that writes', () => {
+  it('has the ten tools of spec §5, and create_proposal is the only one that writes', () => {
     expect(TOOL_SPECS.map((t) => t.name)).toEqual([
       'get_costing', 'get_enquiry', 'get_document_text', 'search_kits', 'search_components',
-      'get_kit', 'get_company_policy', 'price_preview', 'create_proposal',
+      'search_costings', 'get_kit', 'get_company_policy', 'price_preview', 'create_proposal',
     ])
     const writers = TOOL_SPECS.filter((t) => /record|write|apply|create/i.test(t.description))
     expect(writers.map((t) => t.name)).toEqual(['create_proposal'])

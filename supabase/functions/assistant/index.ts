@@ -71,7 +71,7 @@ Deno.serve(async (request: Request) => {
   const entityId = body.entity_id
   const message = (body.message ?? '').trim()
   const task: Task = body.task === 'draft' || body.task === 'review' ? body.task : 'question'
-  if (entityType !== 'enquiry' && entityType !== 'costing') return reply({ error: 'entity_type must be enquiry or costing' }, 400)
+  if (entityType !== 'enquiry' && entityType !== 'costing' && entityType !== 'company') return reply({ error: 'entity_type must be enquiry, costing or company' }, 400)
   if (!entityId) return reply({ error: 'entity_id is required' }, 400)
   if (!message) return reply({ error: 'message is required' }, 400)
   if (message.length > 20_000) return reply({ error: 'message is too long (20,000 characters at most)' }, 400)
@@ -102,8 +102,17 @@ Deno.serve(async (request: Request) => {
   const companyId = (policy as { company?: { id?: string } } | null)?.company?.id
   if (!companyId) return reply({ error: 'You do not belong to a company' }, 403)
 
-  const record = await db.rpc(entityType === 'costing' ? 'costing_snapshot' : 'enquiry_snapshot', { target: entityId })
-  if (!record) return reply({ error: 'not found: either it does not exist or it is not visible to you' }, 404)
+  // A company-wide question (0135) has no record to load: its subject is the
+  // company's own jobs, which the model finds with search_costings. The entity
+  // must still be this company, so a company id cannot be used to ask about
+  // somebody else's.
+  let record: unknown = null
+  if (entityType === 'company') {
+    if (entityId !== companyId) return reply({ error: 'not found: either it does not exist or it is not visible to you' }, 404)
+  } else {
+    record = await db.rpc(entityType === 'costing' ? 'costing_snapshot' : 'enquiry_snapshot', { target: entityId })
+    if (!record) return reply({ error: 'not found: either it does not exist or it is not visible to you' }, 404)
+  }
 
   let conversationId = body.conversation_id ?? null
   if (conversationId) {
